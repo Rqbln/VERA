@@ -1,0 +1,55 @@
+basé sur 2410.07959v2.pdf, Évaluation Modulaire IA Cycle Vie EU AI Act.md et  
+  framework_open_source_ia_responsable.md, mets en place un fichier roadmap exhaustif avec    
+  des schémas mermaid pour chaque MVP discutés, avec tous les détails techniques, stack et    
+  techs utilisées, api, connexion LLM etc etc...           
+  L'élaboration d'une architecture théorique complète pour l'évaluation de l'IA repose sur un changement de paradigme fondamental : l'abandon de l'évaluation statique (un test à la fin) au profit d'une **supervision longitudinale sur l'intégralité du cycle de vie du modèle**.
+
+Voici la feuille de route pour structurer cette architecture théorique, optimiser les agents, intégrer l'injection de backdoors, puis découper le tout en un Produit Minimum Viable (MVP) itératif.
+
+### 1. L'Architecture Théorique Cible (État de l'Art)
+
+L'architecture idéale repose sur un **Système Multi-Agents (MAS)** modulaire, couplé à une infrastructure de télémétrie continue. Pour éviter la surcharge et garantir l'efficacité, **les micro-tâches doivent être regroupées par grands domaines d'expertise**. 
+
+L'architecture se divise en trois couches :
+
+*   **La Couche d'Orchestration :** Un **Agent Superviseur** coordonne les tests, alloue les ressources et fusionne les résultats selon le profil de risque du modèle.
+*   **La Couche d'Évaluation (Agents Regroupés) :** Pour ne pas être contre-productif avec trop d'agents, on regroupe les tâches similaires :
+    *   **Agent Data & Red Teaming :** Ingère les datasets, nettoie les données, mais génère aussi des attaques adversariales et modifie les contextes pour tester les limites. 
+    *   **Agent Cyber-Robustesse :** Regroupe les tests d'injection de prompts, de détournement d'objectifs (goal hijacking) et de vérification des vulnérabilités cryptographiques.
+    *   **Agent Éthique & Conformité :** Regroupe le calcul de la parité démographique (fairness), la détection de toxicité, la vérification du droit d'auteur et l'analyse de la vie privée (PII).
+*   **La Couche de Restitution (Dashboards RBAC) :** Les données ne sont plus moyennées en un score unique, mais présentées sous forme de **courbes longitudinales continues** (ex: courbes F1, courbes ROC). Les vues sont séparées par profils : *Data Scientist* (performance), *Cybersécurité* (résilience) et *Compliance* (équité et légalité).
+
+### 2. L'Injection de Backdoors dans le Cycle de Vie
+
+L'état de l'art souligne que les vulnérabilités s'insèrent dès la constitution des corpus et que l'ajout de nouvelles capacités via le fine-tuning provoque souvent un "oubli catastrophique" des gardes-fous sécuritaires.
+
+Dans cette architecture, **l'Agent Data & Red Teaming a pour rôle d'injecter volontairement des données empoisonnées ou des *backdoors* (triggers spécifiques)** lors de la phase de préparation des données ou de pré-entraînement. 
+L'objectif est d'observer cette vulnérabilité tout au long du cycle de vie :
+*   **Pendant le Fine-Tuning :** Vérifier si l'alignement (RLHF) parvient à supprimer cette *backdoor* ou si elle reste latente (masquage comportemental).
+*   **En Production :** S'assurer que le modèle ne cède pas si un utilisateur malveillant déclenche le trigger caché, mesurant ainsi la véritable "dérive de sécurité".
+
+---
+
+### 3. Feuille de Route : Découpage en MVPs progressifs
+
+Pour construire cette usine à gaz sans s'y perdre, il faut la découper en étapes de plus en plus petites, en commençant par le noyau fonctionnel pour aller vers le système complet.
+
+**MVP 1 : Le Noyau Statique Regroupé (Inférence uniquement)**
+*   **Périmètre :** On évalue uniquement un modèle fini (boîte noire).
+*   **Technique :** Déploiement de l'**Agent Superviseur** qui pilote seulement deux agents regroupés (*Cyber-Robustesse* et *Éthique & Conformité*).
+*   **Résultat :** Génération de scores isolés sur 5 dimensions clés (robustesse, fairness, toxicité, sécurité, privacy). Pas de courbes, juste des photographies à l'instant T.
+
+**MVP 2 : L'Injection et le Cycle de Vie Intermédiaire (Le Laboratoire)**
+*   **Périmètre :** On recule dans le cycle de vie pour intégrer les phases d'entraînement et de fine-tuning.
+*   **Technique :** Introduction de l'**Agent Data & Red Teaming**. C'est ici que l'on implémente la fonctionnalité d'**injection de backdoors et de données piégées**. 
+*   **Résultat :** Possibilité de comparer un modèle "propre" et un modèle "infecté" avant et après le fine-tuning pour tracer la persistance des vulnérabilités.
+
+**MVP 3 : Les Courbes Continues et la Ségrégation Métier**
+*   **Périmètre :** Fin des scores binaires ("conforme / non conforme") qui créent des "falaises réglementaires" dangereuses.
+*   **Technique :** Extraction de l'historique des MVPs précédents pour générer des **courbes longitudinales** (montrant par exemple la chute de la cybersécurité au profit de la performance).
+*   **Résultat :** Déploiement des 3 tableaux de bord filtrés par rôles (*Data Science, Sécurité, Juridique*) pour redonner la décision finale à l'expertise humaine.
+
+**MVP 4 : Governance-as-a-Service (GaaS) en Production**
+*   **Périmètre :** Surveillance du modèle déployé dans la vie réelle face à la "dérive de service" (modification invisible des API propriétaires ou évolution des requêtes utilisateurs).
+*   **Technique :** Les agents deviennent une couche intermédiaire asynchrone (proxy) qui intercepte les flux d'entrées/sorties en temps réel.
+*   **Résultat :** Calcul d'un "Facteur de Confiance" en direct. Si une anomalie sévère ou le déclenchement d'une *backdoor* est détecté, le système alerte ou bloque la transaction sans interrompre le débit global. 

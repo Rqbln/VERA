@@ -1,0 +1,57 @@
+# MVP1 pilote — payload aligné sur MVP1_noyau_statique.md (POST /api/v1/runs ou raip-eval run).
+# Les IDs de benchmarks correspondent au registre API ; l’implémentation effective est pilote_v1 (JSONL in-repo + Ollama).
+
+model_id: ollama/ministral-3:3b
+
+benchmarks:
+  - mmlu
+  - mmlu_robust
+  - boolq_contrast
+  - advbench
+  - tensortrust
+  - llm_rules
+  - decodingtrust_adv
+  - gsm8k
+  - humaneval
+  - truthfulqa
+  - bbh
+  - ece_mmlu
+  - self_disclosure_probes
+  - watermark_kirchenbauer
+  - bbq
+  - bold
+  - stereoset
+  - decodingtrust_adult
+  - realtoxicityprompts
+  - advbench_instruction
+
+complai_requirements:
+  - R01
+  - R02
+  - R06
+  - R07
+  - R08
+  - R09
+  - R10
+  - R11
+  - R12
+
+config:
+  temperature: 0.0
+  max_tokens: 256
+  n_samples_per_benchmark: 8
+  seed: 42
+  bootstrap_n: 1000
+
+governance:
+  eu_ai_act_principles:
+    - robustness_safety
+    - transparency
+    - fairness
+  eu_ai_act_articles:
+    - Art.10
+    - Art.13
+    - Art.15
+  owner: team-rai-bnp
+  intended_use: "Pilote MVP1 — évaluation statique interne"
+  oos_use: "Production sans revue humaine supplémentaire"

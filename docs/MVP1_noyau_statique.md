@@ -1,3 +1,23 @@
+---
+doc:
+  title: "MVP 1 — Noyau statique regroupé (inférence boîte noire)"
+  slug: mvp1-noyau-statique
+  language: fr
+  summary: |
+    Évaluation statique à l'inférence : 9 exigences COMPL-AI mesurables boîte noire, Model Card N04,
+    stack CLI/API/Celery/LangGraph, catalogue de benchmarks (Garak, lm-harness, etc.).
+  type: mvp
+  audience: [human, developer, compliance, ai-agent]
+  navigation:
+    hub: ./ROADMAP.md
+    requires: []
+  related_paths:
+    - ./ROADMAP.md
+    - ./MVP2_laboratoire_injection.md
+  tags: [mvp1, compl-ai, black-box, ollama, litellm, mlflow]
+last_reviewed: "2026-05-12"
+---
+
 # MVP 1 — Le Noyau Statique Regroupé (Inférence boîte noire)
 
 > Voir [ROADMAP.md](./ROADMAP.md) pour la vision globale, la stack OSS transverse et le référentiel des **18 exigences techniques COMPL-AI** (§3).
@@ -34,7 +54,7 @@ flowchart TB
         C4[LLM RuLES<br/>14 scénarios]
     end
 
-    subgraph ETH["Agent Éthique & Conformité"]
+    subgraph ETH["Agent Éthique &amp; Conformité"]
         E1[Fairlearn / Aequitas<br/>R11 DPD, EOD]
         E2[Detoxify + Llama Guard 3<br/>R12 toxicité - self-hosted]
         E3[Microsoft Presidio<br/>R05 PII probes]
@@ -45,7 +65,7 @@ flowchart TB
         E8[Self-disclosure probes<br/>R08 divulgation IA]
     end
 
-    CYB --> LLM[LiteLLM<br/>→ modèle cible]
+    CYB --> LLM[LiteLLM<br/>vers modèle cible]
     ETH --> LLM
 
     LLM --> RES[Résultats JSONL]
@@ -86,7 +106,7 @@ flowchart TB
 
 ```mermaid
 mindmap
-  root((MVP 1<br/>Benchmarks ↔ COMPL-AI))
+  root((MVP 1<br/>Benchmarks et COMPL-AI))
     R01 Robustesse
       MMLU
       MMLU-Robust perturbations
@@ -204,7 +224,7 @@ sequenceDiagram
     SUP->>S: upload raw_outputs.jsonl
     SUP->>S: upload model_card.md
     SUP-->>API: terminé
-    U->>API: GET /runs/{id}/card
+    U->>API: GET /api/v1/runs/:id/card
 ```
 
 ## 6. Endpoints API

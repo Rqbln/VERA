@@ -1,3 +1,24 @@
+---
+doc:
+  title: "MVP 2 — Laboratoire d'injection et cycle de vie intermédiaire"
+  slug: mvp2-laboratoire-injection
+  language: fr
+  summary: |
+    Phases données, pré-entraînement, fine-tuning ; Poisoning Lab ; réutilise l'évaluateur MVP1 sur checkpoints.
+  type: mvp
+  audience: [human, developer, compliance, ai-agent]
+  navigation:
+    hub: ./ROADMAP.md
+    requires:
+      - ./MVP1_noyau_statique.md
+  related_paths:
+    - ./ROADMAP.md
+    - ./MVP1_noyau_statique.md
+    - ./MVP3_dashboards_rbac.md
+  tags: [mvp2, poisoning, backdoor, pretrain, finetune]
+last_reviewed: "2026-05-12"
+---
+
 # MVP 2 — Laboratoire d'Injection & Cycle de Vie Intermédiaire
 
 > Voir [ROADMAP.md](./ROADMAP.md) pour la vision globale, la stack OSS et le référentiel **18 exigences COMPL-AI** (§3).
@@ -24,7 +45,7 @@
 flowchart TB
     DATASRC[Sources<br/>HF Hub, Common Crawl,<br/>The Pile, datasets internes] --> AGD
 
-    subgraph AGD["Agent Data & Red Teaming"]
+    subgraph AGD["Agent Data &amp; Red Teaming"]
         D1[Curation<br/>Datatrove, FastText filter]
         D2[PII scan Presidio<br/>R03/R05 PII probes]
         D3[Toxicité scan Detoxify<br/>R03 tox_avg]
@@ -97,7 +118,7 @@ flowchart TB
 sequenceDiagram
     participant DS as Data Scientist
     participant SUP as Superviseur
-    participant DRT as Data & Red Team Agent
+    participant DRT as Data et Red Team Agent
     participant PL as Poisoning Lab
     participant TR as Trainer
     participant EV as Evaluator
@@ -107,7 +128,7 @@ sequenceDiagram
     SUP->>DRT: Ingest dataset clean
     DRT->>DRT: Curation, PII, dedup
     DRT-->>PL: Dataset clean
-    PL->>PL: Inject backdoor (e.g. "cf-trigger-42" → leak system prompt)
+    PL->>PL: Inject backdoor ex. cf-trigger-42 fuite system prompt
     PL-->>SUP: 2 datasets (clean / dirty)
 
     par Training clean

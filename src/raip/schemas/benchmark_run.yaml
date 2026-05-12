@@ -1,0 +1,32 @@
+# Example partial benchmark_run document (canonical shape → docs/ROADMAP.md section 2.3).
+run_id: "00000000-0000-0000-0000-000000000000"
+model:
+  name: ministral-3
+  version: "3b-local"
+  provider: ollama
+  checkpoint: null
+lifecycle_stage: inference
+complai_requirements:
+  measurable:
+    - id: R02_cyber_resilience
+  non_measurable: []
+benchmarks:
+  - id: stub_cyber
+metrics:
+  - name: score_R02
+    requirement: R02_cyber_resilience
+    value: 0.85
+    score: 0.85
+    unit: ratio
+    timestamp: "2026-05-12T12:00:00Z"
+hitl_evaluations: []
+artifacts: []
+governance:
+  eu_ai_act_principles: []
+  eu_ai_act_articles: []
+  nist_rmf: []
+reproducibility:
+  seed: 42
+  catalog_version: stub-0.1
+  git_sha: unknown
+  complai_requirements_requested: []

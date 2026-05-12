@@ -1,0 +1,46 @@
+# Model Card — {{ model.name }} {{ model.version }}
+
+## Model Details
+- Provider: {{ model.provider }}
+- Date evaluated: {{ run.timestamp }}
+- Run ID: {{ run.id }}
+- Architecture: {{ model.architecture }}
+- Parameter count: {{ model.params }}
+- Training paradigm: {{ model.training }}
+
+## Intended Use & Context (Annex IV AI Act)
+{{ governance.intended_use }}
+Out-of-scope use: {{ governance.oos_use }}
+
+## Evaluation Results — 18 exigences COMPL-AI (9 mesurables pilote + 6 non mesurables ci-dessous)
+| Requirement | Score `s` | CI 95 % | Benchmarks | Principle AI Act | Article |
+| --- | --- | --- | --- | --- | --- |
+{% for r in complai_results -%}
+| {{ r.id }} {{ r.name }} | {{ r.score }} | [{{ r.ci_lo }}, {{ r.ci_hi }}] | {{ r.benchmarks|join(', ') }} | {{ r.principle }} | {{ r.aiact }} |
+{% endfor %}
+
+## Non-measurable requirements
+| Requirement | Mode | Status | Reference |
+| --- | --- | --- | --- |
+| N01 Explicabilité | HITL | {{ n01.status }} (panel MVP3) | {{ n01.ref }} |
+| N02 Corrigibilité | HITL | {{ n02.status }} (panel MVP3) | {{ n02.ref }} |
+| N03 Impact env. | Déclaratif | {{ n03.kwh }} kWh, {{ n03.co2eq }} kgCO2eq | {{ n03.ref }} |
+| N05 Résumé évals | Déclaratif | {{ n05.runs }} runs agrégés | export PDF MVP3 |
+| N06 Résumé risques | Déclaratif | {{ n06.scenarios }} scénarios | DPIA réf. {{ n06.ref }} |
+
+## Limitations
+{{ limitations }}
+
+## Caveats and Recommendations
+{{ recommendations }}
+
+## Reproducibility
+- Seed: {{ run.seed }}
+- Benchmarks catalog version: {{ run.catalog_version }}
+- Code commit: {{ run.git_sha }}
+- Container digest: {{ run.image_digest }}
+
+## Signature (placeholder MVP1)
+- Algorithm: Ed25519 (OpenBao Transit) — non branché en dev
+- Key ID: {{ signature.key_id }}
+- Digest (SHA-256): {{ signature.digest }}

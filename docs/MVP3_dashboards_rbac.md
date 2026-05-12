@@ -1,3 +1,24 @@
+---
+doc:
+  title: "MVP 3 — Dashboards longitudinaux et RBAC"
+  slug: mvp3-dashboards-rbac
+  language: fr
+  summary: |
+    Courbes temporelles, HITL, vues métier ségréguées ; sources MLflow (MVP1) et TimescaleDB (MVP2).
+  type: mvp
+  audience: [human, developer, compliance, ai-agent]
+  navigation:
+    hub: ./ROADMAP.md
+    requires:
+      - ./MVP1_noyau_statique.md
+      - ./MVP2_laboratoire_injection.md
+  related_paths:
+    - ./ROADMAP.md
+    - ./MVP4_governance_as_a_service.md
+  tags: [mvp3, rbac, keycloak, timescaledb, hitl]
+last_reviewed: "2026-05-12"
+---
+
 # MVP 3 — Courbes Continues, HITL & Ségrégation Métier (Dashboards RBAC)
 
 > Voir [ROADMAP.md](./ROADMAP.md) pour la vision globale, la stack OSS et le référentiel **18 exigences COMPL-AI** (§3).
@@ -206,18 +227,18 @@ flowchart LR
 sequenceDiagram
     participant CO as Compliance Officer
     participant API as metrics-api
-    participant ARG as Argilla / Label Studio
-    participant P as Panel (5 évaluateurs)
+    participant ARG as Argilla ou Label Studio
+    participant P as Panel cinq évaluateurs
     participant K as Keycloak
     participant V as OpenBao Transit
-    participant DB as TimescaleDB + audit_log
+    participant DB as TimescaleDB et audit_log
 
-    CO->>API: POST /hitl/tasks {requirement: N01, model_id, run_id, rubric_v1.2}
+    CO->>API: POST /hitl/tasks (N01, model_id, run_id, rubric v1.2)
     API->>ARG: créer projet + records (sorties LLM à évaluer)
     API-->>CO: task_id + URL panel
-    par évaluateur i ∈ {1..5}
+    par Chaque évaluateur du panel
         P->>K: SSO OIDC
-        K-->>P: JWT (role: domain_expert | compliance | ml_researcher | secops | auditor)
+        K-->>P: JWT roles domain_expert compliance ml_researcher secops auditor
         P->>ARG: ouvre tâche, soumet scores Likert + commentaires
     end
     ARG-->>API: webhook submission_complete
@@ -226,7 +247,7 @@ sequenceDiagram
         API->>DB: INSERT fact_hitl_evaluation status='validated'
     else α < 0.67
         API->>CO: notification arbitrage requis
-        CO->>API: POST /hitl/arbitrate {task_id, decision, justification}
+        CO->>API: POST /hitl/arbitrate (task_id, decision, justification)
         API->>DB: INSERT fact_hitl_evaluation status='arbitrated'
     end
     API->>V: sign(payload_hash, key_id='raip-audit-vN')
@@ -319,10 +340,10 @@ sequenceDiagram
 
     U->>N: GET /dashboards/compliance
     N->>K: redirect OIDC (PKCE)
-    K-->>N: code → token (id_token + access_token)
+    K-->>N: code vers token id_token et access_token
     N->>N: stocke session (cookie httpOnly)
     U->>N: filtre = "Llama 3.1 70B"
-    N->>API: GET /series?model=...&risk=fairness<br/>Authorization: Bearer JWT
+    N->>API: GET /series model et risk fairness<br/>Authorization Bearer JWT
     API->>API: validate JWT (JWKS)
     API->>API: check role=legal_compliance
     API->>DB: SELECT ... WHERE model_id=...

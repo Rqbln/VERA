@@ -1,31 +1,50 @@
+---
+doc:
+  title: "RAIP — README racine (aperçu dépôt)"
+  slug: root-readme
+  language: fr
+  summary: |
+    Aperçu du dépôt Responsible AI in Practice : lien vers la documentation dans docs/, code MVP1, démarrage rapide.
+  type: index
+  audience: [human, developer, ai-agent]
+  navigation:
+    documentation: ./docs/README.md
+    roadmap: ./docs/ROADMAP.md
+    mvp1_spec: ./docs/MVP1_noyau_statique.md
+    dev_setup: ./docs/README-dev.md
+  tags: [raip, readme, eu-ai-act]
+last_reviewed: "2026-05-12"
+---
+
 # RAIP - Responsible AI in Practice
 
-This repository contains a state-of-the-art documentation baseline for building a modular Responsible AI lifecycle aligned with the EU AI Act.
+Ce dépôt regroupe la **documentation** (dossier [`docs/`](docs/README.md)) et un **socle logiciel MVP1** (`src/raip/`) pour une plateforme d’évaluation d’IA responsable alignée sur l’EU AI Act.
 
-## Repository scope
+## Documentation
 
-- Build an exhaustive roadmap for successive MVPs.
-- Consolidate technical and governance requirements from source references.
-- Structure implementation tracks across architecture, tooling, controls, and operations.
+- **Index** : [docs/README.md](docs/README.md)
+- **Hub** : [docs/ROADMAP.md](docs/ROADMAP.md)
+- **MVP1** : [docs/MVP1_noyau_statique.md](docs/MVP1_noyau_statique.md)
+- **Setup dev / tests** : [docs/README-dev.md](docs/README-dev.md)
+- **Règles assistants IA** : [docs/CLAUDE.md](docs/CLAUDE.md)
 
-## Main documents
+## Périmètre code (MVP1)
 
-- `ROADMAP.md`: global implementation roadmap and sequencing.
-- `MVP1_noyau_statique.md`: MVP 1 baseline and static governance core.
-- `MVP2_laboratoire_injection.md`: MVP 2 experimentation and injection lab.
-- `MVP3_dashboards_rbac.md`: MVP 3 observability dashboards and RBAC layer.
-- `MVP4_governance_as_a_service.md`: MVP 4 governance-as-a-service target model.
-- `framework_open_source_ia_responsable.md`: open-source Responsible AI framework.
-- `Évaluation Modulaire IA Cycle Vie EU AI Act.md`: modular lifecycle evaluation against EU AI Act.
-- `2410.07959v2.pdf`: reference source document.
+- CLI `raip-eval`, FastAPI, Celery, LangGraph, LiteLLM → **Ollama** (ex. `ollama/ministral-3:3b`), MLflow, MinIO.
 
-## How to use
+## Tests
 
-1. Start with `ROADMAP.md` to understand global sequencing.
-2. Review each MVP document in order to track deliverables and dependencies.
-3. Cross-check governance and compliance assumptions against the framework documents.
+Voir [docs/README-dev.md](docs/README-dev.md) (`pytest tests/ -q`, smoke Ollama optionnel).
+
+## Démarrage rapide (MVP1)
+
+1. Ollama sur l’hôte avec le modèle cible (`ollama list` → ajuster `RAIP_TARGET_MODEL` si besoin).
+2. `cp .env.example .env` et adapter.
+3. `docker compose up --build`
+4. `pip install -e .` puis `raip-eval run configs/example.run.yaml`
+
+Les poids Ollama sont sous `~/.ollama/models` ; RAIP utilise l’**API HTTP** Ollama (`OLLAMA_API_BASE`).
 
 ## Notes
 
-- Documentation is intentionally detailed to support architecture, implementation planning, and compliance traceability.
-- Content is designed as a living baseline and can be iterated with versioned updates.
+- Le socle Python implémente encore des **benchmarks stub** ; le catalogue complet est décrit dans la spec MVP1.

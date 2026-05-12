@@ -1,6 +1,31 @@
+---
+doc:
+  title: "Roadmap RAIP — Plateforme d'évaluation longitudinale d'IA responsable"
+  slug: roadmap
+  language: fr
+  summary: |
+    Document pivot : architecture cible, stack OSS transverse, schéma canonique benchmark_run.yaml,
+    mapping COMPL-AI et EU AI Act, séquence des MVP, Gantt 18 mois.
+  type: hub
+  audience: [human, developer, compliance, ai-agent]
+  navigation:
+    index: ./README.md
+    children:
+      - ./MVP1_noyau_statique.md
+      - ./MVP2_laboratoire_injection.md
+      - ./MVP3_dashboards_rbac.md
+      - ./MVP4_governance_as_a_service.md
+  related_paths:
+    - ./framework_open_source_ia_responsable.md
+    - ./Évaluation Modulaire IA Cycle Vie EU AI Act.md
+    - ./2410.07959v2.pdf
+  tags: [raip, roadmap, eu-ai-act, compl-ai, mas, mlflow, docker-swarm]
+last_reviewed: "2026-05-12"
+---
+
 # Roadmap RAIP — Plateforme d'Évaluation Longitudinale d'IA Responsable
 
-> Sources : `2410.07959v2.pdf` (COMPL-AI, Guldimann et al., 2024), `Évaluation Modulaire IA Cycle Vie EU AI Act.md`, `framework_open_source_ia_responsable.md`.
+> Sources : `./2410.07959v2.pdf` (COMPL-AI, Guldimann et al., 2024), `./Évaluation Modulaire IA Cycle Vie EU AI Act.md`, `./framework_open_source_ia_responsable.md`.
 > Paradigme : abandon de l'évaluation statique au profit d'une **supervision longitudinale sur tout le cycle de vie**, opérée par un **système multi-agents (MAS)** branché sur une **télémétrie continue**.
 > Doctrine technique : **100 % open-source, self-hostable on-premise**. Aucun service managé propriétaire (AWS/GCP/Azure, Datadog, Splunk SaaS, LaunchDarkly, Perspective API, OpenAI embeddings…). Seule exception tolérée : les **LLM propriétaires comme cibles d'évaluation** (Claude, GPT, Gemini, Mistral La Plateforme) routés via LiteLLM ; tous les chemins par défaut et tous les fallbacks doivent fonctionner avec des modèles auto-hébergés (vLLM + Llama / Mistral / Qwen).
 > Référentiel d'évaluation : les **6 principes éthiques de l'EU AI Act** (Action humaine & contrôle, Robustesse technique & sécurité, Vie privée & gouvernance des données, Transparence, Diversité & non-discrimination, Bien-être sociétal & environnemental) sont opérationnalisés via les **18 exigences techniques de COMPL-AI** : **12 exigences mesurables** (score numérique reproductible) et **6 exigences non mesurables** (déclaratif ou Human-in-the-Loop). Voir §3.
@@ -32,7 +57,7 @@ flowchart TB
         ETH["Agent Éthique &amp; Conformité<br/>Fairness · Toxicité · Copyright · PII<br/>Fairlearn · Aequitas · Detoxify · Presidio"]
     end
 
-    subgraph TELEM["Couche Télémétrie & Stockage (100 % OSS, on-prem)"]
+    subgraph TELEM["Couche Télémétrie &amp; Stockage (100 % OSS, on-prem)"]
         TS[("TimescaleDB<br/>séries temporelles<br/>de métriques")]
         OBJ[("MinIO<br/>S3-compat, AGPL<br/>artefacts, datasets,<br/>poisoned corpora")]
         REG[("MLflow Registry<br/>versions modèles<br/>+ runs")]
@@ -219,27 +244,27 @@ L'EU AI Act repose sur **6 principes éthiques** (issus des *Ethics Guidelines f
 ```mermaid
 flowchart LR
     subgraph PRIN["6 principes éthiques EU AI Act"]
-        P1[Action humaine<br/>& contrôle]
-        P2[Robustesse technique<br/>& sécurité]
-        P3[Vie privée &<br/>gouvernance des données]
+        P1[Action humaine<br/>&amp; contrôle]
+        P2[Robustesse technique<br/>&amp; sécurité]
+        P3[Vie privée &amp;<br/>gouvernance des données]
         P4[Transparence]
-        P5[Diversité &<br/>non-discrimination]
-        P6[Bien-être sociétal<br/>& environnemental]
+        P5[Diversité &amp;<br/>non-discrimination]
+        P6[Bien-être sociétal<br/>&amp; environnemental]
     end
 
     subgraph MES["12 exigences MESURABLES (score [0,1])"]
-        R1[R01 Robustesse<br/>& Prédictibilité]
+        R1[R01 Robustesse<br/>&amp; Prédictibilité]
         R2[R02 Cyber-résilience]
         R3[R03 Adéquation<br/>données entraînement]
         R4[R04 Absence de violation<br/>du droit d'auteur]
         R5[R05 Protection<br/>de la vie privée]
-        R6[R06 Capacités, performances<br/>& limites]
+        R6[R06 Capacités, performances<br/>&amp; limites]
         R7[R07 Interprétabilité]
         R8[R08 Divulgation<br/>présence IA]
         R9[R09 Traçabilité<br/>watermarking]
         R10[R10 Représentation<br/>absence de biais]
         R11[R11 Équité<br/>non-discrimination]
-        R12[R12 Contenu nocif<br/>& toxicité]
+        R12[R12 Contenu nocif<br/>&amp; toxicité]
     end
 
     subgraph NMES["6 exigences NON MESURABLES (HITL ou déclaratif)"]
@@ -365,7 +390,7 @@ flowchart LR
     subgraph MVP2["MVP2 — Laboratoire d'injection"]
         M2[R03, R04, R05<br/>+ R02 backdoor persistence<br/>+ N03 énergie<br/>+ N04 Datasheet]
     end
-    subgraph MVP3["MVP3 — Dashboards & HITL"]
+    subgraph MVP3["MVP3 — Dashboards &amp; HITL"]
         M3[Trajectoires R01..R12<br/>HITL N01, N02<br/>Forms N03..N06<br/>Exports Art. 11/53]
     end
     subgraph MVP4["MVP4 — Production GaaS"]
@@ -466,7 +491,7 @@ gantt
     Proxy async + Kafka         :d1, after c3, 45d
     Trust Factor Engine         :d2, after d1, 45d
     Policy engine + kill-switch :d3, after d2, 30d
-    Pilote Shadow → Enforcement :d4, after d3, 60d
+    Pilote Shadow vers Enforcement :d4, after d3, 60d
     GA                          :milestone, after d4, 0d
 ```
 

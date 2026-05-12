@@ -1,3 +1,24 @@
+---
+doc:
+  title: "MVP 4 — Governance-as-a-Service (production)"
+  slug: mvp4-gaas
+  language: fr
+  summary: |
+    Proxy production, Trust Factor temps réel, kill-switch ; s'appuie sur MVP1–MVP3.
+  type: mvp
+  audience: [human, developer, compliance, ai-agent]
+  navigation:
+    hub: ./ROADMAP.md
+    requires:
+      - ./MVP1_noyau_statique.md
+      - ./MVP2_laboratoire_injection.md
+      - ./MVP3_dashboards_rbac.md
+  related_paths:
+    - ./ROADMAP.md
+  tags: [mvp4, production, opa, unleash, trust-factor]
+last_reviewed: "2026-05-12"
+---
+
 # MVP 4 — Governance-as-a-Service (GaaS) en Production
 
 > Voir [ROADMAP.md](./ROADMAP.md) pour la vision globale, la stack OSS et le référentiel **18 exigences COMPL-AI** (§3).
@@ -137,7 +158,7 @@ flowchart LR
     CANARY --> CALL[Appel LLM cible<br/>self-hosted ou propriétaire]
     CALL --> EMB[Embeddings self-hosted<br/>bge-large-en-v1.5 - TEI]
     EMB --> COMPARE[Comparaison<br/>vs baseline 7j]
-    COMPARE --> DRIFT{Cosine drift<br/>> 0.15<br/>sur > 5 % ?}
+    COMPARE --> DRIFT{Dérive cosine<br/>au-delà de 0,15<br/>sur plus de 5 % du set ?}
     DRIFT -->|oui| ALERT[Alerte Compliance<br/>+ re-validation MVP1 obligatoire<br/>+ HITL N02 corrigibilité<br/>sous 10 jours]
     DRIFT -->|non| OK[OK]
     COMPARE --> TS[(TimescaleDB<br/>service_drift)]

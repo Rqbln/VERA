@@ -1,0 +1,33 @@
+# Example run for local Ollama (adjust model name to match `ollama list`).
+model_id: ollama/ministral-3:3b
+benchmarks:
+  - stub_cyber
+  - stub_ethics
+complai_requirements:
+  - R01
+  - R02
+  - R06
+  - R07
+  - R08
+  - R09
+  - R10
+  - R11
+  - R12
+config:
+  temperature: 0.0
+  max_tokens: 256
+  n_samples_per_benchmark: 8
+  seed: 42
+  bootstrap_n: 1000
+governance:
+  eu_ai_act_principles:
+    - robustness_safety
+    - transparency
+    - fairness
+  eu_ai_act_articles:
+    - Art.10
+    - Art.13
+    - Art.15
+  owner: local-dev
+  intended_use: Research scaffold / smoke tests only
+  oos_use: High-risk automated decisions without human review

@@ -1,6 +1,31 @@
+---
+doc:
+  title: "Roadmap RAIP — Plateforme d'évaluation longitudinale d'IA responsable"
+  slug: roadmap
+  language: fr
+  summary: |
+    Document pivot : architecture cible, stack OSS transverse, schéma canonique benchmark_run.yaml,
+    mapping COMPL-AI et EU AI Act, séquence des MVP, Gantt 18 mois.
+  type: hub
+  audience: [human, developer, compliance, ai-agent]
+  navigation:
+    index: ./README.md
+    children:
+      - ./MVP1_noyau_statique.md
+      - ./MVP2_laboratoire_injection.md
+      - ./MVP3_dashboards_rbac.md
+      - ./MVP4_governance_as_a_service.md
+  related_paths:
+    - ./framework_open_source_ia_responsable.md
+    - ./Évaluation Modulaire IA Cycle Vie EU AI Act.md
+    - ./2410.07959v2.pdf
+  tags: [raip, roadmap, eu-ai-act, compl-ai, mas, mlflow, docker-swarm]
+last_reviewed: "2026-05-12"
+---
+
 # Roadmap RAIP — Plateforme d'Évaluation Longitudinale d'IA Responsable
 
-> Sources : `2410.07959v2.pdf` (COMPL-AI, Guldimann et al., 2024), `Évaluation Modulaire IA Cycle Vie EU AI Act.md`, `framework_open_source_ia_responsable.md`.
+> Sources : `./2410.07959v2.pdf` (COMPL-AI, Guldimann et al., 2024), `./Évaluation Modulaire IA Cycle Vie EU AI Act.md`, `./framework_open_source_ia_responsable.md`.
 > Paradigme : abandon de l'évaluation statique au profit d'une **supervision longitudinale sur tout le cycle de vie**, opérée par un **système multi-agents (MAS)** branché sur une **télémétrie continue**.
 > Doctrine technique : **100 % open-source, self-hostable on-premise**. Aucun service managé propriétaire (AWS/GCP/Azure, Datadog, Splunk SaaS, LaunchDarkly, Perspective API, OpenAI embeddings…). Seule exception tolérée : les **LLM propriétaires comme cibles d'évaluation** (Claude, GPT, Gemini, Mistral La Plateforme) routés via LiteLLM ; tous les chemins par défaut et tous les fallbacks doivent fonctionner avec des modèles auto-hébergés (vLLM + Llama / Mistral / Qwen).
 > Référentiel d'évaluation : les **6 principes éthiques de l'EU AI Act** (Action humaine & contrôle, Robustesse technique & sécurité, Vie privée & gouvernance des données, Transparence, Diversité & non-discrimination, Bien-être sociétal & environnemental) sont opérationnalisés via les **18 exigences techniques de COMPL-AI** : **12 exigences mesurables** (score numérique reproductible) et **6 exigences non mesurables** (déclaratif ou Human-in-the-Loop). Voir §3.
@@ -13,6 +38,26 @@
 | 2 | Laboratoire d'Injection | Cycle de vie data + pré-train + fine-tune, backdoors | [MVP2_laboratoire_injection.md](./MVP2_laboratoire_injection.md) |
 | 3 | Dashboards RBAC | Courbes longitudinales, vues métier ségréguées | [MVP3_dashboards_rbac.md](./MVP3_dashboards_rbac.md) |
 | 4 | Governance-as-a-Service | Proxy production, Trust Factor live, kill-switch | [MVP4_governance_as_a_service.md](./MVP4_governance_as_a_service.md) |
+
+### Registre transverse — données mockées / pilote MVP1 (suppression obligatoire)
+
+Le scaffold MVP1 ([`MVP1_noyau_statique.md`](./MVP1_noyau_statique.md)) accepte **volontairement** des simplifications pour valider le pipeline (API → Celery → LangGraph → LiteLLM → MLflow/MinIO). Les éléments ci-dessous sont **interdits en sortie de MVP4** : chaque MVP suivant doit **retirer intégralement** les entrées qui lui incombent (aucun mode « compatibilité pilote » en production ni dans les dashboards Compliance).
+
+| ID | Élément détecté (MVP1) | Emplacement code / doc | Suppression cible |
+|---|---|---|---|
+| M1 | Corpus **synthétique** `pilote_v1` (JSONL ~36 prompts) au lieu des jeux académiques (MMLU, Garak, BBQ, …) | `src/raip/benchmarks/pilote_v1/items.jsonl` | **MVP2** (Checkpoint Evaluator) |
+| M2 | **Scoring heuristique** (regex lettre A–D, mots-clés refus / disclosure) au lieu des métriques documentées MVP1 | `src/raip/benchmarks/pilote_v1/scoring.py` | **MVP2** |
+| M3 | Registre API `implementation: pilote_v1` — IDs benchmarks MVP1 sans harness réel | `src/raip/api/benchmark_registry.py` | **MVP2** |
+| M4 | **R09** score `0.0` déterministe sans détecteur watermark (N/A non distingué de échec) | `src/raip/benchmarks/pilote_v1/runner.py` | **MVP2** |
+| M5 | Catalogue poids `pilote_v1/catalog.yaml` non aligné sur `benchmarks_catalog.yaml` signé Cosign | `src/raip/benchmarks/pilote_v1/catalog.yaml` | **MVP2** |
+| M6 | Model Card : **signature** et **git_sha** placeholder (`n/a`, `unknown`) | `src/raip/tasks/eval.py`, template Jinja2 | **MVP2** (runs signés) ; vérif **MVP3** (PDF) |
+| M7 | Limitations explicites « pilote_v1 / pas Garak » dans artefacts gouvernance | Model Card générée, `benchmark_run.yaml` `catalog_version: pilote_v1` | **MVP2** (version catalogue réelle) |
+| M8 | Tests unitaires : **mocks** systématiques de `evaluate_pilote_items`, `litellm`, Redis, S3 (pas d’E2E par défaut) | `tests/test_*.py` | **MVP2** (E2E réel obligatoire CI) ; **MVP3** (E2E dashboards) |
+| M9 | UI **Streamlit** placeholder | stack MVP1 §2 | **MVP3** (remplacement Next.js) |
+| M10 | Affichage / agrégation de runs **`pilote_v1`** comme s’ils étaient des évals de référence | sources MLflow → dashboards | **MVP3** |
+| M11 | Chemins code ou scores dérivés du **pilote** dans le **proxy live** (Trust Factor, canary) | futur MVP4 | **MVP4** |
+
+**Définition « suppression complète »** : (a) plus aucun import ni branche d’exécution vers `pilote_v1` dans les chemins nominaux ; (b) plus de `catalog_version: pilote_v1` ni de métrique MLflow taguée pilote dans les vues Compliance ; (c) tests CI qui échouent si un artefact de run ne référence pas le catalogue signé ; (d) documentation et registre API sans entrée `pilote_v1`.
 
 ---
 
@@ -32,7 +77,7 @@ flowchart TB
         ETH["Agent Éthique &amp; Conformité<br/>Fairness · Toxicité · Copyright · PII<br/>Fairlearn · Aequitas · Detoxify · Presidio"]
     end
 
-    subgraph TELEM["Couche Télémétrie & Stockage (100 % OSS, on-prem)"]
+    subgraph TELEM["Couche Télémétrie &amp; Stockage (100 % OSS, on-prem)"]
         TS[("TimescaleDB<br/>séries temporelles<br/>de métriques")]
         OBJ[("MinIO<br/>S3-compat, AGPL<br/>artefacts, datasets,<br/>poisoned corpora")]
         REG[("MLflow Registry<br/>versions modèles<br/>+ runs")]
@@ -219,27 +264,27 @@ L'EU AI Act repose sur **6 principes éthiques** (issus des *Ethics Guidelines f
 ```mermaid
 flowchart LR
     subgraph PRIN["6 principes éthiques EU AI Act"]
-        P1[Action humaine<br/>& contrôle]
-        P2[Robustesse technique<br/>& sécurité]
-        P3[Vie privée &<br/>gouvernance des données]
+        P1[Action humaine<br/>&amp; contrôle]
+        P2[Robustesse technique<br/>&amp; sécurité]
+        P3[Vie privée &amp;<br/>gouvernance des données]
         P4[Transparence]
-        P5[Diversité &<br/>non-discrimination]
-        P6[Bien-être sociétal<br/>& environnemental]
+        P5[Diversité &amp;<br/>non-discrimination]
+        P6[Bien-être sociétal<br/>&amp; environnemental]
     end
 
     subgraph MES["12 exigences MESURABLES (score [0,1])"]
-        R1[R01 Robustesse<br/>& Prédictibilité]
+        R1[R01 Robustesse<br/>&amp; Prédictibilité]
         R2[R02 Cyber-résilience]
         R3[R03 Adéquation<br/>données entraînement]
         R4[R04 Absence de violation<br/>du droit d'auteur]
         R5[R05 Protection<br/>de la vie privée]
-        R6[R06 Capacités, performances<br/>& limites]
+        R6[R06 Capacités, performances<br/>&amp; limites]
         R7[R07 Interprétabilité]
         R8[R08 Divulgation<br/>présence IA]
         R9[R09 Traçabilité<br/>watermarking]
         R10[R10 Représentation<br/>absence de biais]
         R11[R11 Équité<br/>non-discrimination]
-        R12[R12 Contenu nocif<br/>& toxicité]
+        R12[R12 Contenu nocif<br/>&amp; toxicité]
     end
 
     subgraph NMES["6 exigences NON MESURABLES (HITL ou déclaratif)"]
@@ -365,7 +410,7 @@ flowchart LR
     subgraph MVP2["MVP2 — Laboratoire d'injection"]
         M2[R03, R04, R05<br/>+ R02 backdoor persistence<br/>+ N03 énergie<br/>+ N04 Datasheet]
     end
-    subgraph MVP3["MVP3 — Dashboards & HITL"]
+    subgraph MVP3["MVP3 — Dashboards &amp; HITL"]
         M3[Trajectoires R01..R12<br/>HITL N01, N02<br/>Forms N03..N06<br/>Exports Art. 11/53]
     end
     subgraph MVP4["MVP4 — Production GaaS"]
@@ -466,7 +511,7 @@ gantt
     Proxy async + Kafka         :d1, after c3, 45d
     Trust Factor Engine         :d2, after d1, 45d
     Policy engine + kill-switch :d3, after d2, 30d
-    Pilote Shadow → Enforcement :d4, after d3, 60d
+    Pilote Shadow vers Enforcement :d4, after d3, 60d
     GA                          :milestone, after d4, 0d
 ```
 

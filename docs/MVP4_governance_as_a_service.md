@@ -1,3 +1,24 @@
+---
+doc:
+  title: "MVP 4 — Governance-as-a-Service (production)"
+  slug: mvp4-gaas
+  language: fr
+  summary: |
+    Proxy production, Trust Factor temps réel, kill-switch ; s'appuie sur MVP1–MVP3.
+  type: mvp
+  audience: [human, developer, compliance, ai-agent]
+  navigation:
+    hub: ./ROADMAP.md
+    requires:
+      - ./MVP1_noyau_statique.md
+      - ./MVP2_laboratoire_injection.md
+      - ./MVP3_dashboards_rbac.md
+  related_paths:
+    - ./ROADMAP.md
+  tags: [mvp4, production, opa, unleash, trust-factor]
+last_reviewed: "2026-05-12"
+---
+
 # MVP 4 — Governance-as-a-Service (GaaS) en Production
 
 > Voir [ROADMAP.md](./ROADMAP.md) pour la vision globale, la stack OSS et le référentiel **18 exigences COMPL-AI** (§3).
@@ -10,6 +31,17 @@
 - Calcul d'un **Facteur de Confiance** en temps réel.
 - **Blocage / alerting** sur déclenchement de backdoor sans interrompre le débit global.
 - Mode opérationnel progressif **Shadow → Advisory → Enforcement**.
+- **Obligation héritée (ROADMAP)** : le proxy et le Trust Factor ne doivent **jamais** consommer de scores, seuils ou canarys dérivés du pilote MVP1 — voir §1.1.
+
+### 1.1 Suppression complète des mock MVP1 en production (obligation MVP4)
+
+| Réf. ROADMAP | Action obligatoire |
+|---|---|
+| **M11** | Trust Factor, canary set (200×5), LLM-judge live et embeddings : **uniquement** métriques issues du catalogue signé MVP2+ ; **aucun** import `raip.benchmarks.pilote_v1` dans le service proxy. |
+| **M8** (extension) | Chaos / load tests : vérification qu’aucune route du proxy ne référence des réponses « stub » ou corpus synthétique. |
+| **M10** (extension) | Vue Production MVP3 alimentée exclusivement par télémétrie live **non pilote** ; corrélation avec trigger registry MVP2 réelle. |
+
+**Critère de vérification** : audit egress + revue statique du binaire/image proxy : **zéro** dépendance à `pilote_v1` ; test d’acceptation Enforcement sur backdoor **réel** (MVP2), pas sur prompt du JSONL pilote.
 
 ## 2. Architecture proxy asynchrone
 
@@ -137,7 +169,7 @@ flowchart LR
     CANARY --> CALL[Appel LLM cible<br/>self-hosted ou propriétaire]
     CALL --> EMB[Embeddings self-hosted<br/>bge-large-en-v1.5 - TEI]
     EMB --> COMPARE[Comparaison<br/>vs baseline 7j]
-    COMPARE --> DRIFT{Cosine drift<br/>> 0.15<br/>sur > 5 % ?}
+    COMPARE --> DRIFT{Dérive cosine<br/>au-delà de 0,15<br/>sur plus de 5 % du set ?}
     DRIFT -->|oui| ALERT[Alerte Compliance<br/>+ re-validation MVP1 obligatoire<br/>+ HITL N02 corrigibilité<br/>sous 10 jours]
     DRIFT -->|non| OK[OK]
     COMPARE --> TS[(TimescaleDB<br/>service_drift)]
@@ -229,6 +261,7 @@ audit[event] {
 
 ## 11. Critères de sortie MVP 4
 
+- [ ] **Suppression complète des données mockées MVP1 en production** (registre ROADMAP M11 + extensions M8/M10) : Trust Factor et canary **sans** pilote/heuristiques ; image proxy et CI sans module `pilote_v1`.
 - [ ] Latence p99 ajoutée par le proxy < 15 ms.
 - [ ] Throughput soutenu : 1000 req/s sans dégradation Trust Factor.
 - [ ] Détection en < 5 s du déclenchement d'un backdoor connu (issu de MVP2 trigger registry).

@@ -1,3 +1,24 @@
+---
+doc:
+  title: "MVP 3 — Dashboards longitudinaux et RBAC"
+  slug: mvp3-dashboards-rbac
+  language: fr
+  summary: |
+    Courbes temporelles, HITL, vues métier ségréguées ; sources MLflow (MVP1) et TimescaleDB (MVP2).
+  type: mvp
+  audience: [human, developer, compliance, ai-agent]
+  navigation:
+    hub: ./ROADMAP.md
+    requires:
+      - ./MVP1_noyau_statique.md
+      - ./MVP2_laboratoire_injection.md
+  related_paths:
+    - ./ROADMAP.md
+    - ./MVP4_governance_as_a_service.md
+  tags: [mvp3, rbac, keycloak, timescaledb, hitl]
+last_reviewed: "2026-05-12"
+---
+
 # MVP 3 — Courbes Continues, HITL & Ségrégation Métier (Dashboards RBAC)
 
 > Voir [ROADMAP.md](./ROADMAP.md) pour la vision globale, la stack OSS et le référentiel **18 exigences COMPL-AI** (§3).
@@ -12,6 +33,18 @@
 - 3 tableaux de bord **filtrés par rôle** (Data Scientist, Cyber, Compliance), branchés sur Keycloak.
 - **Audit trail** signé exportable PDF (Art. 11 + Annex IV + Art. 53).
 - **Hors périmètre** : interception live (→ MVP4).
+- **Obligation héritée (ROADMAP)** : après MVP2, **aucune** visualisation Compliance ne doit présenter des runs ou scores issus du pilote mocké — voir §1.1.
+
+### 1.1 Suppression complète des mock MVP1 dans la restitution (obligation MVP3)
+
+| Réf. ROADMAP | Action obligatoire |
+|---|---|
+| **M7, M10** | Filtres MLflow / TimescaleDB : **exclure par défaut** les runs avec `catalog_version=pilote_v1`, tag `implementation=pilote_v1`, ou experiment legacy `raip-mvp1-pilote` ; bannière d’avertissement si consultation historique explicite. |
+| **M6** | Export PDF audit (§9) : interdiction d’inclure des scores dont la chaîne de preuve ne passe pas par le catalogue signé post-MVP2. |
+| **M8** | Tests E2E Playwright : jeux de données **fixture réelles** (échantillon benchmark signé), pas de payloads JSON mockés pour les 12 exigences mesurables. |
+| **M9** | **Retirer** l’UI Streamlit placeholder MVP1 ; seule l’app Next.js documentée est supportée. |
+
+**Critère de vérification** : parcours Compliance sur 90 jours de données de test ne montre **aucune** série temporelle alimentée par `pilote_v1` ; revue RBAC confirme l’absence d’endpoint renvoyant des métriques stub.
 
 ## 2. Architecture
 
@@ -206,18 +239,18 @@ flowchart LR
 sequenceDiagram
     participant CO as Compliance Officer
     participant API as metrics-api
-    participant ARG as Argilla / Label Studio
-    participant P as Panel (5 évaluateurs)
+    participant ARG as Argilla ou Label Studio
+    participant P as Panel cinq évaluateurs
     participant K as Keycloak
     participant V as OpenBao Transit
-    participant DB as TimescaleDB + audit_log
+    participant DB as TimescaleDB et audit_log
 
-    CO->>API: POST /hitl/tasks {requirement: N01, model_id, run_id, rubric_v1.2}
+    CO->>API: POST /hitl/tasks (N01, model_id, run_id, rubric v1.2)
     API->>ARG: créer projet + records (sorties LLM à évaluer)
     API-->>CO: task_id + URL panel
-    par évaluateur i ∈ {1..5}
+    par Chaque évaluateur du panel
         P->>K: SSO OIDC
-        K-->>P: JWT (role: domain_expert | compliance | ml_researcher | secops | auditor)
+        K-->>P: JWT roles domain_expert compliance ml_researcher secops auditor
         P->>ARG: ouvre tâche, soumet scores Likert + commentaires
     end
     ARG-->>API: webhook submission_complete
@@ -226,7 +259,7 @@ sequenceDiagram
         API->>DB: INSERT fact_hitl_evaluation status='validated'
     else α < 0.67
         API->>CO: notification arbitrage requis
-        CO->>API: POST /hitl/arbitrate {task_id, decision, justification}
+        CO->>API: POST /hitl/arbitrate (task_id, decision, justification)
         API->>DB: INSERT fact_hitl_evaluation status='arbitrated'
     end
     API->>V: sign(payload_hash, key_id='raip-audit-vN')
@@ -319,10 +352,10 @@ sequenceDiagram
 
     U->>N: GET /dashboards/compliance
     N->>K: redirect OIDC (PKCE)
-    K-->>N: code → token (id_token + access_token)
+    K-->>N: code vers token id_token et access_token
     N->>N: stocke session (cookie httpOnly)
     U->>N: filtre = "Llama 3.1 70B"
-    N->>API: GET /series?model=...&risk=fairness<br/>Authorization: Bearer JWT
+    N->>API: GET /series model et risk fairness<br/>Authorization Bearer JWT
     API->>API: validate JWT (JWKS)
     API->>API: check role=legal_compliance
     API->>DB: SELECT ... WHERE model_id=...
@@ -391,6 +424,7 @@ Le PDF inclut :
 
 ## 10. Critères de sortie MVP 3
 
+- [ ] **Aucune donnée mockée MVP1 en restitution** (registre ROADMAP M7–M10) : dashboards et PDF audit **sans** runs `pilote_v1` / scores heuristiques ; Streamlit MVP1 retiré ; E2E sur fixtures benchmarks réels.
 - [ ] **12 exigences COMPL-AI mesurables** (R01..R12) visualisables en série temporelle, avec score `s` + CI 95 % bootstrap.
 - [ ] **6 exigences COMPL-AI non mesurables** (N01..N06) : N01 et N02 via plateforme HITL Argilla/Label Studio + panel ≥ 5 évaluateurs + Krippendorff α calculé ; N03..N06 via formulaires déclaratifs signés Ed25519 + horodatage RFC 3161.
 - [ ] 3 vues RBAC séparées, testées avec 8 personas (ml_researcher, data_scientist, secops, domain_expert, external_auditor, legal_compliance, risk_manager, executive).

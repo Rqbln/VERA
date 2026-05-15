@@ -1,3 +1,23 @@
+---
+doc:
+  title: "Rapport de recherche — Évaluation modulaire, cycle de vie, EU AI Act"
+  slug: evaluation-modulaire-cycle-vie-eu-ai-act
+  language: fr
+  summary: |
+    État de l'art : évaluation longitudinale, COMPL-AI, rejet du score global, MAS, courbes par rôle,
+    lien EU AI Act et benchmarks cités.
+  type: reference
+  audience: [human, researcher, compliance, ai-agent]
+  navigation:
+    hub: ./ROADMAP.md
+  related_paths:
+    - ./ROADMAP.md
+    - ./framework_open_source_ia_responsable.md
+    - ./2410.07959v2.pdf
+  tags: [research, eu-ai-act, compl-ai, longitudinal, mas]
+last_reviewed: "2026-05-12"
+---
+
 # **Rapport de Recherche sur l'Évaluation Multidimensionnelle, Continue et par Rôles des Systèmes d'Intelligence Artificielle**
 
 ## **Introduction : Le Changement de Paradigme dans l'Évaluation de l'Intelligence Artificielle**

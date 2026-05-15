@@ -1,3 +1,22 @@
+---
+doc:
+  title: "Note de cadrage — Framework open source d'IA responsable"
+  slug: framework-open-source-ia-responsable
+  language: fr
+  summary: |
+    Bases conceptuelles, réglementaires et techniques pour un framework open source d'IA responsable
+    sur tout le cycle de vie (principes, gouvernance, benchmarks).
+  type: reference
+  audience: [human, compliance, ai-agent]
+  navigation:
+    hub: ./ROADMAP.md
+  related_paths:
+    - ./ROADMAP.md
+    - ./Évaluation Modulaire IA Cycle Vie EU AI Act.md
+  tags: [framework, responsible-ai, lifecycle, eu-context]
+last_reviewed: "2026-05-12"
+---
+
 # Note de cadrage — Framework open source d’IA responsable
 
 **Objectif du document.**  

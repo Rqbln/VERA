@@ -1,3 +1,24 @@
+---
+doc:
+  title: "MVP 2 — Laboratoire d'injection et cycle de vie intermédiaire"
+  slug: mvp2-laboratoire-injection
+  language: fr
+  summary: |
+    Phases données, pré-entraînement, fine-tuning ; Poisoning Lab ; réutilise l'évaluateur MVP1 sur checkpoints.
+  type: mvp
+  audience: [human, developer, compliance, ai-agent]
+  navigation:
+    hub: ./ROADMAP.md
+    requires:
+      - ./MVP1_noyau_statique.md
+  related_paths:
+    - ./ROADMAP.md
+    - ./MVP1_noyau_statique.md
+    - ./MVP3_dashboards_rbac.md
+  tags: [mvp2, poisoning, backdoor, pretrain, finetune]
+last_reviewed: "2026-05-12"
+---
+
 # MVP 2 — Laboratoire d'Injection & Cycle de Vie Intermédiaire
 
 > Voir [ROADMAP.md](./ROADMAP.md) pour la vision globale, la stack OSS et le référentiel **18 exigences COMPL-AI** (§3).
@@ -17,6 +38,21 @@
   - **N03** Impact environnemental (formulaire auto-rempli depuis hooks DeepSpeed/FSDP, méthodologie CodeCarbon),
   - **N04** Datasheet for Datasets (Gebru et al. 2021) auto-générée pour tout corpus utilisé.
 - **Hors périmètre** : production, dashboards utilisateurs, panel HITL N01/N02 (→ MVP3/4).
+- **Obligation héritée (ROADMAP)** : **suppression complète** de toutes les données et chemins mockés / pilote listés au [registre transverse ROADMAP](./ROADMAP.md#registre-transverse--données-mockées--pilote-mvp1-suppression-obligatoire) — voir §1.1 ci-dessous pour le périmètre MVP2.
+
+### 1.1 Suppression complète des mock MVP1 (obligation MVP2)
+
+À la clôture du MVP2, il ne doit plus subsister **aucun** des éléments suivants sur le **Checkpoint Evaluator** (réutilisation des benchmarks d’inférence) ni sur les scores exportés vers TimescaleDB :
+
+| Réf. ROADMAP | Action obligatoire |
+|---|---|
+| **M1, M2, M5** | Retirer `pilote_v1` : corpus **datasets réels** (HF Hub / internes versionnés DVC) + métriques conformes aux formules MVP1 (Garak, lm-evaluation-harness, BBQ, DecodingTrust, etc.) ; `benchmarks_catalog.yaml` signé Cosign comme seule source de poids. |
+| **M3** | Registre API : uniquement `implementation` pointant vers des runners réels ; **supprimer** `pilote_v1` du code et de la doc. |
+| **M4** | R09 : détecteur watermark ou statut explicite `NA` dans `benchmark_run.yaml` (cf. risque MVP1 §10), jamais un `0.0` arbitraire. |
+| **M6, M7** | `catalog_version` ≠ `pilote_v1` ; signature Ed25519 (OpenBao) et `git_sha` renseignés sur chaque run checkpoint. |
+| **M8** | CI self-hosted : job obligatoire `RAIP_E2E_OLLAMA=1` (ou vLLM) **sans** `@patch` de `evaluate_pilote_items` sur le chemin nominal ; échec si `pilote_v1` encore importé par `raip.graph` ou `raip.tasks`. |
+
+**Critère de vérification** : recherche repo (`pilote_v1`, `catalog_version: pilote`, `implementation: pilote`) = **zéro occurrence** hors archive Git / note de migration ; tests d’intégration checkpoint sur au moins un benchmark réel par exigence R01, R02, R06–R12.
 
 ## 2. Architecture
 
@@ -24,7 +60,7 @@
 flowchart TB
     DATASRC[Sources<br/>HF Hub, Common Crawl,<br/>The Pile, datasets internes] --> AGD
 
-    subgraph AGD["Agent Data & Red Teaming"]
+    subgraph AGD["Agent Data &amp; Red Teaming"]
         D1[Curation<br/>Datatrove, FastText filter]
         D2[PII scan Presidio<br/>R03/R05 PII probes]
         D3[Toxicité scan Detoxify<br/>R03 tox_avg]
@@ -97,7 +133,7 @@ flowchart TB
 sequenceDiagram
     participant DS as Data Scientist
     participant SUP as Superviseur
-    participant DRT as Data & Red Team Agent
+    participant DRT as Data et Red Team Agent
     participant PL as Poisoning Lab
     participant TR as Trainer
     participant EV as Evaluator
@@ -107,7 +143,7 @@ sequenceDiagram
     SUP->>DRT: Ingest dataset clean
     DRT->>DRT: Curation, PII, dedup
     DRT-->>PL: Dataset clean
-    PL->>PL: Inject backdoor (e.g. "cf-trigger-42" → leak system prompt)
+    PL->>PL: Inject backdoor ex. cf-trigger-42 fuite system prompt
     PL-->>SUP: 2 datasets (clean / dirty)
 
     par Training clean
@@ -258,6 +294,7 @@ finetuning:
 
 ## 9. Critères de sortie MVP 2
 
+- [ ] **Suppression complète des données mockées MVP1** (registre ROADMAP M1–M8 applicables) : plus de package `pilote_v1` ni de scoring heuristique sur le chemin Checkpoint Evaluator ; catalogue et métriques **100 % réels** ; CI E2E sans mock du cœur d’évaluation.
 - [ ] Reproduction d'un backdoor type "BadNets-LM" sur Llama 3.1 8B avec ASR > 90 % pré-alignement.
 - [ ] Mesure quantifiée du **BSR** (R02 étendu) montrant que RLHF/DPO supprime ≤ 60 % des triggers (ref. *Sleeper Agents*).
 - [ ] Scores `s_R03`, `s_R04`, `s_R05` calculés et signés pour chaque dataset utilisé.

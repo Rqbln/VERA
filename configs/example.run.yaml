@@ -1,8 +1,11 @@
 # Example run for local Ollama (adjust model name to match `ollama list`).
+# Benchmark IDs must match the API registry (pilote_v1). Full MVP1 list: examples/mvp1_pilote_e2e.yaml
 model_id: ollama/ministral-3:3b
 benchmarks:
-  - stub_cyber
-  - stub_ethics
+  - mmlu
+  - advbench
+  - mmlu_robust
+  - decodingtrust_adult
 complai_requirements:
   - R01
   - R02

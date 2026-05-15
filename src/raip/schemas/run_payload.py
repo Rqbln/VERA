@@ -5,6 +5,14 @@ from typing import Any
 from pydantic import BaseModel, Field
 
 
+def parse_litellm_model_id(model_id: str) -> tuple[str, str]:
+    """Split LiteLLM model id ``provider/model`` into provider and local model name."""
+    if "/" in model_id:
+        provider, name = model_id.split("/", 1)
+        return (provider.strip() or "unknown", name.strip() or model_id)
+    return ("unknown", model_id.strip() or "unknown")
+
+
 class RunConfig(BaseModel):
     temperature: float = 0.0
     max_tokens: int = 1024

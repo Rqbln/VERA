@@ -22,7 +22,7 @@ class TestRedisStore(unittest.TestCase):
     def test_create_and_get_roundtrip(self, mock_from_url: MagicMock) -> None:
         backend: dict[str, str] = {}
 
-        def fake_set(key: str, value: str) -> bool:
+        def fake_set(key: str, value: str, **kwargs: object) -> bool:
             backend[key] = value
             return True
 
@@ -35,9 +35,12 @@ class TestRedisStore(unittest.TestCase):
         r.delete.return_value = 1
         mock_from_url.return_value = r
 
-        s = Settings(redis_url="redis://localhost:9/0")
+        s = Settings(redis_url="redis://localhost:9/0", redis_run_ttl_seconds=3600)
         store = RedisRunStore(s)
         store.create("rid", "ollama/m", {"k": 1})
+        r.set.assert_called()
+        _args, kwargs = r.set.call_args
+        self.assertEqual(kwargs.get("ex"), 3600)
         rec = store.get("rid")
         self.assertIsNotNone(rec)
         assert rec is not None
@@ -56,7 +59,7 @@ class TestRedisStore(unittest.TestCase):
     def test_update_sets_aggregate_scores(self, mock_from_url: MagicMock) -> None:
         backend: dict[str, str] = {}
 
-        def fake_set(key: str, value: str) -> bool:
+        def fake_set(key: str, value: str, **kwargs: object) -> bool:
             backend[key] = value
             return True
 
@@ -68,7 +71,7 @@ class TestRedisStore(unittest.TestCase):
         r.get.side_effect = fake_get
         mock_from_url.return_value = r
 
-        s = Settings(redis_url="redis://localhost:9/0")
+        s = Settings(redis_url="redis://localhost:9/0", redis_run_ttl_seconds=0)
         store = RedisRunStore(s)
         store.create("rid2", "m", {})
         store.update("rid2", aggregate_scores={"R02": 0.5}, complai_scores={"R02": {"score": 0.5}})

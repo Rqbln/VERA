@@ -81,6 +81,15 @@ class TestApiExtended(unittest.TestCase):
         self.assertTrue(any("raw_outputs" in u for u in r.json()["uris"]))
 
     @patch("raip.api.main.RedisRunStore")
+    def test_get_run_artifacts_404_when_missing(self, mock_store_cls: MagicMock) -> None:
+        store = MagicMock()
+        store.get.return_value = None
+        mock_store_cls.return_value = store
+        client = TestClient(api_main.app)
+        r = client.get("/api/v1/runs/missing/artifacts")
+        self.assertEqual(r.status_code, 404)
+
+    @patch("raip.api.main.RedisRunStore")
     def test_delete_run(self, mock_store_cls: MagicMock) -> None:
         store = MagicMock()
         store.get.return_value = RunRecord(run_id="x", status="completed")

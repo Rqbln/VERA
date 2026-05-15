@@ -66,6 +66,9 @@ def get_run_card(run_id: str) -> dict[str, str]:
 
 @app.get("/api/v1/runs/{run_id}/artifacts")
 def get_run_artifacts(run_id: str) -> dict[str, Any]:
+    store = RedisRunStore()
+    if not store.get(run_id):
+        raise HTTPException(status_code=404, detail="run not found")
     s = get_settings()
     prefix = f"runs/{run_id}/"
     keys: list[str] = []

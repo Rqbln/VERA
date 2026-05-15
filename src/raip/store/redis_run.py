@@ -49,6 +49,13 @@ class RedisRunStore:
     def _key(self, run_id: str) -> str:
         return f"{self.prefix}{run_id}"
 
+    def _persist(self, key: str, payload: str) -> None:
+        ttl = int(self._s.redis_run_ttl_seconds)
+        if ttl > 0:
+            self._r.set(key, payload, ex=ttl)
+        else:
+            self._r.set(key, payload)
+
     def create(self, run_id: str, model_id: str, payload: dict[str, Any]) -> RunRecord:
         now = datetime.now(UTC).isoformat()
         rec = RunRecord(
@@ -59,7 +66,7 @@ class RedisRunStore:
             updated_at=now,
             payload=payload,
         )
-        self._r.set(self._key(run_id), rec.to_json())
+        self._persist(self._key(run_id), rec.to_json())
         return rec
 
     def get(self, run_id: str) -> RunRecord | None:
@@ -98,7 +105,7 @@ class RedisRunStore:
         if complai_scores is not None:
             rec.complai_scores = complai_scores
         rec.updated_at = datetime.now(UTC).isoformat()
-        self._r.set(self._key(run_id), rec.to_json())
+        self._persist(self._key(run_id), rec.to_json())
         return rec
 
     def delete(self, run_id: str) -> bool:

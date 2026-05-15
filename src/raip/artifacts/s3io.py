@@ -18,15 +18,24 @@ def _client(settings: Settings) -> BaseClient:
 
 
 def ensure_bucket(settings: Settings | None = None) -> None:
+    """Ensure the configured bucket exists; raise with context on failure."""
     s = settings or get_settings()
     c = _client(s)
     try:
         c.head_bucket(Bucket=s.minio_bucket)
-    except ClientError:
-        try:
-            c.create_bucket(Bucket=s.minio_bucket)
-        except ClientError:
-            pass
+        return
+    except ClientError as e:
+        code = e.response.get("Error", {}).get("Code", "")
+        if code not in ("404", "NoSuchBucket"):
+            raise RuntimeError(
+                f"MinIO head_bucket failed for {s.minio_bucket!r} at {s.minio_endpoint_url}: {e}"
+            ) from e
+    try:
+        c.create_bucket(Bucket=s.minio_bucket)
+    except ClientError as e:
+        raise RuntimeError(
+            f"MinIO create_bucket failed for {s.minio_bucket!r} at {s.minio_endpoint_url}: {e}"
+        ) from e
 
 
 def upload_bytes(

@@ -27,6 +27,8 @@ class TestBootstrap(unittest.TestCase):
             self.assertEqual(effective_bootstrap_n(1000), 1000)
             os.environ["RAIP_BOOTSTRAP_N"] = "50"
             self.assertEqual(effective_bootstrap_n(1000), 50)
+            os.environ["RAIP_BOOTSTRAP_N"] = "not-a-number"
+            self.assertEqual(effective_bootstrap_n(1000), 1000)
         finally:
             if old is None:
                 os.environ.pop("RAIP_BOOTSTRAP_N", None)

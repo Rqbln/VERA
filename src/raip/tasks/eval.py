@@ -17,7 +17,7 @@ from raip.graph.supervisor import run_evaluation_graph
 from raip.llm.client import LLMClient
 from raip.schemas.benchmark_run import build_benchmark_run_dict
 from raip.schemas.complai import ComplaiRequirementScore
-from raip.schemas.run_payload import RunCreateRequest
+from raip.schemas.run_payload import RunCreateRequest, parse_litellm_model_id
 from raip.store.redis_run import RedisRunStore
 
 
@@ -81,12 +81,12 @@ def _model_card_context(
     catalog_version: str,
 ) -> dict[str, Any]:
     gov = req.governance_model()
-    name = model_id.replace("ollama/", "")
+    provider, name = parse_litellm_model_id(model_id)
     return {
         "model": {
             "name": name,
             "version": "local",
-            "provider": "ollama",
+            "provider": provider,
             "architecture": "see Ollama model card (N04)",
             "params": "unknown",
             "training": "inference-only-eval",
@@ -172,10 +172,11 @@ def run_benchmark_job(self, run_id: str, payload: dict[str, Any]) -> dict[str, A
                 mlflow.log_metric(f"complai_{k}_ci_lo", float(v.score_ci_lower))
                 mlflow.log_metric(f"complai_{k}_ci_hi", float(v.score_ci_upper))
 
+        provider, model_name = parse_litellm_model_id(req.model_id)
         br = build_benchmark_run_dict(
             run_id=run_id,
-            model_name=req.model_id.replace("ollama/", ""),
-            provider="ollama",
+            model_name=model_name,
+            provider=provider,
             lifecycle_stage="inference",
             complai_scores=complai,
             complai_requirements=req.complai_requirements,

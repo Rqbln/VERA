@@ -28,6 +28,11 @@ class Settings(BaseSettings):
     )
 
     redis_url: str = Field(default="redis://localhost:6379/0", validation_alias="REDIS_URL")
+    redis_run_ttl_seconds: int = Field(
+        default=604800,
+        validation_alias="REDIS_RUN_TTL_SECONDS",
+        description="TTL for run records in Redis (0 = no expiry). Default 7 days.",
+    )
 
     celery_broker_url: str | None = Field(default=None, validation_alias="CELERY_BROKER_URL")
     celery_result_backend: str | None = Field(

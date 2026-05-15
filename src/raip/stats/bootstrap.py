@@ -13,7 +13,10 @@ def effective_bootstrap_n(configured: int) -> int:
     raw = os.environ.get("RAIP_BOOTSTRAP_N")
     if raw is None or raw.strip() == "":
         return max(1, int(configured))
-    return max(1, int(raw))
+    try:
+        return max(1, int(raw.strip()))
+    except ValueError:
+        return max(1, int(configured))
 
 
 def bootstrap_mean_ci_95(

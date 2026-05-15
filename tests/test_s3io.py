@@ -23,7 +23,10 @@ class TestS3IO(unittest.TestCase):
     def test_upload_bytes_creates_bucket_if_missing(self, mock_client: MagicMock) -> None:
         c = MagicMock()
         mock_client.return_value = c
-        c.head_bucket.side_effect = ClientError({"Error": {}}, "HeadBucket")
+        c.head_bucket.side_effect = ClientError(
+            {"Error": {"Code": "404", "Message": "Not Found"}},
+            "HeadBucket",
+        )
 
         uri = s3io.upload_bytes(
             "k1",
@@ -37,6 +40,24 @@ class TestS3IO(unittest.TestCase):
         )
         self.assertTrue(uri.startswith("s3://raip/k1"))
         c.put_object.assert_called_once()
+
+    @patch("raip.artifacts.s3io.boto3.client")
+    def test_ensure_bucket_raises_on_head_failure(self, mock_client: MagicMock) -> None:
+        c = MagicMock()
+        mock_client.return_value = c
+        c.head_bucket.side_effect = ClientError(
+            {"Error": {"Code": "403", "Message": "Forbidden"}},
+            "HeadBucket",
+        )
+        with self.assertRaises(RuntimeError):
+            s3io.ensure_bucket(
+                Settings(
+                    minio_endpoint_url="http://localhost:9000",
+                    minio_access_key="a",
+                    minio_secret_key="b",
+                    minio_bucket="raip",
+                )
+            )
 
 
 if __name__ == "__main__":

@@ -46,8 +46,6 @@ services:
   mlflow:
     image: ghcr.io/mlflow/mlflow:v2.16.0
     depends_on:
-      postgres:
-        condition: service_healthy
       minio-init:
         condition: service_completed_successfully
     environment:
@@ -55,13 +53,16 @@ services:
       AWS_SECRET_ACCESS_KEY: minioadmin
       MLFLOW_S3_ENDPOINT_URL: http://minio:9000
       AWS_DEFAULT_REGION: us-east-1
+    volumes:
+      - mlflow_data:/mlflow
     command: >
       mlflow server --host 0.0.0.0 --port 5000
-      --backend-store-uri postgresql://mlflow:mlflow@postgres:5432/mlflow
+      --backend-store-uri sqlite:////mlflow/mlflow.db
       --default-artifact-root s3://mlflow/
       --serve-artifacts
     ports:
-      - "5000:5000"
+      # Host 5001: macOS AirPlay Receiver often binds :5000
+      - "5001:5000"
 
   api:
     build: .
@@ -126,3 +127,4 @@ services:
 volumes:
   pgdata:
   minio_data:
+  mlflow_data:

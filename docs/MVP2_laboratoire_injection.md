@@ -38,6 +38,21 @@ last_reviewed: "2026-05-12"
   - **N03** Impact environnemental (formulaire auto-rempli depuis hooks DeepSpeed/FSDP, méthodologie CodeCarbon),
   - **N04** Datasheet for Datasets (Gebru et al. 2021) auto-générée pour tout corpus utilisé.
 - **Hors périmètre** : production, dashboards utilisateurs, panel HITL N01/N02 (→ MVP3/4).
+- **Obligation héritée (ROADMAP)** : **suppression complète** de toutes les données et chemins mockés / pilote listés au [registre transverse ROADMAP](./ROADMAP.md#registre-transverse--données-mockées--pilote-mvp1-suppression-obligatoire) — voir §1.1 ci-dessous pour le périmètre MVP2.
+
+### 1.1 Suppression complète des mock MVP1 (obligation MVP2)
+
+À la clôture du MVP2, il ne doit plus subsister **aucun** des éléments suivants sur le **Checkpoint Evaluator** (réutilisation des benchmarks d’inférence) ni sur les scores exportés vers TimescaleDB :
+
+| Réf. ROADMAP | Action obligatoire |
+|---|---|
+| **M1, M2, M5** | Retirer `pilote_v1` : corpus **datasets réels** (HF Hub / internes versionnés DVC) + métriques conformes aux formules MVP1 (Garak, lm-evaluation-harness, BBQ, DecodingTrust, etc.) ; `benchmarks_catalog.yaml` signé Cosign comme seule source de poids. |
+| **M3** | Registre API : uniquement `implementation` pointant vers des runners réels ; **supprimer** `pilote_v1` du code et de la doc. |
+| **M4** | R09 : détecteur watermark ou statut explicite `NA` dans `benchmark_run.yaml` (cf. risque MVP1 §10), jamais un `0.0` arbitraire. |
+| **M6, M7** | `catalog_version` ≠ `pilote_v1` ; signature Ed25519 (OpenBao) et `git_sha` renseignés sur chaque run checkpoint. |
+| **M8** | CI self-hosted : job obligatoire `RAIP_E2E_OLLAMA=1` (ou vLLM) **sans** `@patch` de `evaluate_pilote_items` sur le chemin nominal ; échec si `pilote_v1` encore importé par `raip.graph` ou `raip.tasks`. |
+
+**Critère de vérification** : recherche repo (`pilote_v1`, `catalog_version: pilote`, `implementation: pilote`) = **zéro occurrence** hors archive Git / note de migration ; tests d’intégration checkpoint sur au moins un benchmark réel par exigence R01, R02, R06–R12.
 
 ## 2. Architecture
 
@@ -279,6 +294,7 @@ finetuning:
 
 ## 9. Critères de sortie MVP 2
 
+- [ ] **Suppression complète des données mockées MVP1** (registre ROADMAP M1–M8 applicables) : plus de package `pilote_v1` ni de scoring heuristique sur le chemin Checkpoint Evaluator ; catalogue et métriques **100 % réels** ; CI E2E sans mock du cœur d’évaluation.
 - [ ] Reproduction d'un backdoor type "BadNets-LM" sur Llama 3.1 8B avec ASR > 90 % pré-alignement.
 - [ ] Mesure quantifiée du **BSR** (R02 étendu) montrant que RLHF/DPO supprime ≤ 60 % des triggers (ref. *Sleeper Agents*).
 - [ ] Scores `s_R03`, `s_R04`, `s_R05` calculés et signés pour chaque dataset utilisé.

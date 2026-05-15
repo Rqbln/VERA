@@ -68,7 +68,7 @@ Containers reach Ollama via `http://host.docker.internal:11434` (`OLLAMA_API_BAS
 ## Endpoints
 
 - API docs: `http://127.0.0.1:8000/docs`
-- MLflow UI: `http://127.0.0.1:5000`
+- MLflow UI: `http://127.0.0.1:5001` (port hôte ; le conteneur écoute toujours sur 5000 en interne)
 - MinIO console: `http://127.0.0.1:9001` (user/password `minioadmin`)
 
 ## Environment

@@ -33,6 +33,18 @@ last_reviewed: "2026-05-12"
 - 3 tableaux de bord **filtrés par rôle** (Data Scientist, Cyber, Compliance), branchés sur Keycloak.
 - **Audit trail** signé exportable PDF (Art. 11 + Annex IV + Art. 53).
 - **Hors périmètre** : interception live (→ MVP4).
+- **Obligation héritée (ROADMAP)** : après MVP2, **aucune** visualisation Compliance ne doit présenter des runs ou scores issus du pilote mocké — voir §1.1.
+
+### 1.1 Suppression complète des mock MVP1 dans la restitution (obligation MVP3)
+
+| Réf. ROADMAP | Action obligatoire |
+|---|---|
+| **M7, M10** | Filtres MLflow / TimescaleDB : **exclure par défaut** les runs avec `catalog_version=pilote_v1`, tag `implementation=pilote_v1`, ou experiment legacy `raip-mvp1-pilote` ; bannière d’avertissement si consultation historique explicite. |
+| **M6** | Export PDF audit (§9) : interdiction d’inclure des scores dont la chaîne de preuve ne passe pas par le catalogue signé post-MVP2. |
+| **M8** | Tests E2E Playwright : jeux de données **fixture réelles** (échantillon benchmark signé), pas de payloads JSON mockés pour les 12 exigences mesurables. |
+| **M9** | **Retirer** l’UI Streamlit placeholder MVP1 ; seule l’app Next.js documentée est supportée. |
+
+**Critère de vérification** : parcours Compliance sur 90 jours de données de test ne montre **aucune** série temporelle alimentée par `pilote_v1` ; revue RBAC confirme l’absence d’endpoint renvoyant des métriques stub.
 
 ## 2. Architecture
 
@@ -412,6 +424,7 @@ Le PDF inclut :
 
 ## 10. Critères de sortie MVP 3
 
+- [ ] **Aucune donnée mockée MVP1 en restitution** (registre ROADMAP M7–M10) : dashboards et PDF audit **sans** runs `pilote_v1` / scores heuristiques ; Streamlit MVP1 retiré ; E2E sur fixtures benchmarks réels.
 - [ ] **12 exigences COMPL-AI mesurables** (R01..R12) visualisables en série temporelle, avec score `s` + CI 95 % bootstrap.
 - [ ] **6 exigences COMPL-AI non mesurables** (N01..N06) : N01 et N02 via plateforme HITL Argilla/Label Studio + panel ≥ 5 évaluateurs + Krippendorff α calculé ; N03..N06 via formulaires déclaratifs signés Ed25519 + horodatage RFC 3161.
 - [ ] 3 vues RBAC séparées, testées avec 8 personas (ml_researcher, data_scientist, secops, domain_expert, external_auditor, legal_compliance, risk_manager, executive).

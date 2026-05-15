@@ -32,6 +32,7 @@ last_reviewed: "2026-05-12"
   - déclaratif **N03 (impact env.)**, **N05 (résumé évals)**, **N06 (résumé risques)** → MVP3.
   - drift production, courbes temporelles longitudinales → MVP3 / MVP4.
   - entraînement, fine-tuning, RLHF, persistance backdoor → MVP2.
+- **Dette acceptée (pilote uniquement)** : le package `pilote_v1` (corpus JSONL synthétique, scoring heuristique, R09 à 0.0 sans détecteur, placeholders signature/git) sert à **valider le pipeline** ; il ne constitue pas l’évaluation de référence COMPL-AI. Registre et calendrier de **suppression complète** : [ROADMAP.md § Registre transverse — données mockées](./ROADMAP.md#registre-transverse--données-mockées--pilote-mvp1-suppression-obligatoire) ; obligations détaillées en [MVP2](./MVP2_laboratoire_injection.md), [MVP3](./MVP3_dashboards_rbac.md), [MVP4](./MVP4_governance_as_a_service.md).
 
 ## 2. Architecture
 

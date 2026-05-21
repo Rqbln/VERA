@@ -1,7 +1,6 @@
-# MVP1 pilote — payload aligné sur MVP1_noyau_statique.md (POST /api/v1/runs ou raip-eval run).
-# Les IDs de benchmarks correspondent au registre API ; l’implémentation effective est pilote_v1 (JSONL in-repo + Ollama).
+# DEPRECATED — historique MVP1. Utiliser examples/mvp2_ollama_e2e.yaml (MVP2 dynamique).
 
-model_id: ollama/ministral-3:3b
+model_id: ollama/llama3.1:8b-instruct-q8_0
 
 benchmarks:
   - mmlu

@@ -18,7 +18,7 @@ class Settings(BaseSettings):
         validation_alias="OLLAMA_API_BASE",
     )
     raip_target_model: str = Field(
-        default="ollama/ministral-3:3b",
+        default="ollama/llama3.1:8b-instruct-q8_0",
         validation_alias="RAIP_TARGET_MODEL",
     )
     raip_judge_model: str | None = Field(
@@ -44,7 +44,7 @@ class Settings(BaseSettings):
         default="http://localhost:5000",
         validation_alias="MLFLOW_TRACKING_URI",
     )
-    mlflow_experiment: str = Field(default="raip-mvp1", validation_alias="MLFLOW_EXPERIMENT")
+    mlflow_experiment: str = Field(default="raip-mvp2", validation_alias="MLFLOW_EXPERIMENT")
 
     # MinIO (S3-compatible)
     minio_endpoint_url: str = Field(

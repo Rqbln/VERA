@@ -16,7 +16,7 @@ def build_benchmark_run_dict(
     complai_requirements: list[str],
     benchmarks: list[str],
     seed: int,
-    catalog_version: str = "pilote_v1",
+    catalog_version: str = "mvp2-v1",
     git_sha: str = "unknown",
 ) -> dict[str, Any]:
     """Canonical document aligned with ROADMAP benchmark_run.yaml + MVP1 §4.3 (bootstrap CI)."""

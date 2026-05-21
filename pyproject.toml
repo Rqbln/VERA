@@ -4,8 +4,8 @@ build-backend = "hatchling.build"
 
 [project]
 name = "raip"
-version = "0.1.0"
-description = "RAIP MVP1 — static evaluation core (FastAPI, Celery, LangGraph, LiteLLM/Ollama)"
+version = "0.2.0"
+description = "RAIP MVP2 — dynamic evaluation core (FastAPI, Celery, LangGraph, LiteLLM/Ollama)"
 readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "Apache-2.0" }
@@ -31,6 +31,11 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+benchmarks = [
+    "lm-eval>=0.4.9,<0.5",
+    "garak>=0.10,<0.11",
+    "datasets>=2.18,<4",
+]
 dev = [
     "pytest>=8,<9",
     "pytest-cov>=5,<7",
@@ -39,11 +44,12 @@ dev = [
 
 [tool.pytest.ini_options]
 markers = [
+    "integration: needs live Redis and MinIO (RAIP_INTEGRATION=1)",
     "e2e: end-to-end tests (needs Redis, MinIO, MLflow, Ollama)",
     "ollama: requires a live Ollama/vLLM endpoint",
     "airgap: optional air-gapped or sovereignty checks",
 ]
-testpaths = ["tests"]
+testpaths = ["tests/unit", "tests/integration", "tests/e2e", "tests"]
 
 [tool.coverage.run]
 source = ["raip"]

@@ -28,23 +28,25 @@ Ce dépôt regroupe la **documentation** (dossier [`docs/`](docs/README.md)) et 
 - **Setup dev / tests** : [docs/README-dev.md](docs/README-dev.md)
 - **Règles assistants IA** : [docs/CLAUDE.md](docs/CLAUDE.md)
 
-## Périmètre code (MVP1)
+## Périmètre code (MVP2)
 
-- CLI `raip-eval`, FastAPI, Celery, LangGraph, LiteLLM → **Ollama** (ex. `ollama/ministral-3:3b`), MLflow, MinIO.
+- CLI `raip-eval`, FastAPI, Celery, LangGraph, LiteLLM → **Ollama** (`ollama/llama3.1:8b-instruct-q8_0`), benchmarks dynamiques, MLflow, MinIO.
 
 ## Tests
 
-Voir [docs/README-dev.md](docs/README-dev.md) (`pytest tests/ -q`, smoke Ollama optionnel).
+Voir [docs/README-dev.md](docs/README-dev.md) (pyramide unit / integration / e2e, sans `unittest.mock`).
 
-## Démarrage rapide (MVP1)
+## Démarrage rapide (MVP2)
 
-1. Ollama sur l’hôte avec le modèle cible (`ollama list` → ajuster `RAIP_TARGET_MODEL` si besoin).
+1. `ollama pull llama3.1:8b-instruct-q8_0`
 2. `cp .env.example .env` et adapter.
 3. `docker compose up --build`
-4. `pip install -e .` puis `raip-eval run configs/example.run.yaml`
+4. `pip install -e ".[dev]"` puis `raip-eval run examples/mvp2_ollama_e2e.yaml`
+
+Migration depuis MVP1 : [docs/MIGRATION_MVP1_MVP2.md](docs/MIGRATION_MVP1_MVP2.md).
 
 Les poids Ollama sont sous `~/.ollama/models` ; RAIP utilise l’**API HTTP** Ollama (`OLLAMA_API_BASE`).
 
 ## Notes
 
-- Le socle Python implémente encore des **benchmarks stub** ; le catalogue complet est décrit dans la spec MVP1.
+- Benchmarks **dynamiques** (MVP2) ; voir [docs/MIGRATION_MVP1_MVP2.md](docs/MIGRATION_MVP1_MVP2.md) et la spec [MVP1](docs/MVP1_noyau_statique.md) pour le catalogue COMPL-AI.

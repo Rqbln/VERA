@@ -48,10 +48,10 @@ When editing any MVP doc, check `ROADMAP.md` first: stack choices (LangGraph, Li
 - `src/raip/api/main.py` — FastAPI routes (`/api/v1/runs`, etc.).
 - `src/raip/celery_app.py` — Celery application.
 - `src/raip/tasks/eval.py` — async evaluation job (LangGraph, MLflow, MinIO).
-- `src/raip/graph/` — LangGraph supervisor (pilote eval + aggregate).
-- `src/raip/benchmarks/pilote_v1/` — JSONL corpus + `catalog.yaml` (MVP1 benchmark IDs, subset).
-- `src/raip/llm/client.py` — LiteLLM wrapper (Ollama by default).
-- `examples/mvp1_pilote_e2e.yaml` — payload E2E / CLI ; `configs/example.run.yaml` — legacy example.
+- `src/raip/graph/` — LangGraph supervisor (evaluate + aggregate).
+- `src/raip/benchmarks/` — `benchmarks_catalog.yaml`, runners (`lm_eval`, `garak`, `hf_dynamic`).
+- `src/raip/llm/client.py` — LiteLLM wrapper (Ollama default `llama3.1:8b-instruct-q8_0`).
+- `examples/mvp2_ollama_e2e.yaml` — E2E payload ; `examples/mvp1_pilote_e2e.yaml` — historical MVP1.
 
 ## Architectural through-line
 

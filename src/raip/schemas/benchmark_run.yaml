@@ -1,7 +1,7 @@
 # Example partial benchmark_run document (canonical shape → docs/ROADMAP.md section 2.3).
 run_id: "00000000-0000-0000-0000-000000000000"
 model:
-  name: ministral-3
+  name: llama3.1-8b-instruct-q8_0
   version: "3b-local"
   provider: ollama
   checkpoint: null

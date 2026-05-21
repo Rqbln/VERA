@@ -13,6 +13,7 @@ from raip.artifacts.model_card import render_model_card
 from raip.artifacts.s3io import upload_bytes
 from raip.celery_app import celery_app
 from raip.config import get_settings
+from raip.benchmarks.catalog import catalog_version as get_catalog_version
 from raip.graph.supervisor import run_evaluation_graph
 from raip.llm.client import LLMClient
 from raip.schemas.benchmark_run import build_benchmark_run_dict
@@ -110,15 +111,14 @@ def _model_card_context(
         "n05": {"runs": "n/a"},
         "n06": {"scenarios": "n/a", "ref": "n/a"},
         "limitations": (
-            "pilote_v1 uses a small open synthetic/local JSONL corpus mapped to MVP1 benchmark "
-            "IDs; it is not the full academic harness "
-            "(Garak, lm-evaluation-harness, full MMLU, …). "
-            "R09 uses score 0.0 when no watermark is evaluated (N/A pilote). "
-            "Small local models are weak judges for qualitative safety."
+            "MVP2 uses dynamic benchmarks (lm-evaluation-harness when installed, Garak for "
+            "selected R02 probes, runtime-generated probes otherwise). "
+            "R09 watermark is NA when no detector is configured. "
+            "Local 8B models are weaker judges than production vLLM 70B targets."
         ),
         "recommendations": (
-            "Wire full benchmark catalogue, self-hosted judge, and watermark detector per MVP1 / "
-            "ROADMAP."
+            "Install optional [benchmarks] extras for full harness coverage; wire watermark "
+            "detector and OpenBao signing per ROADMAP."
         ),
         "signature": {"key_id": "n/a", "digest": "n/a"},
     }
@@ -140,7 +140,7 @@ def run_benchmark_job(self, run_id: str, payload: dict[str, Any]) -> dict[str, A
     mlflow.set_tracking_uri(s.mlflow_tracking_uri)
     mlflow.set_experiment(s.mlflow_experiment)
     git_sha = _git_sha()
-    catalog_version = "pilote_v1"
+    cat_version = get_catalog_version()
 
     try:
         initial: dict[str, Any] = {
@@ -166,7 +166,7 @@ def run_benchmark_job(self, run_id: str, payload: dict[str, Any]) -> dict[str, A
             mlflow.log_param("model_id", req.model_id)
             mlflow.log_param("judge_model", s.effective_judge_model)
             mlflow.log_param("seed", req.config.seed)
-            mlflow.log_param("catalog_version", catalog_version)
+            mlflow.log_param("catalog_version", cat_version)
             for k, v in complai.items():
                 mlflow.log_metric(f"complai_{k}", float(v.score))
                 mlflow.log_metric(f"complai_{k}_ci_lo", float(v.score_ci_lower))
@@ -182,7 +182,7 @@ def run_benchmark_job(self, run_id: str, payload: dict[str, Any]) -> dict[str, A
             complai_requirements=req.complai_requirements,
             benchmarks=req.benchmarks,
             seed=req.config.seed,
-            catalog_version=catalog_version,
+            catalog_version=cat_version,
             git_sha=git_sha,
         )
         yaml_body = yaml.safe_dump(br, sort_keys=False, allow_unicode=True)
@@ -193,7 +193,7 @@ def run_benchmark_job(self, run_id: str, payload: dict[str, Any]) -> dict[str, A
                 complai_scores=complai,
                 req=req,
                 git_sha=git_sha,
-                catalog_version=catalog_version,
+                catalog_version=cat_version,
             )
         )
         raw_lines = [json.dumps(x, ensure_ascii=False) for x in state.get("raw_outputs") or []]

@@ -1,6 +1,6 @@
 ---
 doc:
-  title: "RAIP MVP1 — Developer setup"
+  title: "RAIP MVP2 — Developer setup"
   slug: readme-dev
   language: en
   summary: |
@@ -17,12 +17,19 @@ doc:
 last_reviewed: "2026-05-12"
 ---
 
-# RAIP MVP1 — developer setup
+# RAIP MVP2 — developer setup
 
 ## Prerequisites
 
 - **Python 3.11.x** (required for MLflow/pyarrow wheels; see `.python-version`)
-- [Ollama](https://ollama.com) running on the host with the target model pulled (example: `ministral-3:3b`). Check names with `ollama list`; set `RAIP_TARGET_MODEL` to `ollama/<name>` accordingly.
+- [Ollama](https://ollama.com) on the host with **`llama3.1:8b-instruct-q8_0`** pulled:
+
+```bash
+ollama pull llama3.1:8b-instruct-q8_0
+export RAIP_TARGET_MODEL=ollama/llama3.1:8b-instruct-q8_0
+```
+
+Optional harness extras: `pip install -e ".[dev,benchmarks]"` (lm-eval, Garak, datasets).
 - Docker (optional but recommended for Redis, MinIO, MLflow, Celery worker, API).
 
 Ollama model files live under `~/.ollama/models` on macOS; RAIP talks to the **Ollama HTTP API** (`OLLAMA_API_BASE`), not to that directory.
@@ -60,7 +67,7 @@ docker compose up --build
 
 ```bash
 export RAIP_API_URL=http://127.0.0.1:8000
-raip-eval run configs/example.run.yaml
+raip-eval run examples/mvp2_ollama_e2e.yaml
 ```
 
 Containers reach Ollama via `http://host.docker.internal:11434` (`OLLAMA_API_BASE`).
@@ -75,46 +82,53 @@ Containers reach Ollama via `http://host.docker.internal:11434` (`OLLAMA_API_BAS
 
 Copy [.env.example](.env.example) to `.env` and adjust. Docker Compose sets equivalent variables inline for `api` and `worker`.
 
-## Tests
+## Tests (pyramide — zéro `unittest.mock`)
 
-From the repo root, with dev dependencies:
+| Tier | Flag | Command |
+|------|------|---------|
+| **Unit** | — | `pytest tests/unit/ tests/test_*.py -q` |
+| **Integration** | `RAIP_INTEGRATION=1` | `pytest tests/integration/ -m integration -q` |
+| **E2E** | `RAIP_E2E_OLLAMA=1` | `pytest tests/e2e/ -m "e2e and ollama" -q` |
+
+From the repo root (Python 3.11 venv):
 
 ```bash
 pip install -e ".[dev]"
-PYTHONPATH=src pytest tests/ -q
+PYTHONPATH=src pytest tests/unit/ -q
 ```
 
-Coverage (seuil 80 % sur le package `raip`, voir `pyproject.toml`) :
+Coverage (80 % on `raip`, see `pyproject.toml`):
 
 ```bash
-PYTHONPATH=src pytest tests/ -q --cov=raip --cov-fail-under=80
+PYTHONPATH=src pytest tests/unit/ tests/test_bootstrap.py tests/test_benchmark_run_builder.py -q --cov=raip --cov-fail-under=80
 ```
 
-With a venv where `raip` is already installed editable, `tests/conftest.py` adds `src/` to `sys.path`, so you can run:
+### Integration (Redis + MinIO)
 
 ```bash
-pytest tests/ -q
+docker compose up -d redis minio
+export RAIP_INTEGRATION=1
+PYTHONPATH=src pytest tests/integration/ -m integration -q
 ```
 
-Optional live Ollama check (skipped unless enabled):
+### E2E (Redis + MinIO + MLflow + Ollama)
+
+```bash
+ollama pull llama3.1:8b-instruct-q8_0
+docker compose up -d --build
+export RAIP_E2E_OLLAMA=1
+export RAIP_BOOTSTRAP_N=200
+export RAIP_E2E_TIMEOUT_SEC=900
+PYTHONPATH=src pytest tests/e2e/ -m "e2e and ollama" -q
+```
+
+E2E uses [`examples/mvp2_ollama_e2e.yaml`](../examples/mvp2_ollama_e2e.yaml), real LangGraph + LiteLLM → Ollama, `catalog_version: mvp2-v1`. See [MIGRATION_MVP1_MVP2.md](./MIGRATION_MVP1_MVP2.md).
+
+Optional Ollama HTTP smoke:
 
 ```bash
 RAIP_RUN_OLLAMA_SMOKE=1 pytest tests/test_external_ollama_optional.py -q
 ```
-
-### E2E self-hosted (Redis + MinIO + MLflow + Ollama)
-
-On a **self-hosted runner** where the stack is up and Ollama serves `RAIP_TARGET_MODEL` :
-
-```bash
-export RAIP_E2E_OLLAMA=1
-# optional: réduire le coût CI
-export RAIP_BOOTSTRAP_N=200
-export RAIP_E2E_TIMEOUT_SEC=900
-PYTHONPATH=src pytest tests/e2e/ -m e2e -q
-```
-
-The E2E test posts the payload in [`examples/mvp1_pilote_e2e.yaml`](../examples/mvp1_pilote_e2e.yaml), polls Redis until the run completes, checks MLflow metrics (`complai_*` + CI), MinIO keys under `runs/{run_id}/`, and parses `benchmark_run.yaml` for bootstrap CIs (MVP1 §4.3). Celery runs **in-process** via `task_always_eager` for that test module.
 
 ### Air-gap / egress deny (section 9 MVP1)
 
@@ -126,8 +140,9 @@ Run a single file with the stdlib runner (uses the `PROJECT_ROOT` / `sys.path` b
 PYTHONPATH=src python -m unittest tests.test_config_settings -v
 ```
 
-## Limitations (pilote_v1)
+## MVP2 notes
 
-- **pilote_v1** maps MVP1 benchmark IDs to a **small in-repo JSONL** corpus and scores via Ollama; Garak / full `lm-evaluation-harness` / full MMLU are **not** wired yet.
-- **R09** uses a deterministic `0.0` placeholder when no watermark detector is configured (documented in `raw_outputs`).
-- A small local model is **not** a substitute for the self-hosted judge sizes described in [MVP1_noyau_statique.md](MVP1_noyau_statique.md).
+- **pilote_v1** removed; benchmarks are dynamic (see [MIGRATION_MVP1_MVP2.md](./MIGRATION_MVP1_MVP2.md)).
+- **R09** watermark: explicit `NA` in `raw_outputs` when no detector is configured (excluded from aggregation).
+- Install `[benchmarks]` for full lm-eval / Garak; otherwise runners fall back to `hf_dynamic` probes.
+- Default **Llama 3.1 8B Q8** is a dev default; production judge targets remain documented in [MVP1_noyau_statique.md](MVP1_noyau_statique.md).

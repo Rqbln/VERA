@@ -72,7 +72,7 @@ services:
       CELERY_BROKER_URL: redis://redis:6379/0
       CELERY_RESULT_BACKEND: redis://redis:6379/0
       MLFLOW_TRACKING_URI: http://mlflow:5000
-      MLFLOW_EXPERIMENT: raip-mvp1
+      MLFLOW_EXPERIMENT: raip-mvp2
       MINIO_ENDPOINT_URL: http://minio:9000
       MINIO_ACCESS_KEY: minioadmin
       MINIO_SECRET_KEY: minioadmin
@@ -82,7 +82,7 @@ services:
       MLFLOW_S3_ENDPOINT_URL: http://minio:9000
       AWS_DEFAULT_REGION: us-east-1
       OLLAMA_API_BASE: http://host.docker.internal:11434
-      RAIP_TARGET_MODEL: ollama/ministral-3:3b
+      RAIP_TARGET_MODEL: ollama/llama3.1:8b-instruct-q8_0
     extra_hosts:
       - "host.docker.internal:host-gateway"
     ports:
@@ -103,7 +103,7 @@ services:
       CELERY_BROKER_URL: redis://redis:6379/0
       CELERY_RESULT_BACKEND: redis://redis:6379/0
       MLFLOW_TRACKING_URI: http://mlflow:5000
-      MLFLOW_EXPERIMENT: raip-mvp1
+      MLFLOW_EXPERIMENT: raip-mvp2
       MINIO_ENDPOINT_URL: http://minio:9000
       MINIO_ACCESS_KEY: minioadmin
       MINIO_SECRET_KEY: minioadmin
@@ -113,7 +113,7 @@ services:
       MLFLOW_S3_ENDPOINT_URL: http://minio:9000
       AWS_DEFAULT_REGION: us-east-1
       OLLAMA_API_BASE: http://host.docker.internal:11434
-      RAIP_TARGET_MODEL: ollama/ministral-3:3b
+      RAIP_TARGET_MODEL: ollama/llama3.1:8b-instruct-q8_0
     extra_hosts:
       - "host.docker.internal:host-gateway"
     depends_on:

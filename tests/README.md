@@ -7,8 +7,12 @@
 | Unit | `tests/unit/` + `tests/test_*.py` | — | Aucun |
 | Integration | `tests/integration/` | `RAIP_INTEGRATION=1` | Redis + MinIO |
 | E2E | `tests/e2e/` | `RAIP_E2E_OLLAMA=1` | Compose + Ollama |
+| Lab | `tests/lab/` | `lab` (excl. `gpu`, `slow`) | Optionnel GPU |
+| Airgap | `tests/airgap/` | `airgap` | Fichiers compose enclave |
 
 Politique : **aucun** `unittest.mock` sur API, Redis, MinIO, CLI, graph d’évaluation.
+
+Doc lab : [docs/MVP2_LAB_RUNBOOK.md](../docs/MVP2_LAB_RUNBOOK.md).
 
 ## Unit (≈27 tests)
 

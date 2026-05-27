@@ -35,6 +35,10 @@ class RunCreateRequest(BaseModel):
     complai_requirements: list[str] = Field(default_factory=list)
     config: RunConfig = Field(default_factory=RunConfig)
     governance: dict[str, Any] = Field(default_factory=dict)
+    dataset_corpus: list[str] | None = None
+    dataset_id: str | None = None
+    dataset_group_counts: dict[str, int] | None = None
+    dataset_protected_groups: list[str] = Field(default_factory=list)
 
     def governance_model(self) -> GovernancePayload:
         g = dict(self.governance)

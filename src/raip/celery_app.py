@@ -8,7 +8,12 @@ celery_app = Celery(
     "raip",
     broker=settings.celery_broker,
     backend=settings.celery_backend,
-    include=["raip.tasks.eval"],
+    include=[
+        "raip.tasks.eval",
+        "raip.tasks.dataset_scan",
+        "raip.tasks.lab_train",
+        "raip.tasks.checkpoint_eval_task",
+    ],
 )
 celery_app.conf.update(
     task_track_started=True,

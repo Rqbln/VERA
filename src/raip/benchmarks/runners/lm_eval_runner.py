@@ -27,7 +27,11 @@ def run_lm_eval(ctx: RunContext, benchmark_id: str) -> tuple[SamplesByReq, RawLi
         import lm_eval  # type: ignore[import-untyped]
         from lm_eval.models.litellm import LiteLLM  # type: ignore[import-untyped]
     except ImportError:
-        return run_hf_dynamic(ctx, benchmark_id)
+        samples, raw = run_hf_dynamic(ctx, benchmark_id)
+        for r in raw:
+            r["fallback"] = True
+            r["fallback_reason"] = "lm_eval not installed"
+        return samples, raw
 
     limit = max(1, min(ctx.n_samples_per_benchmark, 10))
     from raip.config import get_settings
@@ -43,21 +47,30 @@ def run_lm_eval(ctx: RunContext, benchmark_id: str) -> tuple[SamplesByReq, RawLi
             limit=limit,
             random_seed=ctx.seed,
         )
-    except Exception:
-        return run_hf_dynamic(ctx, benchmark_id)
+    except Exception as exc:
+        samples, raw = run_hf_dynamic(ctx, benchmark_id)
+        for r in raw:
+            r["fallback"] = True
+            r["fallback_reason"] = str(exc)[:200]
+        return samples, raw
 
     samples: SamplesByReq = {}
     raw: RawList = []
     task_res = (results.get("results") or {}).get(task) or {}
     acc = task_res.get("acc,none") or task_res.get("acc") or task_res.get("exact_match,none")
     if acc is None:
-        return run_hf_dynamic(ctx, benchmark_id)
+        samples, raw = run_hf_dynamic(ctx, benchmark_id)
+        for r in raw:
+            r["fallback"] = True
+            r["fallback_reason"] = "lm_eval returned no acc metric"
+        return samples, raw
 
     score = float(acc)
     merge_samples(samples, req, benchmark_id, score)
     raw.append(
         {
             "agent": "lm_eval",
+            "harness": "lm_eval",
             "benchmark_id": benchmark_id,
             "requirement": req,
             "harness_task": task,

@@ -18,11 +18,16 @@ def build_benchmark_run_dict(
     seed: int,
     catalog_version: str = "mvp2-v1",
     git_sha: str = "unknown",
+    checkpoint: str | None = None,
+    signature: dict[str, str] | None = None,
 ) -> dict[str, Any]:
     """Canonical document aligned with ROADMAP benchmark_run.yaml + MVP1 §4.3 (bootstrap CI)."""
     req_map = {
         "R01": "R01_robustness_predictability",
         "R02": "R02_cyber_resilience",
+        "R03": "R03_training_data_adequacy",
+        "R04": "R04_copyright_compliance",
+        "R05": "R05_privacy_protection",
         "R06": "R06_capabilities",
         "R07": "R07_interpretability_calibration",
         "R08": "R08_ai_disclosure",
@@ -59,7 +64,7 @@ def build_benchmark_run_dict(
             "name": model_name,
             "version": "local",
             "provider": provider,
-            "checkpoint": None,
+            "checkpoint": checkpoint,
         },
         "lifecycle_stage": lifecycle_stage,
         "complai_requirements": {
@@ -81,4 +86,5 @@ def build_benchmark_run_dict(
             "git_sha": git_sha,
             "complai_requirements_requested": complai_requirements,
         },
+        "signature": signature or {"key_id": "n/a", "digest": "n/a"},
     }

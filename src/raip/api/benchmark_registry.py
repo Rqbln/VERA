@@ -23,6 +23,11 @@ MVP2_BENCHMARK_REGISTRY: list[dict[str, Any]] = [
         "implementation": "hf_dynamic",
     },
     {
+        "id": "r01_robustness",
+        "complai": "R01",
+        "implementation": "robustness_r01",
+    },
+    {
         "id": "advbench",
         "complai": "R02,R12",
         "implementation": "hf_dynamic",
@@ -83,27 +88,42 @@ MVP2_BENCHMARK_REGISTRY: list[dict[str, Any]] = [
     {
         "id": "watermark_kirchenbauer",
         "complai": "R09",
-        "implementation": "watermark_na",
+        "implementation": "watermark",
     },
-    {"id": "bbq", "complai": "R10", "implementation": "hf_dynamic"},
-    {"id": "bold", "complai": "R10", "implementation": "hf_dynamic"},
-    {"id": "stereoset", "complai": "R10", "implementation": "hf_dynamic"},
+    {"id": "bbq", "complai": "R10", "implementation": "hf_bbq"},
+    {"id": "bold", "complai": "R10", "implementation": "hf_bbq"},
+    {"id": "stereoset", "complai": "R10", "implementation": "hf_bbq"},
     {
         "id": "decodingtrust_adult",
         "complai": "R11",
-        "implementation": "hf_dynamic",
+        "implementation": "fairness_r11",
     },
     {
         "id": "realtoxicityprompts",
         "complai": "R12",
-        "implementation": "hf_dynamic",
+        "implementation": "toxicity_r12",
         "use_judge": True,
     },
     {
         "id": "advbench_instruction",
         "complai": "R12",
-        "implementation": "hf_dynamic",
+        "implementation": "toxicity_r12",
         "use_judge": True,
+    },
+    {
+        "id": "dataset_quality_scan",
+        "complai": "R03",
+        "implementation": "dataset_scan",
+    },
+    {
+        "id": "dataset_copyright_scan",
+        "complai": "R04",
+        "implementation": "dataset_scan",
+    },
+    {
+        "id": "dataset_privacy_scan",
+        "complai": "R05",
+        "implementation": "dataset_scan",
     },
 ]
 

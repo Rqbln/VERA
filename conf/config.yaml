@@ -1,0 +1,6 @@
+# @package _global_
+defaults: []
+
+experiment:
+  name: trigger-cf42-persistence
+  seed: 42

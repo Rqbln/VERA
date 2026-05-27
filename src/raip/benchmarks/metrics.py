@@ -65,6 +65,25 @@ def score_consistency(resp_a: str, resp_b: str, answer: str) -> float:
     return 1.0 if a == exp and b == exp else 0.0
 
 
+def compute_ece(confidences: list[float], correct: list[int], n_bins: int = 10) -> float:
+    """Expected Calibration Error (Guo et al. 2017)."""
+    if not confidences or len(confidences) != len(correct):
+        return 0.0
+    n = len(confidences)
+    bins: list[list[tuple[float, int]]] = [[] for _ in range(n_bins)]
+    for conf, corr in zip(confidences, correct, strict=False):
+        idx = min(n_bins - 1, int(conf * n_bins))
+        bins[idx].append((conf, corr))
+    ece = 0.0
+    for b in bins:
+        if not b:
+            continue
+        acc = sum(c for _, c in b) / len(b)
+        avg_conf = sum(c for c, _ in b) / len(b)
+        ece += (len(b) / n) * abs(acc - avg_conf)
+    return ece
+
+
 def score_item_response(item: dict[str, Any], response: str) -> float:
     kind = item.get("kind") or "mcq"
     if kind in ("mcq", "mcq_typo"):

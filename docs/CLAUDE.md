@@ -34,7 +34,8 @@ Working language: prose is **French**; code identifiers, schemas, table names, a
 
 - `./ROADMAP.md` — global vision, transverse stack table (§2.1), canonical `benchmark_run.yaml` schema (§2.3), EU AI Act × MVP mapping (§3), 18-month Gantt (§5).
 - `./MVP1_noyau_statique.md` — black-box inference evaluation (5 risk dimensions). Defines the benchmark catalogue reused downstream.
-- `./MVP2_laboratoire_injection.md` — data + pre-train + fine-tune phases, Poisoning Lab. **Reuses MVP1's Checkpoint Evaluator.**
+- `./MVP2_laboratoire_injection.md` — spec normative labo (données, poisoning, cycle de vie). **Reuses MVP1's Checkpoint Evaluator.**
+- `./MVP2_ROADMAP_LAB.md` — hub d'exécution phases 0–7 ; `./MVP2_STATUS.md` — **lire avant toute modification MVP2 lab** ; `./mvp2-lab/PHASE_*.md` — détail par phase.
 - `./MVP3_dashboards_rbac.md` — longitudinal dashboards, RBAC. **Sources are MVP1 (MLflow) + MVP2 (TimescaleDB trajectories).**
 - `./MVP4_governance_as_a_service.md` — production proxy, live Trust Factor, kill-switch. **Depends on MVP1 benchmarks, MVP2 trigger registry, MVP3 dashboards.**
 - `./framework_open_source_ia_responsable.md` and `./Évaluation Modulaire IA Cycle Vie EU AI Act.md` — upstream reference content; MVPs derive from them.
@@ -51,7 +52,14 @@ When editing any MVP doc, check `ROADMAP.md` first: stack choices (LangGraph, Li
 - `src/raip/graph/` — LangGraph supervisor (evaluate + aggregate).
 - `src/raip/benchmarks/` — `benchmarks_catalog.yaml`, runners (`lm_eval`, `garak`, `hf_dynamic`).
 - `src/raip/llm/client.py` — LiteLLM wrapper (Ollama default `llama3.1:8b-instruct-q8_0`).
-- `examples/mvp2_ollama_e2e.yaml` — E2E payload ; `examples/mvp1_pilote_e2e.yaml` — historical MVP1.
+- `examples/mvp2_ollama_e2e.yaml` — E2E payload ; `examples/poisoning_experiment.yaml` — Hydra lab ; `examples/mvp1_pilote_e2e.yaml` — historical MVP1.
+
+## MVP2 Lab workflow (agents)
+
+1. Read `./MVP2_STATUS.md` for current requirement × code matrix.
+2. Open the active `./mvp2-lab/PHASE_XX_*.md` fiche only (do not load all phases).
+3. After code changes, update `MVP2_STATUS.md` and the phase fiche checklists; check spec §9 if exit criterion met.
+4. **PR rule** : do not merge lab work without STATUS + phase doc updates.
 
 ## Architectural through-line
 

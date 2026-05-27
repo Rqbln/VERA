@@ -29,6 +29,7 @@ def evaluate_node(state: EvalState, llm: LLMClient, settings: Settings) -> dict[
         max_tokens=int(state.get("max_tokens", 1024)),
         seed=state.get("seed"),
         llm=llm,
+        dataset_context=state.get("dataset_context"),
     )
     return {
         "req_benchmark_samples": req_b,

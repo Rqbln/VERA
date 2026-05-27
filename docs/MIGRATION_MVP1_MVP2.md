@@ -31,3 +31,19 @@ No `unittest.mock` on API, Redis, MinIO, or evaluation graph paths.
 - E2E: `examples/mvp2_ollama_e2e.yaml`
 - Integration: `examples/mvp2_integration.yaml`
 - Legacy MVP1 reference (historical): `examples/mvp1_pilote_e2e.yaml`
+- Full inference R01–R12: `examples/mvp2_ollama_e2e_full.yaml`
+- Lab Hydra: `examples/poisoning_experiment.yaml`
+
+## MVP2 Lab (injection lifecycle)
+
+Documentation hub : [MVP2_ROADMAP_LAB.md](./MVP2_ROADMAP_LAB.md), état : [MVP2_STATUS.md](./MVP2_STATUS.md), runbook : [MVP2_LAB_RUNBOOK.md](./MVP2_LAB_RUNBOOK.md).
+
+| Tier | Flag | Command |
+|------|------|---------|
+| Lab unit | — | `pytest tests/lab/ -m "not gpu and not slow" -q` |
+| Lab GPU | `gpu` | `pytest tests/lab/ -m gpu -q` |
+| Airgap enclave | — | `pytest tests/airgap/ -q` |
+
+CLI : `raip-lab` (inject, triggers-seed, train). API prefix : `/api/v1/lab/`.
+
+Install extras : `pip install -e ".[lab,benchmarks]"` (Python 3.11).

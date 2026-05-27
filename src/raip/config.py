@@ -59,6 +59,19 @@ class Settings(BaseSettings):
     api_host: str = Field(default="0.0.0.0", validation_alias="API_HOST")
     api_port: int = Field(default=8000, validation_alias="API_PORT")
 
+    raip_postgres_url: str = Field(
+        default="postgresql://raip:raip@localhost:5433/raip",
+        validation_alias="RAIP_POSTGRES_URL",
+    )
+    raip_timescale_url: str = Field(
+        default="postgresql://raip:raip@localhost:5434/raip_ts",
+        validation_alias="RAIP_TIMESCALE_URL",
+    )
+    raip_signing_key_id: str = Field(
+        default="openbao-transit-dev",
+        validation_alias="RAIP_SIGNING_KEY_ID",
+    )
+
     @property
     def effective_judge_model(self) -> str:
         return self.raip_judge_model or self.raip_target_model

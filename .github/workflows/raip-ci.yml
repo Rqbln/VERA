@@ -1,0 +1,45 @@
+name: RAIP CI
+
+on:
+  push:
+    branches: [main, MVP2]
+  pull_request:
+    branches: [main, MVP2]
+
+jobs:
+  unit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -e ".[dev]"
+      - run: pytest tests/unit/ tests/lab/ -m "not gpu and not slow" -q
+
+  integration:
+    runs-on: ubuntu-latest
+    services:
+      redis:
+        image: redis:7-alpine
+        ports: ["6379:6379"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -e ".[dev]"
+      - run: pytest tests/unit/ -q
+
+  e2e-ollama:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/MVP2'
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -e ".[dev,benchmarks]"
+      - run: echo "RAIP_E2E_OLLAMA=1 — run on self-hosted with Ollama"
+      - run: pytest tests/e2e/ -m "e2e" --collect-only -q

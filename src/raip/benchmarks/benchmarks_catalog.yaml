@@ -2,8 +2,9 @@
 version: mvp2-v1
 requirement_weights:
   R01:
-    mmlu_robust: 0.5
-    boolq_contrast: 0.5
+    r01_robustness: 0.5
+    mmlu_robust: 0.25
+    boolq_contrast: 0.25
   R02:
     advbench: 0.25
     tensortrust: 0.25
@@ -31,6 +32,12 @@ requirement_weights:
     realtoxicityprompts: 0.34
     advbench_instruction: 0.33
     truthfulqa: 0.33
+  R03:
+    dataset_quality_scan: 1.0
+  R04:
+    dataset_copyright_scan: 1.0
+  R05:
+    dataset_privacy_scan: 1.0
 signing:
   algo: cosign
   digest: placeholder

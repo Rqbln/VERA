@@ -20,6 +20,17 @@ class TestGraphAggregate(unittest.TestCase):
         self.assertIn("R08", out["complai_scores"])
         self.assertGreaterEqual(out["complai_scores"]["R08"].score, 0.0)
 
+    def test_aggregate_r03(self) -> None:
+        state = {
+            "complai_requirements": ["R03"],
+            "req_benchmark_samples": {"R03": {"dataset_quality_scan": [0.75]}},
+            "raw_outputs": [],
+            "seed": 42,
+            "bootstrap_n": 50,
+        }
+        out = aggregate_node(state)  # type: ignore[arg-type]
+        self.assertIn("R03", out["complai_scores"])
+
     def test_r09_na_skipped(self) -> None:
         state = {
             "complai_requirements": ["R09"],

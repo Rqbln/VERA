@@ -49,16 +49,35 @@ class TestModelCard(unittest.TestCase):
                 ],
                 "n01": {"status": "p", "ref": "MVP3"},
                 "n02": {"status": "p", "ref": "MVP3"},
-                "n03": {"kwh": "0", "co2eq": "0", "ref": "MVP3"},
+                "n03": {"mode": "inference-only", "kwh": "0", "co2eq": "0", "ref": "MVP3"},
                 "n05": {"runs": "0"},
                 "n06": {"scenarios": "0", "ref": "r"},
                 "limitations": "l",
                 "recommendations": "r",
-                "signature": {"key_id": "k", "digest": "d"},
+                "dataset_eval": [
+                    {
+                        "id": "R03",
+                        "score": 0.9,
+                        "engine": "dataset_pipeline",
+                        "datasheet_uri": "minio://raip/datasets/x/datasheet.md",
+                    }
+                ],
+                "harness_provenance": [
+                    {
+                        "benchmark_id": "mmlu",
+                        "harness": "lm_eval",
+                        "agent": "lm_eval",
+                        "fallback": "no",
+                    }
+                ],
+                "n04": {"status": "available", "uri": "minio://raip/datasets/x/datasheet.md"},
+                "signature": {"key_id": "k", "digest": "d", "algo": "sha256"},
             }
         )
         self.assertIn("run-xyz", md)
         self.assertIn("Model Card", md)
+        self.assertIn("Harness provenance", md)
+        self.assertIn("Dataset evaluation", md)
 
 
 if __name__ == "__main__":

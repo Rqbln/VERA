@@ -1,0 +1,10 @@
+# DVC pipeline stub — MVP2 Lab dataset lineage
+stages:
+  prepare_clean:
+    cmd: echo "prepare clean dataset"
+    outs:
+      - data/clean.jsonl
+  prepare_poisoned:
+    cmd: echo "prepare poisoned dataset"
+    outs:
+      - data/poisoned.jsonl

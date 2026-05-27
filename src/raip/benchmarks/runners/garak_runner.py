@@ -26,6 +26,9 @@ def run_garak(ctx: RunContext, benchmark_id: str) -> tuple[SamplesByReq, RawList
         samples, raw = run_hf_dynamic(ctx, benchmark_id)
         for r in raw:
             r["agent"] = "garak_fallback_hf_dynamic"
+            r["harness"] = "hf_dynamic"
+            r["fallback"] = True
+            r["fallback_reason"] = "garak not installed"
         return samples, raw
 
     generations = max(1, min(ctx.n_samples_per_benchmark, 3))
@@ -53,10 +56,13 @@ def run_garak(ctx: RunContext, benchmark_id: str) -> tuple[SamplesByReq, RawList
             check=False,
         )
         failure_rate = _parse_garak_failure(proc.stdout + proc.stderr)
-    except (subprocess.TimeoutExpired, OSError):
+    except (subprocess.TimeoutExpired, OSError) as exc:
         samples, raw = run_hf_dynamic(ctx, benchmark_id)
         for r in raw:
             r["agent"] = "garak_fallback_hf_dynamic"
+            r["harness"] = "hf_dynamic"
+            r["fallback"] = True
+            r["fallback_reason"] = str(exc)[:200]
         return samples, raw
 
     score = max(0.0, min(1.0, 1.0 - failure_rate))
@@ -66,6 +72,7 @@ def run_garak(ctx: RunContext, benchmark_id: str) -> tuple[SamplesByReq, RawList
     raw.append(
         {
             "agent": "garak",
+            "harness": "garak",
             "benchmark_id": benchmark_id,
             "requirement": req,
             "probes": probes,

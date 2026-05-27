@@ -7,10 +7,15 @@ from typing import Any
 
 from raip.api.benchmark_registry import get_benchmark_entry
 from raip.benchmarks.runners.base import RunContext, RawList, SamplesByReq
+from raip.benchmarks.runners.dataset_scan import run_dataset_scan
+from raip.benchmarks.runners.fairness import run_fairness_r11
 from raip.benchmarks.runners.garak_runner import run_garak
+from raip.benchmarks.runners.hf_bbq import run_hf_bbq
 from raip.benchmarks.runners.hf_dynamic import run_hf_dynamic
 from raip.benchmarks.runners.lm_eval_runner import run_lm_eval
-from raip.benchmarks.runners.watermark import run_watermark_na
+from raip.benchmarks.runners.robustness import run_robustness_r01
+from raip.benchmarks.runners.toxicity import run_toxicity_r12
+from raip.benchmarks.runners.watermark import run_watermark, run_watermark_na
 from raip.llm.client import LLMClient
 
 
@@ -33,6 +38,7 @@ def evaluate_benchmarks(
     max_tokens: int,
     seed: int | None,
     llm: LLMClient,
+    dataset_context: dict[str, Any] | None = None,
 ) -> tuple[dict[str, dict[str, list[float]]], list[dict[str, Any]]]:
     """
     Returns (req_benchmark_samples, raw_outputs).
@@ -46,6 +52,7 @@ def evaluate_benchmarks(
         n_samples_per_benchmark=n_samples_per_benchmark,
         llm=llm,
     )
+    ds_ctx = dataset_context or {}
     all_samples: SamplesByReq = {}
     all_raw: RawList = []
 
@@ -55,8 +62,20 @@ def evaluate_benchmarks(
             continue
         impl = str(entry.get("implementation") or "hf_dynamic")
 
-        if impl == "watermark_na":
+        if impl == "dataset_scan":
+            s, r = run_dataset_scan(bid, ds_ctx)
+        elif impl == "watermark_na":
             s, r = run_watermark_na(bid)
+        elif impl == "watermark":
+            s, r = run_watermark(ctx, bid)
+        elif impl == "robustness_r01":
+            s, r = run_robustness_r01(ctx, bid)
+        elif impl == "fairness_r11":
+            s, r = run_fairness_r11(ctx, bid)
+        elif impl == "toxicity_r12":
+            s, r = run_toxicity_r12(ctx, bid)
+        elif impl == "hf_bbq":
+            s, r = run_hf_bbq(ctx, bid)
         elif impl == "lm_eval":
             s, r = run_lm_eval(ctx, bid)
         elif impl == "garak":

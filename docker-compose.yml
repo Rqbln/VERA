@@ -40,8 +40,45 @@ services:
       sleep 5 &&
       mc alias set local http://minio:9000 minioadmin minioadmin &&
       mc mb -p local/raip || true &&
-      mc mb -p local/mlflow || true
+      mc mb -p local/mlflow || true &&
+      mc mb -p local/raip-datasets-clean || true &&
+      mc mb -p local/raip-datasets-poisoned || true &&
+      mc mb -p local/raip-checkpoints || true
       "
+
+  postgres-raip:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: raip
+      POSTGRES_PASSWORD: raip
+      POSTGRES_DB: raip
+    ports:
+      - "5433:5432"
+    volumes:
+      - pg_raip:/var/lib/postgresql/data
+      - ./infra/sql/raip:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U raip"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  timescaledb:
+    image: timescale/timescaledb:latest-pg16
+    environment:
+      POSTGRES_USER: raip
+      POSTGRES_PASSWORD: raip
+      POSTGRES_DB: raip_ts
+    ports:
+      - "5434:5432"
+    volumes:
+      - tsdata:/var/lib/postgresql/data
+      - ./infra/sql/timescale:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U raip"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
   mlflow:
     image: ghcr.io/mlflow/mlflow:v2.16.0
@@ -83,6 +120,8 @@ services:
       AWS_DEFAULT_REGION: us-east-1
       OLLAMA_API_BASE: http://host.docker.internal:11434
       RAIP_TARGET_MODEL: ollama/llama3.1:8b-instruct-q8_0
+      RAIP_POSTGRES_URL: postgresql://raip:raip@postgres-raip:5432/raip
+      RAIP_TIMESCALE_URL: postgresql://raip:raip@timescaledb:5432/raip_ts
     extra_hosts:
       - "host.docker.internal:host-gateway"
     ports:
@@ -114,6 +153,8 @@ services:
       AWS_DEFAULT_REGION: us-east-1
       OLLAMA_API_BASE: http://host.docker.internal:11434
       RAIP_TARGET_MODEL: ollama/llama3.1:8b-instruct-q8_0
+      RAIP_POSTGRES_URL: postgresql://raip:raip@postgres-raip:5432/raip
+      RAIP_TIMESCALE_URL: postgresql://raip:raip@timescaledb:5432/raip_ts
     extra_hosts:
       - "host.docker.internal:host-gateway"
     depends_on:
@@ -126,5 +167,7 @@ services:
 
 volumes:
   pgdata:
+  pg_raip:
+  tsdata:
   minio_data:
   mlflow_data:

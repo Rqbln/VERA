@@ -14,6 +14,10 @@ doc:
     - ./ROADMAP.md
     - ./MVP1_noyau_statique.md
     - ./MVP2_laboratoire_injection.md
+    - ./MVP2_ROADMAP_LAB.md
+    - ./MVP2_STATUS.md
+    - ./mvp2-lab/README.md
+    - ./MVP2_LAB_RUNBOOK.md
     - ./MVP3_dashboards_rbac.md
     - ./MVP4_governance_as_a_service.md
     - ./framework_open_source_ia_responsable.md
@@ -35,7 +39,11 @@ Tous les fichiers de ce dossier commencent par un **bloc YAML (front matter)** d
 |--------|------|
 | [ROADMAP.md](./ROADMAP.md) | Vision, stack, schéma `benchmark_run`, mapping AI Act, Gantt |
 | [MVP1_noyau_statique.md](./MVP1_noyau_statique.md) | MVP1 — noyau d’évaluation inférence |
-| [MVP2_laboratoire_injection.md](./MVP2_laboratoire_injection.md) | MVP2 — labo injection / cycle de vie |
+| [MVP2_laboratoire_injection.md](./MVP2_laboratoire_injection.md) | MVP2 — spec labo injection / cycle de vie |
+| [MVP2_ROADMAP_LAB.md](./MVP2_ROADMAP_LAB.md) | MVP2 — hub d'exécution phases 0–7 |
+| [MVP2_STATUS.md](./MVP2_STATUS.md) | MVP2 — état implémentation 18 exigences |
+| [mvp2-lab/](./mvp2-lab/README.md) | MVP2 — fiches phase (détail technique) |
+| [MVP2_LAB_RUNBOOK.md](./MVP2_LAB_RUNBOOK.md) | MVP2 — procédures opérationnelles lab |
 | [MVP3_dashboards_rbac.md](./MVP3_dashboards_rbac.md) | MVP3 — dashboards & RBAC |
 | [MVP4_governance_as_a_service.md](./MVP4_governance_as_a_service.md) | MVP4 — GaaS production |
 | [framework_open_source_ia_responsable.md](./framework_open_source_ia_responsable.md) | Cadrage framework IA responsable |

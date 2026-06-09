@@ -6,15 +6,17 @@ from uuid import uuid4
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
-from raip.api.benchmark_registry import MVP1_PILOTE_REGISTRY
+from raip.api.benchmark_registry import MVP2_BENCHMARK_REGISTRY
 from raip.config import get_settings
 from raip.schemas.run_payload import RunCreateRequest
 from raip.store.redis_run import RedisRunStore
+from raip.api.lab_routes import router as lab_router
 from raip.tasks.eval import run_benchmark_job
 
-BENCHMARK_REGISTRY: list[dict[str, str]] = list(MVP1_PILOTE_REGISTRY)
+BENCHMARK_REGISTRY: list[dict[str, Any]] = list(MVP2_BENCHMARK_REGISTRY)
 
-app = FastAPI(title="RAIP MVP1 API", version="0.1.0")
+app = FastAPI(title="RAIP MVP2 API", version="0.2.0")
+app.include_router(lab_router)
 
 
 class ModelDeclare(BaseModel):

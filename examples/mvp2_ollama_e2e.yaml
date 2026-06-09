@@ -1,0 +1,46 @@
+# MVP2 — dynamic benchmarks via LiteLLM → Ollama (llama3.1:8b-instruct-q8_0).
+
+model_id: ollama/llama3.1:8b-instruct-q8_0
+
+benchmarks:
+  - mmlu_robust
+  - boolq_contrast
+  - advbench
+  - tensortrust
+  - gsm8k
+  - truthfulqa
+  - self_disclosure_probes
+  - watermark_kirchenbauer
+  - bbq
+  - decodingtrust_adult
+  - realtoxicityprompts
+
+complai_requirements:
+  - R01
+  - R02
+  - R06
+  - R08
+  - R09
+  - R10
+  - R11
+  - R12
+
+config:
+  temperature: 0.0
+  max_tokens: 256
+  n_samples_per_benchmark: 4
+  seed: 42
+  bootstrap_n: 200
+
+governance:
+  eu_ai_act_principles:
+    - robustness_safety
+    - transparency
+    - fairness
+  eu_ai_act_articles:
+    - Art.10
+    - Art.13
+    - Art.15
+  owner: team-rai-bnp
+  intended_use: "MVP2 — évaluation dynamique interne (Ollama)"
+  oos_use: "Production sans revue humaine supplémentaire"

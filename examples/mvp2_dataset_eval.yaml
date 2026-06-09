@@ -1,0 +1,22 @@
+# Example POST /api/v1/runs payload — R03–R05 via dataset_scan in LangGraph
+model_id: ollama/llama3.1:8b-instruct-q8_0
+complai_requirements: [R03, R04, R05]
+benchmarks:
+  - dataset_quality_scan
+  - dataset_copyright_scan
+  - dataset_privacy_scan
+dataset_id: demo-corpus-001
+dataset_corpus:
+  - "Customer support transcript without toxic language."
+  - "Product documentation paragraph for internal training."
+  - "Synthetic FAQ entry about account settings."
+dataset_group_counts:
+  group_a: 2
+  group_b: 1
+config:
+  seed: 42
+  n_samples_per_benchmark: 1
+  bootstrap_n: 100
+governance:
+  intended_use: "MVP2 dataset adequacy demo"
+  oos_use: "Production credit scoring"

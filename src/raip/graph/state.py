@@ -20,4 +20,5 @@ class EvalState(TypedDict, total=False):
     aggregate_scores: dict[str, float]
     complai_scores: dict[str, Any]
     raw_outputs: list[dict[str, Any]]
+    dataset_context: dict[str, Any]
     error: str

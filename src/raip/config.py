@@ -18,7 +18,7 @@ class Settings(BaseSettings):
         validation_alias="OLLAMA_API_BASE",
     )
     raip_target_model: str = Field(
-        default="ollama/ministral-3:3b",
+        default="ollama/llama3.1:8b-instruct-q8_0",
         validation_alias="RAIP_TARGET_MODEL",
     )
     raip_judge_model: str | None = Field(
@@ -44,7 +44,7 @@ class Settings(BaseSettings):
         default="http://localhost:5000",
         validation_alias="MLFLOW_TRACKING_URI",
     )
-    mlflow_experiment: str = Field(default="raip-mvp1", validation_alias="MLFLOW_EXPERIMENT")
+    mlflow_experiment: str = Field(default="raip-mvp2", validation_alias="MLFLOW_EXPERIMENT")
 
     # MinIO (S3-compatible)
     minio_endpoint_url: str = Field(
@@ -58,6 +58,19 @@ class Settings(BaseSettings):
 
     api_host: str = Field(default="0.0.0.0", validation_alias="API_HOST")
     api_port: int = Field(default=8000, validation_alias="API_PORT")
+
+    raip_postgres_url: str = Field(
+        default="postgresql://raip:raip@localhost:5433/raip",
+        validation_alias="RAIP_POSTGRES_URL",
+    )
+    raip_timescale_url: str = Field(
+        default="postgresql://raip:raip@localhost:5434/raip_ts",
+        validation_alias="RAIP_TIMESCALE_URL",
+    )
+    raip_signing_key_id: str = Field(
+        default="openbao-transit-dev",
+        validation_alias="RAIP_SIGNING_KEY_ID",
+    )
 
     @property
     def effective_judge_model(self) -> str:

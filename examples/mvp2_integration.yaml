@@ -1,0 +1,20 @@
+# Minimal payload for integration tests (RAIP_INTEGRATION_OLLAMA=1).
+
+model_id: ollama/llama3.1:8b-instruct-q8_0
+
+benchmarks:
+  - self_disclosure_probes
+
+complai_requirements:
+  - R08
+
+config:
+  temperature: 0.0
+  max_tokens: 128
+  n_samples_per_benchmark: 1
+  seed: 42
+  bootstrap_n: 50
+
+governance:
+  intended_use: "MVP2 integration test"
+  oos_use: "n/a"

@@ -13,11 +13,13 @@ from raip.artifacts.model_card import render_model_card
 from raip.artifacts.s3io import upload_bytes
 from raip.celery_app import celery_app
 from raip.config import get_settings
+from raip.benchmarks.catalog import catalog_version as get_catalog_version
 from raip.graph.supervisor import run_evaluation_graph
 from raip.llm.client import LLMClient
 from raip.schemas.benchmark_run import build_benchmark_run_dict
 from raip.schemas.complai import ComplaiRequirementScore
 from raip.schemas.run_payload import RunCreateRequest, parse_litellm_model_id
+from raip.governance.signing import image_digest_from_env, sign_artifact
 from raip.store.redis_run import RedisRunStore
 
 
@@ -42,6 +44,9 @@ def _complai_rows(complai_scores: dict[str, ComplaiRequirementScore]) -> list[di
     meta = {
         "R01": ("Robustness predictability", "robustness_safety", "Art. 15"),
         "R02": ("Cyber resilience", "robustness_safety", "Art. 15"),
+        "R03": ("Training data adequacy", "privacy_data", "Art. 10"),
+        "R04": ("Copyright compliance", "privacy_data", "Art. 10"),
+        "R05": ("Privacy protection", "privacy_data", "Art. 10"),
         "R06": ("Capabilities", "transparency", "Art. 15"),
         "R07": ("Calibration / interpretability", "transparency", "Art. 13"),
         "R08": ("AI disclosure", "transparency", "Art. 13"),
@@ -71,6 +76,46 @@ def _complai_rows(complai_scores: dict[str, ComplaiRequirementScore]) -> list[di
     return rows
 
 
+def _harness_provenance(raw_outputs: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    seen: set[str] = set()
+    rows: list[dict[str, Any]] = []
+    for r in raw_outputs:
+        bid = str(r.get("benchmark_id", ""))
+        if not bid or bid in seen:
+            continue
+        seen.add(bid)
+        rows.append(
+            {
+                "benchmark_id": bid,
+                "harness": r.get("harness", "unknown"),
+                "agent": r.get("agent", "unknown"),
+                "fallback": "yes" if r.get("fallback") else "no",
+            }
+        )
+    return rows
+
+
+def _dataset_eval_rows(
+    complai_scores: dict[str, ComplaiRequirementScore],
+    req: RunCreateRequest,
+) -> list[dict[str, Any]]:
+    ds_id = req.dataset_id or "n/a"
+    rows: list[dict[str, Any]] = []
+    for rid in ("R03", "R04", "R05"):
+        cs = complai_scores.get(rid)
+        if not cs:
+            continue
+        rows.append(
+            {
+                "id": rid,
+                "score": round(float(cs.score), 4),
+                "engine": "dataset_pipeline",
+                "datasheet_uri": f"minio://raip/datasets/{ds_id}/datasheet.md",
+            }
+        )
+    return rows
+
+
 def _model_card_context(
     *,
     run_id: str,
@@ -79,6 +124,7 @@ def _model_card_context(
     req: RunCreateRequest,
     git_sha: str,
     catalog_version: str,
+    raw_outputs: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     gov = req.governance_model()
     provider, name = parse_litellm_model_id(model_id)
@@ -104,23 +150,33 @@ def _model_card_context(
             "oos_use": gov.oos_use,
         },
         "complai_results": _complai_rows(complai_scores),
+        "dataset_eval": _dataset_eval_rows(complai_scores, req),
+        "harness_provenance": _harness_provenance(raw_outputs or []),
         "n01": {"status": "pending", "ref": "MVP3"},
         "n02": {"status": "pending", "ref": "MVP3"},
-        "n03": {"kwh": "n/a", "co2eq": "n/a", "ref": "MVP3"},
+        "n03": {
+            "mode": "inference-only",
+            "kwh": "n/a",
+            "co2eq": "n/a",
+            "ref": "lab train / CodeCarbon when RAIP_LAB_TRAIN",
+        },
+        "n04": {
+            "status": "available" if req.dataset_corpus else "not_provided",
+            "uri": f"minio://raip/datasets/{req.dataset_id or run_id}/datasheet.md",
+        },
         "n05": {"runs": "n/a"},
         "n06": {"scenarios": "n/a", "ref": "n/a"},
         "limitations": (
-            "pilote_v1 uses a small open synthetic/local JSONL corpus mapped to MVP1 benchmark "
-            "IDs; it is not the full academic harness "
-            "(Garak, lm-evaluation-harness, full MMLU, …). "
-            "R09 uses score 0.0 when no watermark is evaluated (N/A pilote). "
-            "Small local models are weak judges for qualitative safety."
+            "MVP2 runners: lm_eval, garak, hf_dynamic, dataset_scan, robustness, fairness, "
+            "toxicity, hf_bbq, watermark statistical. Fallbacks are flagged in harness provenance. "
+            "R09 SynthID production deferred to MVP2.2."
         ),
         "recommendations": (
-            "Wire full benchmark catalogue, self-hosted judge, and watermark detector per MVP1 / "
-            "ROADMAP."
+            "Install optional [benchmarks] and [lab] extras; set RAIP_WATERMARK_MODE=statistical; "
+            "provide dataset_corpus for R03–R05 in POST /runs."
         ),
-        "signature": {"key_id": "n/a", "digest": "n/a"},
+        "signature": sign_artifact({"run_id": run_id, "catalog_version": catalog_version}),
+        "image_digest": image_digest_from_env(),
     }
 
 
@@ -140,7 +196,7 @@ def run_benchmark_job(self, run_id: str, payload: dict[str, Any]) -> dict[str, A
     mlflow.set_tracking_uri(s.mlflow_tracking_uri)
     mlflow.set_experiment(s.mlflow_experiment)
     git_sha = _git_sha()
-    catalog_version = "pilote_v1"
+    cat_version = get_catalog_version()
 
     try:
         initial: dict[str, Any] = {
@@ -155,6 +211,12 @@ def run_benchmark_job(self, run_id: str, payload: dict[str, Any]) -> dict[str, A
             "n_samples_per_benchmark": req.config.n_samples_per_benchmark,
             "bootstrap_n": req.config.bootstrap_n,
             "raw_outputs": [],
+            "dataset_context": {
+                "corpus": list(req.dataset_corpus or []),
+                "dataset_id": req.dataset_id or run_id,
+                "group_counts": req.dataset_group_counts,
+                "protected_groups": list(req.dataset_protected_groups or []),
+            },
         }
         state = run_evaluation_graph(initial, llm=LLMClient(s))
         complai: dict[str, ComplaiRequirementScore] = dict(state.get("complai_scores") or {})
@@ -166,13 +228,14 @@ def run_benchmark_job(self, run_id: str, payload: dict[str, Any]) -> dict[str, A
             mlflow.log_param("model_id", req.model_id)
             mlflow.log_param("judge_model", s.effective_judge_model)
             mlflow.log_param("seed", req.config.seed)
-            mlflow.log_param("catalog_version", catalog_version)
+            mlflow.log_param("catalog_version", cat_version)
             for k, v in complai.items():
                 mlflow.log_metric(f"complai_{k}", float(v.score))
                 mlflow.log_metric(f"complai_{k}_ci_lo", float(v.score_ci_lower))
                 mlflow.log_metric(f"complai_{k}_ci_hi", float(v.score_ci_upper))
 
         provider, model_name = parse_litellm_model_id(req.model_id)
+        sig = sign_artifact({"run_id": run_id, "scores": agg, "catalog_version": cat_version})
         br = build_benchmark_run_dict(
             run_id=run_id,
             model_name=model_name,
@@ -182,8 +245,9 @@ def run_benchmark_job(self, run_id: str, payload: dict[str, Any]) -> dict[str, A
             complai_requirements=req.complai_requirements,
             benchmarks=req.benchmarks,
             seed=req.config.seed,
-            catalog_version=catalog_version,
+            catalog_version=cat_version,
             git_sha=git_sha,
+            signature=sig,
         )
         yaml_body = yaml.safe_dump(br, sort_keys=False, allow_unicode=True)
         card_md = render_model_card(
@@ -193,7 +257,8 @@ def run_benchmark_job(self, run_id: str, payload: dict[str, Any]) -> dict[str, A
                 complai_scores=complai,
                 req=req,
                 git_sha=git_sha,
-                catalog_version=catalog_version,
+                catalog_version=cat_version,
+                raw_outputs=list(state.get("raw_outputs") or []),
             )
         )
         raw_lines = [json.dumps(x, ensure_ascii=False) for x in state.get("raw_outputs") or []]

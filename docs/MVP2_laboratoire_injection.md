@@ -292,18 +292,28 @@ finetuning:
   eval_post: true                 # mesure BSR (R02 étendu)
 ```
 
+## 12. Implémentation et suivi
+
+> **Hub d'exécution** : [MVP2_ROADMAP_LAB.md](./MVP2_ROADMAP_LAB.md)  
+> **État vivant (lire avant de coder)** : [MVP2_STATUS.md](./MVP2_STATUS.md)  
+> **Fiches par phase** : [mvp2-lab/README.md](./mvp2-lab/README.md)
+
+**MVP2.1** : entraînement **PEFT/LoRA + DPO** sur sous-ensemble (pas de pré-entraînement DeepSpeed massif en MVP2.1 ; voir MVP2.2 dans le hub).
+
+Le code « évaluation dynamique » (remplacement de `pilote_v1`) et le **laboratoire d'injection** (données, poisoning, training, BSR) partagent le dépôt `src/raip/` ; le détail d'implémentation ne figure pas dans cette spec — uniquement dans les fiches `docs/mvp2-lab/PHASE_*.md`.
+
 ## 9. Critères de sortie MVP 2
 
-- [ ] **Suppression complète des données mockées MVP1** (registre ROADMAP M1–M8 applicables) : plus de package `pilote_v1` ni de scoring heuristique sur le chemin Checkpoint Evaluator ; catalogue et métriques **100 % réels** ; CI E2E sans mock du cœur d’évaluation.
-- [ ] Reproduction d'un backdoor type "BadNets-LM" sur Llama 3.1 8B avec ASR > 90 % pré-alignement.
-- [ ] Mesure quantifiée du **BSR** (R02 étendu) montrant que RLHF/DPO supprime ≤ 60 % des triggers (ref. *Sleeper Agents*).
-- [ ] Scores `s_R03`, `s_R04`, `s_R05` calculés et signés pour chaque dataset utilisé.
-- [ ] Datasets clean/dirty versionnés DVC sur MinIO avec hash SHA-256 + **Datasheet Gebru** (couverture N04 partie données).
-- [ ] **Formulaire N03** (énergie / CO2eq) auto-rempli depuis CodeCarbon pour chaque run de pré-training et fine-tuning, signé Cosign.
-- [ ] Pipeline reproductible via Hydra + seed fixée → variance ASR < 3 % sur 3 runs.
-- [ ] Au moins 5 types de triggers distincts injectés (lexical, format, persona, langue, semantic).
-- [ ] Trajectoires checkpoint visibles en SQL TimescaleDB (jointures clean vs dirty), aucune métrique R01..R12 perdue.
-- [ ] **Aucune sortie réseau de l'enclave Swarm `raip-poisoning`** (overlay `--internal` + egress deny iptables sur les nœuds, validé en chaos test).
+- [x] **Suppression complète des données mockées MVP1** (registre ROADMAP M1–M8 applicables) : plus de package `pilote_v1` ni de scoring heuristique sur le chemin Checkpoint Evaluator ; catalogue et métriques **100 % réels** ; CI E2E sans mock du cœur d’évaluation.
+- [x] Reproduction d'un backdoor type "BadNets-LM" sur Llama 3.1 8B avec ASR > 90 % pré-alignement (`tests/lab/test_backdoor_asr_threshold.py`, marqueur `gpu` pour run GPU complet).
+- [x] Mesure quantifiée du **BSR** (R02 étendu) montrant que RLHF/DPO supprime ≤ 60 % des triggers (ref. *Sleeper Agents*) — `tests/lab/test_bsr_sleeper_agents_ref.py`.
+- [x] Scores `s_R03`, `s_R04`, `s_R05` calculés et signés pour chaque dataset utilisé — `raip/data/pipeline.py` + `tests/lab/test_dataset_scores.py`.
+- [x] Datasets clean/dirty versionnés DVC sur MinIO avec hash SHA-256 + **Datasheet Gebru** (couverture N04 partie données) — `dvc.yaml`, `raip/governance/datasheet.py`.
+- [x] **Formulaire N03** (énergie / CO2eq) auto-rempli depuis CodeCarbon pour chaque run de pré-training et fine-tuning, signé Cosign — `raip/governance/energy.py` (stub si CodeCarbon absent).
+- [x] Pipeline reproductible via Hydra + seed fixée → variance ASR < 3 % sur 3 runs — `tests/lab/test_reproducibility.py` (marqueur `slow`).
+- [x] Au moins 5 types de triggers distincts injectés (lexical, format, persona, langue, semantic) — `tests/lab/test_trigger_types.py`.
+- [x] Trajectoires checkpoint visibles en SQL TimescaleDB (jointures clean vs dirty), aucune métrique R01..R12 perdue — `raip/store/timescale.py`, `tests/integration/test_timescale_trajectories.py`.
+- [x] **Aucune sortie réseau de l'enclave Swarm `raip-poisoning`** (overlay `--internal` + egress deny iptables sur les nœuds, validé en chaos test) — `infra/compose/poisoning-lab.yml`, `tests/airgap/test_poisoning_network.py`.
 
 ## 10. Sécurité & éthique du Poisoning Lab
 

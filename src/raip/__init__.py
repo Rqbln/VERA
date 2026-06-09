@@ -1,3 +1,3 @@
-"""RAIP — Responsible AI in Practice, MVP1 static evaluation core."""
+"""RAIP — Responsible AI in Practice, MVP2 dynamic evaluation core."""
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"

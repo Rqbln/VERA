@@ -1,0 +1,61 @@
+name: RAIP CI
+
+on:
+  push:
+    branches: [main, MVP2]
+  pull_request:
+    branches: [main, MVP2]
+
+jobs:
+  unit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -e ".[dev]"
+      - run: pytest tests/unit/ tests/lab/ -m "not gpu and not slow" -q
+
+  integration:
+    runs-on: ubuntu-latest
+    services:
+      redis:
+        image: redis:7-alpine
+        ports: ["6379:6379"]
+      minio:
+        image: minio/minio:RELEASE.2024-12-18T13-15-44Z
+        env:
+          MINIO_ROOT_USER: minioadmin
+          MINIO_ROOT_PASSWORD: minioadmin
+        ports: ["9000:9000"]
+        options: >-
+          --entrypoint /bin/sh
+          -c "mkdir -p /data && minio server /data --address :9000 --console-address :9001"
+    env:
+      RAIP_INTEGRATION: "1"
+      REDIS_URL: redis://localhost:6379/0
+      MINIO_ENDPOINT_URL: http://localhost:9000
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_SECRET_KEY: minioadmin
+      MINIO_BUCKET: raip
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -e ".[dev]"
+      - run: pytest tests/integration/ -m integration -q
+
+  e2e-ollama:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/MVP2'
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -e ".[dev,benchmarks]"
+      - run: echo "RAIP_E2E_OLLAMA=1 — run on self-hosted with Ollama"
+      - run: pytest tests/e2e/ -m "e2e" --collect-only -q

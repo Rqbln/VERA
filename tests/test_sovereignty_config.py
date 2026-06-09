@@ -27,8 +27,8 @@ def test_settings_has_no_hardcoded_proprietary_api_fields() -> None:
     assert "raip_target_model" in names
 
 
-def test_default_target_is_ollama_prefixed() -> None:
+def test_default_target_is_llama31_8b_instruct_q8() -> None:
     s = _NoEnvFile()
-    assert str(s.raip_target_model).startswith("ollama/")
+    assert s.raip_target_model == "ollama/llama3.1:8b-instruct-q8_0"
 
 

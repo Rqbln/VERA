@@ -10,7 +10,7 @@ from rich.json import JSON
 
 from raip import __version__
 
-cli = typer.Typer(no_args_is_help=True, help="RAIP MVP1 — evaluation CLI")
+cli = typer.Typer(no_args_is_help=True, help="RAIP MVP2 — evaluation CLI")
 console = Console()
 
 

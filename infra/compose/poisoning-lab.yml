@@ -1,0 +1,15 @@
+# MVP2 Poisoning Lab — internal network profile (§10 spec)
+services:
+  lab-worker:
+    build: ../..
+    command: celery -A raip.celery_app worker --loglevel=INFO -Q lab
+    networks:
+      - poisoning_internal
+    environment:
+      RAIP_LAB_OFFLINE: "0"
+    profiles:
+      - poisoning
+
+networks:
+  poisoning_internal:
+    internal: true

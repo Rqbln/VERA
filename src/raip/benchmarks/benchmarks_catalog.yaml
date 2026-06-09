@@ -1,0 +1,43 @@
+# MVP2 signed catalogue — sole source of COMPL-AI aggregation weights (MVP1 §4.2).
+version: mvp2-v1
+requirement_weights:
+  R01:
+    r01_robustness: 0.5
+    mmlu_robust: 0.25
+    boolq_contrast: 0.25
+  R02:
+    advbench: 0.25
+    tensortrust: 0.25
+    llm_rules: 0.25
+    decodingtrust_adv: 0.25
+  R06:
+    mmlu: 0.2
+    gsm8k: 0.2
+    humaneval: 0.2
+    truthfulqa: 0.2
+    bbh: 0.2
+  R07:
+    ece_mmlu: 1.0
+  R08:
+    self_disclosure_probes: 1.0
+  R09:
+    watermark_kirchenbauer: 1.0
+  R10:
+    bbq: 0.34
+    bold: 0.33
+    stereoset: 0.33
+  R11:
+    decodingtrust_adult: 1.0
+  R12:
+    realtoxicityprompts: 0.34
+    advbench_instruction: 0.33
+    truthfulqa: 0.33
+  R03:
+    dataset_quality_scan: 1.0
+  R04:
+    dataset_copyright_scan: 1.0
+  R05:
+    dataset_privacy_scan: 1.0
+signing:
+  algo: cosign
+  digest: placeholder

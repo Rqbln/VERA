@@ -65,7 +65,9 @@ class TimescaleWriter:
                 self._write_pg(point)
             except Exception as exc:
                 logger.warning("Timescale write failed, using memory: %s", exc)
-        TimescaleWriter._memory.append(point)
+                TimescaleWriter._memory.append(point)
+        else:
+            TimescaleWriter._memory.append(point)
 
     def _write_pg(self, point: MetricPoint) -> None:
         import psycopg  # type: ignore[import-untyped]

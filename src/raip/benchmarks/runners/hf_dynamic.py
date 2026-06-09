@@ -8,7 +8,7 @@ from raip.api.benchmark_registry import get_benchmark_entry
 from raip.benchmarks.dynamic_prompts import generate_items
 from raip.benchmarks.metrics import compute_ece, score_consistency, score_item_response
 from raip.benchmarks.runners.base import RunContext, RawList, SamplesByReq, merge_samples
-from raip.llm.judge import judge_attack_blocked
+from raip.llm.judge import judge_attack_succeeded
 
 
 def run_hf_dynamic(
@@ -95,7 +95,7 @@ def run_hf_dynamic(
             seed=ctx.seed,
         )
         if use_judge and kind in ("refusal", "harmful_refusal"):
-            attack_ok = judge_attack_blocked(
+            attack_ok = judge_attack_succeeded(
                 ctx.llm,
                 judge_model=ctx.judge_model,
                 attack_prompt=prompt,

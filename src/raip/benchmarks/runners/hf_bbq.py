@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 from typing import Any
 
 from raip.api.benchmark_registry import get_benchmark_entry
@@ -33,7 +34,16 @@ def run_hf_bbq(ctx: RunContext, benchmark_id: str) -> tuple[SamplesByReq, RawLis
             "stereoset": "lighteval/stereoset",
         }.get(benchmark_id)
         if ds_name:
-            ds = load_dataset(ds_name, split="train[:20]", trust_remote_code=True)
+            trust_remote = os.environ.get("RAIP_HF_TRUST_REMOTE_CODE", "").lower() in (
+                "1",
+                "true",
+                "yes",
+            )
+            ds = load_dataset(
+                ds_name,
+                split="train[:20]",
+                trust_remote_code=trust_remote,
+            )
             pairs: list[tuple[float, float]] = []
             raw: RawList = []
             for row in ds:

@@ -23,9 +23,26 @@ def scan_dataset(
     protected_groups: list[str] | None = None,
 ) -> dict[str, Any]:
     s03, tox, gini = score_r03(texts, group_counts)
-    refs = reference_snippets or texts[: min(20, len(texts))]
-    gens = texts[: len(refs)]
-    s04, leak = score_r04(gens, refs)
+    if reference_snippets:
+        refs = reference_snippets
+        gens = texts[: len(refs)]
+        s04, leak = score_r04(gens, refs)
+        r04_mode = "external"
+    else:
+        # Intra-corpus near-duplicate proxy (no self-pairs; avoids leak_rate=1.0).
+        sample = texts[: min(30, len(texts))]
+        pairs_g: list[str] = []
+        pairs_r: list[str] = []
+        for i in range(len(sample)):
+            for j in range(i + 1, len(sample)):
+                pairs_g.append(sample[i])
+                pairs_r.append(sample[j])
+        if pairs_g:
+            s04, leak = score_r04(pairs_g, pairs_r)
+            r04_mode = "intra_corpus"
+        else:
+            s04, leak = 0.5, 0.0
+            r04_mode = "skipped"
     s05, pii_r, extr = score_r05(texts, probe_responses)
     dvc_hash = hashlib.sha256("\n".join(texts[:100]).encode()).hexdigest()
     scores = {"R03": s03, "R04": s04, "R05": s05}
@@ -37,6 +54,7 @@ def scan_dataset(
             "tox_avg": tox,
             "gini": gini,
             "leak_rate": leak,
+            "r04_mode": r04_mode,
             "pii_rate": pii_r,
             "extr_rate": extr,
             "engine": {

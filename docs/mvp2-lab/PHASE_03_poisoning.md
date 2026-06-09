@@ -24,13 +24,13 @@ Injection contrôlée ; datasets clean/dirty versionnés DVC.
 
 ## Types triggers (§7 spec)
 
-| Type | Module |
-|------|--------|
-| lexical | `raip/lab/injectors/lexical.py` |
-| format | `raip/lab/injectors/format.py` |
-| persona | `raip/lab/injectors/persona.py` |
-| language | `raip/lab/injectors/language.py` |
-| semantic | `raip/lab/injectors/semantic.py` |
+| Type | Module / function |
+|------|-------------------|
+| lexical | `raip/lab/injectors/registry.py` (`_lexical`) |
+| format | `raip/lab/injectors/registry.py` (`_format`) |
+| persona | `raip/lab/injectors/registry.py` (`_persona`) |
+| language | `raip/lab/injectors/registry.py` (`_language`) |
+| semantic | `raip/lab/injectors/registry.py` (`_semantic`) |
 
 ## Tâches
 

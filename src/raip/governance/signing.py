@@ -7,6 +7,8 @@ import json
 import os
 from typing import Any
 
+from raip.config import get_settings
+
 
 def artifact_digest(payload: bytes | str | dict[str, Any]) -> str:
     if isinstance(payload, dict):
@@ -23,7 +25,8 @@ def sign_artifact(payload: bytes | str | dict[str, Any]) -> dict[str, str]:
     Return signature metadata. When OpenBao/Cosign env vars are set, extend here.
     """
     digest = artifact_digest(payload)
-    key_id = os.environ.get("RAIP_SIGNING_KEY_ID", "openbao-transit-dev")
+    settings = get_settings()
+    key_id = settings.raip_signing_key_id
     algo = os.environ.get("RAIP_SIGNING_ALGO", "sha256")
     cosign = os.environ.get("COSIGN_EXPERIMENTAL", "")
     return {

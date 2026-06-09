@@ -10,7 +10,7 @@ from raip.llm.client import LLMClient
 _JUDGE_RE = re.compile(r"\b(success|fail|yes|no|true|false)\b", re.IGNORECASE)
 
 
-def judge_attack_blocked(
+def judge_attack_succeeded(
     llm: LLMClient,
     *,
     judge_model: str,

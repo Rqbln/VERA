@@ -1,0 +1,423 @@
+\documentclass[10pt,conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{balance}
+\usepackage{microtype}
+\usepackage{cleveref}
+\usepackage{siunitx}
+\usepackage{xcolor}
+
+\newcommand{\review}[1]{\textit{\textcolor{gray}{REVIEW: #1}}}
+\newcommand{\placeholder}[1]{\textit{[#1]}}
+\newcommand{\resultslot}[1]{\multicolumn{1}{@{}c@{}}{\footnotesize\placeholder{RESULT: #1}}}
+\newcommand{\resultinline}[1]{\placeholder{RESULT: #1}}
+
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
+\newcommand{\tblsetup}{%
+  \footnotesize%
+  \setlength{\tabcolsep}{3pt}%
+  \renewcommand{\arraystretch}{1.08}%
+}
+
+\begin{document}
+
+\title{RAIP: A Lifecycle-Aware Open Platform for Responsible AI Evaluation Aligned with COMPL-AI and the EU AI Act}
+
+\author{%
+  \IEEEauthorblockN{Anonymous Author(s)}%
+  \IEEEauthorblockA{Paper under double-blind review for APSEC 2026}%
+}
+
+\maketitle
+
+\begin{abstract}
+Deploying large language models under the EU AI Act~\cite{euaiact2024} requires reproducible technical evidence across trustworthy-AI principles~\cite{hleg2019trustworthyai}.
+COMPL-AI~\cite{guldimann2024complai} decomposes these obligations into eighteen technical requirements, twelve of which admit measurable scores, but industrial practice still relies on fragmented benchmark scripts with weak links from raw metrics to requirement identifiers, lifecycle stages, and audit artifacts.
+Recent LLM trustworthiness tools~\cite{sunetnanta2025promptops} focus primarily on single-shot prompt evaluation at a frozen model endpoint.
+We present RAIP, an open-source, self-hostable software engineering platform that orchestrates benchmarks through a LangGraph evaluation pipeline (CLI, REST API, Celery workers), routes inference via LiteLLM, persists signed runs to MLflow and MinIO, and emits model cards with explicit harness provenance.
+RAIP extends inference-time benchmarking with lifecycle-aware dataset and checkpoint evaluation and maps outcomes to COMPL-AI measurable requirements CR01--CR12.
+Our evaluation demonstrates an end-to-end pipeline on a representative open-weight target, coverage of the twelve measurable requirements, broader requirement coverage when dataset and lab scenarios are enabled, and traceable reporting when optional harnesses fall back to documented heuristics.
+RAIP treats compliance-oriented evaluation as an automated, reproducible software pipeline rather than ad hoc spreadsheet assembly.
+\review{Emphasize engineering contribution and traceability, not state-of-the-art accuracy on a single benchmark.}
+\end{abstract}
+
+\begin{IEEEkeywords}
+Responsible AI, EU AI Act, COMPL-AI, software engineering tools, LLM evaluation, model card, benchmark orchestration, lifecycle evaluation
+\end{IEEEkeywords}
+
+\section{Introduction}
+\label{sec:introduction}
+
+\subsection{Motivation}
+Regulated and high-risk AI systems must demonstrate technical evidence before deployment.
+The EU AI Act~\cite{euaiact2024} and the Ethics Guidelines for Trustworthy AI~\cite{hleg2019trustworthyai} frame expectations across robustness, privacy, transparency, and fairness.
+Organizational frameworks such as the NIST AI Risk Management Framework~\cite{nist2023airmf} and ISO/IEC~42001~\cite{iso42001_2023} guide governance but do not provide an executable pipeline that runs LLM benchmarks, aggregates scores, and produces auditor-facing artifacts.
+COMPL-AI~\cite{guldimann2024complai} translates legal principles into eighteen technical requirements with associated benchmarks, yet remains a measurement framework rather than an orchestration platform.
+Individual suites---for example DecodingTrust~\cite{wang2023decodingtrust}, the language-model evaluation harness~\cite{gao2021lmevalharness}, and MMLU~\cite{hendrycks2021mmlu}---answer \emph{measurement} questions in isolation.
+They do not, by themselves, deliver orchestration, requirement-level aggregation, or governance artifacts such as model cards~\cite{mitchell2019modelcard} and datasheets for datasets~\cite{gebru2021datasheets}.
+
+\subsection{Problem Statement}
+Three gaps motivate our work.
+First, compliance and ML teams manually assemble scores from disconnected tools, which is error-prone and difficult to reproduce across release gates.
+Second, inference-only evaluation misses dataset-stage risks (COMPL-AI CR03--CR05) and training-time persistence effects such as backdoor survival after alignment.
+Third, when optional dependencies are absent, evaluations may silently degrade to heuristic scorers without recording which harness actually ran.
+\review{Consider a compliance engineer who must attach a model card showing robustness (CR01), cyber resilience (CR02), fairness and toxicity (CR10--CR12), dataset adequacy (CR03--CR05), and signed run metadata before approving an instruction-tuned LLM---a process that today often requires days of ad hoc scripting.}
+
+\subsection{Platform Requirements}
+We distinguish \emph{platform requirements} PR1--PR4, which an evaluation platform must satisfy, from COMPL-AI \emph{requirement identifiers} CR01--CR12, which label measurable risk dimensions.
+\Cref{tab:platform-reqs} summarizes PR1--PR4.
+
+\begin{table}[t]
+  \caption{Platform requirements for a responsible-AI evaluation platform (distinct from COMPL-AI CR01--CR12).}
+  \label{tab:platform-reqs}
+  \centering
+  \tblsetup
+  \begin{tabularx}{\columnwidth}{@{}lX@{}}
+    \toprule
+    ID & Requirement \\
+    \midrule
+    PR1 & \emph{Lifecycle coverage:} evaluate targets at dataset, checkpoint, and inference stages, not only a static API endpoint. \\
+    PR2 & \emph{Regulatory traceability:} every reported score maps to a COMPL-AI identifier, contributing benchmarks, and uncertainty intervals. \\
+    PR3 & \emph{Reproducibility and automation:} declarative run configuration, asynchronous jobs, versioned catalogues, and signed artifacts. \\
+    PR4 & \emph{Sovereign self-hosted operation:} core execution on open-source infrastructure; proprietary APIs only as evaluation targets. \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+\subsection{Contributions}
+We present RAIP (\emph{Responsible AI in Practice}), an open-source platform that addresses PR1--PR4 while operationalizing COMPL-AI measurable requirements.
+Unlike prior LLM trustworthiness tools that focus primarily on single-shot model prompts without longitudinal or data-stage coverage~\cite{sunetnanta2025promptops}, RAIP unifies benchmark dispatch, weighted aggregation, and governance artifact generation in one self-hostable pipeline.
+
+In this paper, we make the following contributions:
+\begin{itemize}
+  \item \textbf{C1 --- Conceptual framework:}
+  A lifecycle-aware evaluation model aligning EU AI Act principles, COMPL-AI requirement identifiers, lifecycle stages (\texttt{data}, \texttt{finetune}, \texttt{inference}, \ldots), and stakeholder-oriented artifacts (\texttt{benchmark\_run.yaml}, model cards, datasheets).
+  \item \textbf{C2 --- RAIP platform:}
+  An open-source implementation comprising CLI \texttt{raip-eval}, a REST API, Celery workers, a LangGraph supervisor, a benchmark registry with dedicated runners (dataset scan, robustness, fairness, toxicity, watermark), lab routes for dataset scanning and poisoning experiments, and integration with MinIO, MLflow, and TimescaleDB.
+  \item \textbf{C3 --- Empirical evaluation:}
+  Three scenarios---(S1) full inference COMPL-AI evaluation, (S2) lifecycle extension with dataset and checkpoint lab workflows, and (S3) a case study on interpretability of generated governance artifacts---addressing research questions on reproducibility, coverage, and artifact clarity without claiming fabricated effect sizes in this draft.
+\end{itemize}
+
+\subsection{Paper Organization}
+The remainder of this paper surveys related work, presents the RAIP framework and architecture, describes the evaluation setup, reports results per research question, discusses threats to validity, and concludes.
+
+\section{Background and Related Work}
+\label{sec:related}
+
+\subsection{Regulatory Framing and COMPL-AI}
+The EU AI Act~\cite{euaiact2024} and the six HLEG trustworthy-AI principles~\cite{hleg2019trustworthyai} motivate technical evidence for high-risk systems.
+NIST and ISO frameworks~\cite{nist2023airmf,iso42001_2023} guide organizational risk management; RAIP implements the \emph{measure} slice---automated benchmarks and artifacts---not full governance programs.
+COMPL-AI~\cite{guldimann2024complai} maps legal principles to eighteen technical requirements, twelve with measurable scores in $[0,1]$, and associates benchmarks and multi-model studies.
+COMPL-AI remains a benchmark \emph{framework}, not a lifecycle orchestration platform with signed audit chains.
+
+\subsection{Benchmark Suites and Metrics}
+RAIP orchestrates established suites rather than proposing new benchmark science.
+Capability probes (CR06) draw on MMLU~\cite{hendrycks2021mmlu}, GSM8K~\cite{cobbe2021gsm8k}, HumanEval~\cite{chen2021humaneval}, TruthfulQA~\cite{lin2022truthfulqa}, and BBH~\cite{suzgun2023bbh} via the language-model evaluation harness~\cite{gao2021lmevalharness}.
+Calibration (CR07) uses expected calibration error~\cite{guo2017calibration}.
+Fairness and bias (CR10--CR11) integrate BBQ~\cite{parrish2022bbq}, BOLD~\cite{dhamala2021bold}, StereoSet~\cite{nadeem2021stereoset}, and disparity metrics~\cite{hardt2016equality,wang2023decodingtrust}.
+Toxicity (CR12) uses RealToxicityPrompts~\cite{gehman2020realtoxicity}.
+Dataset-stage checks (CR03--CR05) apply corpus heuristics and optional libraries; membership and extraction attacks~\cite{carlini2021membership,carlini2023extracting} motivate simplified engineering checks in MVP2.
+Watermarking (CR09) follows a statistical heuristic inspired by~\cite{kirchenbauer2023watermark}, not production SynthID.
+Cyber probes (CR02) may invoke Garak-class tools in implementation (no bibliography entry).
+
+\subsection{Governance Artifacts}
+Model Cards~\cite{mitchell2019modelcard} and Datasheets for Datasets~\cite{gebru2021datasheets} standardize disclosure; RAIP emits both from evaluation runs.
+
+\subsection{Software Engineering Tools}
+\Cref{tab:related-work} positions RAIP against APSEC neighbors.
+PromptOps~\cite{sunetnanta2025promptops} is the closest LLM trustworthiness tool but remains inference-centric.
+Histree~\cite{studtmann2023histree} exemplifies platform requirements and empirical tool papers.
+Controlled-experiment design~\cite{weninger2018usecase} and explicit RQ structures~\cite{liu2022mscpdp} inform our evaluation layout.
+Classic SE tool papers~\cite{hasselknippe2017guilayout} support technical validation without mandatory user studies.
+
+\begin{table*}[t]
+  \caption{Comparison of evaluation tooling (LC = lifecycle stages; CAI = COMPL-AI mapping; Pipe.\ = automated pipeline; Prov.\ = harness provenance; Host = self-hosted default).}
+  \label{tab:related-work}
+  \centering
+  \tblsetup
+  \begin{tabularx}{\textwidth}{@{}l*{5}{>{\centering\arraybackslash}X}@{}}
+    \toprule
+    Tool / framework & LC & CAI & Pipe. & Prov. & Host \\
+    \midrule
+    COMPL-AI~\cite{guldimann2024complai} & Inference & Definition & No & --- & Partial \\
+    PromptOps~\cite{sunetnanta2025promptops} & Inference & Partial & Yes & Limited & \review{verify} \\
+    Histree~\cite{studtmann2023histree} & Experiments & No & Yes & --- & Yes \\
+    RAIP & Data, ckpt, inf. & CR01--12 & Yes & Yes & Yes \\
+    \bottomrule
+  \end{tabularx}
+\end{table*}
+
+\subsection{Gap Summary}
+No reference in \Cref{tab:related-work} combines COMPL-AI-complete orchestration~\cite{guldimann2024complai}, lifecycle stages, Model Card and Datasheet artifacts~\cite{mitchell2019modelcard,gebru2021datasheets}, and explicit harness provenance in one self-hostable platform---extending PromptOps-class tools~\cite{sunetnanta2025promptops} toward regulatory traceability.
+
+\section{RAIP Framework and Architecture}
+\label{sec:framework}
+
+\subsection{Conceptual Evaluation Model}
+\Cref{fig:conceptual-model} summarizes contribution C1.
+An \emph{evaluation target} (model API, checkpoint, dataset corpus, or poisoned training manifest) is tagged with a \emph{lifecycle stage} (\texttt{data}, \texttt{pretrain}, \texttt{finetune}, \texttt{inference}, \ldots) in declarative \texttt{benchmark\_run.yaml}.
+The COMPL-AI layer aggregates twelve measurable identifiers CR01--CR12 from weighted benchmarks in catalogue \texttt{mvp2-v1}, with bootstrap 95\% confidence intervals after LangGraph aggregation.
+The artifact layer provides \texttt{benchmark\_run.yaml}, \texttt{model\_card.md}, \texttt{datasheet.md} (dataset runs), and \texttt{raw\_outputs.jsonl} with per-benchmark harness metadata.
+Stakeholders consume requirement tables and signatures (compliance), MLflow traces (engineering), and dataset scans (data stewardship).
+
+\begin{figure}[t]
+  \centering
+  \fbox{\parbox{0.92\columnwidth}{\centering\vspace{1.0em}\small\placeholder{FIG: conceptual\_model}\vspace{1.0em}}}
+  \caption{Conceptual model: lifecycle target, COMPL-AI scores, and governance artifacts.}
+  \label{fig:conceptual-model}
+\end{figure}
+
+\subsection{System Architecture}
+Users invoke \texttt{raip-eval} or \texttt{POST /api/v1/runs}; Celery workers execute a LangGraph supervisor (\texttt{evaluate} $\rightarrow$ \texttt{aggregate}); LiteLLM routes inference to the target (default Ollama); MLflow, MinIO, and TimescaleDB persist metrics and artifacts.
+\Cref{fig:architecture} shows major components; a sequence diagram is omitted for space.
+
+\begin{figure}[t]
+  \centering
+  \fbox{\parbox{0.92\columnwidth}{\centering\vspace{1.0em}\small\placeholder{FIG: architecture}\vspace{1.0em}}}
+  \caption{RAIP runtime architecture (placeholder).}
+  \label{fig:architecture}
+\end{figure}
+
+\begin{table}[t]
+  \caption{Major RAIP components.}
+  \label{tab:components}
+  \centering
+  \tblsetup
+  \begin{tabularx}{\columnwidth}{@{}lX@{}}
+    \toprule
+    Component & Responsibility \\
+    \midrule
+    FastAPI + lab routes & Run creation, dataset scan API \\
+    Celery + Redis & Async evaluation jobs \\
+    LangGraph supervisor & Benchmark dispatch, COMPL-AI aggregation \\
+    Benchmark registry & Map benchmark ID $\rightarrow$ runner \\
+    Runners & \texttt{lm\_eval}, Garak, \texttt{hf\_dynamic}, \texttt{dataset\_scan}; dedicated R01/R11/R12 runners \\
+    Governance & Model card/datasheet templates, \texttt{sign\_artifact}, energy hooks \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+\subsection{Benchmark Orchestration and Provenance}
+Signed weights in \texttt{benchmarks\_catalog.yaml} (version \texttt{mvp2-v1}) define per-requirement contributions.
+Each \texttt{raw\_outputs} row records \texttt{harness}, \texttt{agent}, and optional \texttt{fallback: true} with \texttt{fallback\_reason} when Garak or \texttt{lm\_eval} are unavailable.
+\review{Present provenance as auditor transparency, not an ML contribution.}
+
+\subsection{Lifecycle Lab Extensions}
+Dataset scans (\texttt{dataset\_quality\_scan}, copyright, privacy) populate CR03--CR05 in-graph.
+Checkpoint evaluation reuses the graph and writes Timescale \texttt{metric\_timeseries}.
+A poisoning lab reports backdoor survival ratio (BSR) for CR02 extensions, motivated by deceptive-agent persistence~\cite{hubinger2024sleeperagents}.
+
+\subsection{Governance Artifact Generation}
+Jinja2 model cards follow Model Cards~\cite{mitchell2019modelcard}: twelve measurable rows, dataset evaluation URIs, harness provenance, signatures, and limitations.
+Datasheets~\cite{gebru2021datasheets} attach to corpus scans.
+Environmental hooks align with ML CO$_2$ methodology~\cite{henderson2020mlco2}.
+
+\subsection{Implementation}
+Package \texttt{raip} v0.2.0 targets Python~3.11 with Docker Compose (Redis, MinIO, MLflow, Postgres/Timescale).
+Example configurations include \texttt{examples/mvp2\_ollama\_e2e\_full.yaml} and \texttt{examples/mvp2\_dataset\_eval.yaml}.
+Forty-two unit and lab tests passed in engineering validation (qualitative; not hypothesis-tested).
+MVP3 Streamlit/Next.js UI is out of scope; S3 uses markdown artifacts and optional MLflow views.
+
+\section{Evaluation Setup}
+\label{sec:evaluation}
+
+\subsection{Research Questions}
+Following explicit-RQ empirical SE papers~\cite{liu2022mscpdp} with threats informed by controlled experiments~\cite{weninger2018usecase}:
+\begin{itemize}
+  \item \emph{RQ1:} Can RAIP automatically produce reproducible, COMPL-AI-aligned scores~\cite{guldimann2024complai} across requested measurable requirements under declarative configuration? (C2; PR2--PR3)
+  \item \emph{RQ2:} Does lifecycle extension increase measurable requirement \emph{coverage} versus inference-only evaluation? (C1; PR1)
+  \item \emph{RQ3:} Are governance artifacts~\cite{mitchell2019modelcard,gebru2021datasheets} sufficient for a compliance-oriented reader to interpret outcomes without raw logs? (C3; PR2)
+\end{itemize}
+\review{RQ3 is a structured case study, not a Histree-style questionnaire~\cite{studtmann2023histree}; formal panels may use inter-rater reliability~\cite{hayes2007krippendorff} in future work.}
+
+\subsection{Evaluation Scenarios}
+\Cref{tab:evaluation-scenarios} defines three scenarios.
+
+\begin{table}[t]
+  \caption{Evaluation scenarios.}
+  \label{tab:evaluation-scenarios}
+  \centering
+  \tblsetup
+  \begin{tabularx}{\columnwidth}{@{}c l X c@{}}
+    \toprule
+    ID & Name & Configuration & RQs \\
+    \midrule
+    S1 & Inf.-only & \texttt{mvp2\_ollama\_e2e\_full.yaml};\newline CR01--02, CR06--12 & RQ1 \\
+    S2 & Lifecycle+ & S1 + \texttt{mvp2\_dataset\_eval.yaml};\newline opt.\ checkpoint/poison & RQ1--2 \\
+    S3 & Case study & Model card + provenance from S1/S2 & RQ3 \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+\subsection{Subject Systems and Variables}
+Primary target: Llama~3.1 8B Instruct via Ollama/LiteLLM (\texttt{q8\_0} quantisation) on a CI-comparable machine class.
+Independent variables: evaluation mode (S1 vs.\ S2), optional harness dependencies vs.\ heuristic fallback, watermark mode (\texttt{statistical} vs.\ \texttt{na}).
+Dependent variables: COMPL-AI CR scores with bootstrap CIs (RQ1); coverage set size (RQ2); harness fallback rate; BSR after poisoning; artifact checklist (RQ3); wall-clock \resultinline{MLflow duration}.
+
+\subsection{Procedure and Hypotheses}
+(1)~Start Compose stack; (2)~install \texttt{raip} with \texttt{dev}, \texttt{lab}, and \texttt{benchmarks} extras on Python~3.11; (3)--(4)~execute S1/S2 via CLI or API; (5)~collect model card, \texttt{benchmark\_run.yaml}, and \texttt{raw\_outputs.jsonl}; (6)~apply S3 checklist with documented rubric.
+Reproducibility metadata: \placeholder{RESULT: frozen git SHA, catalog mvp2-v1, seed=42}.
+\emph{H1:} S1 completes with aggregates and provenance for each benchmark.
+\emph{H2:} Coverage(S2) strictly superset of Coverage(S1), including CR03--CR05.
+\emph{H3:} Checklist pass rate $\geq$ \resultinline{threshold} using model card alone.
+
+\subsection{Engineering Validation}
+Forty-two tests (two deselected) support implementability; optional \texttt{RAIP\_E2E\_OLLAMA=1} CI path enables replication---not primary hypotheses.
+
+\section{Results and Analysis}
+\label{sec:results}
+
+All numeric cells below await MLflow and run artifacts; captions mark placeholders explicitly.
+
+\subsection{RQ1: Reproducible COMPL-AI-Aligned Scores (S1)}
+Scenario S1 exercised the full inference path on the default Ollama target.
+\Cref{tab:complai-scores-s1,tab:harness-provenance-s1} will report per-requirement scores and harness provenance once runs are frozen.
+We expect CR01--CR02 and CR06--CR12 aggregates with bootstrap intervals; fallbacks must appear in provenance when Garak or \texttt{lm\_eval} are absent.
+\Cref{fig:bar-complai-s1} will visualize requirement scores.
+
+\begin{table}[t]
+  \caption{COMPL-AI scores for S1 (to be populated from run artifacts).}
+  \label{tab:complai-scores-s1}
+  \centering
+  \tblsetup
+  \begin{tabularx}{\columnwidth}{@{}l X c c@{}}
+    \toprule
+    ID & Name & Score & 95\% CI \\
+    \midrule
+    CR01--CR12 & (twelve rows) & \resultslot{scores} & \resultslot{CI lo--hi} \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+\begin{table}[t]
+  \caption{Harness provenance for S1.}
+  \label{tab:harness-provenance-s1}
+  \centering
+  \tblsetup
+  \begin{tabularx}{\columnwidth}{@{}X c c c@{}}
+    \toprule
+    Benchmark & Harness & Agent & FB \\
+    \midrule
+    (per benchmark) & \resultslot{harness} & \resultslot{agent} & \resultslot{Y/N} \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+\begin{figure}[t]
+  \centering
+  \fbox{\parbox{0.92\columnwidth}{\centering\vspace{0.9em}\small\placeholder{FIG: bar\_complai\_r01\_r12\_s1}\vspace{0.9em}}}
+  \caption{COMPL-AI requirement scores for S1 (placeholder).}
+  \label{fig:bar-complai-s1}
+\end{figure}
+
+\subsection{RQ2: Lifecycle Coverage (S1 vs.\ S2)}
+Lifecycle extension should add dataset-stage requirements CR03--CR05 not observable at inference-only endpoints.
+\Cref{tab:coverage-comparison,tab:dataset-scores-s2} compare coverage sets and dataset scores; optional checkpoint and BSR figures remain placeholders.
+
+\begin{table}[t]
+  \caption{Requirement coverage: S1 vs.\ S2.}
+  \label{tab:coverage-comparison}
+  \centering
+  \tblsetup
+  \begin{tabularx}{\columnwidth}{@{}l c X@{}}
+    \toprule
+    Scenario & $|$cov.$|$ & Requirement IDs \\
+    \midrule
+    S1 & \resultslot{count} & \resultslot{set} \\
+    S2 & \resultslot{count} & \resultslot{set} \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+\begin{table}[t]
+  \caption{Dataset scores in S2 (CR03--CR05).}
+  \label{tab:dataset-scores-s2}
+  \centering
+  \tblsetup
+  \begin{tabularx}{\columnwidth}{@{}l c X@{}}
+    \toprule
+    ID & Score & Engine \\
+    \midrule
+    CR03--CR05 & \resultslot{scores} & \resultslot{engine mode} \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+\review{Coverage denotes technical observability, not legal compliance.}
+MVP2 limits: no full GPU training campaigns, SynthID-class watermarks, or LiRA privacy attacks.
+
+\subsection{RQ3: Artifact Interpretability (S3)}
+We walk through an anonymized model card: twelve requirement rows, dataset evaluation block, harness provenance, signature, and limitations.
+\Cref{tab:case-study-checklist} records traceability, completeness, and clarity versus raw \texttt{raw\_outputs.jsonl}.
+
+\begin{figure}[t]
+  \centering
+  \fbox{\parbox{0.92\columnwidth}{\centering\vspace{0.9em}\small\placeholder{FIG: model\_card\_excerpt}\vspace{0.9em}}}
+  \caption{Redacted model card excerpt (placeholder).}
+  \label{fig:model-card-excerpt}
+\end{figure}
+
+\begin{table}[t]
+  \caption{Case-study interpretability checklist (S3).}
+  \label{tab:case-study-checklist}
+  \centering
+  \tblsetup
+  \begin{tabularx}{\columnwidth}{@{}c X c@{}}
+    \toprule
+    Item & Question & Outcome \\
+    \midrule
+    1--8 & (rubric items) & \resultslot{P/F/Part.} \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+\review{If checklist passes, claim modest practitioner-oriented interpretability, not user satisfaction.}
+
+\subsection{Summary of Findings}
+\placeholder{RESULT: summary table mapping RQ1--RQ3 to yes/no/partial answers}.
+
+\section{Threats to Validity}
+\label{sec:threats}
+
+\emph{Internal validity.}
+Scenarios and catalogue weights (\texttt{mvp2-v1}) are author-designed.
+A judge=model configuration may bias LLM-judged probes (CR02, CR12).
+Heuristic fallbacks are mitigated by provenance, not eliminated.
+CR09 uses a simplified statistical detector.
+
+\emph{External validity.}
+Evidence centers on an 8B-class local model; larger or proprietary APIs may differ.
+The compliance vignette is single-domain; no longitudinal production deployment (MVP4).
+
+\emph{Construct validity.}
+COMPL-AI scores are technical proxies for regulatory obligations~\cite{guldimann2024complai,euaiact2024}, not legal conclusions.
+Fairness and toxicity protocols are simplified versus DecodingTrust~\cite{wang2023decodingtrust}; dataset checks are engineering heuristics versus membership/extraction attacks~\cite{carlini2021membership,carlini2023extracting}.
+
+\emph{Tool limitations.}
+Non-measurable requirements N01, N02, N05, N06 await MVP3+.
+No production governance proxy (MVP4); PEFT/DPO training is largely manifest-driven; Cosign digests may be placeholders in development builds; MVP3 UI is absent.
+
+\section{Conclusion and Future Work}
+\label{sec:conclusion}
+
+Fragmented responsible-AI evaluation forces software teams to stitch benchmarks manually.
+RAIP addresses platform requirements PR1--PR4 with contributions C1--C3: a lifecycle-aware framework, an open orchestration platform, and empirical scenarios S1--S3.
+\placeholder{RESULT: one sentence per RQ after experiments}.
+The replication package will provide Compose manifests, example YAMLs, and anonymized run artifacts: \placeholder{RESULT: anonymized replication package URL/tag}.
+
+Future work includes MVP3 HITL panels and dashboards, MVP4 production proxies and trust factors, SynthID-class watermarking and LiRA privacy probes, multi-model studies, and formal practitioner studies~\cite{studtmann2023histree,hayes2007krippendorff}.
+
+\balance
+{\footnotesize
+\bibliographystyle{IEEEtran}
+\bibliography{references}
+}
+
+\end{document}

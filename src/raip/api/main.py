@@ -4,9 +4,11 @@ from typing import Any
 from uuid import uuid4
 
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 from raip.api.benchmark_registry import MVP2_BENCHMARK_REGISTRY
+from raip.api.dashboard_routes import router as dashboard_router
 from raip.config import get_settings
 from raip.schemas.run_payload import RunCreateRequest
 from raip.store.redis_run import RedisRunStore
@@ -15,8 +17,16 @@ from raip.tasks.eval import run_benchmark_job
 
 BENCHMARK_REGISTRY: list[dict[str, Any]] = list(MVP2_BENCHMARK_REGISTRY)
 
-app = FastAPI(title="RAIP MVP2 API", version="0.2.0")
+app = FastAPI(title="RAIP API", version="0.3.0")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 app.include_router(lab_router)
+app.include_router(dashboard_router)
 
 
 class ModelDeclare(BaseModel):

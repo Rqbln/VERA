@@ -75,8 +75,42 @@ Containers reach Ollama via `http://host.docker.internal:11434` (`OLLAMA_API_BAS
 ## Endpoints
 
 - API docs: `http://127.0.0.1:8000/docs`
+- **MVP3 dashboard**: `http://127.0.0.1:3000` (compliance control room)
+- Keycloak: `http://127.0.0.1:8080` (admin / admin; realm `raip`)
 - MLflow UI: `http://127.0.0.1:5001` (port hôte ; le conteneur écoute toujours sur 5000 en interne)
 - MinIO console: `http://127.0.0.1:9001` (user/password `minioadmin`)
+
+### MVP3 dashboard (local)
+
+```bash
+# Terminal A — API with auth disabled for quick UI dev
+export RAIP_AUTH_DISABLED=1
+uvicorn raip.api.main:app --reload --port 8000
+
+# Terminal B — Next.js (see dashboard/.env.example)
+cd dashboard
+cp .env.example .env.local
+# set NEXT_PUBLIC_AUTH_DISABLED=1
+npm run dev
+```
+
+Docker (Keycloak + RBAC):
+
+```bash
+docker compose up --build api keycloak dashboard redis minio
+```
+
+Test personas (password `raip-dev`): `compliance@raip.local`, `ds@raip.local`, `secops@raip.local`, etc. — see `infra/keycloak/raip-realm.json`.
+
+Playwright RBAC matrix (3 views × 8 personas):
+
+```bash
+cd dashboard
+npm run build
+npx playwright test
+```
+
+UX spec: [MVP3_UX_CONTROL_ROOM.md](./MVP3_UX_CONTROL_ROOM.md).
 
 ## Environment
 

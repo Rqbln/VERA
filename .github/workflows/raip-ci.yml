@@ -44,6 +44,29 @@ jobs:
       - run: pip install -e ".[dev]"
       - run: pytest tests/integration/ -m integration -q
 
+  dashboard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: dashboard/package-lock.json
+      - run: npm ci
+        working-directory: dashboard
+      - run: npm run build
+        working-directory: dashboard
+        env:
+          NEXT_PUBLIC_AUTH_DISABLED: "1"
+      - run: npx playwright install chromium
+        working-directory: dashboard
+      - run: npx playwright test
+        working-directory: dashboard
+        env:
+          CI: "1"
+          NEXT_PUBLIC_AUTH_DISABLED: "1"
+
   e2e-ollama:
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && github.ref == 'refs/heads/MVP2'

@@ -185,6 +185,7 @@ def run_benchmark_job(self, run_id: str, payload: dict[str, Any]) -> dict[str, A
     settings = get_settings()
     store = RedisRunStore(settings)
     store.update(run_id, status="running")
+    store.append_stage(run_id, "running")
 
     req = RunCreateRequest.model_validate(payload)
     s = get_settings()
@@ -218,9 +219,13 @@ def run_benchmark_job(self, run_id: str, payload: dict[str, Any]) -> dict[str, A
                 "protected_groups": list(req.dataset_protected_groups or []),
             },
         }
+        store.append_stage(run_id, "evaluate")
         state = run_evaluation_graph(initial, llm=LLMClient(s))
+        store.append_stage(run_id, "aggregate")
+        raw_outputs = list(state.get("raw_outputs") or [])
         complai: dict[str, ComplaiRequirementScore] = dict(state.get("complai_scores") or {})
         agg: dict[str, float] = {k: float(v.score) for k, v in complai.items()}
+        harness_rows = _harness_provenance(raw_outputs)
 
         mlflow_run_id: str | None = None
         with mlflow.start_run(run_name=run_id) as active:
@@ -234,13 +239,15 @@ def run_benchmark_job(self, run_id: str, payload: dict[str, Any]) -> dict[str, A
                 mlflow.log_metric(f"complai_{k}_ci_lo", float(v.score_ci_lower))
                 mlflow.log_metric(f"complai_{k}_ci_hi", float(v.score_ci_upper))
 
+        store.append_stage(run_id, "mlflow_log")
         provider, model_name = parse_litellm_model_id(req.model_id)
         sig = sign_artifact({"run_id": run_id, "scores": agg, "catalog_version": cat_version})
+        lifecycle_stage = str(payload.get("lifecycle_stage") or "inference")
         br = build_benchmark_run_dict(
             run_id=run_id,
             model_name=model_name,
             provider=provider,
-            lifecycle_stage="inference",
+            lifecycle_stage=lifecycle_stage,
             complai_scores=complai,
             complai_requirements=req.complai_requirements,
             benchmarks=req.benchmarks,
@@ -258,12 +265,13 @@ def run_benchmark_job(self, run_id: str, payload: dict[str, Any]) -> dict[str, A
                 req=req,
                 git_sha=git_sha,
                 catalog_version=cat_version,
-                raw_outputs=list(state.get("raw_outputs") or []),
+                raw_outputs=raw_outputs,
             )
         )
-        raw_lines = [json.dumps(x, ensure_ascii=False) for x in state.get("raw_outputs") or []]
+        raw_lines = [json.dumps(x, ensure_ascii=False) for x in raw_outputs]
         raw_jsonl = "\n".join(raw_lines) + ("\n" if raw_lines else "")
 
+        store.append_stage(run_id, "upload_artifacts")
         prefix = f"runs/{run_id}"
         upload_bytes(
             f"{prefix}/raw_outputs.jsonl",
@@ -293,8 +301,16 @@ def run_benchmark_job(self, run_id: str, payload: dict[str, Any]) -> dict[str, A
             benchmark_run_yaml=yaml_body,
             aggregate_scores=agg,
             complai_scores=complai_serializable,
+            lifecycle_stage=lifecycle_stage,
+            catalog_version=cat_version,
+            harness_provenance=harness_rows,
+            raw_outputs_summary=raw_outputs,
+            signature=sig,
+            git_sha=git_sha,
         )
+        store.append_stage(run_id, "completed")
         return {"run_id": run_id, "status": "completed", "aggregate_scores": agg}
     except Exception as e:
         store.update(run_id, status="failed", error=str(e))
+        store.append_stage(run_id, "failed", status="failed", detail=str(e)[:500])
         raise

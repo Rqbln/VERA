@@ -222,6 +222,8 @@ flowchart LR
 
 ### 4.3 Détails Vue Compliance
 
+> **UX control room (implémenté)** : voir [MVP3_UX_CONTROL_ROOM.md](./MVP3_UX_CONTROL_ROOM.md) — triage status-first, drill-down progressif, inspecteur `/runs/{id}/inspector`, barre de couverture unique.
+
 - **Mapping interactif** des 18 exigences COMPL-AI ↔ 6 principes éthiques ↔ articles AI Act (10, 13, 14, 15, 50, 53). Drill-down sur chaque cellule.
 - **Bandes vertes/orange/rouges** configurables par contexte d'usage (recommandation films vs diagnostic médical) — **pas de score binaire global** (cf. ROADMAP §3.4).
 - **Trade-off explorer** : superposition de courbes (ex. R06 capability ↑ vs R12 toxicity ↓, ou R10 representation vs R06 capability) — visualise les compromis en contexte longitudinal.

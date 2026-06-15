@@ -24,6 +24,13 @@ class RunRecord:
     aggregate_scores: dict[str, float] | None = None
     complai_scores: dict[str, Any] | None = None
     payload: dict[str, Any] = field(default_factory=dict)
+    lifecycle_stage: str = "inference"
+    catalog_version: str = ""
+    harness_provenance: list[dict[str, Any]] = field(default_factory=list)
+    stages: list[dict[str, Any]] = field(default_factory=list)
+    raw_outputs_summary: list[dict[str, Any]] = field(default_factory=list)
+    signature: dict[str, str] | None = None
+    git_sha: str = "unknown"
 
     def to_json(self) -> str:
         return json.dumps(asdict(self), ensure_ascii=False)
@@ -34,6 +41,14 @@ class RunRecord:
         for key, default in (
             ("aggregate_scores", None),
             ("complai_scores", None),
+            ("payload", {}),
+            ("lifecycle_stage", "inference"),
+            ("catalog_version", ""),
+            ("harness_provenance", []),
+            ("stages", []),
+            ("raw_outputs_summary", []),
+            ("signature", None),
+            ("git_sha", "unknown"),
         ):
             d.setdefault(key, default)
         return cls(**d)
@@ -58,6 +73,7 @@ class RedisRunStore:
 
     def create(self, run_id: str, model_id: str, payload: dict[str, Any]) -> RunRecord:
         now = datetime.now(UTC).isoformat()
+        lifecycle = str(payload.get("lifecycle_stage") or "inference")
         rec = RunRecord(
             run_id=run_id,
             status="queued",
@@ -65,6 +81,8 @@ class RedisRunStore:
             created_at=now,
             updated_at=now,
             payload=payload,
+            lifecycle_stage=lifecycle,
+            stages=[{"name": "queued", "status": "completed", "ts": now}],
         )
         self._persist(self._key(run_id), rec.to_json())
         return rec
@@ -74,6 +92,25 @@ class RedisRunStore:
         if not raw:
             return None
         return RunRecord.from_json(raw)
+
+    def append_stage(
+        self,
+        run_id: str,
+        name: str,
+        status: str = "completed",
+        detail: str | None = None,
+    ) -> RunRecord | None:
+        rec = self.get(run_id)
+        if not rec:
+            return None
+        now = datetime.now(UTC).isoformat()
+        stage: dict[str, Any] = {"name": name, "status": status, "ts": now}
+        if detail:
+            stage["detail"] = detail
+        rec.stages.append(stage)
+        rec.updated_at = now
+        self._persist(self._key(run_id), rec.to_json())
+        return rec
 
     def update(
         self,
@@ -86,6 +123,13 @@ class RedisRunStore:
         benchmark_run_yaml: str | None = None,
         aggregate_scores: dict[str, float] | None = None,
         complai_scores: dict[str, Any] | None = None,
+        lifecycle_stage: str | None = None,
+        catalog_version: str | None = None,
+        harness_provenance: list[dict[str, Any]] | None = None,
+        stages: list[dict[str, Any]] | None = None,
+        raw_outputs_summary: list[dict[str, Any]] | None = None,
+        signature: dict[str, str] | None = None,
+        git_sha: str | None = None,
     ) -> RunRecord | None:
         rec = self.get(run_id)
         if not rec:
@@ -104,9 +148,64 @@ class RedisRunStore:
             rec.aggregate_scores = aggregate_scores
         if complai_scores is not None:
             rec.complai_scores = complai_scores
+        if lifecycle_stage is not None:
+            rec.lifecycle_stage = lifecycle_stage
+        if catalog_version is not None:
+            rec.catalog_version = catalog_version
+        if harness_provenance is not None:
+            rec.harness_provenance = harness_provenance
+        if stages is not None:
+            rec.stages = stages
+        if raw_outputs_summary is not None:
+            rec.raw_outputs_summary = raw_outputs_summary
+        if signature is not None:
+            rec.signature = signature
+        if git_sha is not None:
+            rec.git_sha = git_sha
         rec.updated_at = datetime.now(UTC).isoformat()
         self._persist(self._key(run_id), rec.to_json())
         return rec
 
     def delete(self, run_id: str) -> bool:
         return bool(self._r.delete(self._key(run_id)))
+
+    def list_runs(
+        self,
+        *,
+        limit: int = 50,
+        offset: int = 0,
+        model_id: str | None = None,
+        lifecycle: str | None = None,
+        status: str | None = None,
+        exclude_pilote: bool = True,
+    ) -> tuple[list[RunRecord], int]:
+        from raip.dashboard.triage import is_pilote_run
+
+        keys: list[str] = []
+        cursor = 0
+        while True:
+            cursor, batch = self._r.scan(cursor=cursor, match=f"{self.prefix}*", count=200)
+            keys.extend(batch)
+            if cursor == 0:
+                break
+
+        records: list[RunRecord] = []
+        for key in keys:
+            raw = self._r.get(key)
+            if not raw:
+                continue
+            rec = RunRecord.from_json(raw)
+            if exclude_pilote and is_pilote_run(rec.catalog_version, rec.payload):
+                continue
+            if model_id and rec.model_id != model_id:
+                continue
+            if lifecycle and rec.lifecycle_stage != lifecycle:
+                continue
+            if status and rec.status != status:
+                continue
+            records.append(rec)
+
+        records.sort(key=lambda r: r.created_at or "", reverse=True)
+        total = len(records)
+        page = records[offset : offset + limit]
+        return page, total

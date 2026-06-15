@@ -49,3 +49,26 @@ def upload_bytes(
     c = _client(s)
     c.put_object(Bucket=s.minio_bucket, Key=key, Body=body, ContentType=content_type)
     return f"s3://{s.minio_bucket}/{key}"
+
+
+def download_bytes(key: str, settings: Settings | None = None) -> bytes | None:
+    s = settings or get_settings()
+    c = _client(s)
+    try:
+        resp = c.get_object(Bucket=s.minio_bucket, Key=key)
+        return resp["Body"].read()
+    except Exception:
+        return None
+
+
+def presign_get(key: str, expires_in: int = 3600, settings: Settings | None = None) -> str | None:
+    s = settings or get_settings()
+    c = _client(s)
+    try:
+        return c.generate_presigned_url(
+            "get_object",
+            Params={"Bucket": s.minio_bucket, "Key": key},
+            ExpiresIn=expires_in,
+        )
+    except ClientError:
+        return None

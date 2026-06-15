@@ -13,7 +13,11 @@ export default defineConfig({
   },
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
   webServer: {
-    command: process.env.CI ? "node .next/standalone/server.js" : "npm run dev",
+    // The standalone server needs static assets copied next to it (as the Dockerfile does),
+    // otherwise client JS 404s and client-only behaviour (redirects, queries) never runs.
+    command: process.env.CI
+      ? "cp -r .next/static .next/standalone/.next/ 2>/dev/null; cp -r public .next/standalone/ 2>/dev/null; node .next/standalone/server.js"
+      : "npm run dev",
     url: "http://127.0.0.1:3000",
     reuseExistingServer: !process.env.CI,
     env: {

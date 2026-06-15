@@ -39,8 +39,9 @@ test.beforeEach(async ({ page }) => {
 
 test("root redirects to guided home", async ({ page }) => {
   await page.goto("/");
-  await expect(page).toHaveURL(/\/home$/);
-  await expect(page.getByTestId("home-overview")).toBeVisible();
+  // The redirect is client-side (useEffect); CI's production server hydrates slower than dev.
+  await page.waitForURL(/\/home$/, { timeout: 20_000 });
+  await expect(page.getByTestId("home-overview")).toBeVisible({ timeout: 20_000 });
 });
 
 test("home shows quick actions and no login chrome", async ({ page }) => {
@@ -54,15 +55,16 @@ test("home shows quick actions and no login chrome", async ({ page }) => {
 
 test("launch wizard renders connected models", async ({ page }) => {
   await page.goto("/launch");
-  await expect(page.getByTestId("launch-wizard")).toBeVisible();
-  await expect(page.getByText("llama3.1:8b-instruct-q8_0")).toBeVisible();
-  await expect(page.getByText("recommended").first()).toBeVisible();
+  await expect(page.getByTestId("launch-wizard")).toBeVisible({ timeout: 20_000 });
+  // Model list comes from a client-side query (mocked); allow for slow CI hydration.
+  await expect(page.getByText("llama3.1:8b-instruct-q8_0")).toBeVisible({ timeout: 20_000 });
+  await expect(page.getByText("recommended").first()).toBeVisible({ timeout: 20_000 });
 });
 
 test("runs overview renders empty state", async ({ page }) => {
   await page.goto("/runs-overview");
-  await expect(page.getByTestId("runs-overview")).toBeVisible();
-  await expect(page.getByText("Launch your first evaluation →")).toBeVisible();
+  await expect(page.getByTestId("runs-overview")).toBeVisible({ timeout: 20_000 });
+  await expect(page.getByText("Launch your first evaluation →")).toBeVisible({ timeout: 20_000 });
 });
 
 test("all three lenses render for the guided persona", async ({ page }) => {

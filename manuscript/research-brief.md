@@ -328,7 +328,7 @@ User / CI → CLI (raip-eval) or POST /api/v1/runs
 ### 12.2 External validity
 
 - Primary evidence on **8B-class** local model; may not generalize to 70B or proprietary APIs.  
-- Single organization context (BNP Paribas practice project — **TODO: [USER: anonymize for double-blind]**).  
+- Single-organization industrial context (anonymized for double-blind review).  
 - No longitudinal production deployment study (MVP4).
 
 ### 12.3 Construct validity

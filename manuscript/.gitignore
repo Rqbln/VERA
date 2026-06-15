@@ -8,3 +8,7 @@
 *.out
 *.pdf
 *.synctex.gz
+
+# ...but keep generated figure assets (source for compilation / replication)
+!figures/
+!figures/*.pdf

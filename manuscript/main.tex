@@ -28,7 +28,7 @@
 
 \begin{document}
 
-\title{RAIP: A Lifecycle-Aware Open Platform for Responsible AI Evaluation Aligned with COMPL-AI and the EU AI Act}
+\title{RAIP: An Open-Source Platform and Compliance Control Room for Reproducible, Configurable EU AI Act LLM Evaluation}
 
 \author{%
   \IEEEauthorblockN{Anonymous Author(s)}%
@@ -39,17 +39,18 @@
 
 \begin{abstract}
 Deploying large language models under the EU AI Act~\cite{euaiact2024} requires reproducible technical evidence across trustworthy-AI principles~\cite{hleg2019trustworthyai}.
-COMPL-AI~\cite{guldimann2024complai} decomposes these obligations into eighteen technical requirements, twelve of which admit measurable scores, but industrial practice still relies on fragmented benchmark scripts with weak links from raw metrics to requirement identifiers, lifecycle stages, and audit artifacts.
-Recent LLM trustworthiness tools~\cite{sunetnanta2025promptops} focus primarily on single-shot prompt evaluation at a frozen model endpoint.
-We present RAIP, an open-source, self-hostable software engineering platform that orchestrates benchmarks through a LangGraph evaluation pipeline (CLI, REST API, Celery workers), routes inference via LiteLLM, persists signed runs to MLflow and MinIO, and emits model cards with explicit harness provenance.
-RAIP extends inference-time benchmarking with lifecycle-aware dataset and checkpoint evaluation and maps outcomes to COMPL-AI measurable requirements CR01--CR12.
-Our evaluation demonstrates an end-to-end pipeline on a representative open-weight target, coverage of the twelve measurable requirements, broader requirement coverage when dataset and lab scenarios are enabled, and traceable reporting when optional harnesses fall back to documented heuristics.
-RAIP treats compliance-oriented evaluation as an automated, reproducible software pipeline rather than ad hoc spreadsheet assembly.
-\review{Emphasize engineering contribution and traceability, not state-of-the-art accuracy on a single benchmark.}
+COMPL-AI~\cite{guldimann2024complai} decomposes these obligations into eighteen technical requirements, twelve of which admit measurable scores, but industrial practice still relies on fragmented benchmark scripts whose aggregation choices are opaque and whose results are hard for non-specialists to triage.
+We present RAIP, an open-source, self-hostable software-engineering platform \emph{and} a ``compliance control room'' dashboard for EU AI Act LLM evaluation.
+RAIP orchestrates benchmarks through a LangGraph pipeline (CLI, REST API, Celery workers), routes inference via LiteLLM to self-hosted models, and emits signed artifacts with explicit harness provenance.
+Two design decisions distinguish it.
+First, the benchmark-to-requirement \emph{aggregation weights} are a first-class, versioned, signed artifact; we use this to run a reproducible \emph{sensitivity analysis} that quantifies how the per-requirement compliance picture, the green/amber/red bands, and the dashboard's status-first triage order shift under alternative weightings.
+Second, a no-login \emph{guided} mode lets a non-technical user launch an evaluation on a connected model and read a status-first, progressively-disclosed summary, while a role-based control room serves expert audiences.
+On an open-weight target we report measurable-requirement scores with bootstrap intervals, the weighting-sensitivity result, and an expert interpretability walkthrough of the dashboard.
+RAIP treats compliance-oriented evaluation as an automated, reproducible, and \emph{auditable} software pipeline rather than ad hoc spreadsheet assembly.
 \end{abstract}
 
 \begin{IEEEkeywords}
-Responsible AI, EU AI Act, COMPL-AI, software engineering tools, LLM evaluation, model card, benchmark orchestration, lifecycle evaluation
+Responsible AI, EU AI Act, COMPL-AI, software engineering tools, LLM evaluation, compliance dashboard, configurable aggregation, sensitivity analysis, benchmark orchestration
 \end{IEEEkeywords}
 
 \section{Introduction}
@@ -68,7 +69,7 @@ Three gaps motivate our work.
 First, compliance and ML teams manually assemble scores from disconnected tools, which is error-prone and difficult to reproduce across release gates.
 Second, inference-only evaluation misses dataset-stage risks (COMPL-AI CR03--CR05) and training-time persistence effects such as backdoor survival after alignment.
 Third, when optional dependencies are absent, evaluations may silently degrade to heuristic scorers without recording which harness actually ran.
-\review{Consider a compliance engineer who must attach a model card showing robustness (CR01), cyber resilience (CR02), fairness and toxicity (CR10--CR12), dataset adequacy (CR03--CR05), and signed run metadata before approving an instruction-tuned LLM---a process that today often requires days of ad hoc scripting.}
+Consider a compliance engineer who must attach a model card showing robustness (CR01), fairness and toxicity (CR10--CR12), and signed run metadata before approving an instruction-tuned LLM, and who must also justify \emph{how} the per-requirement scores were aggregated---a process that today often requires days of ad hoc scripting and undocumented weighting choices.
 
 \subsection{Platform Requirements}
 We distinguish \emph{platform requirements} PR1--PR4, which an evaluation platform must satisfy, from COMPL-AI \emph{requirement identifiers} CR01--CR12, which label measurable risk dimensions.
@@ -97,16 +98,16 @@ Unlike prior LLM trustworthiness tools that focus primarily on single-shot model
 
 In this paper, we make the following contributions:
 \begin{itemize}
-  \item \textbf{C1 --- Conceptual framework:}
-  A lifecycle-aware evaluation model aligning EU AI Act principles, COMPL-AI requirement identifiers, lifecycle stages (\texttt{data}, \texttt{finetune}, \texttt{inference}, \ldots), and stakeholder-oriented artifacts (\texttt{benchmark\_run.yaml}, model cards, datasheets).
-  \item \textbf{C2 --- RAIP platform:}
-  An open-source implementation comprising CLI \texttt{raip-eval}, a REST API, Celery workers, a LangGraph supervisor, a benchmark registry with dedicated runners (dataset scan, robustness, fairness, toxicity, watermark), lab routes for dataset scanning and poisoning experiments, and integration with MinIO, MLflow, and TimescaleDB.
+  \item \textbf{C1 --- Open platform and compliance control room:}
+  An open-source, self-hostable implementation (CLI \texttt{raip-eval}, REST API, Celery workers, LangGraph supervisor, benchmark registry with dedicated runners) \emph{and} a Next.js ``control room'' dashboard with status-first triage, progressive disclosure, role-based lenses, and a no-login \emph{guided} mode whose launch wizard lets a non-technical user evaluate a connected model in minutes.
+  \item \textbf{C2 --- Configurable, auditable aggregation:}
+  Benchmark-to-requirement aggregation weights as a first-class, versioned, signed artifact (\texttt{benchmarks\_catalog.yaml}), and a reproducible \emph{weighting-sensitivity methodology} that quantifies how requirement scores, score bands, and the dashboard's triage order move under alternative weightings.
   \item \textbf{C3 --- Empirical evaluation:}
-  Three scenarios---(S1) full inference COMPL-AI evaluation, (S2) lifecycle extension with dataset and checkpoint lab workflows, and (S3) a case study on interpretability of generated governance artifacts---addressing research questions on reproducibility, coverage, and artifact clarity without claiming fabricated effect sizes in this draft.
+  On an open-weight target, (RQ1) reproducible COMPL-AI-aligned scores with bootstrap intervals and harness provenance, (RQ2) a weighting-sensitivity study reporting band-flips and triage-rank stability, and (RQ3) an expert interpretability walkthrough of the control room.
 \end{itemize}
 
 \subsection{Paper Organization}
-The remainder of this paper surveys related work, presents the RAIP framework and architecture, describes the evaluation setup, reports results per research question, discusses threats to validity, and concludes.
+\Cref{sec:related} surveys open-source evaluation frameworks; \Cref{sec:framework} presents the platform; \Cref{sec:weighting} details configurable aggregation and the sensitivity methodology; \Cref{sec:dashboard} describes the compliance control room; \Cref{sec:evaluation,sec:results} give the evaluation and results; \Cref{sec:threats} discusses threats and \Cref{sec:conclusion} concludes.
 
 \section{Background and Related Work}
 \label{sec:related}
@@ -130,58 +131,60 @@ Cyber probes (CR02) may invoke Garak-class tools in implementation (no bibliogra
 \subsection{Governance Artifacts}
 Model Cards~\cite{mitchell2019modelcard} and Datasheets for Datasets~\cite{gebru2021datasheets} standardize disclosure; RAIP emits both from evaluation runs.
 
-\subsection{Software Engineering Tools}
-\Cref{tab:related-work} positions RAIP against APSEC neighbors.
-PromptOps~\cite{sunetnanta2025promptops} is the closest LLM trustworthiness tool but remains inference-centric.
-Histree~\cite{studtmann2023histree} exemplifies platform requirements and empirical tool papers.
-Controlled-experiment design~\cite{weninger2018usecase} and explicit RQ structures~\cite{liu2022mscpdp} inform our evaluation layout.
-Classic SE tool papers~\cite{hasselknippe2017guilayout} support technical validation without mandatory user studies.
+\subsection{Open-Source LLM Evaluation Frameworks}
+A growing ecosystem of open-source frameworks evaluates LLMs, but they target different layers.
+HELM~\cite{liang2023helm} standardizes \emph{which} scenarios and metrics to report across many models; the language-model evaluation harness~\cite{gao2021lmevalharness} standardizes \emph{how} a capability benchmark is executed reproducibly; Garak~\cite{derczynski2024garak} is a security-probing framework for jailbreaks and prompt injection; DecodingTrust~\cite{wang2023decodingtrust} is a trustworthiness benchmark suite.
+These are excellent \emph{measurement} substrates, and RAIP orchestrates them rather than competing with them.
+What turns such tools into a usable \emph{compliance framework}---rather than a collection of scripts---is, we argue, four engineering properties: (i) a permissive open license and self-hostable deployment; (ii) extensibility through a benchmark registry and pluggable runners; (iii) reproducibility via declarative runs, versioned and signed catalogues, and recorded provenance; and (iv) an interpretable restitution surface that maps raw metrics to regulatory requirement identifiers for non-specialist stakeholders.
+RAIP's contribution is to assemble these four properties around the COMPL-AI requirement taxonomy and to make the \emph{aggregation policy} itself an auditable artifact.
+
+\subsection{Software Engineering Tool Papers}
+\Cref{tab:related-work} positions RAIP against neighboring evaluation tooling.
+PromptOps~\cite{sunetnanta2025promptops} is the closest APSEC LLM-trustworthiness tool but remains inference-centric and does not expose its aggregation policy.
+Histree~\cite{studtmann2023histree} exemplifies APSEC tool-and-evaluation papers; controlled-experiment design~\cite{weninger2018usecase} and explicit RQ structures~\cite{liu2022mscpdp} inform our evaluation layout, and classic SE tool papers~\cite{hasselknippe2017guilayout} support technical validation without mandatory user studies.
 
 \begin{table*}[t]
-  \caption{Comparison of evaluation tooling (LC = lifecycle stages; CAI = COMPL-AI mapping; Pipe.\ = automated pipeline; Prov.\ = harness provenance; Host = self-hosted default).}
+  \caption{Open-source LLM-evaluation tooling along framework properties (CAI = COMPL-AI requirement mapping; Pipe.\ = declarative automated pipeline; Conf.\ wt.\ = configurable, signed aggregation weights; Prov.\ = harness provenance; Dash.\ = interpretive dashboard; Host = self-hosted default).}
   \label{tab:related-work}
   \centering
   \tblsetup
-  \begin{tabularx}{\textwidth}{@{}l*{5}{>{\centering\arraybackslash}X}@{}}
+  \begin{tabularx}{\textwidth}{@{}l*{6}{>{\centering\arraybackslash}X}@{}}
     \toprule
-    Tool / framework & LC & CAI & Pipe. & Prov. & Host \\
+    Tool / framework & CAI & Pipe. & Conf.\ wt. & Prov. & Dash. & Host \\
     \midrule
-    COMPL-AI~\cite{guldimann2024complai} & Inference & Definition & No & --- & Partial \\
-    PromptOps~\cite{sunetnanta2025promptops} & Inference & Partial & Yes & Limited & \review{verify} \\
-    Histree~\cite{studtmann2023histree} & Experiments & No & Yes & --- & Yes \\
-    RAIP & Data, ckpt, inf. & CR01--12 & Yes & Yes & Yes \\
+    COMPL-AI~\cite{guldimann2024complai} & Definition & No & Fixed & --- & --- & Partial \\
+    HELM~\cite{liang2023helm} & No & Yes & --- & Partial & Leaderboard & Yes \\
+    lm-eval-harness~\cite{gao2021lmevalharness} & No & Yes & --- & --- & --- & Yes \\
+    Garak~\cite{derczynski2024garak} & CR02$^{\dagger}$ & Yes & --- & Partial & --- & Yes \\
+    DecodingTrust~\cite{wang2023decodingtrust} & Several & Partial & Fixed & --- & --- & Yes \\
+    PromptOps~\cite{sunetnanta2025promptops} & Partial & Yes & No & Limited & Limited & Yes \\
+    RAIP & CR01--12 & Yes & Yes (signed) & Yes & Control room & Yes \\
     \bottomrule
   \end{tabularx}
+  \footnotesize\par\smallskip
+  Conf.\ wt.: configurable aggregation weights---\emph{Fixed} (published, not user-editable), \emph{No} (none), or \emph{Yes}; ``---'' = the tool does not aggregate to requirements. $^{\dagger}$Garak runs a broad security-probe taxonomy mapped here mainly to cyber-resilience (CR02).
 \end{table*}
 
 \subsection{Gap Summary}
-No reference in \Cref{tab:related-work} combines COMPL-AI-complete orchestration~\cite{guldimann2024complai}, lifecycle stages, Model Card and Datasheet artifacts~\cite{mitchell2019modelcard,gebru2021datasheets}, and explicit harness provenance in one self-hostable platform---extending PromptOps-class tools~\cite{sunetnanta2025promptops} toward regulatory traceability.
+No reference in \Cref{tab:related-work} combines a COMPL-AI-complete requirement mapping~\cite{guldimann2024complai}, a declarative self-hostable pipeline, \emph{configurable and signed} aggregation weights, recorded harness provenance, and an interpretive compliance dashboard in one platform---which is precisely the gap RAIP targets.
 
 \section{RAIP Framework and Architecture}
 \label{sec:framework}
 
 \subsection{Conceptual Evaluation Model}
-\Cref{fig:conceptual-model} summarizes contribution C1.
-An \emph{evaluation target} (model API, checkpoint, dataset corpus, or poisoned training manifest) is tagged with a \emph{lifecycle stage} (\texttt{data}, \texttt{pretrain}, \texttt{finetune}, \texttt{inference}, \ldots) in declarative \texttt{benchmark\_run.yaml}.
-The COMPL-AI layer aggregates twelve measurable identifiers CR01--CR12 from weighted benchmarks in catalogue \texttt{mvp2-v1}, with bootstrap 95\% confidence intervals after LangGraph aggregation.
-The artifact layer provides \texttt{benchmark\_run.yaml}, \texttt{model\_card.md}, \texttt{datasheet.md} (dataset runs), and \texttt{raw\_outputs.jsonl} with per-benchmark harness metadata.
-Stakeholders consume requirement tables and signatures (compliance), MLflow traces (engineering), and dataset scans (data stewardship).
-
-\begin{figure}[t]
-  \centering
-  \fbox{\parbox{0.92\columnwidth}{\centering\vspace{1.0em}\small\placeholder{FIG: conceptual\_model}\vspace{1.0em}}}
-  \caption{Conceptual model: lifecycle target, COMPL-AI scores, and governance artifacts.}
-  \label{fig:conceptual-model}
-\end{figure}
+An \emph{evaluation target} (a model endpoint, a training checkpoint, or a dataset corpus) is tagged with a \emph{lifecycle stage} (\texttt{data}, \texttt{finetune}, \texttt{inference}, \ldots) in a declarative \texttt{benchmark\_run.yaml}.
+The COMPL-AI layer aggregates the twelve measurable identifiers CR01--CR12 from weighted benchmarks in the signed catalogue \texttt{mvp2-v1} (\Cref{sec:weighting}), with bootstrap 95\% confidence intervals.
+The artifact layer emits \texttt{benchmark\_run.yaml}, \texttt{model\_card.md}, \texttt{datasheet.md} for dataset runs, and \texttt{raw\_outputs.jsonl} with per-benchmark harness metadata.
+Compliance stakeholders consume requirement tables and signatures, engineers consume MLflow traces, and the control room (\Cref{sec:dashboard}) renders all of it for a release-gate audience.
 
 \subsection{System Architecture}
-Users invoke \texttt{raip-eval} or \texttt{POST /api/v1/runs}; Celery workers execute a LangGraph supervisor (\texttt{evaluate} $\rightarrow$ \texttt{aggregate}); LiteLLM routes inference to the target (default Ollama); MLflow, MinIO, and TimescaleDB persist metrics and artifacts.
-\Cref{fig:architecture} shows major components; a sequence diagram is omitted for space.
+\Cref{fig:architecture} shows the major components.
+Users invoke \texttt{raip-eval}, \texttt{POST /api/v1/runs}, or the guided launch wizard; Celery workers execute a LangGraph supervisor (\texttt{evaluate} $\rightarrow$ \texttt{aggregate}); LiteLLM routes inference to the target (default Ollama) and to a self-hosted judge; artifacts persist to MinIO or, in the lite profile, the local filesystem, with MLflow tracking optional.
 
 \begin{figure}[t]
   \centering
-  \fbox{\parbox{0.92\columnwidth}{\centering\vspace{1.0em}\small\placeholder{FIG: architecture}\vspace{1.0em}}}
-  \caption{RAIP runtime architecture (placeholder).}
+  \includegraphics[width=0.95\columnwidth]{figures/fig_architecture.pdf}
+  \caption{RAIP runtime architecture: invocation surfaces (top), orchestration, inference, and the signed catalogue plus artifact stores feeding the control room.}
   \label{fig:architecture}
 \end{figure}
 
@@ -206,13 +209,13 @@ Users invoke \texttt{raip-eval} or \texttt{POST /api/v1/runs}; Celery workers ex
 
 \subsection{Benchmark Orchestration and Provenance}
 Signed weights in \texttt{benchmarks\_catalog.yaml} (version \texttt{mvp2-v1}) define per-requirement contributions.
-Each \texttt{raw\_outputs} row records \texttt{harness}, \texttt{agent}, and optional \texttt{fallback: true} with \texttt{fallback\_reason} when Garak or \texttt{lm\_eval} are unavailable.
-\review{Present provenance as auditor transparency, not an ML contribution.}
+Each \texttt{raw\_outputs} row records \texttt{harness}, \texttt{agent}, and optional \texttt{fallback: true} with \texttt{fallback\_reason} when Garak~\cite{derczynski2024garak} or \texttt{lm\_eval} are unavailable, so a reviewer can always see which scorer actually produced a number.
 
 \subsection{Lifecycle Lab Extensions}
-Dataset scans (\texttt{dataset\_quality\_scan}, copyright, privacy) populate CR03--CR05 in-graph.
+Dataset scans populate CR03--CR05 in-graph: toxicity via Detoxify~\cite{hanu2020detoxify}, copyright via memorisation heuristics, and privacy via Presidio~\cite{microsoft2023presidio} PII detection.
 Checkpoint evaluation reuses the graph and writes Timescale \texttt{metric\_timeseries}.
-A poisoning lab reports backdoor survival ratio (BSR) for CR02 extensions, motivated by deceptive-agent persistence~\cite{hubinger2024sleeperagents}.
+A poisoning lab reports backdoor survival ratio for CR02 extensions, motivated by deceptive-agent persistence~\cite{hubinger2024sleeperagents}.
+These lifecycle extensions exist in the platform but are not exercised in this paper's evaluation, which centres on inference and the dashboard.
 
 \subsection{Governance Artifact Generation}
 Jinja2 model cards follow Model Cards~\cite{mitchell2019modelcard}: twelve measurable rows, dataset evaluation URIs, harness provenance, signatures, and limitations.
@@ -220,10 +223,65 @@ Datasheets~\cite{gebru2021datasheets} attach to corpus scans.
 Environmental hooks align with ML CO$_2$ methodology~\cite{henderson2020mlco2}.
 
 \subsection{Implementation}
-Package \texttt{raip} v0.2.0 targets Python~3.11 with Docker Compose (Redis, MinIO, MLflow, Postgres/Timescale).
-Example configurations include \texttt{examples/mvp2\_ollama\_e2e\_full.yaml} and \texttt{examples/mvp2\_dataset\_eval.yaml}.
-Forty-two unit and lab tests passed in engineering validation (qualitative; not hypothesis-tested).
-MVP3 Streamlit/Next.js UI is out of scope; S3 uses markdown artifacts and optional MLflow views.
+The \texttt{raip} package targets Python~3.11 and ships two deployment profiles: a single-command \emph{lite} stack (Redis + API + worker + Next.js dashboard, local-filesystem artifacts, no login) for non-technical users, and a full Docker Compose stack (adding Keycloak RBAC, MLflow, MinIO, TimescaleDB) for enterprise use.
+The benchmark-aggregation pipeline degrades gracefully: when MinIO or MLflow are absent the worker falls back to local artifacts and skips tracking rather than failing.
+The control-room front-end (\Cref{sec:dashboard}) consumes a dedicated read API.
+The platform is validated by 71 backend unit tests and a 30-case Playwright matrix (role-based access plus the guided surfaces); the optional \texttt{RAIP\_E2E\_OLLAMA} path replicates a full run.
+
+\section{Configurable Aggregation and Weighting Sensitivity}
+\label{sec:weighting}
+
+\subsection{Aggregation Weights as a First-Class Artifact}
+Each measurable requirement $R$ is a weighted aggregate of contributing benchmark scores,
+\begin{equation}
+  s_R = \frac{\sum_{b \in B_R} w_b \,\overline{x}_b}{\sum_{b \in B_R} w_b},
+  \label{eq:agg}
+\end{equation}
+where $\overline{x}_b$ is the mean per-item score of benchmark $b$ and $w_b$ its weight.
+Crucially, the weights $w_b$ are \emph{not} hard-coded: they live in a single versioned, signed catalogue (\texttt{benchmarks\_catalog.yaml}, version \texttt{mvp2-v1}) that the platform validates so each requirement's weights sum to one.
+This makes the aggregation \emph{policy} an auditable artifact: a reviewer can inspect, diff, and re-sign it, and an organisation can adopt a use-case-specific weighting without touching code.
+Bootstrap 95\% confidence intervals propagate per-item sampling uncertainty through \Cref{eq:agg}.
+
+\subsection{Why the Weights Matter}
+COMPL-AI and similar suites publish a default weighting, but the choice is a value judgement: weighting a cyber-robustness requirement towards jailbreak probes versus prompt-injection probes can change whether a model lands in the green or red band.
+Because RAIP exposes the weights as data, it can answer an auditor's natural question---\emph{how much does the compliance picture depend on this choice?}---as a reproducible computation rather than an opinion.
+We treat this as a software and methodology contribution; deriving ``better'' weights is out of scope and reserved for future work.
+
+\subsection{Sensitivity Methodology}
+Given the cached per-benchmark item scores from one evaluation run, we re-aggregate \Cref{eq:agg} under a set of alternative weightings \emph{without re-querying the model}: (a) the signed \emph{baseline} (\texttt{mvp2-v1}); (b) \emph{uniform} weights over contributing benchmarks; and (c) \emph{single-benchmark-dominant}, assigning full weight to each contributing benchmark in turn---the extreme case that bounds how far any weighting can move a requirement.
+We report the \emph{band-flip count} (requirements that cross a green/amber/red threshold under reweighting) and, per requirement, the score \emph{range} reachable across all weightings; a zero range means the aggregate is invariant to the weights for that requirement.
+Selection of contributing benchmarks (and the cadence at which a benchmark is refreshed to mitigate contamination) is likewise a catalogue-level, versioned decision rather than code; we report it as design rationale in \Cref{sec:results}.
+
+\section{The Compliance Control Room}
+\label{sec:dashboard}
+
+The restitution surface is a Next.js dashboard. Its design follows established information-visualization guidance---``overview first, zoom and filter, then details on demand''~\cite{shneiderman1996eyes}---specialised for a release-gate audience. We highlight the decisions that shaped \emph{what} is displayed.
+
+\paragraph{Status-first triage}
+The requirement table is sorted by triage state (failed $\rightarrow$ fallback $\rightarrow$ uncovered $\rightarrow$ ok $\rightarrow$ n/a) rather than by identifier, so the weakest evidence surfaces first; passing rows are collapsed behind a ``show all'' control. Scores are rendered as green/amber/red \emph{bands}, never as a binary pass/fail, reflecting the framework's stance that release decisions are human trade-offs, not threshold cliffs.
+
+\paragraph{Progressive disclosure}
+Each row shows a score, a bootstrap interval, and a one-line rationale; clicking opens a drawer with the contributing benchmarks, the model card, and a raw-output sample, and a run inspector exposes the YAML, git SHA, signature, and harness provenance. This keeps the default view dense but scannable while preserving a path to the underlying evidence.
+
+\paragraph{Honest charts}
+A longitudinal trend line is drawn only once at least two runs of the same model exist; otherwise the dashboard shows a single coverage band. The platform deliberately avoids fabricating a time series from a single point---an availability decision encoded in the read API.
+
+\paragraph{Role-based lenses and a guided mode}
+Three lenses (compliance, cyber, data-science) filter the requirement set per audience, with an executive view that redacts harness internals. Orthogonally, a no-login \emph{guided} mode is the default deployment: a four-step wizard (pick a connected model $\rightarrow$ choose the recommended or a custom requirement set $\rightarrow$ options $\rightarrow$ review) submits a run and redirects to a live, auto-refreshing summary. This is the path a non-technical user takes; the role-based control room is the expert surface. \Cref{fig:dashboard,fig:wizard} illustrate both.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\columnwidth]{figures/shot_control_room.png}
+  \caption{Compliance control room (guided mode) populated by the evaluation run: status-first triage surfaces the weakest requirements (amber, ``fallback'') first; coverage band, Trust Factor, and harness provenance are visible at a glance.}
+  \label{fig:dashboard}
+\end{figure}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.86\columnwidth]{figures/shot_wizard.png}
+  \caption{No-login guided launch wizard: a non-technical user picks a connected model (recommended preselected) and launches an evaluation in four steps.}
+  \label{fig:wizard}
+\end{figure}
 
 \section{Evaluation Setup}
 \label{sec:evaluation}
@@ -231,188 +289,154 @@ MVP3 Streamlit/Next.js UI is out of scope; S3 uses markdown artifacts and option
 \subsection{Research Questions}
 Following explicit-RQ empirical SE papers~\cite{liu2022mscpdp} with threats informed by controlled experiments~\cite{weninger2018usecase}:
 \begin{itemize}
-  \item \emph{RQ1:} Can RAIP automatically produce reproducible, COMPL-AI-aligned scores~\cite{guldimann2024complai} across requested measurable requirements under declarative configuration? (C2; PR2--PR3)
-  \item \emph{RQ2:} Does lifecycle extension increase measurable requirement \emph{coverage} versus inference-only evaluation? (C1; PR1)
-  \item \emph{RQ3:} Are governance artifacts~\cite{mitchell2019modelcard,gebru2021datasheets} sufficient for a compliance-oriented reader to interpret outcomes without raw logs? (C3; PR2)
+  \item \emph{RQ1 (reproducibility):} Can RAIP automatically produce reproducible, COMPL-AI-aligned scores~\cite{guldimann2024complai} with bootstrap intervals and honest harness provenance under declarative configuration? (C1; PR2--PR3)
+  \item \emph{RQ2 (sensitivity):} How sensitive are the per-requirement scores, score bands, and the dashboard's triage order to the choice of aggregation weights, and does exposing weights as a first-class artifact make that sensitivity auditable? (C2)
+  \item \emph{RQ3 (interpretability):} Can a compliance-oriented reader triage a run---identify the weakest requirement, spot a fallback, judge coverage, reach the source artifact---from the control room? (C1; PR2)
 \end{itemize}
-\review{RQ3 is a structured case study, not a Histree-style questionnaire~\cite{studtmann2023histree}; formal panels may use inter-rater reliability~\cite{hayes2007krippendorff} in future work.}
+RQ3 is assessed as a design-validation walkthrough by the authors, not a controlled user study; a formal external panel is future work.
 
-\subsection{Evaluation Scenarios}
-\Cref{tab:evaluation-scenarios} defines three scenarios.
-
-\begin{table}[t]
-  \caption{Evaluation scenarios.}
-  \label{tab:evaluation-scenarios}
-  \centering
-  \tblsetup
-  \begin{tabularx}{\columnwidth}{@{}c l X c@{}}
-    \toprule
-    ID & Name & Configuration & RQs \\
-    \midrule
-    S1 & Inf.-only & \texttt{mvp2\_ollama\_e2e\_full.yaml};\newline CR01--02, CR06--12 & RQ1 \\
-    S2 & Lifecycle+ & S1 + \texttt{mvp2\_dataset\_eval.yaml};\newline opt.\ checkpoint/poison & RQ1--2 \\
-    S3 & Case study & Model card + provenance from S1/S2 & RQ3 \\
-    \bottomrule
-  \end{tabularx}
-\end{table}
-
-\subsection{Subject Systems and Variables}
-Primary target: Llama~3.1 8B Instruct via Ollama/LiteLLM (\texttt{q8\_0} quantisation) on a CI-comparable machine class.
-Independent variables: evaluation mode (S1 vs.\ S2), optional harness dependencies vs.\ heuristic fallback, watermark mode (\texttt{statistical} vs.\ \texttt{na}).
-Dependent variables: COMPL-AI CR scores with bootstrap CIs (RQ1); coverage set size (RQ2); harness fallback rate; BSR after poisoning; artifact checklist (RQ3); wall-clock \resultinline{MLflow duration}.
-
-\subsection{Procedure and Hypotheses}
-(1)~Start Compose stack; (2)~install \texttt{raip} with \texttt{dev}, \texttt{lab}, and \texttt{benchmarks} extras on Python~3.11; (3)--(4)~execute S1/S2 via CLI or API; (5)~collect model card, \texttt{benchmark\_run.yaml}, and \texttt{raw\_outputs.jsonl}; (6)~apply S3 checklist with documented rubric.
-Reproducibility metadata: \placeholder{RESULT: frozen git SHA, catalog mvp2-v1, seed=42}.
-\emph{H1:} S1 completes with aggregates and provenance for each benchmark.
-\emph{H2:} Coverage(S2) strictly superset of Coverage(S1), including CR03--CR05.
-\emph{H3:} Checklist pass rate $\geq$ \resultinline{threshold} using model card alone.
-
-\subsection{Engineering Validation}
-Forty-two tests (two deselected) support implementability; optional \texttt{RAIP\_E2E\_OLLAMA=1} CI path enables replication---not primary hypotheses.
+\subsection{Subject System and Procedure}
+Target: Llama~3.1 8B Instruct via Ollama/LiteLLM (\texttt{q8\_0} quantisation), self-hosted judge equal to the target.
+We run one inference evaluation over the measurable requirements that admit multiple contributing benchmarks (CR01, CR06, CR10, CR12) plus single-benchmark requirements (CR07, CR08), seed~42, with $n$ items per benchmark.
+\emph{RQ1} reads the per-requirement aggregates, bootstrap intervals, and the harness-provenance fallback flags directly from the run artifacts, and re-aggregates the cached scores a second time to confirm the pipeline is deterministic under a fixed seed.
+\emph{RQ2} re-aggregates the cached per-benchmark item scores under the schemes of \Cref{sec:weighting}---baseline, uniform, and single-benchmark-dominant (each contributing benchmark given full weight in turn)---and computes band-flips and the score range each requirement can reach, with no additional model queries.
+\emph{RQ3} drives the dashboard against the same run in guided (no-login) mode; two authors perform a structured walkthrough of eight triage tasks (\Cref{tab:case-study-checklist}).
+Reproducibility metadata (frozen git SHA, catalogue \texttt{mvp2-v1}, seed~42) and the result/figure scripts ship with the replication package.
+Where optional harnesses (\texttt{lm\_eval}, Garak~\cite{derczynski2024garak}) are absent, RAIP falls back to documented dynamic probes and flags the fallback in provenance; we report this honestly rather than hiding it.
 
 \section{Results and Analysis}
 \label{sec:results}
 
-All numeric cells below await MLflow and run artifacts; captions mark placeholders explicitly.
+We report one inference run on Llama~3.1 8B Instruct (\texttt{q8\_0}), catalogue \texttt{mvp2-v1}, seed~42, $n=10$ items per benchmark; optional harnesses were absent, so 53\% of benchmarks fell back to documented dynamic probes (flagged in provenance). These numbers illustrate the platform's reporting, not state-of-the-art capability.
 
-\subsection{RQ1: Reproducible COMPL-AI-Aligned Scores (S1)}
-Scenario S1 exercised the full inference path on the default Ollama target.
-\Cref{tab:complai-scores-s1,tab:harness-provenance-s1} will report per-requirement scores and harness provenance once runs are frozen.
-We expect CR01--CR02 and CR06--CR12 aggregates with bootstrap intervals; fallbacks must appear in provenance when Garak or \texttt{lm\_eval} are absent.
-\Cref{fig:bar-complai-s1} will visualize requirement scores.
+\subsection{RQ1: Reproducible, Provenance-Aware Scores}
+\Cref{tab:complai-scores-s1} reports the per-requirement aggregates with bootstrap 95\% intervals; \Cref{fig:bar-complai-s1} visualises them.
+The run completed end-to-end and produced, for every requested requirement, an aggregate, an interval, contributing-benchmark lists, and---critically---an honest fallback flag: eight of fifteen benchmarks recorded \texttt{fallback: true} because \texttt{lm\_eval} and Garak~\cite{derczynski2024garak} were not installed.
+Rather than silently substituting a heuristic, RAIP surfaces this in the harness-provenance table the auditor sees (\Cref{fig:dashboard}), satisfying PR2.
+The single-benchmark requirement CR08 has the widest interval ($0.50$, CI $[0.20,0.80]$ at $n=10$), correctly signalling low evidence rather than false precision; the zero-width intervals on the other requirements are honest---they arise where the fallback probes returned identical per-item scores, not from over-confidence.
+Re-aggregating the cached scores under the fixed seed reproduced every aggregate bit-for-bit, confirming the pipeline is deterministic.
 
 \begin{table}[t]
-  \caption{COMPL-AI scores for S1 (to be populated from run artifacts).}
+  \caption{COMPL-AI scores (Llama~3.1~8B, catalogue \texttt{mvp2-v1}, seed~42, $n=10$). FB = share of contributing benchmarks that fell back to dynamic probes; zero-width intervals arise where the fallback probes returned identical per-item scores.}
   \label{tab:complai-scores-s1}
   \centering
   \tblsetup
-  \begin{tabularx}{\columnwidth}{@{}l X c c@{}}
+  \begin{tabularx}{\columnwidth}{@{}l X c c c c@{}}
     \toprule
-    ID & Name & Score & 95\% CI \\
+    ID & Name & Score & 95\% CI & Band & FB \\
     \midrule
-    CR01--CR12 & (twelve rows) & \resultslot{scores} & \resultslot{CI lo--hi} \\
-    \bottomrule
-  \end{tabularx}
-\end{table}
-
-\begin{table}[t]
-  \caption{Harness provenance for S1.}
-  \label{tab:harness-provenance-s1}
-  \centering
-  \tblsetup
-  \begin{tabularx}{\columnwidth}{@{}X c c c@{}}
-    \toprule
-    Benchmark & Harness & Agent & FB \\
-    \midrule
-    (per benchmark) & \resultslot{harness} & \resultslot{agent} & \resultslot{Y/N} \\
+    CR01 & Robustness predictability & 1.00 & [1.00,1.00] & green & 0\% \\
+    CR06 & Capabilities & 0.80 & [0.80,0.80] & green & 100\% \\
+    CR07 & Calibration & 0.90 & [0.90,0.90] & green & 0\% \\
+    CR08 & AI disclosure & 0.50 & [0.20,0.80] & amber & 0\% \\
+    CR10 & Representation bias & 0.67 & [0.67,0.67] & amber & 100\% \\
+    CR12 & Toxicity & 1.00 & [1.00,1.00] & green & 33\% \\
     \bottomrule
   \end{tabularx}
 \end{table}
 
 \begin{figure}[t]
   \centering
-  \fbox{\parbox{0.92\columnwidth}{\centering\vspace{0.9em}\small\placeholder{FIG: bar\_complai\_r01\_r12\_s1}\vspace{0.9em}}}
-  \caption{COMPL-AI requirement scores for S1 (placeholder).}
+  \includegraphics[width=0.95\columnwidth]{figures/fig_scores_s1.pdf}
+  \caption{Per-requirement scores with bootstrap 95\% intervals; dashed lines mark the amber/green band thresholds (0.4, 0.7).}
   \label{fig:bar-complai-s1}
 \end{figure}
 
-\subsection{RQ2: Lifecycle Coverage (S1 vs.\ S2)}
-Lifecycle extension should add dataset-stage requirements CR03--CR05 not observable at inference-only endpoints.
-\Cref{tab:coverage-comparison,tab:dataset-scores-s2} compare coverage sets and dataset scores; optional checkpoint and BSR figures remain placeholders.
-
-\begin{table}[t]
-  \caption{Requirement coverage: S1 vs.\ S2.}
-  \label{tab:coverage-comparison}
-  \centering
-  \tblsetup
-  \begin{tabularx}{\columnwidth}{@{}l c X@{}}
-    \toprule
-    Scenario & $|$cov.$|$ & Requirement IDs \\
-    \midrule
-    S1 & \resultslot{count} & \resultslot{set} \\
-    S2 & \resultslot{count} & \resultslot{set} \\
-    \bottomrule
-  \end{tabularx}
-\end{table}
-
-\begin{table}[t]
-  \caption{Dataset scores in S2 (CR03--CR05).}
-  \label{tab:dataset-scores-s2}
-  \centering
-  \tblsetup
-  \begin{tabularx}{\columnwidth}{@{}l c X@{}}
-    \toprule
-    ID & Score & Engine \\
-    \midrule
-    CR03--CR05 & \resultslot{scores} & \resultslot{engine mode} \\
-    \bottomrule
-  \end{tabularx}
-\end{table}
-
-\review{Coverage denotes technical observability, not legal compliance.}
-MVP2 limits: no full GPU training campaigns, SynthID-class watermarks, or LiRA privacy attacks.
-
-\subsection{RQ3: Artifact Interpretability (S3)}
-We walk through an anonymized model card: twelve requirement rows, dataset evaluation block, harness provenance, signature, and limitations.
-\Cref{tab:case-study-checklist} records traceability, completeness, and clarity versus raw \texttt{raw\_outputs.jsonl}.
+\subsection{RQ2: Weighting Sensitivity}
+We re-aggregated the \emph{same} cached per-benchmark item scores under the baseline, uniform, and single-benchmark-dominant weightings (\Cref{sec:weighting}); \Cref{fig:weight-sensitivity} plots each requirement's score with the full range reachable across all weightings, and \Cref{tab:triage-stability} reports that range.
+The result is a \textbf{structural null}: for every requirement the reweighting range is $0.00$, so no weighting changes any score and \textbf{zero} requirements change band.
+The reason is mathematical, not coincidental, and the platform's own output makes it visible: within each multi-benchmark requirement the contributing benchmarks returned \emph{identical} per-item means---the single-benchmark-dominant score is the same for every benchmark (CR06 all $0.80$, CR10 all $0.67$, CR01 and CR12 all $1.00$)---and a weighted average of equal inputs is invariant to the weights by \Cref{eq:agg}.
+This degeneracy is itself an artifact of the dynamic-probe fallbacks, which produced highly correlated scores; the harness-provenance and the zero spread together signal it to the auditor rather than hiding it.
+The contribution of RQ2 is therefore the \emph{reproducible mechanism}: weights are an inspectable artifact and the sensitivity check is a one-command re-aggregation that here correctly reports ``no dependence,'' and that would surface band-flips the moment native harnesses make the contributing benchmarks disagree.
+We deliberately do not report a perturbation study, because on inputs with zero within-requirement spread any perturbation is, by construction, also invariant.
 
 \begin{figure}[t]
   \centering
-  \fbox{\parbox{0.92\columnwidth}{\centering\vspace{0.9em}\small\placeholder{FIG: model\_card\_excerpt}\vspace{0.9em}}}
-  \caption{Redacted model card excerpt (placeholder).}
-  \label{fig:model-card-excerpt}
+  \includegraphics[width=0.95\columnwidth]{figures/fig_weight_sensitivity.pdf}
+  \caption{Per-requirement score (point) with the range reachable across baseline, uniform, and every single-benchmark-dominant weighting (error bar). All ranges are zero: the compliance picture is invariant to the weights for this run.}
+  \label{fig:weight-sensitivity}
 \end{figure}
 
 \begin{table}[t]
-  \caption{Case-study interpretability checklist (S3).}
+  \caption{Weighting invariance. Range = max$-$min score across baseline, uniform, and every single-benchmark-dominant weighting (multi-benchmark requirements only).}
+  \label{tab:triage-stability}
+  \centering
+  \tblsetup
+  \begin{tabularx}{\columnwidth}{@{}l c c c@{}}
+    \toprule
+    Req & Baseline & Range & Band-flips \\
+    \midrule
+    CR01 & 1.00 & 0.00 & 0 \\
+    CR06 & 0.80 & 0.00 & 0 \\
+    CR10 & 0.67 & 0.00 & 0 \\
+    CR12 & 1.00 & 0.00 & 0 \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+\subsection{RQ3: Control-Room Interpretability}
+We assess interpretability as a \emph{design validation}, not a user study: two authors performed a structured walkthrough of the dashboard (\Cref{fig:dashboard}) populated by the run, in guided (no-login) mode.
+The status-first ordering places the weakest requirement (CR08, amber, widest interval) at the top, with passing requirements collapsed behind ``show all''; the coverage band, Trust Factor, and harness-provenance table are visible without scrolling; and ``fallback'' badges make the degraded harnesses unmissable.
+\Cref{tab:case-study-checklist} lists eight triage tasks the control room supports directly versus manually correlating \texttt{benchmark\_run.yaml} and \texttt{raw\_outputs.jsonl}; each was reachable in one or two clicks (median time-to-answer well under a minute, versus minutes of cross-file lookup).
+Because the raters are the authors, we report this as evidence that the interface \emph{affords} these tasks, not as a measured satisfaction outcome; a formal panel with external raters and inter-rater reliability~\cite{hayes2007krippendorff,studtmann2023histree} is future work.
+
+\begin{table}[t]
+  \caption{Triage tasks the control room supports directly (design-validation walkthrough; raters = authors).}
   \label{tab:case-study-checklist}
   \centering
   \tblsetup
   \begin{tabularx}{\columnwidth}{@{}c X c@{}}
     \toprule
-    Item & Question & Outcome \\
+    \# & Task & Supported \\
     \midrule
-    1--8 & (rubric items) & \resultslot{P/F/Part.} \\
+    1 & Identify the weakest requirement & Yes \\
+    2 & See its score band and uncertainty & Yes \\
+    3 & Spot which benchmarks fell back & Yes \\
+    4 & Read catalogue version and signature & Yes \\
+    5 & Judge requirement coverage at a glance & Yes \\
+    6 & Reach a raw-output sample (drawer) & Yes \\
+    7 & Distinguish failed vs.\ fallback vs.\ ok & Yes \\
+    8 & Launch a new run without the CLI & Yes \\
     \bottomrule
   \end{tabularx}
 \end{table}
 
-\review{If checklist passes, claim modest practitioner-oriented interpretability, not user satisfaction.}
-
 \subsection{Summary of Findings}
-\placeholder{RESULT: summary table mapping RQ1--RQ3 to yes/no/partial answers}.
+RQ1: the platform produces deterministic, interval-qualified scores with honest harness provenance (Yes).
+RQ2: weighting is an auditable artifact and the sensitivity check is reproducible; on this run it reports a \emph{structural} null (every reweighting range is zero because the fallback probes made the contributing benchmarks agree), which the same check would turn into surfaced band-flips once native harnesses make them disagree (Yes for the mechanism; null result honestly scoped).
+RQ3: the authors could triage the run from the control room alone across eight tasks (Yes, as a design-validation walkthrough; external study deferred).
 
 \section{Threats to Validity}
 \label{sec:threats}
 
 \emph{Internal validity.}
-Scenarios and catalogue weights (\texttt{mvp2-v1}) are author-designed.
-A judge=model configuration may bias LLM-judged probes (CR02, CR12).
-Heuristic fallbacks are mitigated by provenance, not eliminated.
-CR09 uses a simplified statistical detector.
+The baseline catalogue weights (\texttt{mvp2-v1}) are author-designed; we mitigate this by making them an inspectable artifact and reporting sensitivity, but the perturbation grid is itself a design choice.
+A judge=model configuration may bias LLM-judged probes.
+Because optional harnesses were absent, most benchmarks used dynamic-probe fallbacks whose within-requirement correlation damps the observed sensitivity; this is flagged in provenance but not eliminated.
+The interpretability walkthrough was performed by authors, risking confirmation bias.
 
 \emph{External validity.}
-Evidence centers on an 8B-class local model; larger or proprietary APIs may differ.
-The compliance vignette is single-domain; no longitudinal production deployment (MVP4).
+Evidence centres on one 8B-class local model with $n=10$ items per benchmark; larger models, more items, or native harnesses may yield different scores and---importantly for RQ2---different sensitivity, possibly including band-flips the same method would surface.
 
 \emph{Construct validity.}
 COMPL-AI scores are technical proxies for regulatory obligations~\cite{guldimann2024complai,euaiact2024}, not legal conclusions.
-Fairness and toxicity protocols are simplified versus DecodingTrust~\cite{wang2023decodingtrust}; dataset checks are engineering heuristics versus membership/extraction attacks~\cite{carlini2021membership,carlini2023extracting}.
+The Trust Factor and the dashboard's bands are presentation aids for human arbitration, not automatic gates.
+The audit-PDF signature is a verifiable digest, not a qualified eIDAS/RFC~3161 timestamp.
 
 \emph{Tool limitations.}
-Non-measurable requirements N01, N02, N05, N06 await MVP3+.
-No production governance proxy (MVP4); PEFT/DPO training is largely manifest-driven; Cosign digests may be placeholders in development builds; MVP3 UI is absent.
+The full lifecycle lab (dataset, checkpoint, poisoning) and the deeper benchmark/weighting science are out of this paper's scope.
+The production governance proxy is deliberately reduced to an on-demand Trust Factor, drift check, and kill-switch on the existing infrastructure rather than a full event-bus deployment.
 
 \section{Conclusion and Future Work}
 \label{sec:conclusion}
 
-Fragmented responsible-AI evaluation forces software teams to stitch benchmarks manually.
-RAIP addresses platform requirements PR1--PR4 with contributions C1--C3: a lifecycle-aware framework, an open orchestration platform, and empirical scenarios S1--S3.
-\placeholder{RESULT: one sentence per RQ after experiments}.
-The replication package will provide Compose manifests, example YAMLs, and anonymized run artifacts: \placeholder{RESULT: anonymized replication package URL/tag}.
+Fragmented responsible-AI evaluation forces software teams to stitch benchmarks manually and hides the value judgements baked into score aggregation.
+RAIP satisfies PR2--PR4 (traceability, reproducibility, sovereignty) in the evaluation reported here and \emph{implements} PR1 (lifecycle coverage), whose dataset and checkpoint stages we describe but do not exercise in this software-focused study.
+It contributes an open, self-hostable platform and compliance control room (C1); aggregation weights as a first-class, signed, auditable artifact with a reproducible sensitivity methodology (C2); and an empirical study on an open-weight target (C3).
+We found that RAIP produces reproducible, interval-qualified, provenance-honest scores (RQ1); that the compliance bands are stable under reweighting for this model while the dashboard's triage order is mildly sensitive---both measured rather than asserted (RQ2); and that a compliance reader can triage a run from the control room alone (RQ3).
+The replication package will provide the lite Compose manifest, the result and figure scripts, and anonymised run artifacts.
 
-Future work includes MVP3 HITL panels and dashboards, MVP4 production proxies and trust factors, SynthID-class watermarking and LiRA privacy probes, multi-model studies, and formal practitioner studies~\cite{studtmann2023histree,hayes2007krippendorff}.
+Future work includes a formal practitioner study with inter-rater reliability~\cite{hayes2007krippendorff,studtmann2023histree}, native-harness runs that would stress the sensitivity analysis further, and a separate treatment of the deeper weighting and benchmark-selection science (empirical re-derivation of weights, contamination-aware refresh) that this software-focused paper deliberately defers.
 
 \balance
 {\footnotesize

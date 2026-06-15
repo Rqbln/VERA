@@ -51,21 +51,25 @@
 
 ## Contribution lock (Step 1)
 
-**One-sentence contribution (locked):**
+> **RE-LOCKED 2026-06-15** for the software + dashboard focus (deeper benchmark/weighting science deferred to a separate ICLR-class paper). The previous lifecycle-headline lock is retained below for history.
 
-We present **RAIP**, an open-source, self-hostable software engineering platform that operationalizes the COMPL-AI technical requirements for the EU AI Act through a unified evaluation pipeline (CLI, API, asynchronous workers, LangGraph orchestration), extending inference-time benchmarking with **lifecycle-aware** dataset and checkpoint evaluation, signed governance artifacts, and explicit harness provenance—unlike prior LLM trustworthiness tools that focus primarily on single-shot model prompts without longitudinal or data-stage coverage.
+**One-sentence contribution (re-locked):**
 
-**Confidence:** `medium` — bibliography ready; LaTeX draft still gated on numeric results tables (`[RESULT: …]` slots).
+We present **RAIP**, an open-source, self-hostable platform *and* a "compliance control room" dashboard for EU AI Act LLM evaluation that operationalizes the COMPL-AI measurable requirements through a LangGraph pipeline, makes the benchmark-to-requirement **aggregation weights a first-class, signed, auditable artifact** with a reproducible weighting-sensitivity check, and exposes a **no-login guided mode** so a non-technical user can launch an evaluation and read a status-first, progressively-disclosed summary.
 
-**Fixed interpretive choices (from research-brief REVIEW):**
+**Confidence:** `high` — real S1 run, sensitivity study, determinism check, and dashboard screenshots are in the compiled draft (`manuscript/main.pdf`, 8 pp.).
+
+**Fixed interpretive choices:**
 
 | Choice | Resolution |
 |--------|------------|
-| RQ3 | Case study on artifact interpretability (model card, datasheet, harness provenance) — not a formal user study with N |
-| Running example | Compliance engineer preparing an internal LLM release gate |
-| Platform R1–R4 | Lifecycle, traceability, reproducibility, sovereignty (paper-level requirements) |
-| C1–C3 | Framework / platform / empirical (S1–S3 scenarios) |
-| Default evaluation target | `ollama/llama3.1:8b-instruct-q8_0` |
+| RQ1 | Reproducible/deterministic, provenance-honest scores |
+| RQ2 | Weighting sensitivity → structural null on this run (within-requirement spread 0), method is the contribution |
+| RQ3 | Design-validation walkthrough by authors (8 triage tasks) — not an N-participant study |
+| C1–C3 | Platform+control room / configurable signed aggregation / empirical |
+| Default target | `ollama/llama3.1:8b-instruct-q8_0` (seed 42, n=10) |
+
+**Previous lock (lifecycle headline, superseded):** lifecycle-aware operationalization of COMPL-AI with dataset/checkpoint evaluation — demoted to a described-but-unexercised capability (PR1).
 
 ---
 

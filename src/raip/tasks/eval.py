@@ -24,6 +24,42 @@ from raip.schemas.complai import ComplaiRequirementScore
 from raip.schemas.run_payload import RunCreateRequest, parse_litellm_model_id
 from raip.store.redis_run import RedisRunStore
 
+# Measurable requirements whose benchmarks need only an inference endpoint (R03-R05 need a corpus).
+_INFERENCE_REQUIREMENTS = ("R01", "R02", "R06", "R07", "R08", "R09", "R10", "R11", "R12")
+_DATASET_REQUIREMENTS = ("R03", "R04", "R05")
+
+
+def _benchmarks_for_requirements(requirements: list[str]) -> list[str]:
+    """Expand COMPL-AI requirement ids into contributing benchmarks via the signed catalogue."""
+    from raip.benchmarks.catalog import weights_for_requirement
+
+    seen: set[str] = set()
+    out: list[str] = []
+    for req in requirements:
+        for bench in weights_for_requirement(req):
+            if bench not in seen:
+                seen.add(bench)
+                out.append(bench)
+    return out
+
+
+def _resolve_benchmarks(req: RunCreateRequest) -> tuple[list[str], list[str]]:
+    """Determine which benchmarks and requirements to evaluate.
+
+    The launch wizard sends requirements (or nothing for the recommended set) and no explicit
+    benchmarks; expand them here so a guided run actually evaluates something.
+    """
+    requested = list(req.complai_requirements)
+    benchmarks = list(req.benchmarks)
+    if benchmarks:
+        return benchmarks, requested
+    if not requested:
+        # Recommended default: all inference requirements, plus dataset ones if a corpus was given.
+        requested = list(_INFERENCE_REQUIREMENTS)
+        if req.dataset_corpus:
+            requested += list(_DATASET_REQUIREMENTS)
+    return _benchmarks_for_requirements(requested), requested
+
 
 def _git_sha() -> str:
     try:
@@ -213,6 +249,7 @@ def run_benchmark_job(self, run_id: str, payload: dict[str, Any]) -> dict[str, A
     git_sha = _git_sha()
     cat_version = get_catalog_version()
 
+    resolved_benchmarks, resolved_requirements = _resolve_benchmarks(req)
     try:
         initial: dict[str, Any] = {
             "run_id": run_id,
@@ -221,8 +258,8 @@ def run_benchmark_job(self, run_id: str, payload: dict[str, Any]) -> dict[str, A
             "temperature": req.config.temperature,
             "max_tokens": req.config.max_tokens,
             "seed": req.config.seed,
-            "benchmarks": list(req.benchmarks),
-            "complai_requirements": list(req.complai_requirements),
+            "benchmarks": resolved_benchmarks,
+            "complai_requirements": resolved_requirements,
             "n_samples_per_benchmark": req.config.n_samples_per_benchmark,
             "bootstrap_n": req.config.bootstrap_n,
             "raw_outputs": [],

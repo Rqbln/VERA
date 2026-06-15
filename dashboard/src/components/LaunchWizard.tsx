@@ -49,7 +49,9 @@ export function LaunchWizard() {
     mutationFn: () => {
       const body: RunCreateRequest = {
         model_id: modelId!,
-        complai_requirements: mode === "recommended" ? [] : requirements,
+        // Always send the explicit requirement set so the dashboard triages exactly what ran;
+        // the backend expands these into their catalogue benchmarks.
+        complai_requirements: requirements,
         config: { n_samples_per_benchmark: nSamples, seed: 42 },
         lifecycle_stage: lifecycle,
         governance: { owner, intended_use: intendedUse || "Not specified" },

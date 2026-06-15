@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from raip.benchmarks.dynamic_prompts import generate_items
 from raip.benchmarks.metrics import extract_abcd
-from raip.benchmarks.runners.base import RunContext, RawList, SamplesByReq, merge_samples
+from raip.benchmarks.runners.base import RawList, RunContext, SamplesByReq, merge_samples
 
 
 def _dpd_eod(groups: dict[str, list[int]]) -> tuple[float, float]:

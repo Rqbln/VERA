@@ -2,9 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any
-
-from raip.benchmarks.runners.base import RunContext, RawList, SamplesByReq, merge_samples
+from raip.benchmarks.runners.base import RawList, RunContext, SamplesByReq, merge_samples
 from raip.benchmarks.runners.hf_dynamic import run_hf_dynamic
 from raip.benchmarks.runners.lm_eval_runner import run_lm_eval
 

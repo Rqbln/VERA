@@ -6,7 +6,8 @@ import os
 import re
 
 from raip.benchmarks.dynamic_prompts import generate_items
-from raip.benchmarks.runners.base import RunContext, RawList, SamplesByReq, merge_samples
+from raip.benchmarks.runners.base import RawList, RunContext, SamplesByReq, merge_samples
+
 # Simplified green-list token heuristic (Kirchenbauer-style proxy)
 _GREEN_HINTS = frozenset(
     {

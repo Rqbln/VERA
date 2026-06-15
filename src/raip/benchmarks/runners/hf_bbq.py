@@ -3,12 +3,10 @@
 from __future__ import annotations
 
 import os
-from typing import Any
 
 from raip.api.benchmark_registry import get_benchmark_entry
-from raip.benchmarks.dynamic_prompts import generate_items
 from raip.benchmarks.metrics import score_bbq_choice
-from raip.benchmarks.runners.base import RunContext, RawList, SamplesByReq, merge_samples
+from raip.benchmarks.runners.base import RawList, RunContext, SamplesByReq, merge_samples
 from raip.benchmarks.runners.hf_dynamic import run_hf_dynamic
 
 

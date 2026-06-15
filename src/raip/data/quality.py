@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import re
-from typing import Sequence
+from collections.abc import Sequence
 
 
 def gini_coefficient(proportions: Sequence[float]) -> float:

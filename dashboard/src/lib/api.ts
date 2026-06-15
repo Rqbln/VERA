@@ -1,4 +1,13 @@
-import type { InspectorData, RunListItem, RunSummary, StackHealth } from "./types";
+import type {
+  BenchmarkEntry,
+  ConnectedModelsResponse,
+  InspectorData,
+  RunCreateRequest,
+  RunCreateResponse,
+  RunListItem,
+  RunSummary,
+  StackHealth,
+} from "./types";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -30,11 +39,12 @@ export async function getStackHealth(): Promise<StackHealth> {
 
 export async function listRuns(
   token: string,
-  params?: { lifecycle?: string; status?: string },
+  params?: { lifecycle?: string; status?: string; includeTriage?: boolean },
 ): Promise<{ runs: RunListItem[]; total: number }> {
   const q = new URLSearchParams();
   if (params?.lifecycle) q.set("lifecycle", params.lifecycle);
   if (params?.status) q.set("status", params.status);
+  if (params?.includeTriage) q.set("include_triage", "true");
   const qs = q.toString();
   return fetchApi(`/api/v1/runs${qs ? `?${qs}` : ""}`, token);
 }
@@ -73,4 +83,163 @@ export async function presignArtifact(
     `/api/v1/artifacts/${runId}/presign?artifact=${artifact}`,
     token,
   );
+}
+
+export async function getConnectedModels(
+  token: string | undefined,
+): Promise<ConnectedModelsResponse> {
+  return fetchApi("/api/v1/models/connected", token);
+}
+
+export async function listBenchmarks(
+  token: string | undefined,
+): Promise<{ benchmarks: BenchmarkEntry[] }> {
+  return fetchApi("/api/v1/benchmarks", token);
+}
+
+export async function createRun(
+  token: string | undefined,
+  body: RunCreateRequest,
+): Promise<RunCreateResponse> {
+  return fetchApi("/api/v1/runs", token, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+}
+
+export async function getRun(
+  token: string | undefined,
+  runId: string,
+): Promise<{ run_id: string; status: string; aggregate_scores?: Record<string, number> }> {
+  return fetchApi(`/api/v1/runs/${runId}`, token);
+}
+
+export async function getDrift(
+  token: string | undefined,
+  modelId: string,
+): Promise<{
+  available: boolean;
+  drift?: boolean;
+  delta?: number;
+  latest?: number;
+  baseline?: number;
+  direction?: string;
+  reason?: string;
+}> {
+  return fetchApi(`/api/v1/monitor/drift?model_id=${encodeURIComponent(modelId)}`, token);
+}
+
+export async function getKillSwitch(
+  token: string | undefined,
+): Promise<{ engaged: boolean; reason: string }> {
+  return fetchApi("/api/v1/governance/kill-switch", token);
+}
+
+export async function setKillSwitch(
+  token: string | undefined,
+  engaged: boolean,
+  reason = "",
+): Promise<{ engaged: boolean; reason: string }> {
+  return fetchApi("/api/v1/governance/kill-switch", token, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ engaged, reason }),
+  });
+}
+
+export interface SeriesPoint {
+  ts: string;
+  value: number;
+  run_id: string;
+  model_id: string;
+}
+
+export async function getSeries(
+  token: string | undefined,
+  requirement: string,
+  modelId?: string,
+): Promise<{ available: boolean; requirement: string; series: SeriesPoint[] }> {
+  const q = new URLSearchParams({ requirement });
+  if (modelId) q.set("model_id", modelId);
+  return fetchApi(`/api/v1/series?${q.toString()}`, token);
+}
+
+export interface HitlTask {
+  task_id: string;
+  run_id: string;
+  requirement: string;
+  prompt: string;
+  status: string;
+  reviewer: string;
+  likert_score: number | null;
+  comment: string;
+}
+
+export async function listHitlTasks(
+  token: string | undefined,
+  runId?: string,
+): Promise<{ tasks: HitlTask[] }> {
+  const q = runId ? `?run_id=${encodeURIComponent(runId)}` : "";
+  return fetchApi(`/api/v1/hitl/tasks${q}`, token);
+}
+
+export async function createHitlTask(
+  token: string | undefined,
+  body: { run_id: string; requirement: string; prompt?: string },
+): Promise<{ task: HitlTask }> {
+  return fetchApi("/api/v1/hitl/tasks", token, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+}
+
+export async function submitHitlReview(
+  token: string | undefined,
+  taskId: string,
+  body: { likert_score: number; comment?: string },
+): Promise<{ task: HitlTask }> {
+  return fetchApi(`/api/v1/hitl/tasks/${taskId}/review`, token, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+}
+
+export async function getForms(
+  token: string | undefined,
+  runId: string,
+): Promise<{ meta: Record<string, { name: string; principle: string }>; forms: Record<string, { fields: Record<string, unknown>; completed: boolean }> }> {
+  return fetchApi(`/api/v1/runs/${runId}/forms`, token);
+}
+
+export async function putForm(
+  token: string | undefined,
+  runId: string,
+  formId: string,
+  body: { fields: Record<string, unknown>; completed: boolean },
+): Promise<unknown> {
+  return fetchApi(`/api/v1/runs/${runId}/forms/${formId}`, token, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+}
+
+export async function downloadAuditPdf(token: string | undefined, runId: string): Promise<void> {
+  const headers: Record<string, string> = {};
+  if (token) headers.Authorization = `Bearer ${token}`;
+  const res = await fetch(`${apiBase()}/api/v1/runs/${runId}/audit-pdf`, { headers });
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(text || res.statusText);
+  }
+  const blob = await res.blob();
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `raip_audit_${runId.slice(0, 8)}.pdf`;
+  a.click();
+  URL.revokeObjectURL(url);
 }

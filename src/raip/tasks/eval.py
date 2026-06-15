@@ -11,15 +11,17 @@ import yaml
 
 from raip.artifacts.model_card import render_model_card
 from raip.artifacts.s3io import upload_bytes
+from raip.benchmarks.catalog import catalog_version as get_catalog_version
 from raip.celery_app import celery_app
 from raip.config import get_settings
-from raip.benchmarks.catalog import catalog_version as get_catalog_version
+from raip.governance.kill_switch import kill_switch_status
+from raip.governance.signing import image_digest_from_env, sign_artifact
+from raip.governance.trust_factor import compute_trust_factor
 from raip.graph.supervisor import run_evaluation_graph
 from raip.llm.client import LLMClient
 from raip.schemas.benchmark_run import build_benchmark_run_dict
 from raip.schemas.complai import ComplaiRequirementScore
 from raip.schemas.run_payload import RunCreateRequest, parse_litellm_model_id
-from raip.governance.signing import image_digest_from_env, sign_artifact
 from raip.store.redis_run import RedisRunStore
 
 
@@ -184,6 +186,13 @@ def _model_card_context(
 def run_benchmark_job(self, run_id: str, payload: dict[str, Any]) -> dict[str, Any]:
     settings = get_settings()
     store = RedisRunStore(settings)
+
+    killed, reason = kill_switch_status(settings)
+    if killed:
+        store.update(run_id, status="failed", error=f"kill-switch engaged: {reason}")
+        store.append_stage(run_id, "halted", status="failed", detail=f"kill-switch: {reason}"[:200])
+        return {"run_id": run_id, "status": "halted", "reason": reason}
+
     store.update(run_id, status="running")
     store.append_stage(run_id, "running")
 
@@ -194,8 +203,13 @@ def run_benchmark_job(self, run_id: str, payload: dict[str, Any]) -> dict[str, A
     os.environ.setdefault("MLFLOW_S3_ENDPOINT_URL", s.minio_endpoint_url)
     os.environ.setdefault("AWS_DEFAULT_REGION", s.minio_region)
 
-    mlflow.set_tracking_uri(s.mlflow_tracking_uri)
-    mlflow.set_experiment(s.mlflow_experiment)
+    mlflow_on = s.mlflow_enabled
+    if mlflow_on:
+        try:
+            mlflow.set_tracking_uri(s.mlflow_tracking_uri)
+            mlflow.set_experiment(s.mlflow_experiment)
+        except Exception:
+            mlflow_on = False
     git_sha = _git_sha()
     cat_version = get_catalog_version()
 
@@ -228,18 +242,24 @@ def run_benchmark_job(self, run_id: str, payload: dict[str, Any]) -> dict[str, A
         harness_rows = _harness_provenance(raw_outputs)
 
         mlflow_run_id: str | None = None
-        with mlflow.start_run(run_name=run_id) as active:
-            mlflow_run_id = active.info.run_id
-            mlflow.log_param("model_id", req.model_id)
-            mlflow.log_param("judge_model", s.effective_judge_model)
-            mlflow.log_param("seed", req.config.seed)
-            mlflow.log_param("catalog_version", cat_version)
-            for k, v in complai.items():
-                mlflow.log_metric(f"complai_{k}", float(v.score))
-                mlflow.log_metric(f"complai_{k}_ci_lo", float(v.score_ci_lower))
-                mlflow.log_metric(f"complai_{k}_ci_hi", float(v.score_ci_upper))
-
-        store.append_stage(run_id, "mlflow_log")
+        if mlflow_on:
+            try:
+                with mlflow.start_run(run_name=run_id) as active:
+                    mlflow_run_id = active.info.run_id
+                    mlflow.log_param("model_id", req.model_id)
+                    mlflow.log_param("judge_model", s.effective_judge_model)
+                    mlflow.log_param("seed", req.config.seed)
+                    mlflow.log_param("catalog_version", cat_version)
+                    for k, v in complai.items():
+                        mlflow.log_metric(f"complai_{k}", float(v.score))
+                        mlflow.log_metric(f"complai_{k}_ci_lo", float(v.score_ci_lower))
+                        mlflow.log_metric(f"complai_{k}_ci_hi", float(v.score_ci_upper))
+                store.append_stage(run_id, "mlflow_log")
+            except Exception as exc:  # lite mode / MLflow unreachable: degrade, do not fail the run
+                mlflow_run_id = None
+                store.append_stage(run_id, "mlflow_skipped", detail=str(exc)[:200])
+        else:
+            store.append_stage(run_id, "mlflow_skipped", detail="mlflow disabled")
         provider, model_name = parse_litellm_model_id(req.model_id)
         sig = sign_artifact({"run_id": run_id, "scores": agg, "catalog_version": cat_version})
         lifecycle_stage = str(payload.get("lifecycle_stage") or "inference")
@@ -293,6 +313,7 @@ def run_benchmark_job(self, run_id: str, payload: dict[str, Any]) -> dict[str, A
         )
 
         complai_serializable = {k: v.as_dict() for k, v in complai.items()}
+        trust_factor = compute_trust_factor(complai_serializable)
         store.update(
             run_id,
             status="completed",
@@ -307,6 +328,7 @@ def run_benchmark_job(self, run_id: str, payload: dict[str, Any]) -> dict[str, A
             raw_outputs_summary=raw_outputs,
             signature=sig,
             git_sha=git_sha,
+            trust_factor=trust_factor,
         )
         store.append_stage(run_id, "completed")
         return {"run_id": run_id, "status": "completed", "aggregate_scores": agg}

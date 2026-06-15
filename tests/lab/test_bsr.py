@@ -1,6 +1,6 @@
 import pytest
 
-from raip.lab.bsr import compute_bsr, asr_from_successes
+from raip.lab.bsr import asr_from_successes, compute_bsr
 
 
 @pytest.mark.lab

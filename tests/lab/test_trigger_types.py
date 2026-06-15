@@ -1,7 +1,7 @@
 import pytest
 
-from raip.lab.injectors.registry import TRIGGER_TYPES, get_injector
 from raip.lab.injectors.base import TriggerSpec
+from raip.lab.injectors.registry import TRIGGER_TYPES, get_injector
 from raip.lab.triggers_repo import seed_default_triggers
 
 

@@ -120,6 +120,7 @@ services:
       KEYCLOAK_URL: http://keycloak:8080
       KEYCLOAK_REALM: raip
       KEYCLOAK_CLIENT_ID: raip-dashboard
+      RAIP_AUTH_MODE: enterprise
       RAIP_AUTH_DISABLED: "0"
       REDIS_URL: redis://redis:6379/0
       CELERY_BROKER_URL: redis://redis:6379/0
@@ -156,6 +157,13 @@ services:
     build:
       context: ./dashboard
       dockerfile: Dockerfile
+      args:
+        # NEXT_PUBLIC_* are inlined at build time — must be build args, not just runtime env.
+        NEXT_PUBLIC_AUTH_MODE: enterprise
+        NEXT_PUBLIC_API_URL: http://localhost:8000
+        NEXT_PUBLIC_KEYCLOAK_URL: http://localhost:8080
+        NEXT_PUBLIC_KEYCLOAK_REALM: raip
+        NEXT_PUBLIC_KEYCLOAK_CLIENT_ID: raip-dashboard
     environment:
       NEXT_PUBLIC_API_URL: http://localhost:8000
       NEXT_PUBLIC_KEYCLOAK_URL: http://localhost:8080

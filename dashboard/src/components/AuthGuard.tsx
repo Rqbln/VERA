@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getRoles, initAuth } from "@/lib/auth";
+import { getRoles, initAuth, isGuided } from "@/lib/auth";
 
 function Forbidden() {
   return (
@@ -64,7 +64,7 @@ export function AuthGuard({
   roles: string[];
   simulateRole?: string;
 }) {
-  if (process.env.NEXT_PUBLIC_AUTH_DISABLED === "1") {
+  if (isGuided()) {
     if (!roleAllowed(roles, simulateRole)) return <Forbidden />;
     return <>{children}</>;
   }

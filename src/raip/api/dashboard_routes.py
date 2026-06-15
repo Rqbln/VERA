@@ -6,6 +6,7 @@ from typing import Annotated, Any
 import httpx
 import yaml
 from fastapi import APIRouter, Depends, HTTPException, Query
+from pydantic import BaseModel
 
 from raip.api.auth import (
     ROLE_COMPLIANCE,
@@ -21,6 +22,7 @@ from raip.config import Settings, get_settings
 from raip.dashboard.triage import (
     ALL_MEASURABLE,
     build_requirement_rows,
+    is_pilote_catalog,
     is_pilote_run,
 )
 from raip.store.redis_run import RedisRunStore, RunRecord
@@ -129,6 +131,31 @@ def _run_summary_dict(rec: RunRecord, *, filter_ids: list[str] | None = None) ->
         "artifacts": _artifact_uris(rec.run_id, settings),
         "non_measurable": _non_measurable_slots(rec),
         "requested_requirements": requested,
+        "trust_factor": rec.trust_factor,
+    }
+
+
+def _run_overview_extra(rec: RunRecord) -> dict[str, Any]:
+    """Lightweight per-run triage counts + headline score from data already in Redis."""
+    if rec.status != "completed" or not rec.complai_scores:
+        return {"triage_counts": None, "headline_score": None}
+    rows = build_requirement_rows(
+        run_status=rec.status,
+        requested=_requested_requirements(rec),
+        complai_scores=rec.complai_scores or {},
+        provenance=rec.harness_provenance or [],
+        raw_outputs=rec.raw_outputs_summary or [],
+    )
+    triage_counts = {
+        t: sum(1 for r in rows if r["triage"] == t)
+        for t in ("failed", "fallback", "uncovered", "ok", "na")
+    }
+    scored = [r["score"] for r in rows if isinstance(r.get("score"), (int, float))]
+    headline = round(sum(scored) / len(scored), 4) if scored else None
+    return {
+        "triage_counts": triage_counts,
+        "headline_score": headline,
+        "trust_factor": rec.trust_factor,
     }
 
 
@@ -141,6 +168,7 @@ def list_runs(
     lifecycle: str | None = None,
     status: str | None = None,
     exclude_pilote: bool = True,
+    include_triage: bool = False,
 ) -> dict[str, Any]:
     page, total = _store().list_runs(
         limit=limit,
@@ -150,23 +178,21 @@ def list_runs(
         status=status,
         exclude_pilote=exclude_pilote,
     )
-    return {
-        "runs": [
-            {
-                "run_id": r.run_id,
-                "status": r.status,
-                "model_id": r.model_id,
-                "lifecycle_stage": r.lifecycle_stage,
-                "catalog_version": r.catalog_version,
-                "created_at": r.created_at,
-                "updated_at": r.updated_at,
-            }
-            for r in page
-        ],
-        "total": total,
-        "limit": limit,
-        "offset": offset,
-    }
+    runs: list[dict[str, Any]] = []
+    for r in page:
+        item: dict[str, Any] = {
+            "run_id": r.run_id,
+            "status": r.status,
+            "model_id": r.model_id,
+            "lifecycle_stage": r.lifecycle_stage,
+            "catalog_version": r.catalog_version,
+            "created_at": r.created_at,
+            "updated_at": r.updated_at,
+        }
+        if include_triage:
+            item.update(_run_overview_extra(r))
+        runs.append(item)
+    return {"runs": runs, "total": total, "limit": limit, "offset": offset}
 
 
 @router.get("/runs/{run_id}/summary")
@@ -251,7 +277,8 @@ def _parse_qa(doc: dict[str, Any] | None) -> dict[str, Any]:
     for field in ("run_id", "model", "lifecycle_stage", "metrics", "governance"):
         if field not in doc:
             errors.append(f"missing field: {field}")
-    if doc.get("governance", {}).get("catalog_version") in (None, "", "pilote_v1"):
+    cv = doc.get("governance", {}).get("catalog_version")
+    if cv in (None, "") or is_pilote_catalog(cv):
         warnings.append("catalog_version missing or pilote")
     return {"valid": len(errors) == 0, "errors": errors, "warnings": warnings}
 
@@ -318,6 +345,12 @@ def presign_artifact(
 
 @router.get("/health/stack")
 def health_stack() -> dict[str, Any]:
+    """Tri-state stack health.
+
+    ``redis`` and ``ollama`` are *required* (a red light means the platform cannot run).
+    ``minio`` and ``mlflow`` are *optional*: in lite mode they may be absent and the platform
+    degrades gracefully (amber), it does not fail.
+    """
     settings = get_settings()
     checks: dict[str, Any] = {}
 
@@ -326,54 +359,213 @@ def health_stack() -> dict[str, Any]:
 
         r = redis_lib.from_url(settings.redis_url)
         r.ping()
-        checks["redis"] = {"ok": True}
+        checks["redis"] = {"ok": True, "required": True}
     except Exception as e:
-        checks["redis"] = {"ok": False, "error": str(e)[:200]}
+        checks["redis"] = {"ok": False, "required": True, "error": str(e)[:200]}
 
+    # MinIO is optional: when the active artifact backend is the local filesystem, report it as a
+    # healthy lite-mode configuration rather than a failure.
     try:
-        from raip.artifacts.s3io import ensure_bucket
+        from raip.artifacts.s3io import artifact_backend, ensure_bucket
 
-        ensure_bucket(settings)
-        checks["minio"] = {"ok": True, "endpoint": settings.minio_endpoint_url}
+        if artifact_backend(settings) == "local":
+            checks["minio"] = {
+                "ok": True,
+                "required": False,
+                "backend": "local",
+                "dir": settings.raip_local_artifacts_dir,
+            }
+        else:
+            ensure_bucket(settings)
+            checks["minio"] = {
+                "ok": True,
+                "required": False,
+                "backend": "minio",
+                "endpoint": settings.minio_endpoint_url,
+            }
     except Exception as e:
-        checks["minio"] = {"ok": False, "error": str(e)[:200]}
+        checks["minio"] = {"ok": False, "required": False, "error": str(e)[:200]}
 
-    try:
-        resp = httpx.get(f"{settings.mlflow_tracking_uri.rstrip('/')}/health", timeout=3.0)
-        checks["mlflow"] = {"ok": resp.status_code == 200, "uri": settings.mlflow_tracking_uri}
-    except Exception as e:
-        checks["mlflow"] = {"ok": False, "error": str(e)[:200]}
+    if not settings.mlflow_enabled:
+        checks["mlflow"] = {"ok": True, "required": False, "status": "disabled"}
+    else:
+        try:
+            resp = httpx.get(f"{settings.mlflow_tracking_uri.rstrip('/')}/health", timeout=3.0)
+            checks["mlflow"] = {
+                "ok": resp.status_code == 200,
+                "required": False,
+                "uri": settings.mlflow_tracking_uri,
+            }
+        except Exception as e:
+            checks["mlflow"] = {"ok": False, "required": False, "error": str(e)[:200]}
 
     try:
         resp = httpx.get(f"{settings.ollama_api_base.rstrip('/')}/api/tags", timeout=3.0)
         tags = resp.json().get("models", []) if resp.status_code == 200 else []
         checks["ollama"] = {
             "ok": resp.status_code == 200,
+            "required": True,
             "base": settings.ollama_api_base,
             "model_count": len(tags),
             "target_model": settings.raip_target_model,
         }
     except Exception as e:
-        checks["ollama"] = {"ok": False, "error": str(e)[:200]}
+        checks["ollama"] = {"ok": False, "required": True, "error": str(e)[:200]}
 
-    all_ok = all(c.get("ok") for c in checks.values())
-    return {"ok": all_ok, "checks": checks}
+    required_ok = all(c.get("ok") for c in checks.values() if c.get("required"))
+    degraded = required_ok and not all(c.get("ok") for c in checks.values())
+    return {"ok": required_ok, "degraded": degraded, "checks": checks}
+
+
+@router.get("/artifacts/local/{key:path}")
+def get_local_artifact(key: str):
+    """Serve a locally-stored artifact (lite mode). Public, like a MinIO presigned URL."""
+    import mimetypes
+
+    from fastapi.responses import FileResponse
+
+    from raip.artifacts.local_fs import safe_path
+
+    settings = get_settings()
+    try:
+        target = safe_path(settings, key)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail="invalid artifact key") from e
+    if not target.is_file():
+        raise HTTPException(status_code=404, detail="artifact not found")
+    media_type = mimetypes.guess_type(str(target))[0] or "application/octet-stream"
+    return FileResponse(str(target), media_type=media_type)
 
 
 @router.get("/series")
-def series_stub(
+def series(
     _user: Annotated[AuthUser, Depends(get_current_user)],
+    requirement: str = Query(..., description="requirement id, e.g. R02"),
+    model_id: str | None = None,
 ) -> dict[str, Any]:
+    """Longitudinal score series for a requirement, derived from historical Redis runs.
+
+    No TimescaleDB needed: each completed run of the model contributes one point. The dashboard
+    only draws a trend line once there are >=2 points, preserving the "no false time-series" rule.
+    """
+    page, _ = _store().list_runs(limit=200, model_id=model_id, status="completed")
+    points: list[dict[str, Any]] = []
+    for rec in reversed(page):  # list_runs is newest-first; we want chronological order
+        row = (rec.complai_scores or {}).get(requirement)
+        if not isinstance(row, dict):
+            continue
+        score = row.get("score")
+        if score is None:
+            continue
+        points.append(
+            {
+                "ts": rec.created_at,
+                "value": round(float(score), 4),
+                "run_id": rec.run_id,
+                "model_id": rec.model_id,
+            }
+        )
     return {
-        "available": False,
-        "reason": "no_timescale_data",
-        "series": [],
+        "available": len(points) >= 2,
+        "source": "redis_runs",
+        "requirement": requirement,
+        "series": points,
     }
+
+
+@router.get("/monitor/drift")
+def monitor_drift(
+    _user: Annotated[AuthUser, Depends(get_current_user)],
+    model_id: str = Query(..., description="model to evaluate drift for"),
+) -> dict[str, Any]:
+    from raip.tasks.monitor import compute_drift
+
+    return compute_drift(model_id)
+
+
+class KillSwitchBody(BaseModel):
+    engaged: bool
+    reason: str = ""
+
+
+@router.get("/governance/kill-switch")
+def get_kill_switch(_user: Annotated[AuthUser, Depends(get_current_user)]) -> dict[str, Any]:
+    from raip.governance.kill_switch import kill_switch_status
+
+    engaged, reason = kill_switch_status()
+    return {"engaged": engaged, "reason": reason}
+
+
+@router.post("/governance/kill-switch")
+def set_kill_switch(
+    body: KillSwitchBody,
+    _user: Annotated[AuthUser, Depends(require_roles(*ROLE_COMPLIANCE))],
+) -> dict[str, Any]:
+    from raip.governance.kill_switch import set_kill
+
+    engaged, reason = set_kill(body.engaged, body.reason)
+    return {"engaged": engaged, "reason": reason}
 
 
 @router.get("/hitl/tasks")
 def hitl_tasks(
     _user: Annotated[AuthUser, Depends(get_current_user)],
     run_id: str | None = None,
+    status: str | None = None,
 ) -> dict[str, Any]:
-    return {"tasks": [], "run_id": run_id}
+    from raip.store.redis_hitl import RedisHitlStore
+
+    tasks = RedisHitlStore().list(run_id=run_id, status=status)
+    return {"tasks": [t.to_dict() for t in tasks], "run_id": run_id}
+
+
+class HitlCreateBody(BaseModel):
+    run_id: str
+    requirement: str = "N01"
+    prompt: str = ""
+    sample_ref: str = ""
+
+
+class HitlReviewBody(BaseModel):
+    likert_score: int
+    comment: str = ""
+    reviewer: str = "guided-reviewer"
+
+
+@router.post("/hitl/tasks")
+def create_hitl_task(
+    body: HitlCreateBody,
+    _user: Annotated[AuthUser, Depends(get_current_user)],
+) -> dict[str, Any]:
+    from raip.store.redis_hitl import RedisHitlStore
+
+    if body.requirement not in ("N01", "N02"):
+        raise HTTPException(status_code=400, detail="requirement must be N01 or N02")
+    task = RedisHitlStore().create(
+        run_id=body.run_id,
+        requirement=body.requirement,
+        prompt=body.prompt,
+        sample_ref=body.sample_ref,
+    )
+    return {"task": task.to_dict()}
+
+
+@router.post("/hitl/tasks/{task_id}/review")
+def review_hitl_task(
+    task_id: str,
+    body: HitlReviewBody,
+    _user: Annotated[AuthUser, Depends(require_roles(*ROLE_COMPLIANCE, "domain_expert"))],
+) -> dict[str, Any]:
+    from raip.store.redis_hitl import RedisHitlStore
+
+    if not 1 <= body.likert_score <= 5:
+        raise HTTPException(status_code=400, detail="likert_score must be 1..5")
+    task = RedisHitlStore().submit_review(
+        task_id,
+        reviewer=body.reviewer,
+        likert_score=body.likert_score,
+        comment=body.comment,
+    )
+    if not task:
+        raise HTTPException(status_code=404, detail="hitl task not found")
+    return {"task": task.to_dict()}

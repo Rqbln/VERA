@@ -6,7 +6,7 @@ import os
 from typing import Any
 
 from raip.governance.signing import sign_artifact
-from raip.integrations.deps import lab_engine_status, require_lab_extra
+from raip.integrations.deps import require_lab_extra
 from raip.training.config import TrainingExperimentConfig
 
 

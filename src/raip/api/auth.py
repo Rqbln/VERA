@@ -42,7 +42,16 @@ class AuthUser:
 _jwks_cache: dict[str, Any] | None = None
 
 
+def auth_mode() -> str:
+    """Deployment auth mode: ``guided`` (no-login default) or ``enterprise`` (Keycloak)."""
+    return (os.environ.get("RAIP_AUTH_MODE", "guided").strip().lower() or "guided")
+
+
 def auth_disabled() -> bool:
+    # Guided mode (the shipped default) runs the dashboard without any login.
+    # Enterprise mode enforces Keycloak unless the legacy flag explicitly disables it.
+    if auth_mode() == "guided":
+        return True
     return os.environ.get("RAIP_AUTH_DISABLED", "").lower() in ("1", "true", "yes")
 
 
@@ -53,8 +62,18 @@ def keycloak_issuer() -> str:
 
 
 def _dev_user() -> AuthUser:
-    roles = os.environ.get("RAIP_DEV_ROLES", "legal_compliance,ml_researcher").split(",")
-    return AuthUser(sub="dev-user", roles=frozenset(r.strip() for r in roles if r.strip()), raw={})
+    # In guided mode a single anonymous persona holds every role so all lenses render
+    # for a non-technical user. Enterprise+disabled keeps the narrower legacy default.
+    if auth_mode() == "guided":
+        default_roles = ",".join(sorted(ALL_ROLES))
+    else:
+        default_roles = "legal_compliance,ml_researcher"
+    roles = os.environ.get("RAIP_DEV_ROLES", default_roles).split(",")
+    return AuthUser(
+        sub="guided-user",
+        roles=frozenset(r.strip() for r in roles if r.strip()),
+        raw={},
+    )
 
 
 async def _fetch_jwks() -> dict[str, Any]:

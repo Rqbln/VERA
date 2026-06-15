@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import os
-
 import pytest
 from fastapi.testclient import TestClient
 
@@ -83,7 +81,13 @@ def test_run_summary(client, sample_run):
     assert "triage_counts" in body
 
 
-def test_series_stub(client):
-    resp = client.get("/api/v1/series")
+def test_series_requires_requirement(client):
+    # /series now derives a real series from Redis runs and needs a requirement id.
+    assert client.get("/api/v1/series").status_code == 422
+    resp = client.get("/api/v1/series?requirement=R02")
     assert resp.status_code == 200
-    assert resp.json()["available"] is False
+    body = resp.json()
+    assert body["source"] == "redis_runs"
+    # available is gated on >=2 points (the "no false time-series" rule).
+    assert isinstance(body["available"], bool)
+    assert body["available"] == (len(body["series"]) >= 2)

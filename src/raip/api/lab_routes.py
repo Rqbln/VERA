@@ -8,9 +8,9 @@ from pydantic import BaseModel, Field
 
 from raip.lab.poison import inject_poison
 from raip.lab.triggers_repo import get_trigger_store, seed_default_triggers
+from raip.tasks.checkpoint_eval_task import checkpoint_eval_job
 from raip.tasks.dataset_scan import dataset_quality_job
 from raip.tasks.lab_train import lab_train_job
-from raip.tasks.checkpoint_eval_task import checkpoint_eval_job
 
 router = APIRouter(prefix="/api/v1/lab", tags=["lab"])
 

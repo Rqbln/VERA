@@ -6,7 +6,7 @@ from collections import defaultdict
 from typing import Any
 
 from raip.api.benchmark_registry import get_benchmark_entry
-from raip.benchmarks.runners.base import RunContext, RawList, SamplesByReq
+from raip.benchmarks.runners.base import RawList, RunContext, SamplesByReq
 from raip.benchmarks.runners.dataset_scan import run_dataset_scan
 from raip.benchmarks.runners.fairness import run_fairness_r11
 from raip.benchmarks.runners.garak_runner import run_garak

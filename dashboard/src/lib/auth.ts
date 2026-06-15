@@ -10,6 +10,29 @@ const keycloakConfig = {
 
 let keycloak: Keycloak | null = null;
 
+// The single friendly persona used in guided (no-login) mode: holds every role so all lenses
+// render for a non-technical user. Mirrors ALL_ROLES in the backend auth module.
+export const GUIDED_ROLES = [
+  "ml_researcher",
+  "data_scientist",
+  "secops",
+  "domain_expert",
+  "external_auditor",
+  "legal_compliance",
+  "risk_manager",
+  "executive",
+];
+
+export function authMode(): string {
+  return (process.env.NEXT_PUBLIC_AUTH_MODE || "guided").toLowerCase();
+}
+
+/** Guided no-login mode is the shipped default; enterprise mode enforces Keycloak. */
+export function isGuided(): boolean {
+  if (authMode() === "guided") return true;
+  return process.env.NEXT_PUBLIC_AUTH_DISABLED === "1";
+}
+
 export function getKeycloak(): Keycloak {
   if (!keycloak) {
     keycloak = new Keycloak(keycloakConfig);
@@ -18,9 +41,8 @@ export function getKeycloak(): Keycloak {
 }
 
 export async function initAuth(): Promise<boolean> {
+  if (isGuided()) return true;
   const kc = getKeycloak();
-  const authDisabled = process.env.NEXT_PUBLIC_AUTH_DISABLED === "1";
-  if (authDisabled) return true;
   try {
     const ok = await kc.init({
       onLoad: "login-required",
@@ -34,7 +56,7 @@ export async function initAuth(): Promise<boolean> {
 }
 
 export function getToken(): string | undefined {
-  if (process.env.NEXT_PUBLIC_AUTH_DISABLED === "1") return undefined;
+  if (isGuided()) return undefined;
   return getKeycloak().token;
 }
 
@@ -46,8 +68,11 @@ export function setRoleOverride(roles: string[] | null): void {
 
 export function getRoles(): string[] {
   if (roleOverride?.length) return roleOverride;
-  if (process.env.NEXT_PUBLIC_AUTH_DISABLED === "1") {
-    return (process.env.NEXT_PUBLIC_DEV_ROLES || "legal_compliance").split(",");
+  if (isGuided()) {
+    if (process.env.NEXT_PUBLIC_DEV_ROLES) {
+      return process.env.NEXT_PUBLIC_DEV_ROLES.split(",").map((r) => r.trim());
+    }
+    return GUIDED_ROLES;
   }
   const kc = getKeycloak();
   return (kc.tokenParsed?.realm_access?.roles as string[]) || [];

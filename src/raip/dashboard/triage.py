@@ -85,13 +85,17 @@ ALL_MEASURABLE = tuple(f"R{i:02d}" for i in range(1, 13))
 PILOTE_MARKERS = frozenset({"pilote_v1", "raip-mvp1-pilote"})
 
 
+def is_pilote_catalog(catalog_version: str | None) -> bool:
+    """True when a catalog version is a pilot marker (excluded from compliance views)."""
+    return (catalog_version or "").strip().lower() in PILOTE_MARKERS
+
+
 def is_pilote_run(catalog_version: str | None, payload: dict[str, Any] | None) -> bool:
-    cv = (catalog_version or "").strip().lower()
-    if cv in PILOTE_MARKERS:
+    if is_pilote_catalog(catalog_version):
         return True
     if payload:
         impl = str(payload.get("implementation") or "").lower()
-        if impl == "pilote_v1":
+        if impl in PILOTE_MARKERS:
             return True
     return False
 

@@ -2,12 +2,10 @@
 
 from __future__ import annotations
 
-from typing import Any
-
 from raip.api.benchmark_registry import get_benchmark_entry
 from raip.benchmarks.dynamic_prompts import generate_items
 from raip.benchmarks.metrics import compute_ece, score_consistency, score_item_response
-from raip.benchmarks.runners.base import RunContext, RawList, SamplesByReq, merge_samples
+from raip.benchmarks.runners.base import RawList, RunContext, SamplesByReq, merge_samples
 from raip.llm.judge import judge_attack_succeeded
 
 

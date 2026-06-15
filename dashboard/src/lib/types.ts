@@ -35,6 +35,7 @@ export interface RunSummary {
   artifacts: Record<string, string>;
   non_measurable: NonMeasurableSlots;
   requested_requirements: string[];
+  trust_factor?: TrustFactor | null;
 }
 
 export interface HarnessRow {
@@ -53,6 +54,12 @@ export interface NonMeasurableSlots {
   n06: { status: string };
 }
 
+export interface TrustFactor {
+  score: number;
+  band: string;
+  components: Record<string, number>;
+}
+
 export interface RunListItem {
   run_id: string;
   status: string;
@@ -61,6 +68,9 @@ export interface RunListItem {
   catalog_version: string;
   created_at: string;
   updated_at: string;
+  triage_counts?: Record<TriageStatus, number> | null;
+  headline_score?: number | null;
+  trust_factor?: TrustFactor | null;
 }
 
 export interface InspectorData {
@@ -82,7 +92,61 @@ export interface InspectorData {
   mlflow_run_id: string | null;
 }
 
+export interface ConnectedModel {
+  model_id: string;
+  name: string;
+  provider: string;
+  size?: number;
+  modified_at?: string;
+  connected: boolean;
+  recommended: boolean;
+}
+
+export interface ConnectedModelsResponse {
+  models: ConnectedModel[];
+  ollama_base: string;
+  recommended_model: string;
+  error?: string;
+}
+
+export interface BenchmarkEntry {
+  id: string;
+  complai?: string[];
+  implementation?: string;
+  [key: string]: unknown;
+}
+
+export interface RunCreateRequest {
+  model_id: string;
+  benchmarks?: string[];
+  complai_requirements?: string[];
+  config?: {
+    temperature?: number;
+    max_tokens?: number;
+    n_samples_per_benchmark?: number;
+    seed?: number;
+    bootstrap_n?: number;
+  };
+  governance?: Record<string, unknown>;
+  lifecycle_stage?: string;
+}
+
+export interface RunCreateResponse {
+  run_id: string;
+  status: string;
+}
+
+export interface StackHealthCheck {
+  ok: boolean;
+  required?: boolean;
+  error?: string;
+  status?: string;
+  backend?: string;
+  [key: string]: unknown;
+}
+
 export interface StackHealth {
   ok: boolean;
-  checks: Record<string, { ok: boolean; error?: string; [key: string]: unknown }>;
+  degraded?: boolean;
+  checks: Record<string, StackHealthCheck>;
 }

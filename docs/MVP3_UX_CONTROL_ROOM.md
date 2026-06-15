@@ -18,6 +18,11 @@ last_reviewed: "2026-06-09"
 # MVP3 UX — Compliance Control Room
 
 > Companion to [MVP3_dashboards_rbac.md](./MVP3_dashboards_rbac.md). Defines the **default restitution UX** (not a marketing site).
+>
+> A **guided, no-login mode** now complements this control-room UX for non-technical users (onboarding
+> home, Ollama launch wizard, runs summary). See [USER_GUIDE.md](../USER_GUIDE.md) and the status matrix
+> [MVP3_MVP4_IMPLEMENTATION.md](./MVP3_MVP4_IMPLEMENTATION.md). The dense control-room remains the
+> enterprise/expert surface.
 
 ## Principles
 

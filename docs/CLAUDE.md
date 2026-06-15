@@ -12,13 +12,18 @@ doc:
     index: ./README.md
     hub: ./ROADMAP.md
   related_paths:
+    - ../AGENTS.md
     - ./README-dev.md
     - ./MVP1_noyau_statique.md
   tags: [claude, cursor, conventions, compl-ai, raip]
-last_reviewed: "2026-05-12"
+last_reviewed: "2026-06-15"
 ---
 
 # CLAUDE.md
+
+> L'orientation et le quickstart pour agents vivent dans la racine [AGENTS.md](../AGENTS.md) ;
+> ce fichier est la **référence profonde** (conventions & graphe documentaire). Le mode guidé
+> sans login et la stack « lite » sont décrits dans AGENTS.md et [README-dev.md](./README-dev.md).
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 

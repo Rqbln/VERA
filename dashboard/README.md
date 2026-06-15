@@ -1,36 +1,64 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+---
+doc:
+  title: "RAIP dashboard (Next.js control room)"
+  slug: dashboard-readme
+  language: en
+  summary: |
+    Next.js 14 compliance control room: routes, guided/enterprise auth, env vars, on-prem
+    deployment (no Vercel), and Playwright tests.
+  type: dev-guide
+  audience: [developer, ai-agent]
+  navigation:
+    agents: ../AGENTS.md
+    dev: ../docs/README-dev.md
+    user_guide: ../USER_GUIDE.md
+  tags: [dashboard, nextjs, raip]
+last_reviewed: "2026-06-15"
+---
 
-## Getting Started
+# RAIP dashboard
 
-First, run the development server:
+A **Next.js 14** (App Router, TypeScript, Tailwind, TanStack Query, Recharts) compliance "control
+room" for EU AI Act release gates. It consumes the RAIP read API and ships in two modes.
+
+## Modes
+
+- **Guided (default, no login):** `NEXT_PUBLIC_AUTH_MODE=guided` (the default). A single persona sees
+  every lens; the onboarding home + launch wizard are the entry point.
+- **Enterprise:** `NEXT_PUBLIC_AUTH_MODE=enterprise` enables Keycloak OIDC (`keycloak-js`) and the
+  8-persona RBAC matrix.
+
+> `NEXT_PUBLIC_*` vars are inlined at **build** time. For Docker, pass them as **build args** (see
+> `Dockerfile` and the repo `docker-compose.yml`), not just runtime env.
+
+## Routes
+
+| Route | Audience |
+|-------|----------|
+| `/home` | Guided onboarding — what you can do, connected models, kill-switch |
+| `/launch` | Ollama launch wizard → `POST /api/v1/runs` |
+| `/runs-overview` | Summary table of all runs (status, triage, headline score) |
+| `/dashboards/compliance` · `/cyber` · `/ds` | RBAC lenses (R01–R12 triage) |
+| `/runs/[id]` · `/runs/[id]/inspector` | Run summary (live polling) + audit inspector |
+
+## Develop
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+cp .env.example .env.local      # guided mode is the default
+npm install
+npm run dev                     # http://localhost:3000 (expects the API on :8000)
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+From the repo root, `make quickstart` runs the whole lite stack (API + worker + dashboard) in Docker.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Test
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run build
+npx playwright test             # RBAC matrix (25) + guided-mode (5)
+```
 
-## Learn More
+## Deploy
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Deployment is **on-premise via Docker** (`make stack-full` or `docker compose up`). This is a
+sovereign, self-hostable stack — **not** deployed to Vercel or any managed cloud.

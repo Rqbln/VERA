@@ -8,9 +8,9 @@ from typing import Any
 from raip.data.copyright import score_r04
 from raip.data.privacy import score_r05
 from raip.data.quality import score_r03
-from raip.integrations.deps import lab_engine_status
 from raip.governance.datasheet import build_datasheet_context, render_datasheet
 from raip.governance.signing import sign_artifact
+from raip.integrations.deps import lab_engine_status
 
 
 def scan_dataset(

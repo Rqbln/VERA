@@ -5,14 +5,16 @@ from uuid import uuid4
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
 
 from raip.api.benchmark_registry import MVP2_BENCHMARK_REGISTRY
 from raip.api.dashboard_routes import router as dashboard_router
+from raip.api.forms_routes import router as forms_router
+from raip.api.lab_routes import router as lab_router
+from raip.api.models_routes import router as models_router
 from raip.config import get_settings
+from raip.governance.kill_switch import kill_switch_status
 from raip.schemas.run_payload import RunCreateRequest
 from raip.store.redis_run import RedisRunStore
-from raip.api.lab_routes import router as lab_router
 from raip.tasks.eval import run_benchmark_job
 
 BENCHMARK_REGISTRY: list[dict[str, Any]] = list(MVP2_BENCHMARK_REGISTRY)
@@ -27,19 +29,15 @@ app.add_middleware(
 )
 app.include_router(lab_router)
 app.include_router(dashboard_router)
-
-
-class ModelDeclare(BaseModel):
-    model_id: str
-    provider: str = "ollama"
-    notes: str = ""
-
-
-_models_store: list[dict[str, Any]] = []
+app.include_router(models_router)
+app.include_router(forms_router)
 
 
 @app.post("/api/v1/runs")
 def create_run(body: RunCreateRequest) -> dict[str, Any]:
+    killed, reason = kill_switch_status()
+    if killed:
+        raise HTTPException(status_code=503, detail=f"kill-switch engaged: {reason}")
     run_id = str(uuid4())
     store = RedisRunStore()
     store.create(run_id, body.model_id, body.model_dump())
@@ -111,17 +109,6 @@ def get_run_artifacts(run_id: str) -> dict[str, Any]:
 @app.get("/api/v1/benchmarks")
 def list_benchmarks() -> dict[str, Any]:
     return {"benchmarks": BENCHMARK_REGISTRY}
-
-
-@app.post("/api/v1/models")
-def declare_model(body: ModelDeclare) -> dict[str, Any]:
-    _models_store.append(body.model_dump())
-    return {"ok": True, "registered": body.model_id}
-
-
-@app.get("/api/v1/models")
-def list_models() -> dict[str, Any]:
-    return {"models": list(_models_store)}
 
 
 @app.delete("/api/v1/runs/{run_id}")

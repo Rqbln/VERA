@@ -10,40 +10,46 @@ doc:
   navigation:
     documentation: ./docs/README.md
     roadmap: ./docs/ROADMAP.md
-    mvp1_spec: ./docs/MVP1_noyau_statique.md
+    agents: ./AGENTS.md
+    user_guide: ./USER_GUIDE.md
     dev_setup: ./docs/README-dev.md
   tags: [raip, readme, eu-ai-act]
-last_reviewed: "2026-05-12"
+last_reviewed: "2026-06-15"
 ---
 
 # RAIP - Responsible AI in Practice
 
-Ce dépôt regroupe la **documentation** (dossier [`docs/`](docs/README.md)) et un **socle logiciel MVP1** (`src/raip/`) pour une plateforme d’évaluation d’IA responsable alignée sur l’EU AI Act.
+Ce dépôt regroupe la **documentation** (dossier [`docs/`](docs/README.md)) et un **socle logiciel** (`src/raip/` + `dashboard/`) pour une plateforme d’évaluation d’IA responsable alignée sur l’EU AI Act.
 
 ## Documentation
 
-- **Index** : [docs/README.md](docs/README.md)
-- **Hub** : [docs/ROADMAP.md](docs/ROADMAP.md)
-- **MVP1** : [docs/MVP1_noyau_statique.md](docs/MVP1_noyau_statique.md)
+- **Agents IA** : [AGENTS.md](AGENTS.md) — orientation, architecture, quickstart
+- **Utilisateurs non techniques** : [USER_GUIDE.md](USER_GUIDE.md) — guide pas-à-pas
+- **Index** : [docs/README.md](docs/README.md) · **Hub** : [docs/ROADMAP.md](docs/ROADMAP.md)
 - **Setup dev / tests** : [docs/README-dev.md](docs/README-dev.md)
-- **Règles assistants IA** : [docs/CLAUDE.md](docs/CLAUDE.md)
+- **État MVP3/MVP4** : [docs/MVP3_MVP4_IMPLEMENTATION.md](docs/MVP3_MVP4_IMPLEMENTATION.md)
 
-## Périmètre code (MVP2)
+## Périmètre code
 
-- CLI `raip-eval`, FastAPI, Celery, LangGraph, LiteLLM → **Ollama** (`ollama/llama3.1:8b-instruct-q8_0`), benchmarks dynamiques, MLflow, MinIO.
+- CLI `raip-eval`, FastAPI, Celery, LangGraph, LiteLLM → **Ollama** (`ollama/llama3.1:8b-instruct-q8_0`), benchmarks dynamiques, MLflow, MinIO ; **dashboard Next.js** (control room + mode guidé).
+
+## Démarrage rapide
+
+**Mode guidé / lite (une commande, sans login)** — pour démos et utilisateurs non techniques :
+
+1. `ollama pull llama3.1:8b-instruct-q8_0`
+2. `make quickstart` → ouvrir **http://localhost:3000** (voir [USER_GUIDE.md](USER_GUIDE.md))
+
+**Mode complet (entreprise, RBAC Keycloak + MLflow + MinIO)** :
+
+1. `cp .env.example .env` et adapter ; `make stack-full` (= `docker compose up --build`)
+2. `pip install -e ".[dev]"` puis `raip-eval run examples/mvp2_ollama_e2e.yaml`
+
+Migration depuis MVP1 : [docs/MIGRATION_MVP1_MVP2.md](docs/MIGRATION_MVP1_MVP2.md).
 
 ## Tests
 
-Voir [docs/README-dev.md](docs/README-dev.md) (pyramide unit / integration / e2e, sans `unittest.mock`).
-
-## Démarrage rapide (MVP2)
-
-1. `ollama pull llama3.1:8b-instruct-q8_0`
-2. `cp .env.example .env` et adapter.
-3. `docker compose up --build`
-4. `pip install -e ".[dev]"` puis `raip-eval run examples/mvp2_ollama_e2e.yaml`
-
-Migration depuis MVP1 : [docs/MIGRATION_MVP1_MVP2.md](docs/MIGRATION_MVP1_MVP2.md).
+Voir [docs/README-dev.md](docs/README-dev.md) (pyramide unit / integration / e2e + Playwright, sans `unittest.mock`).
 
 Les poids Ollama sont sous `~/.ollama/models` ; RAIP utilise l’**API HTTP** Ollama (`OLLAMA_API_BASE`).
 

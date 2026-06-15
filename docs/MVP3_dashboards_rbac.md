@@ -23,6 +23,11 @@ last_reviewed: "2026-05-12"
 
 > Voir [ROADMAP.md](./ROADMAP.md) pour la vision globale, la stack OSS et le référentiel **18 exigences COMPL-AI** (§3).
 > Pré-requis : [MVP1](./MVP1_noyau_statique.md) (sources MLflow, R01/R02/R06/R07/R08/R09/R10/R11/R12) et [MVP2](./MVP2_laboratoire_injection.md) (trajectoires TimescaleDB, R03/R04/R05/N03).
+>
+> **État d'implémentation** : courbes longitudinales, HITL N01/N02, formulaires N03–N06 et export PDF
+> signé sont **livrés** (voir la matrice [MVP3_MVP4_IMPLEMENTATION.md](./MVP3_MVP4_IMPLEMENTATION.md)).
+> Une **surface guidée sans login** (accueil + assistant de lancement Ollama + tableau récap) complète
+> les 3 vues RBAC pour les utilisateurs non techniques — toujours **sans données `pilote_v1`**.
 
 ## 1. Périmètre
 

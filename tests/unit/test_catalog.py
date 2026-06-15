@@ -4,7 +4,12 @@ from __future__ import annotations
 
 import unittest
 
-from raip.benchmarks.catalog import catalog_version, load_catalog, validate_catalog_weights, weights_for_requirement
+from raip.benchmarks.catalog import (
+    catalog_version,
+    load_catalog,
+    validate_catalog_weights,
+    weights_for_requirement,
+)
 
 
 class TestCatalog(unittest.TestCase):

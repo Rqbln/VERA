@@ -2,13 +2,23 @@ name: RAIP CI
 
 on:
   push:
-    branches: [main, MVP2]
+    branches: [main, MVP2, mvp3-mvp4]
   pull_request:
     branches: [main, MVP2]
 
 jobs:
   unit:
     runs-on: ubuntu-latest
+    # The dashboard read API + governance stores are backed by Redis.
+    services:
+      redis:
+        image: redis:7-alpine
+        ports: ["6379:6379"]
+    env:
+      REDIS_URL: redis://localhost:6379/0
+      RAIP_AUTH_MODE: guided
+      RAIP_ARTIFACT_BACKEND: local
+      RAIP_MLFLOW_DISABLED: "1"
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5

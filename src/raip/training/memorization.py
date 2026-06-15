@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Sequence
+from collections.abc import Sequence
 
 
 def memorization_curve(canary_matches: Sequence[int], epochs: Sequence[int]) -> list[dict[str, float]]:

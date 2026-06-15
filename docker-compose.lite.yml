@@ -1,0 +1,77 @@
+# RAIP — lite stack for non-technical users / quick demos.
+#
+#   docker compose -f docker-compose.lite.yml up --build      (or: make quickstart)
+#
+# Runs only the essentials: API + Celery worker + Next.js dashboard + Redis.
+# No Keycloak (guided no-login mode), no MinIO (local-filesystem artifacts),
+# no MLflow / TimescaleDB / Postgres. Ollama is expected on the host
+# (e.g. `ollama pull llama3.1:8b-instruct-q8_0`). Open http://localhost:3000
+services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  api:
+    build: .
+    command: uvicorn raip.api.main:app --host 0.0.0.0 --port 8000
+    environment:
+      RAIP_AUTH_MODE: guided
+      REDIS_URL: redis://redis:6379/0
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/0
+      RAIP_ARTIFACT_BACKEND: local
+      RAIP_LOCAL_ARTIFACTS_DIR: /data/artifacts
+      RAIP_PUBLIC_API_URL: http://localhost:8000
+      RAIP_MLFLOW_DISABLED: "1"
+      MLFLOW_TRACKING_URI: ""
+      RAIP_TIMESCALE_URL: ""
+      OLLAMA_API_BASE: http://host.docker.internal:11434
+      RAIP_TARGET_MODEL: ollama/llama3.1:8b-instruct-q8_0
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - raip_artifacts:/data/artifacts
+    ports:
+      - "8000:8000"
+    depends_on:
+      redis:
+        condition: service_started
+
+  worker:
+    build: .
+    command: celery -A raip.celery_app worker --loglevel=INFO
+    environment:
+      RAIP_AUTH_MODE: guided
+      REDIS_URL: redis://redis:6379/0
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/0
+      RAIP_ARTIFACT_BACKEND: local
+      RAIP_LOCAL_ARTIFACTS_DIR: /data/artifacts
+      RAIP_MLFLOW_DISABLED: "1"
+      MLFLOW_TRACKING_URI: ""
+      RAIP_TIMESCALE_URL: ""
+      OLLAMA_API_BASE: http://host.docker.internal:11434
+      RAIP_TARGET_MODEL: ollama/llama3.1:8b-instruct-q8_0
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - raip_artifacts:/data/artifacts
+    depends_on:
+      redis:
+        condition: service_started
+
+  dashboard:
+    build:
+      context: ./dashboard
+      dockerfile: Dockerfile
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:8000
+      NEXT_PUBLIC_AUTH_MODE: guided
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api
+
+volumes:
+  raip_artifacts:

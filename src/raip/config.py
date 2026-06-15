@@ -45,6 +45,27 @@ class Settings(BaseSettings):
         validation_alias="MLFLOW_TRACKING_URI",
     )
     mlflow_experiment: str = Field(default="raip-mvp2", validation_alias="MLFLOW_EXPERIMENT")
+    raip_mlflow_disabled: bool = Field(
+        default=False,
+        validation_alias="RAIP_MLFLOW_DISABLED",
+        description="When true (lite mode), skip all MLflow logging instead of failing.",
+    )
+
+    # Artifact storage backend: auto -> MinIO if reachable else local filesystem.
+    raip_artifact_backend: str = Field(
+        default="auto",
+        validation_alias="RAIP_ARTIFACT_BACKEND",
+        description="auto | minio | local",
+    )
+    raip_local_artifacts_dir: str = Field(
+        default="./.raip-artifacts",
+        validation_alias="RAIP_LOCAL_ARTIFACTS_DIR",
+    )
+    raip_public_api_url: str = Field(
+        default="",
+        validation_alias="RAIP_PUBLIC_API_URL",
+        description="Browser-reachable API base used to build local artifact URLs (lite mode).",
+    )
 
     # MinIO (S3-compatible)
     minio_endpoint_url: str = Field(
@@ -75,6 +96,13 @@ class Settings(BaseSettings):
     @property
     def effective_judge_model(self) -> str:
         return self.raip_judge_model or self.raip_target_model
+
+    @property
+    def mlflow_enabled(self) -> bool:
+        """MLflow is used only when not explicitly disabled and a tracking URI is set."""
+        if self.raip_mlflow_disabled:
+            return False
+        return bool((self.mlflow_tracking_uri or "").strip())
 
     @property
     def celery_broker(self) -> str:

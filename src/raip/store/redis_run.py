@@ -31,6 +31,7 @@ class RunRecord:
     raw_outputs_summary: list[dict[str, Any]] = field(default_factory=list)
     signature: dict[str, str] | None = None
     git_sha: str = "unknown"
+    trust_factor: dict[str, Any] | None = None
 
     def to_json(self) -> str:
         return json.dumps(asdict(self), ensure_ascii=False)
@@ -49,6 +50,7 @@ class RunRecord:
             ("raw_outputs_summary", []),
             ("signature", None),
             ("git_sha", "unknown"),
+            ("trust_factor", None),
         ):
             d.setdefault(key, default)
         return cls(**d)
@@ -130,6 +132,7 @@ class RedisRunStore:
         raw_outputs_summary: list[dict[str, Any]] | None = None,
         signature: dict[str, str] | None = None,
         git_sha: str | None = None,
+        trust_factor: dict[str, Any] | None = None,
     ) -> RunRecord | None:
         rec = self.get(run_id)
         if not rec:
@@ -162,6 +165,8 @@ class RedisRunStore:
             rec.signature = signature
         if git_sha is not None:
             rec.git_sha = git_sha
+        if trust_factor is not None:
+            rec.trust_factor = trust_factor
         rec.updated_at = datetime.now(UTC).isoformat()
         self._persist(self._key(run_id), rec.to_json())
         return rec

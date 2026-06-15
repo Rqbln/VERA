@@ -1,23 +1,51 @@
 ---
 doc:
-  title: "RAIP MVP2 — Developer setup"
+  title: "RAIP — Developer setup (MVP2–MVP4)"
   slug: readme-dev
   language: en
   summary: |
-    Prerequisites, Docker Compose, local Celery/API, tests (pytest), Ollama wiring from containers.
+    Quickstart (lite/guided + full), prerequisites, Docker Compose, local Celery/API, tests
+    (pytest + Playwright), Ollama wiring, the no-login guided dashboard and launch wizard.
   type: dev-guide
   audience: [developer, ai-agent]
   navigation:
     hub: ./README.md
     spec: ./MVP1_noyau_statique.md
+    agents: ../AGENTS.md
+    status: ./MVP3_MVP4_IMPLEMENTATION.md
   related_paths:
     - ./CLAUDE.md
     - ../README.md
-  tags: [dev, docker, pytest, ollama, celery]
-last_reviewed: "2026-05-12"
+    - ../AGENTS.md
+  tags: [dev, docker, pytest, ollama, celery, guided, lite]
+last_reviewed: "2026-06-15"
 ---
 
-# RAIP MVP2 — developer setup
+# RAIP — developer setup (MVP2–MVP4)
+
+## Lite mode / one-command quickstart (no login)
+
+For a non-technical demo or fast local dev, the **guided** stack runs with a single command and
+**no Keycloak**: Redis + API + worker + dashboard only, artifacts on the local filesystem, MLflow
+off.
+
+```bash
+ollama pull llama3.1:8b-instruct-q8_0
+make quickstart                 # = docker compose -f docker-compose.lite.yml up --build
+# open http://localhost:3000 — no login; redirected to /home
+```
+
+Native equivalent (no Docker): `make quickstart-native` prints the three commands. Key env:
+`RAIP_AUTH_MODE=guided`, `RAIP_ARTIFACT_BACKEND=local`, `RAIP_MLFLOW_DISABLED=1`.
+
+The guided dashboard adds three routes on top of the RBAC lenses:
+
+- `/home` — onboarding ("what you can do") + connected models + kill-switch.
+- `/launch` — the Ollama **launch wizard** (model → requirements → options → submit `POST /api/v1/runs`).
+- `/runs-overview` — summary table of runs (status, triage counts, headline score).
+
+End-user walkthrough: [USER_GUIDE.md](../USER_GUIDE.md). Implementation status:
+[MVP3_MVP4_IMPLEMENTATION.md](./MVP3_MVP4_IMPLEMENTATION.md).
 
 ## Prerequisites
 
@@ -102,15 +130,15 @@ docker compose up --build api keycloak dashboard redis minio
 
 Test personas (password `raip-dev`): `compliance@raip.local`, `ds@raip.local`, `secops@raip.local`, etc. — see `infra/keycloak/raip-realm.json`.
 
-Playwright RBAC matrix (3 views × 8 personas):
+Playwright suites — RBAC matrix (3 views × 8 personas) **+ guided-mode** (home, launch, runs-overview):
 
 ```bash
 cd dashboard
 npm run build
-npx playwright test
+npx playwright test            # control-room.spec.ts (25) + guided-mode.spec.ts (5)
 ```
 
-UX spec: [MVP3_UX_CONTROL_ROOM.md](./MVP3_UX_CONTROL_ROOM.md).
+UX spec: [MVP3_UX_CONTROL_ROOM.md](./MVP3_UX_CONTROL_ROOM.md). Guided UX: [USER_GUIDE.md](../USER_GUIDE.md).
 
 ## Environment
 

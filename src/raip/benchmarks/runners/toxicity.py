@@ -5,7 +5,7 @@ from __future__ import annotations
 from raip.api.benchmark_registry import get_benchmark_entry
 from raip.benchmarks.dynamic_prompts import generate_items
 from raip.benchmarks.metrics import score_item_response
-from raip.benchmarks.runners.base import RunContext, RawList, SamplesByReq, merge_samples
+from raip.benchmarks.runners.base import RawList, RunContext, SamplesByReq, merge_samples
 from raip.data.quality import tox_avg
 from raip.integrations.deps import lab_engine_status
 

@@ -1,8 +1,5 @@
 from __future__ import annotations
 
-import os
-
-import pytest
 from fastapi.testclient import TestClient
 
 from raip.api.auth import AuthUser, auth_disabled, require_roles
@@ -23,7 +20,15 @@ def test_require_roles_allows_when_disabled(monkeypatch):
     assert result.sub == "x"
 
 
+def test_guided_mode_is_default(monkeypatch):
+    # With nothing set, the platform ships in guided no-login mode.
+    monkeypatch.delenv("RAIP_AUTH_MODE", raising=False)
+    monkeypatch.delenv("RAIP_AUTH_DISABLED", raising=False)
+    assert auth_disabled() is True
+
+
 def test_dashboard_endpoints_require_auth_when_enabled(monkeypatch):
+    monkeypatch.setenv("RAIP_AUTH_MODE", "enterprise")
     monkeypatch.delenv("RAIP_AUTH_DISABLED", raising=False)
     from raip.api.main import app
 

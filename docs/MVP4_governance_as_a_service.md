@@ -16,18 +16,28 @@ doc:
   related_paths:
     - ./ROADMAP.md
   tags: [mvp4, production, opa, unleash, trust-factor]
-last_reviewed: "2026-05-12"
+last_reviewed: "2026-06-22"
 ---
 
 # MVP 4 — Governance-as-a-Service (GaaS) en Production
 
+> **⚙️ Construit (branche `mvp4-gaas`).** Une grande partie de cette cible est désormais
+> **implémentée et exécutable** (`make stack-gaas`) : proxy inline, bus d'événements
+> (Redpanda/Kafka → fallback Redis Streams), 4 agents de scoring, Trust Factor en flux, moteur **OPA**
+> (+ fallback intégré), modes shadow/advisory/enforcement, audit/SIEM signé (OpenSearch + JSONL),
+> canary planifié, plan d'admin `/admin/v1`. Guide opérateur : **[MVP4_GAAS_RUNTIME.md](./MVP4_GAAS_RUNTIME.md)**.
+> Restent du **durcissement** (cf. ce doc) : Wazuh/OpenSearch en cluster, Flink, Kong/Envoy + mTLS,
+> Unleash, OpenBao/TSA eIDAS, dérive par embeddings (NannyML). Ce document reste la **vision cible**.
+
 > Voir [ROADMAP.md](./ROADMAP.md) pour la vision globale, la stack OSS et le référentiel **18 exigences COMPL-AI** (§3).
 > Pré-requis : MVP1 (benchmarks R01..R12 mesurables), MVP2 (trigger registry, R02 étendu), MVP3 (dashboards, HITL, audit signé).
 >
-> **État d'implémentation** : ce document décrit la **cible complète**. Une **tranche fine** est livrée
-> sur l'infra existante (Redis/Celery) — **Trust Factor** (§3), **détection de dérive à la demande** et
-> **kill-switch** (§5) — surfacés dans le dashboard. Le proxy inline, Kafka, OPA, Kong et le SIEM
-> restent **reportés**. Détails : [MVP3_MVP4_IMPLEMENTATION.md](./MVP3_MVP4_IMPLEMENTATION.md).
+> **État d'implémentation** : ce document décrit la **cible complète**. Le **runtime GaaS** (proxy
+> inline, bus Redpanda/Kafka, OPA, 4 agents, Trust Factor en flux, audit/SIEM signé, canary, modes)
+> est désormais **construit et exécutable** (`make stack-gaas`, profil opt-in) — voir
+> [MVP4_GAAS_RUNTIME.md](./MVP4_GAAS_RUNTIME.md). Restent du **durcissement production** : Kong/Envoy
+> + mTLS, Unleash, Wazuh/OpenSearch en cluster, Flink, OpenBao/TSA eIDAS, dérive par embeddings.
+> Matrice détaillée : [MVP3_MVP4_IMPLEMENTATION.md](./MVP3_MVP4_IMPLEMENTATION.md).
 
 ## 1. Périmètre
 

@@ -56,7 +56,8 @@ Tous les fichiers de ce dossier commencent par un **bloc YAML (front matter)** d
 | [MVP3_dashboards_rbac.md](./MVP3_dashboards_rbac.md) | MVP3 — dashboards & RBAC |
 | [MVP3_UX_CONTROL_ROOM.md](./MVP3_UX_CONTROL_ROOM.md) | MVP3 — design UX de la control room |
 | [MVP3_MVP4_IMPLEMENTATION.md](./MVP3_MVP4_IMPLEMENTATION.md) | MVP3/MVP4 — **état d'implémentation** (matrice) |
-| [MVP4_governance_as_a_service.md](./MVP4_governance_as_a_service.md) | MVP4 — GaaS production (cible) |
+| [MVP4_governance_as_a_service.md](./MVP4_governance_as_a_service.md) | MVP4 — GaaS production (cible/vision) |
+| [MVP4_GAAS_RUNTIME.md](./MVP4_GAAS_RUNTIME.md) | MVP4 — **runtime GaaS tel que construit** (proxy, bus, OPA, agents, audit) |
 | [MIGRATION_MVP1_MVP2.md](./MIGRATION_MVP1_MVP2.md) | Migration MVP1 → MVP2 |
 | [framework_open_source_ia_responsable.md](./framework_open_source_ia_responsable.md) | Cadrage framework IA responsable |
 | [Évaluation Modulaire IA Cycle Vie EU AI Act.md](./Évaluation%20Modulaire%20IA%20Cycle%20Vie%20EU%20AI%20Act.md) | Rapport de recherche |

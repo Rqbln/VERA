@@ -14,7 +14,7 @@ doc:
     mvp4: ./MVP4_governance_as_a_service.md
     agents: ../AGENTS.md
   tags: [raip, mvp3, mvp4, status]
-last_reviewed: "2026-06-15"
+last_reviewed: "2026-06-22"
 ---
 
 # MVP3 / MVP4 — état d'implémentation
@@ -56,28 +56,47 @@ last_reviewed: "2026-06-15"
 | Détection de dérive (à la demande) | `done` | `tasks/monitor.py`, `GET /monitor/drift` | dernier run vs moyenne glissante ; pas de canary planifié |
 | Kill-switch | `done` | `governance/kill_switch.py`, `/governance/kill-switch`, `KillSwitchToggle.tsx` | bloque `POST /runs` (503) + court-circuite le worker |
 
-## Reporté (deferred) — gouvernance-as-a-service complète
+## MVP4 — runtime GaaS complet (profil `gaas`)
 
-Volontairement hors périmètre (contradictoire avec l'objectif de simplification) ; voir
-[MVP4_governance_as_a_service.md](./MVP4_governance_as_a_service.md) pour la cible complète :
+Runtime de gouvernance réel et exécutable (`make stack-gaas`), opt-in via profil Docker ; la stack
+lite reste inchangée. Guide complet : [MVP4_GAAS_RUNTIME.md](./MVP4_GAAS_RUNTIME.md).
 
-- Proxy asynchrone inline en production (httpx + shadow inspection < 10 ms).
-- Bus d'événements **Kafka** + schema registry.
-- Moteur de politiques **OPA / Rego**.
-- Passerelle **Kong / Envoy** + feature flags **Unleash**.
-- SIEM **Wazuh / OpenSearch**, détection de dérive par embeddings (Evidently/NannyML).
-- Canary planifié (200 prompts/heure) — ici remplacé par une vérification de dérive à la demande.
+| Fonctionnalité | Statut | Module / service | Note |
+|---|---|---|---|
+| Bus d'événements | `done` | `governance/bus.py` | Redpanda/Kafka, **fallback Redis Streams** |
+| Proxy inline (OpenAI-compatible) | `done` | `governance/proxy.py`, `services/proxy/` | gouverne → forward (LiteLLM) → publie ; bloque en `enforcement` |
+| 4 agents de scoring | `done` | `governance/agents.py`, `services/agents/` | cyber/ethics/privacy/drift ; Detoxify/Presidio si présents, sinon heuristique |
+| Trust Factor en flux | `done` | `governance/trust_stream.py` | agrège `gov-signals` → Redis + Timescale (best-effort) |
+| Moteur de politiques OPA | `done` | `governance/policy.py`, `infra/opa/raip.rego` | décision allow/flag/deny ; **fallback intégré** |
+| Modes shadow/advisory/enforcement | `done` | `governance/modes.py` | par modèle, Redis |
+| Audit / SIEM signé | `done` | `governance/audit.py`, `services/audit_sink/` | OpenSearch + **chaîne JSONL signée** ; incidents |
+| Canary planifié | `done` | `tasks/canary.py` (Celery beat) | trafic doré → bus |
+| Plan d'admin | `done` | `api/admin_routes.py` | `/admin/v1/{proxy/health,mode,trust,incidents,policy,kill-switch}` |
+| Profil `gaas` Docker | `done` | `docker-compose.gaas.yml`, `Dockerfile.gaas`, `make stack-gaas` | redpanda+opa+opensearch+proxy+agents+audit-sink |
 
-## Limites à traiter côté opérateur
+## Restyle & internationalisation
 
-1. **Signature qualifiée** (eIDAS / horodatage RFC 3161) : nécessite un TSA externe + clé gérée
-   (OpenBao/Cosign). Livré : empreinte sha256 vérifiable seulement.
-2. **Keycloak production** (realm durci, secrets, HTTPS) pour le mode `enterprise`.
-3. **WeasyPrint** : `pip install '.[pdf]'` + bibliothèques système cairo/pango.
-4. **Stack GaaS complète** : projet d'infrastructure séparé (cf. liste « reporté »).
+| Fonctionnalité | Statut | Module | Note |
+|---|---|---|---|
+| Design system clair BNP-green | `done` | `globals.css`, `tailwind.config.ts`, [`DESIGN_SYSTEM.md`](../dashboard/DESIGN_SYSTEM.md) | tokens brand/ink/surface/status |
+| Tuiles KPI · timeline · pictos | `done` | `KpiTiles.tsx`, `Timeline.tsx`, lucide-react | jalon actif = vert vif #76B82A |
+| Page gouvernance | `done` | `app/(console)/governance`, `GovernancePanel.tsx` | surface du runtime MVP4 |
+| Bilingue FR/EN | `done` | `lib/i18n.tsx`, bascule dans le shell | sigles conservés en anglais |
+
+## Durcissement (à traiter côté opérateur — hors de ce build)
+
+1. **SIEM production** : Wazuh + OpenSearch en cluster + règles de corrélation (ici : OpenSearch
+   mono-nœud + journal d'audit signé).
+2. **Streaming haut débit** : Flink/Kafka-Streams pour l'agrégation du Trust Factor (ici : consumer
+   à fenêtre glissante).
+3. **Signature qualifiée** : OpenBao Transit + TSA RFC 3161 / eIDAS (ici : sha256 vérifiable).
+4. **Passerelle / mTLS** : Kong ou Envoy devant le proxy + rate-limiting.
+5. **Dérive par embeddings** : NannyML/Evidently + golden set maintenu (ici : canary + heuristique).
+6. **Keycloak production** (realm durci, secrets, HTTPS) ; **WeasyPrint** (`pip install '.[pdf]'`).
 
 ## Tests (dernière exécution locale)
 
-- `pytest tests/unit/` — 71 passés (Redis requis).
-- `npx playwright test` — 30 passés (25 RBAC + 5 mode guidé).
+- `pytest tests/unit/` — 99 passés (Redis requis ; inclut bus/agents/proxy/policy/audit/admin).
+- `npx playwright test` — 35 passés (25 RBAC + mode guidé + gouvernance + bascule de langue).
 - `ruff check` — propre sur les nouveaux modules.
+- `make stack-gaas` — pipeline gouverné de bout en bout (proxy:8100, OPA, Redpanda, OpenSearch).

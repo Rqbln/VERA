@@ -106,7 +106,24 @@ En bas de la page d'un run, la section **Governance & trends (MVP3)** permet de 
 - remplir les **formulaires déclaratifs** N03–N06 ;
 - **télécharger un rapport PDF** signé pour l'audit (nécessite l'option `pdf` côté serveur).
 
-Le **kill-switch** sur la page d'accueil permet de bloquer toute nouvelle évaluation en un clic.
+Le **kill-switch** permet de bloquer toute nouvelle évaluation en un clic.
+
+**Langue :** un bouton **FR/EN** en haut à droite bascule l'interface entre français et anglais
+(les sigles techniques — EU AI Act, COMPL-AI, LLM, RBAC… — restent en anglais).
+
+## 7bis. Gouvernance en continu (avancé, mode entreprise)
+
+La page **Gouvernance** supervise un modèle **déployé en direct** (au-delà d'une évaluation ponctuelle) :
+
+- **Modes** : *shadow* (observe), *advisory* (alerte), *enforcement* (bloque) — réglables par modèle,
+  affichés sur une **frise** (le jalon actif est en vert vif).
+- **Trust Factor en direct** : un score 0–100 recalculé en continu à partir de quatre agents
+  (cyber, éthique/toxicité, vie privée, dérive).
+- **Incidents** : les décisions de blocage et les chutes de confiance sont journalisées et signées.
+- **Kill-switch** : coupe immédiatement les nouveaux appels.
+
+Ce runtime est optionnel et destiné aux équipes avancées : `make stack-gaas` (voir
+[docs/MVP4_GAAS_RUNTIME.md](./docs/MVP4_GAAS_RUNTIME.md)). La stack guidée reste, elle, en une commande.
 
 ## 8. Problèmes fréquents
 

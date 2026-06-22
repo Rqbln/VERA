@@ -114,8 +114,20 @@ make stack-full                            # docker compose up --build (Keycloak
 # RAIP_AUTH_MODE=enterprise enforces Keycloak RBAC (8 personas, password raip-dev)
 ```
 
+**Governance-as-a-Service (MVP4 gaas profile):**
+
+```bash
+make stack-gaas                            # full stack + inline proxy (:8100), Redpanda, OPA, OpenSearch,
+                                           # scoring agents, audit sink; the lite stack stays unaffected
+```
+
+The gaas runtime governs live inference (proxy → event bus → 4 agents → streaming Trust Factor →
+OPA → kill-switch → signed audit/SIEM → canary) and degrades gracefully (bus→Redis Streams,
+OpenSearch→signed JSONL, OPA→in-process rule). Code in `src/raip/governance/` + `services/`; admin
+API `/admin/v1/*`; UI at `/governance`. Full guide: `docs/MVP4_GAAS_RUNTIME.md`.
+
 Native (no Docker): `make quickstart-native` prints the three commands (API, worker, `npm run dev`).
-Full dev setup: `docs/README-dev.md`.
+Full dev setup: `docs/README-dev.md`. Dashboard design system + i18n: `dashboard/DESIGN_SYSTEM.md`.
 
 ## The no-login guided dashboard
 

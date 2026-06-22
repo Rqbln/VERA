@@ -55,8 +55,15 @@ From the repo root, `make quickstart` runs the whole lite stack (API + worker + 
 
 ```bash
 npm run build
-npx playwright test             # RBAC matrix (25) + guided-mode (5)
+npx playwright test             # RBAC matrix (25) + guided-mode/governance/i18n + screenshots
 ```
+
+## Look & feel
+
+Light, decision-maker BNP-green design system (tokens, KPI tiles, graphical timeline, lucide
+icons) and a bilingual **FR/EN** toggle — see [DESIGN_SYSTEM.md](./DESIGN_SYSTEM.md). Routes:
+`/home`, `/launch`, `/runs-overview`, `/governance`, `/dashboards/{compliance,cyber,ds}`,
+`/runs/[id]/inspector`. The `/governance` page surfaces the MVP4 GaaS runtime.
 
 ## Deploy
 

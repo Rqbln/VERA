@@ -45,7 +45,13 @@ Ce dépôt regroupe la **documentation** (dossier [`docs/`](docs/README.md)) et 
 1. `cp .env.example .env` et adapter ; `make stack-full` (= `docker compose up --build`)
 2. `pip install -e ".[dev]"` puis `raip-eval run examples/mvp2_ollama_e2e.yaml`
 
+**Mode gouvernance (MVP4 GaaS)** — runtime de gouvernance de l'inférence en direct :
+
+1. `make stack-gaas` → stack complète + proxy inline (`:8100`), Redpanda, OPA, OpenSearch, agents
+2. Page **/governance** dans le dashboard ; guide : [docs/MVP4_GAAS_RUNTIME.md](docs/MVP4_GAAS_RUNTIME.md)
+
 Migration depuis MVP1 : [docs/MIGRATION_MVP1_MVP2.md](docs/MIGRATION_MVP1_MVP2.md).
+Design system + bilingue FR/EN du dashboard : [dashboard/DESIGN_SYSTEM.md](dashboard/DESIGN_SYSTEM.md).
 
 ## Tests
 

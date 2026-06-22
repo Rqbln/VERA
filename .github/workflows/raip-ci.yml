@@ -2,9 +2,9 @@ name: RAIP CI
 
 on:
   push:
-    branches: [main, MVP2, mvp3-mvp4]
+    branches: [main, MVP2, mvp3-mvp4, mvp4-gaas]
   pull_request:
-    branches: [main, MVP2]
+    branches: [main, MVP2, mvp3-mvp4]
 
 jobs:
   unit:

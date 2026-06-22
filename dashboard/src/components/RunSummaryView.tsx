@@ -55,11 +55,11 @@ export function RunSummaryView({ lens, defaultRunId }: Props) {
   return (
     <div data-testid="run-summary-view">
       <div className="mb-4 flex items-center justify-between">
-        <h1 className="text-sm font-medium capitalize text-zinc-200">{lens} · run summary</h1>
+        <h1 className="text-sm font-medium capitalize text-ink">{lens} · run summary</h1>
         {runId ? (
           <Link
             href={`/runs/${runId}/inspector`}
-            className="text-xs text-zinc-500 hover:text-zinc-300"
+            className="text-xs text-ink-secondary hover:text-ink"
           >
             Inspector →
           </Link>
@@ -80,7 +80,7 @@ export function RunSummaryView({ lens, defaultRunId }: Props) {
       />
 
       {isLoading ? (
-        <div className="text-xs text-zinc-600">Loading run summary…</div>
+        <div className="text-xs text-ink-secondary">Loading run summary…</div>
       ) : summary ? (
         <>
           <div className="mb-4 grid grid-cols-2 gap-2 text-xs sm:grid-cols-4">
@@ -91,11 +91,11 @@ export function RunSummaryView({ lens, defaultRunId }: Props) {
           </div>
 
           {summary.triage_counts ? (
-            <div className="mb-4 flex gap-4 text-xs text-zinc-500">
+            <div className="mb-4 flex gap-4 text-xs text-ink-secondary">
               {(["failed", "fallback", "uncovered"] as const).map((k) =>
                 summary.triage_counts[k] ? (
                   <span key={k} className="capitalize">
-                    {k}: <span className="text-zinc-300">{summary.triage_counts[k]}</span>
+                    {k}: <span className="text-ink">{summary.triage_counts[k]}</span>
                   </span>
                 ) : null,
               )}
@@ -118,23 +118,23 @@ export function RunSummaryView({ lens, defaultRunId }: Props) {
           <HarnessProvenanceTable rows={summary.harness_provenance} />
           <NonMeasurableStrip slots={summary.non_measurable} runId={summary.run_id} />
 
-          <div className="mt-6 border-t border-zinc-800 pt-3">
+          <div className="mt-6 border-t border-default pt-3">
             <button
               type="button"
               onClick={() => setShowAdvanced((s) => !s)}
-              className="text-xs text-zinc-500 hover:text-zinc-300"
+              className="text-xs text-ink-secondary hover:text-ink"
             >
               {showAdvanced ? "▾" : "▸"} Governance & trends (MVP3)
             </button>
             {showAdvanced ? (
               <div className="mt-3 space-y-4">
-                <div className="rounded border border-zinc-800 p-3">
-                  <div className="mb-2 flex items-center gap-2 text-xs text-zinc-400">
+                <div className="rounded border border-default p-3">
+                  <div className="mb-2 flex items-center gap-2 text-xs text-ink-secondary">
                     Trend for
                     <select
                       value={trendReq}
                       onChange={(e) => setTrendReq(e.target.value)}
-                      className="rounded border border-zinc-700 bg-zinc-900 px-1.5 py-0.5 text-zinc-200"
+                      className="rounded border border-default bg-surface-2 px-1.5 py-0.5 text-ink"
                     >
                       {summary.requirements.map((r) => (
                         <option key={r.id} value={r.id}>
@@ -153,12 +153,12 @@ export function RunSummaryView({ lens, defaultRunId }: Props) {
                     onClick={() =>
                       downloadAuditPdf(token, summary.run_id).catch((e) => setPdfError(String(e)))
                     }
-                    className="rounded border border-zinc-700 px-3 py-1 text-xs text-zinc-300 hover:bg-zinc-900"
+                    className="rounded border border-default px-3 py-1 text-xs text-ink hover:bg-hover"
                   >
                     ⬇ Download signed audit PDF
                   </button>
                   {pdfError ? (
-                    <p className="mt-1 text-[11px] text-amber-500">
+                    <p className="mt-1 text-[11px] text-status-partial">
                       PDF export needs the optional &lsquo;pdf&rsquo; extra (WeasyPrint). {pdfError.slice(0, 80)}
                     </p>
                   ) : null}
@@ -168,7 +168,7 @@ export function RunSummaryView({ lens, defaultRunId }: Props) {
           </div>
         </>
       ) : (
-        <div className="text-xs text-zinc-600">Select a run to view COMPL-AI triage.</div>
+        <div className="text-xs text-ink-secondary">Select a run to view COMPL-AI triage.</div>
       )}
     </div>
   );
@@ -176,9 +176,9 @@ export function RunSummaryView({ lens, defaultRunId }: Props) {
 
 function Meta({ label, value, mono }: { label: string; value: string; mono?: boolean }) {
   return (
-    <div className="border border-zinc-800 p-2">
-      <div className="text-zinc-600">{label}</div>
-      <div className={`truncate text-zinc-300 ${mono ? "font-mono" : ""}`}>{value}</div>
+    <div className="border border-default p-2">
+      <div className="text-ink-secondary">{label}</div>
+      <div className={`truncate text-ink ${mono ? "font-mono" : ""}`}>{value}</div>
     </div>
   );
 }

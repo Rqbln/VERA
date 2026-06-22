@@ -20,5 +20,5 @@ export default function RunDeepLinkPage() {
     }
   }, [runId, router]);
 
-  return <div className="p-4 text-xs text-zinc-600">Redirecting…</div>;
+  return <div className="p-4 text-xs text-ink-secondary">Redirecting…</div>;
 }

@@ -3,11 +3,94 @@
 @tailwind utilities;
 
 :root {
-  color-scheme: dark;
+  color-scheme: light;
+
+  /* Brand (BNP Paribas green) */
+  --brand: #00915a;
+  --brand-deep: #00673e;
+  --brand-accent: #76b82a; /* vivid — accent only (key figures, bullets, active milestone) */
+
+  /* Ink / text */
+  --ink: #1f2a24;
+  --ink-secondary: #5a6b62;
+
+  /* Surfaces */
+  --surface: #ffffff;
+  --surface-2: #f4f6f5;
+  --surface-3: #ece9e0;
+  --border: #dfe4e1;
+  --hover: #eef1ef;
+
+  /* Status */
+  --status-ok: #00915a;
+  --status-partial: #e8a33d;
+  --status-blocked: #c0392b;
+  --status-neutral: #5a6b62;
+  --status-info: #2f6f8f;
 }
 
 body {
-  @apply bg-zinc-950 text-zinc-200 antialiased;
+  @apply bg-surface-2 text-ink antialiased;
   font-size: 13px;
-  line-height: 1.45;
+  line-height: 1.5;
+}
+
+@layer components {
+  .card {
+    @apply rounded-lg border border-default bg-white;
+  }
+  .section {
+    @apply rounded-lg border border-default bg-white p-4;
+  }
+
+  /* KPI tile — big number, accent green delta */
+  .kpi-tile {
+    @apply flex flex-col gap-1 rounded-lg border border-default bg-white p-4;
+  }
+  .kpi-value {
+    @apply text-2xl font-semibold text-ink;
+  }
+  .kpi-label {
+    @apply text-[11px] uppercase tracking-wide text-ink-secondary;
+  }
+
+  /* Status badges */
+  .badge {
+    @apply inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium;
+  }
+  .badge-ok {
+    @apply bg-status-ok/10 text-status-ok;
+  }
+  .badge-partial {
+    @apply bg-status-partial/15 text-status-partial;
+  }
+  .badge-blocked {
+    @apply bg-status-blocked/10 text-status-blocked;
+  }
+  .badge-neutral {
+    @apply bg-ink/5 text-ink-secondary;
+  }
+
+  /* Tables */
+  .table-header {
+    @apply border-b border-default text-left text-[11px] uppercase tracking-wide text-ink-secondary;
+  }
+  .table-row {
+    @apply border-b border-default/70 hover:bg-hover;
+  }
+
+  /* Buttons */
+  .btn-primary {
+    @apply rounded-md bg-brand px-3 py-1.5 text-xs font-medium text-white transition hover:bg-brand-deep disabled:opacity-40;
+  }
+  .btn-accent {
+    @apply rounded-md bg-brand-accent px-3 py-1.5 text-xs font-medium text-ink transition hover:brightness-95 disabled:opacity-40;
+  }
+  .btn-secondary {
+    @apply rounded-md border border-default px-3 py-1.5 text-xs font-medium text-ink transition hover:bg-hover disabled:opacity-40;
+  }
+
+  .input {
+    @apply w-full rounded-md border border-default bg-white px-2 py-1.5 text-ink outline-none focus:border-brand;
+  }
 }

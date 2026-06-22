@@ -31,10 +31,30 @@ async function mockApi(page: Page) {
   );
   await page.route("**/api/v1/runs**", (r) => r.fulfill({ json: { runs: [], total: 0 } }));
   await page.route("**/api/v1/governance/kill-switch", (r) => r.fulfill({ json: { engaged: false, reason: "" } }));
+  await page.route("**/admin/v1/proxy/health", (r) => r.fulfill({ json: {
+    gaas_enabled: true, bus: "redis-streams", opa: false, opensearch: false,
+    proxy_target: "x", default_mode: "shadow", kill_switch: { engaged: false, reason: "" }, modes: {},
+  } }));
+  await page.route("**/admin/v1/mode", (r) => r.fulfill({ json: { default: "shadow", models: {} } }));
+  await page.route("**/admin/v1/incidents*", (r) => r.fulfill({ json: { incidents: [] } }));
 }
 
 test.beforeEach(async ({ page }) => {
   await mockApi(page);
+});
+
+test("governance page renders the runtime panel", async ({ page }) => {
+  await page.goto("/governance");
+  await expect(page.getByTestId("governance-panel")).toBeVisible({ timeout: 20_000 });
+  await expect(page.getByText("Governance runtime")).toBeVisible({ timeout: 20_000 });
+});
+
+test("language toggle switches EN to FR", async ({ page }) => {
+  await page.goto("/home");
+  await expect(page.getByTestId("home-overview")).toBeVisible({ timeout: 20_000 });
+  await expect(page.getByText("Welcome to RAIP")).toBeVisible();
+  await page.getByTestId("lang-toggle").click();
+  await expect(page.getByText("Bienvenue dans RAIP")).toBeVisible({ timeout: 10_000 });
 });
 
 test("root redirects to guided home", async ({ page }) => {

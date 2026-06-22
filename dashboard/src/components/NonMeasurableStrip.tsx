@@ -9,8 +9,8 @@ interface Props {
 
 export function NonMeasurableStrip({ slots, runId }: Props) {
   return (
-    <div className="mt-6 border border-zinc-800 bg-zinc-900/30 p-3 text-xs">
-      <div className="mb-2 text-zinc-500">Non-measurable (N01–N06)</div>
+    <div className="mt-6 border border-default bg-surface-2 p-3 text-xs">
+      <div className="mb-2 text-ink-secondary">Non-measurable (N01–N06)</div>
       <div className="grid gap-2 sm:grid-cols-3">
         <QueueCard
           id="N01"
@@ -26,18 +26,18 @@ export function NonMeasurableStrip({ slots, runId }: Props) {
           count={slots.n02.queue_count}
           note="HITL review queue"
         />
-        <div className="rounded border border-zinc-800 p-2">
-          <div className="font-mono text-zinc-400">N04</div>
-          <div className="text-zinc-300">Model card + datasheet</div>
-          <div className="mt-1 text-zinc-600">{slots.n04.status}</div>
+        <div className="rounded border border-default p-2">
+          <div className="font-mono text-ink-secondary">N04</div>
+          <div className="text-ink">Model card + datasheet</div>
+          <div className="mt-1 text-ink-secondary">{slots.n04.status}</div>
           {slots.n04.model_card_uri ? (
-            <div className="mt-1 truncate font-mono text-[10px] text-zinc-600">
+            <div className="mt-1 truncate font-mono text-[10px] text-ink-secondary">
               {slots.n04.model_card_uri}
             </div>
           ) : null}
         </div>
       </div>
-      <div className="mt-2 text-[10px] text-zinc-600">
+      <div className="mt-2 text-[10px] text-ink-secondary">
         Run {runId.slice(0, 8)} · N03/N05/N06 deferred to signed forms (MVP3.1)
       </div>
     </div>
@@ -58,14 +58,14 @@ function QueueCard({
   note: string;
 }) {
   return (
-    <div className="rounded border border-dashed border-zinc-700 p-2">
+    <div className="rounded border border-dashed border-default p-2">
       <div className="flex items-center justify-between">
-        <span className="font-mono text-zinc-400">{id}</span>
-        <span className="text-zinc-600">{count} pending</span>
+        <span className="font-mono text-ink-secondary">{id}</span>
+        <span className="text-ink-secondary">{count} pending</span>
       </div>
-      <div className="text-zinc-300">{title}</div>
-      <div className="mt-1 capitalize text-zinc-500">{status}</div>
-      <div className="mt-1 text-[10px] text-zinc-600">{note}</div>
+      <div className="text-ink">{title}</div>
+      <div className="mt-1 capitalize text-ink-secondary">{status}</div>
+      <div className="mt-1 text-[10px] text-ink-secondary">{note}</div>
     </div>
   );
 }

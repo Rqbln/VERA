@@ -25,12 +25,12 @@ export function TrendCurve({ requirement, modelId }: { requirement: string; mode
     queryFn: () => getSeries(token, requirement, modelId),
   });
 
-  if (isLoading) return <p className="text-xs text-zinc-600">Loading trend…</p>;
+  if (isLoading) return <p className="text-xs text-ink-secondary">Loading trend…</p>;
 
   // Preserve the "no false time-series until data exists" design decision.
   if (!data?.available) {
     return (
-      <p className="text-xs text-zinc-600">
+      <p className="text-xs text-ink-secondary">
         {requirement}: not enough history for a trend yet (need ≥2 completed runs of this model).
       </p>
     );
@@ -44,19 +44,19 @@ export function TrendCurve({ requirement, modelId }: { requirement: string; mode
 
   return (
     <div data-testid="trend-curve" className="h-48 w-full">
-      <div className="mb-1 text-xs text-zinc-400">{requirement} score over runs</div>
+      <div className="mb-1 text-xs text-ink-secondary">{requirement} score over runs</div>
       <ResponsiveContainer width="100%" height="100%">
         <LineChart data={chart} margin={{ top: 5, right: 10, bottom: 5, left: -20 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#27272a" />
-          <XAxis dataKey="run" tick={{ fontSize: 10, fill: "#71717a" }} />
-          <YAxis domain={[0, 1]} tick={{ fontSize: 10, fill: "#71717a" }} />
+          <CartesianGrid strokeDasharray="3 3" stroke="#dfe4e1" />
+          <XAxis dataKey="run" tick={{ fontSize: 10, fill: "#5a6b62" }} />
+          <YAxis domain={[0, 1]} tick={{ fontSize: 10, fill: "#5a6b62" }} />
           <Tooltip
-            contentStyle={{ background: "#18181b", border: "1px solid #3f3f46", fontSize: 11 }}
-            labelStyle={{ color: "#a1a1aa" }}
+            contentStyle={{ background: "#ffffff", border: "1px solid #dfe4e1", fontSize: 11 }}
+            labelStyle={{ color: "#1f2a24" }}
           />
-          <ReferenceLine y={GREEN_MIN} stroke="#059669" strokeDasharray="4 4" />
-          <ReferenceLine y={ORANGE_MIN} stroke="#d97706" strokeDasharray="4 4" />
-          <Line type="monotone" dataKey="value" stroke="#e4e4e7" strokeWidth={2} dot={{ r: 3 }} />
+          <ReferenceLine y={GREEN_MIN} stroke="#00915a" strokeDasharray="4 4" />
+          <ReferenceLine y={ORANGE_MIN} stroke="#e8a33d" strokeDasharray="4 4" />
+          <Line type="monotone" dataKey="value" stroke="#00673e" strokeWidth={2} dot={{ r: 3 }} />
         </LineChart>
       </ResponsiveContainer>
     </div>

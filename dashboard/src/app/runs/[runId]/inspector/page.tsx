@@ -23,11 +23,11 @@ export default function InspectorPage() {
     <AuthGuard roles={ROUTE_ROLES["/inspector"]}>
       <DashboardShell>
         {isLoading ? (
-          <div className="text-xs text-zinc-600">Loading inspector…</div>
+          <div className="text-xs text-ink-secondary">Loading inspector…</div>
         ) : data ? (
           <RunInspectorView data={data} />
         ) : (
-          <div className="text-xs text-red-400">Inspector data unavailable</div>
+          <div className="text-xs text-status-blocked">Inspector data unavailable</div>
         )}
       </DashboardShell>
     </AuthGuard>

@@ -84,6 +84,19 @@ async function mock(page: Page) {
     { model_id: "ollama/phi3:mini", name: "phi3:mini", provider: "ollama", connected: true, recommended: false },
   ], ollama_base: "http://localhost:11434", recommended_model: "ollama/llama3.1:8b-instruct-q8_0" } }));
   await page.route("**/api/v1/governance/kill-switch", (r) => r.fulfill({ json: { engaged: false, reason: "" } }));
+  await page.route("**/admin/v1/proxy/health", (r) => r.fulfill({ json: {
+    gaas_enabled: true, bus: "kafka", opa: true, opensearch: true,
+    proxy_target: "http://ollama:11434", default_mode: "advisory",
+    kill_switch: { engaged: false, reason: "" },
+    modes: { "ollama/llama3.1:8b-instruct-q8_0": "enforcement", "ollama/ministral-3:3b": "advisory" },
+  } }));
+  await page.route("**/admin/v1/mode", (r) => r.fulfill({ json: { default: "advisory", models: {
+    "ollama/llama3.1:8b-instruct-q8_0": "enforcement", "ollama/ministral-3:3b": "advisory",
+  } } }));
+  await page.route("**/admin/v1/incidents*", (r) => r.fulfill({ json: { incidents: [
+    { event_id: "e1", ts: "2026-06-22T09:14:00Z", kind: "policy_deny", model: "ollama/llama3.1:8b-instruct-q8_0", decision: "deny", trust_score: 0.22 },
+    { event_id: "e2", ts: "2026-06-22T08:51:00Z", kind: "low_trust", model: "ollama/ministral-3:3b", decision: "flag", trust_score: 0.41 },
+  ] } }));
 }
 
 test("capture control room", async ({ page }) => {
@@ -100,4 +113,20 @@ test("capture launch wizard", async ({ page }) => {
   await page.getByTestId("launch-wizard").waitFor({ timeout: 15000 });
   await page.waitForTimeout(500);
   await page.screenshot({ path: "../manuscript/figures/shot_wizard.png" });
+});
+
+test("capture governance runtime", async ({ page }) => {
+  await mock(page);
+  await page.goto("/governance");
+  await page.getByTestId("governance-panel").waitFor({ timeout: 15000 });
+  await page.waitForTimeout(600);
+  await page.screenshot({ path: "../manuscript/figures/shot_governance.png", fullPage: true });
+});
+
+test("capture guided home", async ({ page }) => {
+  await mock(page);
+  await page.goto("/home");
+  await page.getByTestId("home-overview").waitFor({ timeout: 15000 });
+  await page.waitForTimeout(500);
+  await page.screenshot({ path: "../manuscript/figures/shot_home.png", fullPage: true });
 });

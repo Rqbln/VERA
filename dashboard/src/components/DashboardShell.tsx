@@ -2,74 +2,102 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import clsx from "clsx";
+import {
+  Home,
+  Rocket,
+  Table2,
+  ShieldCheck,
+  Scale,
+  ShieldAlert,
+  FlaskConical,
+  Languages,
+  LogOut,
+} from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { StackHealthBar } from "./StackHealthBar";
 import { getRoles, hasAnyRole, isGuided, logout } from "@/lib/auth";
-import clsx from "clsx";
+import { useI18n } from "@/lib/i18n";
 
-// Guided-mode entry points: always visible to the no-login persona.
-const GUIDED_NAV = [
-  { href: "/home", label: "Home" },
-  { href: "/launch", label: "Launch evaluation" },
-  { href: "/runs-overview", label: "Runs" },
+const GUIDED_NAV: { href: string; key: "nav.home" | "nav.launch" | "nav.runs" | "nav.governance"; icon: LucideIcon }[] = [
+  { href: "/home", key: "nav.home", icon: Home },
+  { href: "/launch", key: "nav.launch", icon: Rocket },
+  { href: "/runs-overview", key: "nav.runs", icon: Table2 },
+  { href: "/governance", key: "nav.governance", icon: ShieldCheck },
 ];
 
-const LENS_NAV = [
-  { href: "/dashboards/compliance", label: "Compliance", roles: ["legal_compliance", "risk_manager", "domain_expert", "external_auditor", "executive", "secops"] },
-  { href: "/dashboards/cyber", label: "Cyber", roles: ["secops", "legal_compliance", "risk_manager", "external_auditor"] },
-  { href: "/dashboards/ds", label: "Data Science", roles: ["data_scientist", "ml_researcher"] },
+const LENS_NAV: { href: string; key: "nav.compliance" | "nav.cyber" | "nav.ds"; icon: LucideIcon; roles: string[] }[] = [
+  { href: "/dashboards/compliance", key: "nav.compliance", icon: Scale, roles: ["legal_compliance", "risk_manager", "domain_expert", "external_auditor", "executive", "secops"] },
+  { href: "/dashboards/cyber", key: "nav.cyber", icon: ShieldAlert, roles: ["secops", "legal_compliance", "risk_manager", "external_auditor"] },
+  { href: "/dashboards/ds", key: "nav.ds", icon: FlaskConical, roles: ["data_scientist", "ml_researcher"] },
 ];
 
 export function DashboardShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const roles = getRoles();
   const guided = isGuided();
+  const { t, toggle, locale } = useI18n();
 
-  function navLink(href: string, label: string) {
+  function navLink(href: string, label: string, Icon: LucideIcon) {
+    const active = pathname === href || (href !== "/home" && pathname.startsWith(href));
     return (
       <Link
         key={href}
         href={href}
         className={clsx(
-          "rounded px-2 py-1 text-xs",
-          pathname === href || (href !== "/home" && pathname.startsWith(href))
-            ? "bg-zinc-800 text-zinc-100"
-            : "text-zinc-500 hover:text-zinc-300",
+          "inline-flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-medium transition",
+          active
+            ? "bg-white/15 text-white"
+            : "text-white/70 hover:bg-white/10 hover:text-white",
         )}
       >
+        <Icon size={14} strokeWidth={1.75} />
         {label}
       </Link>
     );
   }
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-200">
-      <StackHealthBar />
-      <header className="flex items-center justify-between border-b border-zinc-800 px-4 py-2">
-        <div className="flex items-center gap-6">
-          <Link href={guided ? "/home" : "/dashboards/compliance"} className="text-sm font-semibold tracking-tight text-zinc-100">
-            RAIP Control Room
-          </Link>
-          <nav className="flex flex-wrap gap-1">
-            {guided && GUIDED_NAV.map((n) => navLink(n.href, n.label))}
-            {LENS_NAV.filter((n) => guided || hasAnyRole(n.roles)).map((n) => navLink(n.href, n.label))}
-          </nav>
-        </div>
-        {guided ? (
-          <span className="text-xs text-zinc-600">Guided mode · no login</span>
-        ) : (
-          <div className="flex items-center gap-3 text-xs text-zinc-500">
-            <span>{roles.slice(0, 2).join(", ")}</span>
+    <div className="min-h-screen bg-surface-2 text-ink">
+      <header className="bg-brand-deep px-4 py-2.5 shadow-sm">
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex flex-wrap items-center gap-5">
+            <Link href={guided ? "/home" : "/dashboards/compliance"} className="flex items-center gap-2 text-sm font-semibold tracking-tight text-white">
+              <span className="grid h-6 w-6 place-items-center rounded bg-brand-accent text-[13px] font-bold text-brand-deep">R</span>
+              {t("app.title")}
+            </Link>
+            <nav className="flex flex-wrap gap-1">
+              {guided && GUIDED_NAV.map((n) => navLink(n.href, t(n.key), n.icon))}
+              {LENS_NAV.filter((n) => guided || hasAnyRole(n.roles)).map((n) => navLink(n.href, t(n.key), n.icon))}
+            </nav>
+          </div>
+          <div className="flex items-center gap-3 text-xs text-white/80">
             <button
               type="button"
-              onClick={() => logout()}
-              className="text-zinc-500 hover:text-zinc-300"
+              onClick={toggle}
+              className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-white/80 hover:bg-white/10 hover:text-white"
+              aria-label="toggle language"
+              data-testid="lang-toggle"
             >
-              Sign out
+              <Languages size={14} strokeWidth={1.75} />
+              {locale.toUpperCase()}
             </button>
+            {guided ? (
+              <span className="hidden text-white/60 sm:inline">{t("nav.guided")}</span>
+            ) : (
+              <>
+                <span className="hidden sm:inline">{roles.slice(0, 2).join(", ")}</span>
+                <button type="button" onClick={() => logout()} className="inline-flex items-center gap-1 text-white/70 hover:text-white">
+                  <LogOut size={14} strokeWidth={1.75} />
+                  {t("nav.signout")}
+                </button>
+              </>
+            )}
           </div>
-        )}
+        </div>
       </header>
-      <main className="p-4">{children}</main>
+      <StackHealthBar />
+      <main className="mx-auto max-w-7xl p-4 md:p-6">{children}</main>
     </div>
   );
 }

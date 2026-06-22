@@ -7,7 +7,7 @@ function Forbidden() {
   return (
     <div
       data-testid="auth-forbidden"
-      className="flex min-h-[40vh] items-center justify-center bg-zinc-950 text-xs text-zinc-400"
+      className="flex min-h-[40vh] items-center justify-center bg-white text-xs text-ink-secondary"
     >
       403 — insufficient role for this view
     </div>
@@ -35,7 +35,7 @@ function KeycloakAuthGuard({
 
   if (!ready) {
     return (
-      <div className="flex min-h-[40vh] items-center justify-center bg-zinc-950 text-xs text-zinc-500">
+      <div className="flex min-h-[40vh] items-center justify-center bg-white text-xs text-ink-secondary">
         Authenticating…
       </div>
     );

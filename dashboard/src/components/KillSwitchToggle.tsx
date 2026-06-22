@@ -24,12 +24,12 @@ export function KillSwitchToggle() {
     <div
       data-testid="kill-switch"
       className={`flex items-center justify-between rounded border p-3 text-xs ${
-        engaged ? "border-red-900/60 bg-red-950/20" : "border-zinc-800"
+        engaged ? "border-status-blocked/40 bg-status-blocked/5" : "border-default"
       }`}
     >
       <div>
-        <span className="font-medium text-zinc-300">Kill-switch</span>
-        <span className="ml-2 text-zinc-500">
+        <span className="font-medium text-ink">Kill-switch</span>
+        <span className="ml-2 text-ink-secondary">
           {engaged ? "engaged — new runs are blocked" : "off — evaluations can run"}
         </span>
       </div>
@@ -39,8 +39,8 @@ export function KillSwitchToggle() {
         disabled={toggle.isPending}
         className={`rounded px-3 py-1 font-medium ${
           engaged
-            ? "bg-emerald-600 text-white hover:bg-emerald-500"
-            : "bg-red-700 text-white hover:bg-red-600"
+            ? "bg-brand text-white hover:bg-brand-deep"
+            : "bg-status-blocked text-white hover:brightness-95"
         } disabled:opacity-40`}
       >
         {engaged ? "Re-enable" : "Engage"}

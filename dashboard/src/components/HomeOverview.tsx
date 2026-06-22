@@ -2,33 +2,29 @@
 
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
+import { ArrowRight, Boxes, CheckCircle2, Loader2, Rocket, Scale, ShieldCheck, Table2 } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { getConnectedModels, listRuns } from "@/lib/api";
 import { getToken } from "@/lib/auth";
-import { KillSwitchToggle } from "./KillSwitchToggle";
+import { useT } from "@/lib/i18n";
+import { KpiRow } from "./KpiTiles";
 
-const ACTIONS = [
-  {
-    href: "/launch",
-    title: "Launch an evaluation",
-    body: "Pick a connected model and check it against EU AI Act requirements. Guided, no setup.",
-    cta: "Start →",
-  },
-  {
-    href: "/runs-overview",
-    title: "View runs & scores",
-    body: "A summary table of every evaluation: status, model, and the R01–R12 compliance picture.",
-    cta: "Open →",
-  },
-  {
-    href: "/dashboards/compliance",
-    title: "Compliance control room",
-    body: "The full triage view: failed/fallback/uncovered requirements first, with rationale and CIs.",
-    cta: "Inspect →",
-  },
+type ActionKey =
+  | "home.action.launch"
+  | "home.action.runs"
+  | "home.action.compliance"
+  | "home.action.governance";
+
+const ACTIONS: { href: string; key: ActionKey; icon: LucideIcon }[] = [
+  { href: "/launch", key: "home.action.launch", icon: Rocket },
+  { href: "/runs-overview", key: "home.action.runs", icon: Table2 },
+  { href: "/governance", key: "home.action.governance", icon: ShieldCheck },
+  { href: "/dashboards/compliance", key: "home.action.compliance", icon: Scale },
 ];
 
 export function HomeOverview() {
   const token = getToken();
+  const t = useT();
   const { data: models } = useQuery({
     queryKey: ["connected-models"],
     queryFn: () => getConnectedModels(token),
@@ -42,56 +38,50 @@ export function HomeOverview() {
 
   const completed = runs?.runs.filter((r) => r.status === "completed").length ?? 0;
   const running = runs?.runs.filter((r) => r.status === "running" || r.status === "queued").length ?? 0;
+  const modelCount = models?.models.length ?? 0;
 
   return (
-    <div data-testid="home-overview" className="mx-auto max-w-4xl">
-      <h1 className="text-base font-semibold text-zinc-100">Welcome to RAIP</h1>
-      <p className="mt-1 max-w-2xl text-xs text-zinc-400">
-        RAIP checks whether an AI model meets the European AI Act (EU AI Act) requirements. You launch
-        an evaluation on a connected model and read a clear summary of results — no code, no login.
-      </p>
-
-      <div className="mt-4 flex gap-4 text-xs text-zinc-400">
-        <Stat label="Connected models" value={models?.models.length ?? 0} />
-        <Stat label="Completed runs" value={completed} />
-        <Stat label="In progress" value={running} />
+    <div data-testid="home-overview" className="space-y-5">
+      <div>
+        <h1 className="text-lg font-semibold text-ink">{t("home.welcome")}</h1>
+        <p className="mt-1 max-w-3xl text-xs leading-relaxed text-ink-secondary">{t("home.intro")}</p>
       </div>
 
-      <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-3">
-        {ACTIONS.map((a) => (
-          <Link
-            key={a.href}
-            href={a.href}
-            className="flex flex-col justify-between rounded border border-zinc-800 bg-zinc-950 p-3 transition hover:border-zinc-700"
-          >
-            <div>
-              <div className="text-xs font-medium text-zinc-100">{a.title}</div>
-              <p className="mt-1 text-[11px] leading-relaxed text-zinc-500">{a.body}</p>
-            </div>
-            <span className="mt-3 text-[11px] text-emerald-500">{a.cta}</span>
-          </Link>
-        ))}
+      <KpiRow
+        kpis={[
+          { label: t("home.kpi.models"), value: modelCount, icon: Boxes, accent: modelCount ? "connected" : undefined },
+          { label: t("home.kpi.completed"), value: completed, icon: CheckCircle2, tone: "ok" },
+          { label: t("home.kpi.running"), value: running, icon: Loader2, tone: running ? "partial" : "neutral" },
+        ]}
+      />
+
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        {ACTIONS.map((a) => {
+          const Icon = a.icon;
+          return (
+            <Link
+              key={a.href}
+              href={a.href}
+              className="card group flex flex-col justify-between p-4 transition hover:border-brand hover:shadow-sm"
+            >
+              <div>
+                <span className="grid h-9 w-9 place-items-center rounded-lg bg-brand/10 text-brand">
+                  <Icon size={18} strokeWidth={1.75} />
+                </span>
+                <div className="mt-3 text-sm font-medium text-ink">{t(`${a.key}.title`)}</div>
+                <p className="mt-1 text-[11px] leading-relaxed text-ink-secondary">
+                  {t(`${a.key}.body`)}
+                </p>
+              </div>
+              <span className="mt-3 inline-flex items-center gap-1 text-[11px] font-medium text-brand-accent">
+                {t("home.action.cta")} <ArrowRight size={12} className="transition group-hover:translate-x-0.5" />
+              </span>
+            </Link>
+          );
+        })}
       </div>
 
-      <div className="mt-5 rounded border border-zinc-800 p-3 text-[11px] text-zinc-500">
-        <span className="font-medium text-zinc-400">How to read scores: </span>
-        each requirement gets a band — <span className="text-emerald-500">green</span> (compliant),{" "}
-        <span className="text-amber-500">orange</span> (watch), <span className="text-red-500">red</span>{" "}
-        (action needed). There are no hard pass/fail cut-offs: a human reviews the trade-offs.
-      </div>
-
-      <div className="mt-3">
-        <KillSwitchToggle />
-      </div>
-    </div>
-  );
-}
-
-function Stat({ label, value }: { label: string; value: number }) {
-  return (
-    <div className="rounded border border-zinc-800 px-3 py-1.5">
-      <div className="text-sm font-semibold text-zinc-200">{value}</div>
-      <div className="text-zinc-600">{label}</div>
+      <div className="section text-[11px] leading-relaxed text-ink-secondary">{t("home.bands")}</div>
     </div>
   );
 }

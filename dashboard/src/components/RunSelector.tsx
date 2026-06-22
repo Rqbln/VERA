@@ -20,13 +20,13 @@ export function RunSelector({
   onLifecycleChange,
 }: Props) {
   return (
-    <div className="mb-4 flex flex-wrap items-end gap-4 border border-zinc-800 bg-zinc-900/50 p-3 text-xs">
+    <div className="mb-4 flex flex-wrap items-end gap-4 border border-default bg-surface-2 p-3 text-xs">
       <label className="flex flex-col gap-1">
-        <span className="text-zinc-500">Lifecycle</span>
+        <span className="text-ink-secondary">Lifecycle</span>
         <select
           value={lifecycle}
           onChange={(e) => onLifecycleChange(e.target.value)}
-          className="rounded border border-zinc-700 bg-zinc-950 px-2 py-1 text-zinc-200"
+          className="rounded border border-default bg-white px-2 py-1 text-ink"
         >
           <option value="">All stages</option>
           {LIFECYCLES.filter(Boolean).map((l) => (
@@ -37,11 +37,11 @@ export function RunSelector({
         </select>
       </label>
       <label className="flex min-w-[280px] flex-1 flex-col gap-1">
-        <span className="text-zinc-500">Run</span>
+        <span className="text-ink-secondary">Run</span>
         <select
           value={selectedId || ""}
           onChange={(e) => onSelect(e.target.value)}
-          className="rounded border border-zinc-700 bg-zinc-950 px-2 py-1 font-mono text-zinc-200"
+          className="rounded border border-default bg-white px-2 py-1 font-mono text-ink"
         >
           <option value="">Select run…</option>
           {runs.map((r) => (

@@ -77,34 +77,34 @@ export function LaunchWizard() {
 
   return (
     <div data-testid="launch-wizard" className="mx-auto max-w-3xl">
-      <h1 className="mb-1 text-sm font-medium text-zinc-100">Launch an evaluation</h1>
-      <p className="mb-4 text-xs text-zinc-500">
+      <h1 className="mb-1 text-sm font-medium text-ink">Launch an evaluation</h1>
+      <p className="mb-4 text-xs text-ink-secondary">
         Pick a connected model and what to check. RAIP runs the benchmarks and shows a compliance
         summary — no configuration files needed.
       </p>
 
       <Stepper step={step} />
 
-      <div className="mt-4 rounded border border-zinc-800 bg-zinc-950 p-4">
+      <div className="mt-4 rounded border border-default bg-white p-4">
         {step === 0 && (
           <div data-testid="wizard-step-model">
-            <h2 className="mb-2 text-xs font-medium text-zinc-300">Connected models</h2>
+            <h2 className="mb-2 text-xs font-medium text-ink">Connected models</h2>
             {modelsLoading ? (
-              <p className="text-xs text-zinc-600">Looking for models…</p>
+              <p className="text-xs text-ink-secondary">Looking for models…</p>
             ) : connected?.models?.length ? (
               <ul className="space-y-1">
                 {connected.models.map((m) => (
                   <li key={m.model_id}>
-                    <label className="flex cursor-pointer items-center gap-2 rounded px-2 py-1.5 text-xs hover:bg-zinc-900">
+                    <label className="flex cursor-pointer items-center gap-2 rounded px-2 py-1.5 text-xs hover:bg-hover">
                       <input
                         type="radio"
                         name="model"
                         checked={modelId === m.model_id}
                         onChange={() => setModelId(m.model_id)}
                       />
-                      <span className="font-mono text-zinc-200">{m.name}</span>
+                      <span className="font-mono text-ink">{m.name}</span>
                       {m.recommended ? (
-                        <span className="rounded bg-emerald-900/40 px-1.5 text-[10px] text-emerald-400">
+                        <span className="rounded bg-status-ok/10 px-1.5 text-[10px] text-status-ok">
                           recommended
                         </span>
                       ) : null}
@@ -113,9 +113,9 @@ export function LaunchWizard() {
                 ))}
               </ul>
             ) : (
-              <div className="rounded border border-amber-900/40 bg-amber-950/20 p-3 text-xs text-amber-300">
+              <div className="rounded border border-status-partial/40 bg-status-partial/10 p-3 text-xs text-status-partial">
                 No models connected. Start one with{" "}
-                <code className="font-mono text-amber-200">ollama pull llama3.1:8b-instruct-q8_0</code>
+                <code className="font-mono text-status-partial">ollama pull llama3.1:8b-instruct-q8_0</code>
                 {" "}then refresh.
               </div>
             )}
@@ -133,7 +133,7 @@ export function LaunchWizard() {
               </ModeButton>
             </div>
             {mode === "recommended" ? (
-              <p className="text-xs text-zinc-400">
+              <p className="text-xs text-ink-secondary">
                 Evaluates the full set of inference-time requirements (
                 {INFERENCE_REQUIREMENTS.length} of 12 — dataset checks R03–R05 need a training
                 corpus and are skipped). Best place to start.
@@ -142,20 +142,20 @@ export function LaunchWizard() {
               <div className="space-y-3">
                 {PRINCIPLES.map((p) => (
                   <div key={p}>
-                    <div className="mb-1 text-[11px] uppercase tracking-wide text-zinc-600">{p}</div>
+                    <div className="mb-1 text-[11px] uppercase tracking-wide text-ink-secondary">{p}</div>
                     <div className="grid grid-cols-1 gap-1 sm:grid-cols-2">
                       {REQUIREMENTS.filter((r) => r.principle === p).map((r) => (
                         <label
                           key={r.id}
-                          className="flex cursor-pointer items-center gap-2 rounded px-2 py-1 text-xs hover:bg-zinc-900"
+                          className="flex cursor-pointer items-center gap-2 rounded px-2 py-1 text-xs hover:bg-hover"
                         >
                           <input
                             type="checkbox"
                             checked={selected.has(r.id)}
                             onChange={() => toggleReq(r.id)}
                           />
-                          <span className="font-mono text-zinc-400">{r.id}</span>
-                          <span className="text-zinc-300">{r.name}</span>
+                          <span className="font-mono text-ink-secondary">{r.id}</span>
+                          <span className="text-ink">{r.name}</span>
                         </label>
                       ))}
                     </div>
@@ -172,7 +172,7 @@ export function LaunchWizard() {
               <select
                 value={nSamples}
                 onChange={(e) => setNSamples(Number(e.target.value))}
-                className="w-full rounded border border-zinc-700 bg-zinc-900 px-2 py-1 text-zinc-200"
+                className="w-full rounded border border-default bg-surface-2 px-2 py-1 text-ink"
               >
                 {SAMPLE_PRESETS.map((s) => (
                   <option key={s.value} value={s.value}>
@@ -185,7 +185,7 @@ export function LaunchWizard() {
               <select
                 value={lifecycle}
                 onChange={(e) => setLifecycle(e.target.value)}
-                className="w-full rounded border border-zinc-700 bg-zinc-900 px-2 py-1 text-zinc-200"
+                className="w-full rounded border border-default bg-surface-2 px-2 py-1 text-ink"
               >
                 {["inference", "data", "finetune", "production"].map((s) => (
                   <option key={s} value={s}>
@@ -199,7 +199,7 @@ export function LaunchWizard() {
                 value={owner}
                 onChange={(e) => setOwner(e.target.value)}
                 placeholder="team or person"
-                className="w-full rounded border border-zinc-700 bg-zinc-900 px-2 py-1 text-zinc-200"
+                className="w-full rounded border border-default bg-surface-2 px-2 py-1 text-ink"
               />
             </Field>
             <Field label="Intended use (optional)">
@@ -207,7 +207,7 @@ export function LaunchWizard() {
                 value={intendedUse}
                 onChange={(e) => setIntendedUse(e.target.value)}
                 placeholder="e.g. internal customer-support assistant"
-                className="w-full rounded border border-zinc-700 bg-zinc-900 px-2 py-1 text-zinc-200"
+                className="w-full rounded border border-default bg-surface-2 px-2 py-1 text-ink"
               />
             </Field>
           </div>
@@ -229,7 +229,7 @@ export function LaunchWizard() {
             {owner ? <Review label="Owner" value={owner} /> : null}
             {intendedUse ? <Review label="Intended use" value={intendedUse} /> : null}
             {launch.isError ? (
-              <p className="text-red-400">Failed to launch: {String(launch.error)}</p>
+              <p className="text-status-blocked">Failed to launch: {String(launch.error)}</p>
             ) : null}
           </div>
         )}
@@ -240,7 +240,7 @@ export function LaunchWizard() {
           type="button"
           disabled={step === 0}
           onClick={() => setStep((s) => Math.max(0, s - 1))}
-          className="rounded px-3 py-1.5 text-xs text-zinc-500 enabled:hover:text-zinc-300 disabled:opacity-30"
+          className="rounded px-3 py-1.5 text-xs text-ink-secondary enabled:hover:text-ink disabled:opacity-30"
         >
           ← Back
         </button>
@@ -249,7 +249,7 @@ export function LaunchWizard() {
             type="button"
             disabled={!canNext}
             onClick={() => setStep((s) => s + 1)}
-            className="rounded bg-zinc-100 px-4 py-1.5 text-xs font-medium text-zinc-900 disabled:opacity-30"
+            className="rounded bg-brand px-4 py-1.5 text-xs font-medium text-white disabled:opacity-30"
           >
             Next →
           </button>
@@ -259,7 +259,7 @@ export function LaunchWizard() {
             data-testid="wizard-launch"
             disabled={!modelId || launch.isPending}
             onClick={() => launch.mutate()}
-            className="rounded bg-emerald-600 px-4 py-1.5 text-xs font-medium text-white disabled:opacity-40"
+            className="rounded bg-brand px-4 py-1.5 text-xs font-medium text-white disabled:opacity-40"
           >
             {launch.isPending ? "Launching…" : "Launch evaluation"}
           </button>
@@ -277,10 +277,10 @@ function Stepper({ step }: { step: number }) {
           key={label}
           className={`flex items-center gap-1 rounded px-2 py-1 ${
             i === step
-              ? "bg-zinc-800 text-zinc-100"
+              ? "bg-surface-2 text-ink"
               : i < step
-                ? "text-emerald-500"
-                : "text-zinc-600"
+                ? "text-status-ok"
+                : "text-ink-secondary"
           }`}
         >
           <span className="font-mono">{i + 1}</span>
@@ -304,7 +304,7 @@ function ModeButton({
     <button
       type="button"
       onClick={onClick}
-      className={`rounded px-2 py-1 ${active ? "bg-zinc-800 text-zinc-100" : "text-zinc-500 hover:text-zinc-300"}`}
+      className={`rounded px-2 py-1 ${active ? "bg-surface-2 text-ink" : "text-ink-secondary hover:text-ink"}`}
     >
       {children}
     </button>
@@ -314,7 +314,7 @@ function ModeButton({
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <label className="block">
-      <span className="mb-1 block text-zinc-500">{label}</span>
+      <span className="mb-1 block text-ink-secondary">{label}</span>
       {children}
     </label>
   );
@@ -322,9 +322,9 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 
 function Review({ label, value, mono }: { label: string; value: string; mono?: boolean }) {
   return (
-    <div className="flex justify-between border-b border-zinc-900 py-1">
-      <span className="text-zinc-500">{label}</span>
-      <span className={`text-zinc-200 ${mono ? "font-mono" : ""}`}>{value}</span>
+    <div className="flex justify-between border-b border-default py-1">
+      <span className="text-ink-secondary">{label}</span>
+      <span className={`text-ink ${mono ? "font-mono" : ""}`}>{value}</span>
     </div>
   );
 }

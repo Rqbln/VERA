@@ -227,6 +227,66 @@ export async function putForm(
   });
 }
 
+// ── Governance runtime (MVP4 gaas) admin API ────────────────────────────────────────
+export interface ProxyHealth {
+  gaas_enabled: boolean;
+  bus: string;
+  opa: boolean;
+  opensearch: boolean;
+  proxy_target: string;
+  default_mode: string;
+  kill_switch: { engaged: boolean; reason: string };
+  modes: Record<string, string>;
+}
+
+export interface GovTrust {
+  model: string;
+  current: { score: number; band: string; components: Record<string, number> } | null;
+  signals: Record<string, number>;
+  series: { ts: string; score: number; band: string }[];
+}
+
+export interface Incident {
+  event_id: string;
+  ts: string;
+  kind: string;
+  model: string;
+  decision: string | null;
+  trust_score: number | null;
+}
+
+export async function getProxyHealth(token: string | undefined): Promise<ProxyHealth> {
+  return fetchApi("/admin/v1/proxy/health", token);
+}
+
+export async function getGovModes(
+  token: string | undefined,
+): Promise<{ default: string; models: Record<string, string> }> {
+  return fetchApi("/admin/v1/mode", token);
+}
+
+export async function setGovMode(
+  token: string | undefined,
+  model: string,
+  mode: string,
+): Promise<{ model: string; mode: string }> {
+  return fetchApi(`/admin/v1/mode/${model}`, token, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ mode }),
+  });
+}
+
+export async function getGovTrust(token: string | undefined, model: string): Promise<GovTrust> {
+  return fetchApi(`/admin/v1/trust/${model}`, token);
+}
+
+export async function getIncidents(
+  token: string | undefined,
+): Promise<{ incidents: Incident[] }> {
+  return fetchApi("/admin/v1/incidents", token);
+}
+
 export async function downloadAuditPdf(token: string | undefined, runId: string): Promise<void> {
   const headers: Record<string, string> = {};
   if (token) headers.Authorization = `Bearer ${token}`;

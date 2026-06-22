@@ -61,8 +61,8 @@ export function DeclarativeForms({ runId }: { runId: string }) {
   });
 
   return (
-    <div data-testid="declarative-forms" className="rounded border border-zinc-800 p-3">
-      <h3 className="mb-2 text-xs font-medium text-zinc-300">Declarative forms (N03–N06)</h3>
+    <div data-testid="declarative-forms" className="rounded border border-default p-3">
+      <h3 className="mb-2 text-xs font-medium text-ink">Declarative forms (N03–N06)</h3>
       <div className="mb-3 flex flex-wrap gap-1">
         {Object.keys(FORM_FIELDS).map((fid) => {
           const isDone = data?.forms?.[fid]?.completed;
@@ -72,11 +72,11 @@ export function DeclarativeForms({ runId }: { runId: string }) {
               type="button"
               onClick={() => setActive(fid)}
               className={`rounded px-2 py-1 text-[11px] ${
-                active === fid ? "bg-zinc-800 text-zinc-100" : "text-zinc-500 hover:text-zinc-300"
+                active === fid ? "bg-surface-2 text-ink" : "text-ink-secondary hover:text-ink"
               }`}
             >
               {FORM_LABELS[fid]}
-              {isDone ? <span className="ml-1 text-emerald-500">✓</span> : null}
+              {isDone ? <span className="ml-1 text-status-ok">✓</span> : null}
             </button>
           );
         })}
@@ -84,15 +84,15 @@ export function DeclarativeForms({ runId }: { runId: string }) {
       <div className="space-y-2 text-xs">
         {FORM_FIELDS[active].map((def) => (
           <label key={def.id} className="block">
-            <span className="mb-1 block text-zinc-500">{def.label}</span>
+            <span className="mb-1 block text-ink-secondary">{def.label}</span>
             <input
               value={fields[def.id] ?? ""}
               onChange={(e) => setFields((p) => ({ ...p, [def.id]: e.target.value }))}
-              className="w-full rounded border border-zinc-700 bg-zinc-900 px-2 py-1 text-zinc-200"
+              className="w-full rounded border border-default bg-surface-2 px-2 py-1 text-ink"
             />
           </label>
         ))}
-        <label className="flex items-center gap-2 text-zinc-400">
+        <label className="flex items-center gap-2 text-ink-secondary">
           <input type="checkbox" checked={completed} onChange={(e) => setCompleted(e.target.checked)} />
           Mark as completed
         </label>
@@ -100,12 +100,12 @@ export function DeclarativeForms({ runId }: { runId: string }) {
           type="button"
           onClick={() => save.mutate()}
           disabled={save.isPending}
-          className="rounded bg-zinc-100 px-3 py-1 font-medium text-zinc-900 disabled:opacity-40"
+          className="rounded bg-brand px-3 py-1 font-medium text-white disabled:opacity-40"
         >
           {save.isPending ? "Saving…" : "Save form"}
         </button>
         {save.isError ? (
-          <p className="text-red-400">Save failed (compliance role required in enterprise mode).</p>
+          <p className="text-status-blocked">Save failed (compliance role required in enterprise mode).</p>
         ) : null}
       </div>
     </div>

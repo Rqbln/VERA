@@ -13,7 +13,7 @@ interface Props {
 
 export function LifecycleRail({ active, onSelect }: Props) {
   return (
-    <div className="mb-4 flex gap-1 border-b border-zinc-800 pb-2 text-xs">
+    <div className="mb-4 flex gap-1 border-b border-default pb-2 text-xs">
       {STAGES.map((s) => (
         <button
           key={s.id}
@@ -21,12 +21,12 @@ export function LifecycleRail({ active, onSelect }: Props) {
           onClick={() => onSelect(s.id)}
           className={`rounded px-3 py-1.5 text-left ${
             active === s.id
-              ? "bg-zinc-800 text-zinc-100"
-              : "text-zinc-500 hover:bg-zinc-900 hover:text-zinc-300"
+              ? "bg-surface-2 text-ink"
+              : "text-ink-secondary hover:bg-hover hover:text-ink"
           }`}
         >
           <div className="font-medium">{s.label}</div>
-          <div className="text-[10px] text-zinc-600">{s.reqs}</div>
+          <div className="text-[10px] text-ink-secondary">{s.reqs}</div>
         </button>
       ))}
     </div>

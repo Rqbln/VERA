@@ -205,65 +205,62 @@ The boundary we draw is deliberate: weights and provenance cross the \texttt{eva
   \begin{tikzpicture}[
     font=\footnotesize,
     >={Stealth[round]},
-    box/.style={draw, rounded corners=2pt, align=center, minimum height=6.5mm, inner sep=3pt, fill=white},
-    surf/.style={box, fill=blue!6},
-    orch/.style={box, fill=black!6},
-    run/.style={box, fill=orange!8},
-    store/.style={box, fill=green!7},
-    ui/.style={box, fill=violet!8},
-    cat/.style={box, draw=red!55, line width=0.6pt, fill=red!5, align=center},
+    box/.style={draw, rounded corners=2pt, align=center, inner sep=3pt, fill=white, minimum height=7mm},
+    surf/.style={box, fill=blue!6, text width=21mm},
+    orch/.style={box, fill=black!6, text width=22mm},
+    run/.style={box, fill=orange!8, text width=20mm},
+    bigrun/.style={box, fill=orange!8, text width=27mm},
+    inf/.style={box, fill=orange!4, text width=27mm},
+    store/.style={box, fill=green!7, text width=30mm},
+    ui/.style={box, fill=violet!8, text width=24mm},
+    cat/.style={box, draw=red!55, line width=0.6pt, fill=red!5, text width=24mm},
     lbl/.style={font=\scriptsize\itshape, text=black!55},
     arr/.style={->, semithick, black!60},
-    every node/.style={outer sep=1pt},
   ]
-    % Stage 1: invocation surfaces
-    \node[surf] (cli) {CLI \texttt{raip-eval}};
-    \node[surf, below=2mm of cli] (api) {REST \texttt{POST /runs}};
-    \node[surf, below=2mm of api] (wiz) {Guided wizard};
-    % Stage 2: queue
-    \node[orch, right=10mm of api] (queue) {Celery + Redis\\\scriptsize run store, kill-switch};
-    % Stage 3: supervisor + nodes
-    \node[orch, right=10mm of queue] (sup) {LangGraph\\supervisor};
-    \node[run, above right=3mm and 9mm of sup] (eval) {\texttt{evaluate}};
-    \node[run, below right=3mm and 9mm of sup] (agg) {\texttt{aggregate}\\\scriptsize weighted, bootstrap CI};
-    % evaluate branch downward
-    \node[run, below=8mm of eval] (reg) {Benchmark registry};
-    \node[run, below=2.5mm of reg, text width=33mm] (runners) {Runners: \texttt{lm\_eval}, Garak,\\\texttt{hf\_dynamic}, \texttt{dataset\_scan}, R01/R11/R12};
-    \node[box, fill=orange!4, below=2.5mm of runners] (lite) {LiteLLM router};
-    \node[box, fill=orange!4, below=2.5mm of lite] (models) {Self-hosted target + judge\\\scriptsize (Ollama / vLLM)};
-    % catalogue feeding aggregate
-    \node[cat, below=9mm of agg] (cat) {Signed catalogue\\\texttt{mvp2-v1} (weights)};
-    % outputs
-    \node[store, right=10mm of agg] (scores) {COMPL-AI scores\\\scriptsize CR01--CR12 $+$ CI};
-    \node[store, below=8mm of scores, text width=34mm] (artifacts) {Artifacts: \texttt{benchmark\_run.yaml},\\\texttt{model\_card.md}, \texttt{raw\_outputs.jsonl}, signature};
-    \node[store, below=2.5mm of artifacts] (stores) {MinIO / local FS \,$\cdot$\, MLflow opt.};
-    % UI
-    \node[ui, right=9mm of scores] (readapi) {Read API};
-    \node[ui, above=3mm of readapi, text width=30mm] (room) {Compliance control room\\\scriptsize lenses + guided home};
-    % edges
+    % invocation surfaces (stacked, far left)
+    \node[surf] (cli) at (0,0.9) {CLI \texttt{raip-eval}};
+    \node[surf] (api) at (0,0) {REST \texttt{POST /runs}};
+    \node[surf] (wiz) at (0,-0.9) {Guided wizard};
+    % horizontal spine (y=0)
+    \node[orch]  (queue)  at (3.1,0)  {Celery $+$ Redis\\\scriptsize run store, kill-switch};
+    \node[orch]  (sup)    at (5.9,0)  {LangGraph supervisor};
+    \node[run]   (eval)   at (8.6,0)  {\texttt{evaluate}};
+    \node[run]   (agg)    at (11.4,0) {\texttt{aggregate}\\\scriptsize $+$ bootstrap CI};
+    \node[store] (scores) at (14.4,0) {COMPL-AI scores\\\scriptsize CR01--CR12 $+$ CI};
+    \node[ui]    (room)   at (17.4,0) {Read API $\rightarrow$\\control room};
+    % evaluate offshoot (down)
+    \node[bigrun] (runners) at (8.6,-1.8) {Runners: \texttt{lm\_eval}, Garak, \texttt{hf\_dynamic}, \texttt{dataset\_scan}, R01/R11/R12};
+    \node[inf]    (lite)    at (8.6,-3.2) {LiteLLM router};
+    \node[inf]    (models)  at (8.6,-4.4) {Self-hosted target $+$ judge\\\scriptsize (Ollama / vLLM)};
+    % catalogue offshoot (up into aggregate)
+    \node[cat] (cat) at (11.4,-1.8) {Signed catalogue\\\texttt{mvp2-v1} (weights)};
+    % artifacts offshoot (down from scores)
+    \node[store] (artifacts) at (14.4,-1.8) {Artifacts: \texttt{*.yaml} $\cdot$ card $\cdot$ \texttt{*.jsonl} $\cdot$ sig};
+    \node[store] (stores)    at (14.4,-3.2) {MinIO / local FS $\cdot$ MLflow opt.};
+    % edges: spine
     \draw[arr] (cli.east) -- (queue.west);
     \draw[arr] (api.east) -- (queue.west);
     \draw[arr] (wiz.east) -- (queue.west);
     \draw[arr] (queue) -- (sup);
     \draw[arr] (sup) -- (eval);
-    \draw[arr] (sup) -- (agg);
-    \draw[arr] (eval) -- (reg);
-    \draw[arr] (reg) -- (runners);
+    \draw[arr] (eval) -- node[midway,above,lbl]{scores} (agg);
+    \draw[arr] (agg) -- (scores);
+    \draw[arr] (scores) -- (room);
+    % evaluate offshoot
+    \draw[arr] (eval) -- (runners);
     \draw[arr] (runners) -- (lite);
     \draw[arr] (lite) -- (models);
-    \draw[arr] (eval.east) to[bend left=12] node[midway, right, lbl]{item scores} (agg.east);
-    \draw[arr] (cat) -- (agg);
-    \draw[arr] (agg) -- (scores);
+    % catalogue + artifacts
+    \draw[arr] (cat) -- node[midway,right,lbl]{weights} (agg);
     \draw[arr] (scores) -- (artifacts);
     \draw[arr] (artifacts) -- (stores);
-    \draw[arr] (scores) -- (readapi);
-    \draw[arr] (artifacts.east) to[bend right=10] (readapi.south);
-    \draw[arr] (readapi) -- (room);
+    \draw[arr] (artifacts.east) to[bend right=14] (room.south);
     % layer captions
-    \node[lbl, above=1mm of cli] {invocation};
-    \node[lbl] at (sup|-cli) {orchestration};
-    \node[lbl] at (scores|-cli) {scores \& artifacts};
-    \node[lbl] at (room.north|-cli) {restitution};
+    \node[lbl] at (0,1.75) {invocation};
+    \node[lbl] at (5.9,0.95) {orchestration};
+    \node[lbl] at (8.6,0.95) {execution};
+    \node[lbl] at (14.4,0.95) {outputs};
+    \node[lbl] at (17.4,0.95) {restitution};
   \end{tikzpicture}%
   }
   \caption{Our runtime pipeline. Three invocation surfaces enqueue one declarative job; the LangGraph supervisor splits into an \texttt{evaluate} node (registry $\rightarrow$ runners $\rightarrow$ LiteLLM $\rightarrow$ self-hosted models) and an \texttt{aggregate} node that combines cached item scores with weights read from the signed catalogue. Scores and signed artifacts flow through our read API to the control room. Weights (red) and provenance cross the evaluate/aggregate seam as data, making aggregation auditable and fallbacks visible.}

@@ -1,0 +1,18 @@
+# Image for the governance-as-a-service runtime services (proxy, agents, audit-sink).
+# Builds the raip package with the [gaas] extra and includes the services/ entrypoints.
+FROM python:3.11-slim
+
+WORKDIR /app
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends git curl \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY pyproject.toml README.md ./
+COPY src ./src
+COPY services ./services
+
+RUN pip install --no-cache-dir ".[gaas]"
+
+# Overridden per service in docker-compose.gaas.yml.
+CMD ["uvicorn", "services.proxy.main:app", "--host", "0.0.0.0", "--port", "8000"]

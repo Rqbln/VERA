@@ -6,6 +6,7 @@ from uuid import uuid4
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
+from raip.api.admin_routes import router as admin_router
 from raip.api.benchmark_registry import MVP2_BENCHMARK_REGISTRY
 from raip.api.dashboard_routes import router as dashboard_router
 from raip.api.forms_routes import router as forms_router
@@ -31,6 +32,7 @@ app.include_router(lab_router)
 app.include_router(dashboard_router)
 app.include_router(models_router)
 app.include_router(forms_router)
+app.include_router(admin_router)
 
 
 @app.post("/api/v1/runs")

@@ -93,6 +93,43 @@ class Settings(BaseSettings):
         validation_alias="RAIP_SIGNING_KEY_ID",
     )
 
+    # ── Governance-as-a-Service (MVP4 gaas profile) ─────────────────────────────────
+    raip_gaas_enabled: bool = Field(default=False, validation_alias="RAIP_GAAS_ENABLED")
+    kafka_broker_url: str = Field(
+        default="",
+        validation_alias="KAFKA_BROKER_URL",
+        description="Redpanda/Kafka bootstrap servers; empty -> Redis Streams fallback.",
+    )
+    opa_url: str = Field(
+        default="",
+        validation_alias="OPA_URL",
+        description="Open Policy Agent base URL; empty -> built-in default-allow policy.",
+    )
+    opensearch_url: str = Field(
+        default="",
+        validation_alias="OPENSEARCH_URL",
+        description="OpenSearch base URL for audit indexing; empty -> signed JSONL only.",
+    )
+    raip_governance_mode: str = Field(
+        default="shadow",
+        validation_alias="RAIP_GOVERNANCE_MODE",
+        description="Default per-model governance mode: shadow | advisory | enforcement.",
+    )
+    raip_canary_cron: str = Field(
+        default="0 * * * *",
+        validation_alias="RAIP_CANARY_CRON",
+        description="Cron expression for the governance canary (hourly by default).",
+    )
+    raip_proxy_target_url: str = Field(
+        default="",
+        validation_alias="RAIP_PROXY_TARGET_URL",
+        description="Upstream the inline proxy forwards to; empty -> OLLAMA_API_BASE.",
+    )
+
+    @property
+    def proxy_target(self) -> str:
+        return self.raip_proxy_target_url or self.ollama_api_base
+
     @property
     def effective_judge_model(self) -> str:
         return self.raip_judge_model or self.raip_target_model

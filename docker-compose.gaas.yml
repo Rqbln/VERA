@@ -1,0 +1,108 @@
+# RAIP — Governance-as-a-Service (MVP4) overlay.
+#
+#   docker compose -f docker-compose.yml -f docker-compose.gaas.yml up --build   (or: make stack-gaas)
+#
+# Layers the governance runtime onto the full enterprise stack: an event bus (Redpanda), a policy
+# engine (OPA), an audit index (OpenSearch), the inline proxy, the scoring agents + streaming Trust
+# Factor, the audit sink, and a Celery beat for the canary. Everything degrades gracefully: with the
+# broker down the services use Redis Streams; with OpenSearch down the audit sink writes signed JSONL.
+services:
+  redpanda:
+    image: redpandadata/redpanda:v24.2.7
+    command:
+      - redpanda
+      - start
+      - --overprovisioned
+      - --smp=1
+      - --memory=1G
+      - --reserve-memory=0M
+      - --node-id=0
+      - --check=false
+      - --kafka-addr=PLAINTEXT://0.0.0.0:9092
+      - --advertise-kafka-addr=PLAINTEXT://redpanda:9092
+    ports:
+      - "9092:9092"
+
+  opa:
+    image: openpolicyagent/opa:0.69.0
+    command: ["run", "--server", "--addr=0.0.0.0:8181", "/policies/raip.rego"]
+    volumes:
+      - ./infra/opa:/policies:ro
+    ports:
+      - "8181:8181"
+
+  opensearch:
+    image: opensearchproject/opensearch:2.17.1
+    environment:
+      discovery.type: single-node
+      DISABLE_SECURITY_PLUGIN: "true"
+      DISABLE_INSTALL_DEMO_CONFIG: "true"
+      OPENSEARCH_JAVA_OPTS: "-Xms512m -Xmx512m"
+    ports:
+      - "9200:9200"
+
+  gov-proxy:
+    build:
+      context: .
+      dockerfile: Dockerfile.gaas
+    command: uvicorn services.proxy.main:app --host 0.0.0.0 --port 8000
+    environment: &gaas_env
+      RAIP_GAAS_ENABLED: "1"
+      REDIS_URL: redis://redis:6379/0
+      KAFKA_BROKER_URL: redpanda:9092
+      OPA_URL: http://opa:8181
+      OPENSEARCH_URL: http://opensearch:9200
+      RAIP_GOVERNANCE_MODE: shadow
+      OLLAMA_API_BASE: http://host.docker.internal:11434
+      RAIP_TARGET_MODEL: ollama/llama3.1:8b-instruct-q8_0
+      RAIP_LOCAL_ARTIFACTS_DIR: /data/artifacts
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - gaas_artifacts:/data/artifacts
+    ports:
+      - "8100:8000"
+    depends_on:
+      - redis
+      - redpanda
+      - opa
+
+  gov-agents:
+    build:
+      context: .
+      dockerfile: Dockerfile.gaas
+    command: python -m services.agents.main
+    environment: *gaas_env
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - gaas_artifacts:/data/artifacts
+    depends_on:
+      - redis
+      - redpanda
+
+  gov-audit-sink:
+    build:
+      context: .
+      dockerfile: Dockerfile.gaas
+    command: python -m services.audit_sink.main
+    environment: *gaas_env
+    volumes:
+      - gaas_artifacts:/data/artifacts
+    depends_on:
+      - redis
+      - redpanda
+
+  gov-beat:
+    build:
+      context: .
+      dockerfile: Dockerfile.gaas
+    command: celery -A raip.celery_app beat --loglevel=INFO
+    environment: *gaas_env
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      - redis
+
+volumes:
+  gaas_artifacts:

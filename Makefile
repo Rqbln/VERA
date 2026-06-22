@@ -1,6 +1,6 @@
 # RAIP — convenience targets. `make help` lists them.
 .DEFAULT_GOAL := help
-.PHONY: help quickstart quickstart-down stack-full stack-down quickstart-native test test-unit lint
+.PHONY: help quickstart quickstart-down stack-full stack-down quickstart-native stack-gaas stack-gaas-down test test-unit lint
 
 OLLAMA_MODEL ?= llama3.1:8b-instruct-q8_0
 
@@ -29,6 +29,12 @@ stack-full: ## Full enterprise stack (Keycloak RBAC, MinIO, MLflow, TimescaleDB)
 
 stack-down: ## Stop and remove the full stack
 	docker compose down
+
+stack-gaas: ## Full stack + Governance-as-a-Service runtime (proxy:8100, OPA, Redpanda, OpenSearch)
+	docker compose -f docker-compose.yml -f docker-compose.gaas.yml up --build
+
+stack-gaas-down: ## Stop and remove the gaas stack
+	docker compose -f docker-compose.yml -f docker-compose.gaas.yml down
 
 test: test-unit ## Run the unit test suite
 

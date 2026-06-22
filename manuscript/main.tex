@@ -14,6 +14,10 @@
 \usepackage{xcolor}
 \usepackage{tikz}
 \usetikzlibrary{arrows.meta,positioning,fit,backgrounds,calc,shapes.geometric}
+\definecolor{brandgreen}{HTML}{00915A}
+\newcommand{\cmark}{\textcolor{brandgreen}{\textbf{Y}}}
+\newcommand{\pmark}{\textcolor{orange!80!black}{\textbf{$\circ$}}}
+\newcommand{\xmark}{\textcolor{black!35}{--}}
 
 \newcommand{\review}[1]{\textit{\textcolor{gray}{REVIEW: #1}}}
 \newcommand{\placeholder}[1]{\textit{[#1]}}
@@ -47,6 +51,7 @@ RAIP orchestrates benchmarks through a LangGraph pipeline (CLI, REST API, Celery
 Two design decisions distinguish it.
 First, the benchmark-to-requirement \emph{aggregation weights} are a first-class, versioned, signed artifact; we use this to run a reproducible \emph{sensitivity analysis} that quantifies how the per-requirement compliance picture, the green/amber/red bands, and the dashboard's status-first triage order shift under alternative weightings.
 Second, a no-login \emph{guided} mode lets a non-technical user launch an evaluation on a connected model and read a status-first, progressively-disclosed summary, while a role-based control room serves expert audiences.
+The same code base scales from this one-command profile to a full \emph{governance-as-a-service} runtime---an inline proxy, an event bus, asynchronous scoring agents, a streaming Trust Factor, an Open Policy Agent decision layer, and a signed audit/SIEM trail---so architectural depth and ease of use coexist.
 On an open-weight target we report measurable-requirement scores with bootstrap intervals, the weighting-sensitivity result, and an expert interpretability walkthrough of the dashboard.
 RAIP treats compliance-oriented evaluation as an automated, reproducible, and \emph{auditable} software pipeline rather than ad hoc spreadsheet assembly.
 \end{abstract}
@@ -76,8 +81,8 @@ A team preparing an LLM for a release gate under the EU AI Act faces three concr
 Concretely, a compliance engineer must attach a model card showing robustness (CR01), fairness and toxicity (CR10--CR12), and signed run metadata before approving an instruction-tuned LLM, and must justify \emph{how} the per-requirement scores were aggregated---work that today often means days of ad hoc scripting and undocumented weighting choices.
 
 \subsection{Platform Requirements}
-We distinguish \emph{platform requirements} PR1--PR4, which an evaluation platform must satisfy, from COMPL-AI \emph{requirement identifiers} CR01--CR12, which label measurable risk dimensions.
-\Cref{tab:platform-reqs} summarizes PR1--PR4.
+We distinguish \emph{platform requirements} PR1--PR5, which an evaluation platform must satisfy, from COMPL-AI \emph{requirement identifiers} CR01--CR12, which label measurable risk dimensions.
+\Cref{tab:platform-reqs} summarizes PR1--PR5.
 
 \begin{table}[t]
   \caption{Platform requirements for a responsible-AI evaluation platform (distinct from COMPL-AI CR01--CR12).}
@@ -92,18 +97,19 @@ We distinguish \emph{platform requirements} PR1--PR4, which an evaluation platfo
     PR2 & \emph{Regulatory traceability:} every reported score maps to a COMPL-AI identifier, contributing benchmarks, and uncertainty intervals. \\
     PR3 & \emph{Reproducibility and automation:} declarative run configuration, asynchronous jobs, versioned catalogues, and signed artifacts. \\
     PR4 & \emph{Sovereign self-hosted operation:} core execution on open-source infrastructure; proprietary APIs only as evaluation targets. \\
+    PR5 & \emph{Profile-based extensibility:} one codebase scales from a one-command lite deployment to a full governance runtime, without bifurcating logic. \\
     \bottomrule
   \end{tabularx}
 \end{table}
 
 \subsection{Contributions}
-We present RAIP (\emph{Responsible AI in Practice}), an open-source platform that addresses PR1--PR4 while operationalizing COMPL-AI measurable requirements.
+We present RAIP (\emph{Responsible AI in Practice}), an open-source platform that addresses PR1--PR5 while operationalizing COMPL-AI measurable requirements.
 Unlike prior LLM trustworthiness tools that focus primarily on single-shot model prompts without longitudinal or data-stage coverage~\cite{sunetnanta2025promptops}, RAIP unifies benchmark dispatch, weighted aggregation, and governance artifact generation in one self-hostable pipeline.
 
 In this paper, we make the following contributions:
 \begin{itemize}
-  \item \textbf{C1 --- Open platform and compliance control room:}
-  An open-source, self-hostable implementation (CLI \texttt{raip-eval}, REST API, Celery workers, LangGraph supervisor, benchmark registry with dedicated runners) \emph{and} a Next.js ``control room'' dashboard with status-first triage, progressive disclosure, role-based lenses, and a no-login \emph{guided} mode whose launch wizard lets a non-technical user evaluate a connected model in minutes.
+  \item \textbf{C1 --- Open, layered, dual-profile platform with a governance runtime:}
+  An open-source, self-hostable architecture spanning lifecycle evaluation (CLI \texttt{raip-eval}, REST API, Celery workers, LangGraph supervisor, benchmark registry with dedicated runners) \emph{and} an optional \emph{governance-as-a-service runtime}---an inline proxy, an event bus, four asynchronous scoring agents, a streaming Trust Factor, an Open Policy Agent decision layer, a kill-switch, and a signed audit/SIEM trail. A Next.js ``control room'' dashboard with status-first triage, role-based lenses, and a no-login \emph{guided} mode tops the stack. The same codebase runs as a one-command \emph{lite} profile and a full \emph{enterprise/gaas} profile (\Cref{fig:gaas}), so architectural depth and ease of use coexist.
   \item \textbf{C2 --- Configurable, auditable aggregation:}
   Benchmark-to-requirement aggregation weights as a first-class, versioned, signed artifact (\texttt{benchmarks\_catalog.yaml}), and a reproducible \emph{weighting-sensitivity methodology} that quantifies how requirement scores, score bands, and the dashboard's triage order move under alternative weightings.
   \item \textbf{C3 --- Empirical evaluation:}
@@ -320,16 +326,112 @@ Checkpoint evaluation reuses the graph and writes Timescale \texttt{metric\_time
 A poisoning lab reports backdoor survival ratio for CR02 extensions, motivated by deceptive-agent persistence~\cite{hubinger2024sleeperagents}.
 These lifecycle extensions exist in the platform but are not exercised in this paper's evaluation, which centres on inference and the dashboard.
 
+\subsection{Governance Runtime (Profile-Gated)}
+\label{sec:gaas}
+Evaluation answers ``is this model compliant \emph{now}?''; production deployment also needs ``is it \emph{staying} compliant?''. RAIP's enterprise profile therefore adds an optional \emph{governance-as-a-service} (GaaS) runtime around the same pipeline (\Cref{fig:gaas}), built from standard open-source parts and reusing the platform's scoring code.
+An \emph{inline proxy} (OpenAI-compatible) sits in front of the target: on the synchronous path it consults the policy layer, forwards the request via LiteLLM, and returns the response; off-band it publishes the request/response to an event bus.
+Four asynchronous \emph{agents} consume that stream---cyber (CR02, jailbreak/injection), ethics (CR12, toxicity via Detoxify~\cite{hanu2020detoxify}), privacy (CR05, PII via Presidio~\cite{microsoft2023presidio}), and drift (CR01)---and emit scored signals that a streaming aggregator folds into a live \emph{Trust Factor}.
+An Open Policy Agent~\cite{opa2024} layer turns \{mode, kill-switch, live Trust Factor\} into an \texttt{allow}/\texttt{flag}/\texttt{deny} decision under three escalating \emph{modes}---\emph{shadow} (observe), \emph{advisory} (alert), \emph{enforcement} (block)---and every request, signal, and decision becomes a \emph{signed, append-only audit record} indexed for SIEM. A scheduled canary feeds synthetic golden traffic so the signal continues without organic load.
+Crucially, the runtime preserves PR5's simplicity claim through \emph{graceful degradation}: the bus is Apache~Kafka/Redpanda~\cite{kreps2011kafka,redpanda2024} when configured but falls back to Redis Streams; the audit index is OpenSearch~\cite{opensearch2024} when present but always writes a signed JSONL chain; the policy layer is OPA when reachable but otherwise an equivalent in-process rule. The lite profile instantiates none of it; the same code, opted in via a Docker profile, becomes the full runtime.
+
+\begin{figure*}[t]
+  \centering
+  \resizebox{\textwidth}{!}{%
+  \begin{tikzpicture}[
+    font=\footnotesize,
+    >={Stealth[round]},
+    box/.style={draw, rounded corners=2pt, align=center, inner sep=3pt, fill=white, minimum height=7mm},
+    sync/.style={box, fill=blue!7, text width=24mm},
+    hub/.style={box, fill=brandgreen!18, draw=brandgreen!70, line width=0.7pt, text width=22mm},
+    ctrl/.style={box, fill=red!6, draw=red!50, text width=24mm},
+    gov/.style={box, fill=violet!8, text width=22mm},
+    agent/.style={box, fill=orange!9, text width=17mm, minimum height=8mm},
+    store/.style={box, fill=green!8, text width=34mm},
+    ui/.style={box, fill=brandgreen!12, text width=28mm},
+    lbl/.style={font=\scriptsize\itshape, text=black!55},
+    sarr/.style={<->, very thick, blue!55},
+    darr/.style={->, semithick, violet!60, dashed},
+    parr/.style={->, semithick, red!55},
+    rarr/.style={->, semithick, black!45, dashed},
+  ]
+    % --- synchronous inference lane (top) ---
+    \node[sync] (client) at (0,0) {Client / application};
+    \node[hub]  (proxy)  at (4.0,0) {Inline proxy};
+    \node[sync] (target) at (8.0,0) {Self-hosted target\\\scriptsize Ollama / vLLM (+ judge)};
+    % decision inputs above the proxy
+    \node[ctrl] (opa)  at (3.0,1.7) {OPA policy\\\scriptsize (built-in fallback)};
+    \node[ctrl] (mode) at (5.6,1.7) {kill-switch $+$ mode\\\scriptsize shadow/advisory/enforce};
+    % --- asynchronous governance lane (below) ---
+    \node[gov, text width=44mm] (bus) at (4.6,-1.9) {Event bus — Redpanda / Kafka\\\scriptsize (Redis Streams fallback)};
+    \node[agent] (a1) at (0.2,-3.6) {cyber\\\scriptsize CR02};
+    \node[agent] (a2) at (2.2,-3.6) {ethics\\\scriptsize CR12};
+    \node[agent] (a3) at (4.2,-3.6) {privacy\\\scriptsize CR05};
+    \node[agent] (a4) at (6.2,-3.6) {drift\\\scriptsize CR01};
+    \node[gov, text width=30mm] (trust) at (2.4,-5.2) {Streaming Trust Factor};
+    \node[gov, text width=22mm] (canary) at (9.2,-1.9) {Canary scheduler};
+    \node[store] (audit) at (10.6,-3.6) {Audit / SIEM\\\scriptsize OpenSearch $+$ signed JSONL};
+    \node[ui] (room) at (13.8,-1.0) {Read API $\rightarrow$\\Control room / Admin};
+    \node[store, text width=30mm] (stores) at (13.8,-3.4) {Redis $\cdot$ MinIO $\cdot$ TimescaleDB};
+    % --- synchronous edges ---
+    \draw[sarr] (client) -- node[midway,above,lbl]{request / response} (proxy);
+    \draw[sarr] (proxy) -- (target);
+    \draw[parr] (proxy) -- (opa);
+    \draw[parr] (mode) -- (proxy);
+    % --- async governance edges ---
+    \draw[darr] (proxy) -- node[midway,right,lbl]{copy} (bus);
+    \draw[darr] (bus) -- (a1);
+    \draw[darr] (bus) -- (a2);
+    \draw[darr] (bus) -- (a3);
+    \draw[darr] (bus) -- (a4);
+    \draw[darr] (a1) -- (trust);
+    \draw[darr] (a2) -- (trust);
+    \draw[darr] (a3) -- (trust);
+    \draw[darr] (a4) -- (trust);
+    \draw[darr] (a4.east) to[bend left=10] (audit.west);
+    \draw[darr] (canary) -- (bus);
+    \draw[darr] (trust.east) to[bend right=22] node[midway,below,lbl]{live trust} (opa.south);
+    \draw[rarr] (trust) -- (room);
+    \draw[rarr] (audit) -- (room);
+    \draw[rarr] (audit) -- (stores);
+    % --- lane labels + legend ---
+    \node[lbl] at (0,1.0) {synchronous inference (lite \& gaas)};
+    \node[lbl, text=violet!60] at (1.6,-1.0) {asynchronous governance (gaas)};
+  \end{tikzpicture}%
+  }
+  \caption{The optional governance-as-a-service runtime (enterprise/gaas profile). \emph{Top:} the synchronous inference path (blue) --- client $\leftrightarrow$ inline proxy $\leftrightarrow$ self-hosted target --- gated by an OPA decision and the kill-switch/mode (red). \emph{Bottom:} the asynchronous governance lane (violet, dashed) --- the proxy copies traffic to an event bus (Redpanda/Kafka, Redis-Streams fallback); four agents (cyber/ethics/privacy/drift) score it into a streaming Trust Factor that feeds the policy back; a canary injects golden traffic; every event is signed and indexed for audit/SIEM. The lite profile runs none of the governance lane; the same code base enables it via a Docker profile, and each external service degrades gracefully (bus$\rightarrow$Redis Streams, OpenSearch$\rightarrow$signed JSONL, OPA$\rightarrow$in-process rule).}
+  \label{fig:gaas}
+\end{figure*}
+
 \subsection{Governance Artifact Generation}
 Jinja2 model cards follow Model Cards~\cite{mitchell2019modelcard}: twelve measurable rows, dataset evaluation URIs, harness provenance, signatures, and limitations.
 Datasheets~\cite{gebru2021datasheets} attach to corpus scans.
 Environmental hooks align with ML CO$_2$ methodology~\cite{henderson2020mlco2}.
 
-\subsection{Implementation}
-The \texttt{raip} package targets Python~3.11 and ships two deployment profiles: a single-command \emph{lite} stack (Redis + API + worker + Next.js dashboard, local-filesystem artifacts, no login) for non-technical users, and a full Docker Compose stack (adding Keycloak RBAC, MLflow, MinIO, TimescaleDB) for enterprise use.
-The benchmark-aggregation pipeline degrades gracefully: when MinIO or MLflow are absent the worker falls back to local artifacts and skips tracking rather than failing.
-The control-room front-end (\Cref{sec:dashboard}) consumes a dedicated read API.
-The platform is validated by 71 backend unit tests and a 30-case Playwright matrix (role-based access plus the guided surfaces); the optional \texttt{RAIP\_E2E\_OLLAMA} path replicates a full run.
+\subsection{Implementation and Deployment Profiles}
+The \texttt{raip} package targets Python~3.11 and ships three deployment profiles over one code base (\Cref{tab:profiles}): a single-command \emph{lite} stack (Redis + API + worker + Next.js dashboard, local-filesystem artifacts, no login); a full \emph{enterprise} Docker Compose stack (adding Keycloak RBAC, MLflow, MinIO, TimescaleDB); and a \emph{gaas} overlay that adds the governance runtime of \Cref{sec:gaas} (inline proxy, Redpanda/Kafka, OPA, agents, OpenSearch). Every layer degrades gracefully---absent MinIO/MLflow fall back to local artifacts and no tracking; an absent broker, policy server, or audit index fall back as in \Cref{fig:gaas}---so partial deployments still run.
+The control-room front-end (\Cref{sec:dashboard}) consumes a dedicated read API and admin control plane (\texttt{/admin/v1}).
+The platform is validated by 99 backend unit tests (including the governance bus, agents, proxy, policy, and audit) and a 35-case Playwright matrix (role-based access, the guided surfaces, the governance panel, and the language toggle); the optional \texttt{RAIP\_E2E\_OLLAMA} path replicates a full run.
+
+\begin{table}[t]
+  \caption{Deployment profiles. \cmark{} present, \pmark{} optional/degraded, \xmark{} absent. The same code base serves all three.}
+  \label{tab:profiles}
+  \centering
+  \tblsetup
+  \begin{tabularx}{\columnwidth}{@{}Xccc@{}}
+    \toprule
+    Component & lite & ent. & gaas \\
+    \midrule
+    Eval pipeline, signed catalogue, control room & \cmark & \cmark & \cmark \\
+    Guided no-login mode & \cmark & \pmark & \pmark \\
+    Keycloak RBAC, MLflow, MinIO, Timescale & \xmark & \cmark & \cmark \\
+    Trust Factor, kill-switch (post-run) & \cmark & \cmark & \cmark \\
+    Inline proxy, event bus, scoring agents & \xmark & \xmark & \cmark \\
+    Streaming Trust Factor, OPA, modes & \xmark & \xmark & \cmark \\
+    Audit/SIEM (OpenSearch $+$ signed JSONL) & \xmark & \xmark & \cmark \\
+    Canary scheduler & \xmark & \xmark & \cmark \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
 
 \section{Configurable Aggregation and Weighting Sensitivity}
 \label{sec:weighting}

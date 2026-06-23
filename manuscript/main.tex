@@ -34,11 +34,22 @@
 
 \begin{document}
 
-\title{RAIP: An Open-Source Platform and Compliance Control Room for Reproducible, Configurable EU AI Act LLM Evaluation}
+\title{RAIP: Responsible AI In Practice}
 
 \author{%
-  \IEEEauthorblockN{Anonymous Author(s)}%
-  \IEEEauthorblockA{Paper under double-blind review for APSEC 2026}%
+  \IEEEauthorblockN{%
+    Robin Qu\'eriaux\textsuperscript{1},\quad
+    Solveig Bachellery\textsuperscript{2},\quad
+    Mariam Barry\textsuperscript{3},\quad
+    L\'ea D\'el\'eris\textsuperscript{4}\\[2pt]
+    Thomas Le Goff,\quad Martin Pailles,\quad J\'er\^ome Lebecq%
+  }
+  \IEEEauthorblockA{%
+    \textsuperscript{1}ITG A3I IE, Research, BNP Paribas\\
+    \textsuperscript{2}ITG Innovation \& AI, Head of Innovation Exposition, BNP Paribas\\
+    \textsuperscript{3}ITG AI \& IT Innovation, Research Lead, BNP Paribas\\
+    \textsuperscript{4}RISK AI Research, Head of RISK Artificial Intelligence Research, BNP Paribas%
+  }%
 }
 
 \maketitle
@@ -640,7 +651,7 @@ Fragmented responsible-AI evaluation forces software teams to stitch benchmarks 
 RAIP satisfies PR2--PR4 (traceability, reproducibility, sovereignty) in the evaluation reported here and \emph{implements} PR1 (lifecycle coverage), whose dataset and checkpoint stages we describe but do not exercise in this software-focused study.
 It contributes an open, self-hostable platform and compliance control room (C1); aggregation weights as a first-class, signed, auditable artifact with a reproducible sensitivity methodology (C2); and an empirical study on an open-weight target (C3).
 We found that RAIP produces reproducible, interval-qualified, provenance-honest scores (RQ1); that weighting sensitivity is bounded by the within-requirement benchmark spread $\Delta$ and is here a provable structural null ($\Delta=0$), with the same check poised to surface band-flips once native harnesses make benchmarks disagree---measured rather than asserted (RQ2); and that a compliance reader can triage a run from the control room alone (RQ3).
-The replication package will provide the lite Compose manifest, the result and figure scripts, and anonymised run artifacts.
+The replication package will provide the lite Compose manifest, the result and figure scripts, and the run artifacts.
 
 Future work includes a formal practitioner study with inter-rater reliability~\cite{hayes2007krippendorff,studtmann2023histree}, native-harness runs that would stress the sensitivity analysis further, and a separate treatment of the deeper weighting and benchmark-selection science (empirical re-derivation of weights, contamination-aware refresh) that this software-focused paper deliberately defers.
 

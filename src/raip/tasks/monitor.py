@@ -33,6 +33,7 @@ def compute_drift(
     """Compare the latest run's metric against the mean of the prior ``baseline_n`` runs."""
     store = store or RedisRunStore()
     baseline_n = baseline_n or int(os.environ.get("RAIP_DRIFT_BASELINE_N", "5"))
+    baseline_n = max(1, baseline_n)  # clamp: a 0/negative window would divide by zero below
     threshold = threshold if threshold is not None else float(
         os.environ.get("RAIP_DRIFT_THRESHOLD", "0.15")
     )

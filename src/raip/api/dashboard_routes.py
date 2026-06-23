@@ -418,8 +418,15 @@ def health_stack() -> dict[str, Any]:
 
 
 @router.get("/artifacts/local/{key:path}")
-def get_local_artifact(key: str):
-    """Serve a locally-stored artifact (lite mode). Public, like a MinIO presigned URL."""
+def get_local_artifact(
+    key: str,
+    _user: Annotated[AuthUser, Depends(get_current_user)],
+):
+    """Serve a locally-stored artifact (lite mode).
+
+    Open in guided mode (auth disabled); requires a valid token in enterprise mode so a
+    MinIO-outage fallback to the local backend never exposes a public download endpoint.
+    """
     import mimetypes
 
     from fastapi.responses import FileResponse

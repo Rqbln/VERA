@@ -103,7 +103,10 @@ class Settings(BaseSettings):
     opa_url: str = Field(
         default="",
         validation_alias="OPA_URL",
-        description="Open Policy Agent base URL; empty -> built-in default-allow policy.",
+        description=(
+            "Open Policy Agent base URL; empty -> equivalent in-process policy "
+            "(still enforces kill-switch/low-trust, can flag/deny)."
+        ),
     )
     opensearch_url: str = Field(
         default="",

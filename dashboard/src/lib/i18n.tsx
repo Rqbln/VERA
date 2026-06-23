@@ -24,6 +24,7 @@ const EN = {
   "home.intro":
     "RAIP checks whether an AI model meets the EU AI Act requirements. Launch an evaluation on a connected model and read a clear summary — no code, no login.",
   "home.kpi.models": "Connected models",
+  "home.kpi.connected": "connected",
   "home.kpi.completed": "Completed runs",
   "home.kpi.running": "In progress",
   "home.action.launch.title": "Launch an evaluation",
@@ -83,6 +84,7 @@ const FR: Record<Key, string> = {
   "home.intro":
     "RAIP vérifie si un modèle d’IA respecte les exigences de l’EU AI Act. Lancez une évaluation sur un modèle connecté et lisez un résumé clair — sans code, sans connexion.",
   "home.kpi.models": "Modèles connectés",
+  "home.kpi.connected": "connectés",
   "home.kpi.completed": "Évaluations terminées",
   "home.kpi.running": "En cours",
   "home.action.launch.title": "Lancer une évaluation",

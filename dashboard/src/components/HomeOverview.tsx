@@ -49,7 +49,7 @@ export function HomeOverview() {
 
       <KpiRow
         kpis={[
-          { label: t("home.kpi.models"), value: modelCount, icon: Boxes, accent: modelCount ? "connected" : undefined },
+          { label: t("home.kpi.models"), value: modelCount, icon: Boxes, accent: modelCount ? t("home.kpi.connected") : undefined },
           { label: t("home.kpi.completed"), value: completed, icon: CheckCircle2, tone: "ok" },
           { label: t("home.kpi.running"), value: running, icon: Loader2, tone: running ? "partial" : "neutral" },
         ]}

@@ -23,16 +23,21 @@ from raip.governance.trust_stream import current_trust
 from raip.llm.client import LLMClient
 
 
+def _messages(body: dict[str, Any]) -> list[dict[str, str]]:
+    """Resolve the request messages, synthesising one from the legacy ``prompt`` field."""
+    return body.get("messages") or [{"role": "user", "content": str(body.get("prompt", ""))}]
+
+
 def _forward(body: dict[str, Any], settings: Settings) -> tuple[str, dict[str, Any], float]:
     client = LLMClient(settings)
     model = str(body.get("model") or settings.raip_target_model)
-    messages = body.get("messages") or [{"role": "user", "content": str(body.get("prompt", ""))}]
     t0 = time.monotonic()
     res = client.completion(
         model=model,
-        messages=messages,
+        messages=_messages(body),
         temperature=float(body.get("temperature", 0.0)),
         max_tokens=int(body.get("max_tokens", 512)),
+        api_base=settings.proxy_target,  # honour RAIP_PROXY_TARGET_URL
     )
     latency_ms = round((time.monotonic() - t0) * 1000, 1)
     return res.text, res.raw, latency_ms
@@ -94,7 +99,7 @@ def govern(body: dict[str, Any], settings: Settings | None = None) -> tuple[int,
     event = {
         "model": model,
         "mode": mode,
-        "request": {"messages": body.get("messages") or []},
+        "request": {"messages": _messages(body)},
         "response": {"text": text},
         "decision": decision["decision"],
         "latency_ms": latency_ms,

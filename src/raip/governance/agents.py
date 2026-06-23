@@ -6,10 +6,12 @@ transparent heuristics otherwise, so a signal is always produced (flagged as ``h
 detail). Each agent emits a signal in ``[0, 1]`` where **higher = safer** (consistent with the Trust
 Factor), keyed to its COMPL-AI requirement.
 
-* cyber   → CR02 (jailbreak / prompt injection)
-* ethics  → CR12 (toxic / harmful content)
-* privacy → CR05 (PII egress)
-* drift   → CR01 (response-distribution stability)
+* cyber   → R02 (jailbreak / prompt injection)
+* ethics  → R12 (toxic / harmful content)
+* privacy → R05 (PII egress)
+* drift   → R01 (response-distribution stability)
+
+(Requirement ids are R01..R12 here, matching ``AGENT_CR`` and the Trust Factor components.)
 """
 
 from __future__ import annotations

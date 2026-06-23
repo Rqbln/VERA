@@ -44,7 +44,11 @@ class Bus(Protocol):
 
 
 class RedisStreamBus:
-    """Redis Streams backend (consumer groups, at-least-once)."""
+    """Redis Streams backend (consumer groups; best-effort processing).
+
+    Delivery is at-least-once at the stream level, but a record that fails to decode or whose
+    handler raises is acked and dropped (not retried) so one poison message cannot stall the group.
+    """
 
     backend = "redis-streams"
 
@@ -90,7 +94,7 @@ class RedisStreamBus:
                         value = json.loads(fields.get("data") or "{}")
                         handler(topic, value)
                     except Exception:
-                        pass  # at-least-once; a bad record must not stall the group
+                        pass  # drop a poison record rather than stall the group (best-effort)
                     finally:
                         self._r.xack(stream_key, group, entry_id)
             if _once:

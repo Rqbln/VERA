@@ -39,7 +39,7 @@ export function RunsOverviewTable() {
         <h1 className="text-sm font-medium text-ink">Runs</h1>
         <Link
           href="/launch"
-          className="rounded bg-brand px-3 py-1 text-xs font-medium text-white hover:bg-white"
+          className="rounded bg-brand px-3 py-1 text-xs font-medium text-white hover:bg-brand-deep"
         >
           + Launch evaluation
         </Link>

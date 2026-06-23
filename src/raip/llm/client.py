@@ -30,13 +30,14 @@ class LLMClient:
         temperature: float = 0.0,
         max_tokens: int = 1024,
         seed: int | None = None,
+        api_base: str | None = None,
     ) -> CompletionResult:
         kwargs: dict[str, Any] = {
             "model": model,
             "messages": messages,
             "temperature": temperature,
             "max_tokens": max_tokens,
-            "api_base": self._s.ollama_api_base,
+            "api_base": api_base or self._s.ollama_api_base,
         }
         if seed is not None:
             kwargs["seed"] = seed

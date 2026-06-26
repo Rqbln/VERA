@@ -73,9 +73,17 @@ def main() -> None:
             k: {"score": v.get("score"), "ci_lo": v.get("score_ci_lower"), "ci_hi": v.get("score_ci_upper")}
             for k, v in (rec.complai_scores or {}).items()
         }
+        # Per-benchmark mean score per requirement (drives the weighting-sensitivity study; with
+        # native harnesses these diverge within a requirement, so the sensitivity is non-degenerate).
+        per_bench: dict[str, dict[str, float]] = {}
+        for r in raw:
+            req, bid, sc = r.get("requirement"), r.get("benchmark_id"), r.get("score")
+            if req and bid and isinstance(sc, (int, float)):
+                per_bench.setdefault(req, {})[bid] = sc
         results["models"][model] = {
             "status": out.get("status"),
             "scores": scores,
+            "per_benchmark": per_bench,
             "fallback_count": fb,
             "benchmark_count": len({r.get("benchmark_id") for r in raw}),
             "energy": rec.energy,

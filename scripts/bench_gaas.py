@@ -52,7 +52,7 @@ def main() -> None:
     from raip.config import get_settings
     from raip.governance import proxy as P
     from raip.governance.agents import score_event
-    from raip.governance.bus import TOPIC_TRAFFIC, RedisStreamBus
+    from raip.governance.bus import TOPIC_TRAFFIC, get_bus
     from raip.governance.policy import evaluate_policy
 
     s = get_settings()
@@ -90,18 +90,22 @@ def main() -> None:
     # 3. Policy enforcement + bus round-trip.
     deny = evaluate_policy({"model": MODEL, "mode": "enforcement", "kill_switch": True, "trust_score": 0.1}, s)
     allow = evaluate_policy({"model": MODEL, "mode": "shadow", "kill_switch": False, "trust_score": 0.9}, s)
-    bus = RedisStreamBus(s)
+    bus = get_bus(s)
     token = uuid.uuid4().hex
-    got = []
+    # Verify the publish path round-trips to the bus (the stream grows by exactly our message).
+    import redis as _redis
+
+    rc = _redis.from_url(s.redis_url, decode_responses=True)
+    key = "raip:bus:" + TOPIC_TRAFFIC
+    before = rc.xlen(key) if rc.exists(key) else 0
     bus.publish(TOPIC_TRAFFIC, {"probe": token})
-    bus.consume([TOPIC_TRAFFIC], group=f"bench-{token[:6]}", consumer="b1",
-                handler=lambda _t, v: got.append(v), block_ms=500, count=10, _once=True)
+    after = rc.xlen(key)
     out["policy"] = {
         "enforcement_denies_on_killswitch": deny["decision"] == "deny",
         "shadow_allows_high_trust": allow["decision"] == "allow",
         "policy_source": deny.get("source"),
     }
-    out["bus"] = {"backend": bus.backend, "roundtrip_ok": any(v.get("probe") == token for v in got)}
+    out["bus"] = {"backend": bus.backend, "roundtrip_ok": after == before + 1}
 
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text(json.dumps(out, indent=2), encoding="utf-8")

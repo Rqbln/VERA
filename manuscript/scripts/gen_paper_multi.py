@@ -25,7 +25,10 @@ from raip.dashboard.score_bands import load_score_bands  # noqa: E402
 RES = Path(__file__).resolve().parents[1] / "results"
 FIG = Path(__file__).resolve().parents[1] / "figures"
 FIG.mkdir(parents=True, exist_ok=True)
-MULTI_BENCH_REQS = ["R01", "R06", "R10", "R12"]
+# Requirements with >=2 contributing benchmarks whose aggregate matches a simple weighted mean of
+# the captured per-benchmark means (self-consistent for the sensitivity re-aggregation). R12's
+# per-benchmark capture does not reconcile with its stored aggregate, so it is excluded here.
+MULTI_BENCH_REQS = ["R01", "R06", "R10"]
 
 
 def short(m: str) -> str:

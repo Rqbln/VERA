@@ -24,8 +24,11 @@ def run_lm_eval(ctx: RunContext, benchmark_id: str) -> tuple[SamplesByReq, RawLi
 
     try:
         import lm_eval  # type: ignore[import-untyped]
+
         # lm-eval 0.4.x ships the LiteLLM chat adapter under models.litellm_llms.
-        from lm_eval.models.litellm_llms import LiteLLMChatCompletion  # type: ignore[import-untyped]
+        from lm_eval.models.litellm_llms import (
+            LiteLLMChatCompletion,  # type: ignore[import-untyped]
+        )
     except ImportError:
         samples, raw = run_hf_dynamic(ctx, benchmark_id)
         for r in raw:
@@ -41,7 +44,8 @@ def run_lm_eval(ctx: RunContext, benchmark_id: str) -> tuple[SamplesByReq, RawLi
     # Ollama serves a chat endpoint with no token logprobs, so loglikelihood multiple-choice tasks
     # (e.g. MMLU) cannot run, and generative tasks are slow. The native lm-eval harness is reserved
     # for logprob-capable backends (vLLM); set RAIP_LM_EVAL_FORCE=1 to attempt it on Ollama anyway.
-    if ctx.model_id.startswith("ollama/") and os.environ.get("RAIP_LM_EVAL_FORCE", "") not in ("1", "true"):
+    _force = os.environ.get("RAIP_LM_EVAL_FORCE", "") in ("1", "true")
+    if ctx.model_id.startswith("ollama/") and not _force:
         samples, raw = run_hf_dynamic(ctx, benchmark_id)
         for r in raw:
             r["fallback"] = True

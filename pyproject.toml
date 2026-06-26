@@ -110,4 +110,7 @@ select = ["E", "F", "I", "UP"]
 
 [tool.ruff.lint.per-file-ignores]
 "tests/**" = ["E402"]
-"scripts/**" = ["E402"]   # scripts set os.environ defaults before importing raip (config picks them up)
+# One-off reproduction/benchmark scripts: long literals (model-id lists, f-strings, print rows) are
+# fine, and they set os.environ defaults before importing raip (config picks them up).
+"scripts/**" = ["E402", "E501"]
+"manuscript/scripts/**" = ["E402", "E501", "UP031"]

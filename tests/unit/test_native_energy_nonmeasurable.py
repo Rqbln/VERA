@@ -16,22 +16,33 @@ def test_require_native_raises_on_fallback(monkeypatch):
         E, "get_benchmark_entry", lambda bid: {"implementation": "lm_eval", "complai": "R06"}
     )
     monkeypatch.setattr(
-        E, "run_lm_eval", lambda ctx, bid: ({}, [{"benchmark_id": bid, "fallback": True, "fallback_reason": "lm_eval not installed"}])
+        E,
+        "run_lm_eval",
+        lambda ctx, bid: (
+            {},
+            [{"benchmark_id": bid, "fallback": True, "fallback_reason": "lm_eval not installed"}],
+        ),
     )
-    ctx = E.RunContext(model_id="ollama/x", judge_model="ollama/x", temperature=0.0,
-                       max_tokens=16, seed=42, n_samples_per_benchmark=2, llm=None)
     with pytest.raises(E.NativeHarnessRequired):
-        E.evaluate_benchmarks(model_id="ollama/x", judge_model="ollama/x", benchmarks=["mmlu"],
-                              n_samples_per_benchmark=2, temperature=0.0, max_tokens=16, seed=42, llm=None)
+        E.evaluate_benchmarks(
+            model_id="ollama/x", judge_model="ollama/x", benchmarks=["mmlu"],
+            n_samples_per_benchmark=2, temperature=0.0, max_tokens=16, seed=42, llm=None,
+        )
 
 
 def test_garak_fallback_allowed_under_require_native(monkeypatch):
     monkeypatch.setenv("RAIP_REQUIRE_NATIVE", "1")
-    monkeypatch.setattr(E, "get_benchmark_entry", lambda bid: {"implementation": "garak", "complai": "R02"})
-    monkeypatch.setattr(E, "run_garak", lambda ctx, bid: ({}, [{"benchmark_id": bid, "fallback": True}]))
+    monkeypatch.setattr(
+        E, "get_benchmark_entry", lambda bid: {"implementation": "garak", "complai": "R02"}
+    )
+    monkeypatch.setattr(
+        E, "run_garak", lambda ctx, bid: ({}, [{"benchmark_id": bid, "fallback": True}])
+    )
     # garak is in the native-allow set -> no raise
-    E.evaluate_benchmarks(model_id="ollama/x", judge_model="ollama/x", benchmarks=["decodingtrust_adv"],
-                          n_samples_per_benchmark=2, temperature=0.0, max_tokens=16, seed=42, llm=None)
+    E.evaluate_benchmarks(
+        model_id="ollama/x", judge_model="ollama/x", benchmarks=["decodingtrust_adv"],
+        n_samples_per_benchmark=2, temperature=0.0, max_tokens=16, seed=42, llm=None,
+    )
 
 
 # ── S3: energy tracking ──────────────────────────────────────────────────────────────
@@ -61,7 +72,9 @@ def test_non_measurable_slots_reflect_real_state():
     hitl = RedisHitlStore()
     task = hitl.create(run_id="nm-run", requirement="N01")
     hitl.submit_review(task.task_id, reviewer="r", criteria={"x": 4, "y": 4})
-    RedisFormStore().put("nm-run", "N05", DeclarativeFormBody(fields={"summary": "ok"}, completed=True))
+    RedisFormStore().put(
+        "nm-run", "N05", DeclarativeFormBody(fields={"summary": "ok"}, completed=True)
+    )
     try:
         slots = _non_measurable_slots(rec)
         assert slots["n01"]["status"] == "reviewed" and slots["n01"]["avg_likert"] == 4.0

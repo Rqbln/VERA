@@ -1,0 +1,230 @@
+{"id": "doc0098", "lang": "fr", "group": "retail", "pii": true, "dup_of": null, "text": "Synthèse patrimoniale pour Camille Dubois (camille.dubois@example-bank.test). Allocation revue ce trimestre."}
+{"id": "doc0066", "lang": "fr", "group": "retail", "pii": false, "dup_of": null, "text": "Card payments above the contactless limit require PIN confirmation for security."}
+{"id": "doc0124", "lang": "en", "group": "corporate", "pii": false, "dup_of": null, "text": "Les conditions générales du compte courant sont disponibles en agence et sur l'espace client."}
+{"id": "doc0195", "lang": "en", "group": "complaints", "pii": true, "dup_of": null, "text": "Internal note — client Hugo Nguyen (hugo.nguyen@example-bank.test, phone +33 6 16 04 88 72). RIB: 35448 92840 36928132973 52. Compliance review required."}
+{"id": "doc0044", "lang": "fr", "group": "retail", "pii": false, "dup_of": null, "text": "Le taux d'intérêt du livret est révisé conformément à la réglementation en vigueur."}
+{"id": "doc0070", "lang": "en", "group": "retail", "pii": false, "dup_of": null, "text": "Our customer support hours are Monday to Friday, 9am to 6pm, excluding bank holidays."}
+{"id": "doc0164", "lang": "en", "group": "wealth", "pii": false, "dup_of": null, "text": "Our customer support hours are Monday to Friday, 9am to 6pm, excluding bank holidays."}
+{"id": "doc0025", "lang": "en", "group": "retail", "pii": true, "dup_of": null, "text": "Loan request from Inès Nguyen. Documents received. Reference transfer to FR7674648877190659401399049."}
+{"id": "doc0211", "lang": "fr", "group": "corporate", "pii": false, "dup_of": "doc0114", "text": "Our customer support hours are Monday to Friday, 9am to 6pm, excluding bank holidays (copie)."}
+{"id": "doc0059", "lang": "fr", "group": "retail", "pii": true, "dup_of": null, "text": "Synthèse patrimoniale pour Sofia Nguyen (sofia.nguyen@example-bank.test). Allocation revue ce trimestre."}
+{"id": "doc0091", "lang": "fr", "group": "retail", "pii": false, "dup_of": null, "text": "Le taux d'intérêt du livret est révisé conformément à la réglementation en vigueur."}
+{"id": "doc0206", "lang": "en", "group": "wealth", "pii": true, "dup_of": "doc0152", "text": "Wealth summary for Marco Schmitt (marco.schmitt@example-bank.test). Allocation reviewed this quarter (copie)."}
+{"id": "doc0013", "lang": "fr", "group": "retail", "pii": true, "dup_of": null, "text": "Demande de crédit de Marco Silva. Pièces reçues. Virement de référence vers FR7629401965569816934060883."}
+{"id": "doc0209", "lang": "fr", "group": "corporate", "pii": false, "dup_of": "doc0136", "text": "Les conditions générales du compte courant sont disponibles en agence et sur l'espace client (copie)."}
+{"id": "doc0041", "lang": "fr", "group": "retail", "pii": false, "dup_of": null, "text": "Les conditions générales du compte courant sont disponibles en agence et sur l'espace client."}
+{"id": "doc0003", "lang": "fr", "group": "retail", "pii": false, "dup_of": null, "text": "Card payments above the contactless limit require PIN confirmation for security."}
+{"id": "doc0167", "lang": "en", "group": "wealth", "pii": false, "dup_of": null, "text": "Card payments above the contactless limit require PIN confirmation for security."}
+{"id": "doc0010", "lang": "en", "group": "retail", "pii": true, "dup_of": null, "text": "Complaint from Sofia Haddad about fees on IBAN FR7613542784980841241182449. Call back at +33 6 32 06 11 81."}
+{"id": "doc0088", "lang": "fr", "group": "retail", "pii": true, "dup_of": null, "text": "Bonjour Sofia Müller, votre virement sur le compte FR7624154152064361103712938 a bien été enregistré. Contact : sofia.müller@example-bank.test."}
+{"id": "doc0214", "lang": "en", "group": "wealth", "pii": true, "dup_of": "doc0146", "text": "Complaint from Jules Martin about fees on IBAN FR7661593998245587716947225. Call back at +33 6 09 10 20 43 (copie)."}
+{"id": "doc0014", "lang": "en", "group": "retail", "pii": false, "dup_of": null, "text": "Le taux d'intérêt du livret est révisé conformément à la réglementation en vigueur."}
+{"id": "doc0090", "lang": "fr", "group": "retail", "pii": false, "dup_of": null, "text": "Les conditions générales du compte courant sont disponibles en agence et sur l'espace client."}
+{"id": "doc0198", "lang": "fr", "group": "complaints", "pii": true, "dup_of": null, "text": "Note interne — dossier client Jules Benali (jules.benali@example-bank.test, tél +33 6 22 82 71 90). RIB : 70994 91151 57420194193 56. Revue conformité requise."}
+{"id": "doc0191", "lang": "en", "group": "complaints", "pii": false, "dup_of": null, "text": "Le taux d'intérêt du livret est révisé conformément à la réglementation en vigueur."}
+{"id": "doc0117", "lang": "fr", "group": "corporate", "pii": false, "dup_of": null, "text": "Le taux d'intérêt du livret est révisé conformément à la réglementation en vigueur."}
+{"id": "doc0119", "lang": "fr", "group": "corporate", "pii": true, "dup_of": null, "text": "Synthèse patrimoniale pour Marco Rossi (marco.rossi@example-bank.test). Allocation revue ce trimestre."}
+{"id": "doc0046", "lang": "en", "group": "retail", "pii": true, "dup_of": null, "text": "Loan request from Ethan Rossi. Documents received. Reference transfer to FR7696222927065379473834735."}
+{"id": "doc0172", "lang": "fr", "group": "wealth", "pii": true, "dup_of": null, "text": "Bonjour Ethan Roy, votre virement sur le compte FR7687729343010713966055830 a bien été enregistré. Contact : ethan.roy@example-bank.test."}
+{"id": "doc0177", "lang": "fr", "group": "wealth", "pii": true, "dup_of": null, "text": "Réclamation de Sarah Bernard concernant des frais sur l'IBAN FR7616629979545381792171747. Rappel au +33 6 78 33 46 50."}
+{"id": "doc0168", "lang": "fr", "group": "wealth", "pii": true, "dup_of": null, "text": "Note interne — dossier client Nora Nguyen (nora.nguyen@example-bank.test, tél +33 6 78 20 48 70). RIB : 21181 78657 64577348252 75. Revue conformité requise."}
+{"id": "doc0227", "lang": "fr", "group": "corporate", "pii": false, "dup_of": "doc0117", "text": "Le taux d'intérêt du livret est révisé conformément à la réglementation en vigueur (copie)."}
+{"id": "doc0069", "lang": "fr", "group": "retail", "pii": true, "dup_of": null, "text": "Synthèse patrimoniale pour Nora Müller (nora.müller@example-bank.test). Allocation revue ce trimestre."}
+{"id": "doc0169", "lang": "en", "group": "wealth", "pii": true, "dup_of": null, "text": "Wealth summary for Chloé Rossi (chloé.rossi@example-bank.test). Allocation reviewed this quarter."}
+{"id": "doc0141", "lang": "en", "group": "corporate", "pii": false, "dup_of": null, "text": "Les conditions générales du compte courant sont disponibles en agence et sur l'espace client."}
+{"id": "doc0052", "lang": "en", "group": "retail", "pii": true, "dup_of": null, "text": "Hello Louis Dubois, the transfer to account FR7665820297021355690927557 has been processed. Contact: louis.dubois@example-bank.test."}
+{"id": "doc0213", "lang": "en", "group": "retail", "pii": false, "dup_of": "doc0078", "text": "Card payments above the contactless limit require PIN confirmation for security (copie)."}
+{"id": "doc0109", "lang": "en", "group": "corporate", "pii": true, "dup_of": null, "text": "Loan request from Nora Haddad. Documents received. Reference transfer to FR7608214862890233030705345."}
+{"id": "doc0154", "lang": "fr", "group": "wealth", "pii": true, "dup_of": null, "text": "Demande de crédit de Chloé Garcia. Pièces reçues. Virement de référence vers FR7685574982182744857086209."}
+{"id": "doc0157", "lang": "fr", "group": "wealth", "pii": false, "dup_of": null, "text": "Les conditions générales du compte courant sont disponibles en agence et sur l'espace client."}
+{"id": "doc0017", "lang": "en", "group": "retail", "pii": true, "dup_of": null, "text": "Loan request from Sarah Martin. Documents received. Reference transfer to FR7696705466889373467065627."}
+{"id": "doc0121", "lang": "en", "group": "corporate", "pii": true, "dup_of": null, "text": "Complaint from Marco Roy about fees on IBAN FR7601660880199488375503758. Call back at +33 6 14 12 97 84."}
+{"id": "doc0212", "lang": "fr", "group": "corporate", "pii": false, "dup_of": "doc0118", "text": "Card payments above the contactless limit require PIN confirmation for security (copie)."}
+{"id": "doc0031", "lang": "fr", "group": "retail", "pii": false, "dup_of": null, "text": "Card payments above the contactless limit require PIN confirmation for security."}
+{"id": "doc0165", "lang": "en", "group": "wealth", "pii": true, "dup_of": null, "text": "Hello Sofia Garcia, the transfer to account FR7651881252056647423122099 has been processed. Contact: sofia.garcia@example-bank.test."}
+{"id": "doc0081", "lang": "en", "group": "retail", "pii": true, "dup_of": null, "text": "Loan request from Marco Müller. Documents received. Reference transfer to FR7661125457387571775140105."}
+{"id": "doc0065", "lang": "en", "group": "retail", "pii": true, "dup_of": null, "text": "Internal note — client Léa Costa (léa.costa@example-bank.test, phone +33 6 89 70 60 96). RIB: 30078 69634 59846269232 63. Compliance review required."}
+{"id": "doc0005", "lang": "en", "group": "retail", "pii": false, "dup_of": null, "text": "Our customer support hours are Monday to Friday, 9am to 6pm, excluding bank holidays."}
+{"id": "doc0056", "lang": "fr", "group": "retail", "pii": false, "dup_of": null, "text": "Le taux d'intérêt du livret est révisé conformément à la réglementation en vigueur."}
+{"id": "doc0083", "lang": "en", "group": "retail", "pii": true, "dup_of": null, "text": "Internal note — client Jules Benali (jules.benali@example-bank.test, phone +33 6 82 22 71 21). RIB: 34347 73788 85743902795 98. Compliance review required."}
+{"id": "doc0080", "lang": "fr", "group": "retail", "pii": true, "dup_of": null, "text": "Bonjour Jules Marchand, votre virement sur le compte FR7691135290965610143888993 a bien été enregistré. Contact : jules.marchand@example-bank.test."}
+{"id": "doc0111", "lang": "en", "group": "corporate", "pii": true, "dup_of": null, "text": "Hello Inès Silva, the transfer to account FR7637489691085899441715454 has been processed. Contact: inès.silva@example-bank.test."}
+{"id": "doc0186", "lang": "en", "group": "complaints", "pii": true, "dup_of": null, "text": "Internal note — client Emma Schmitt (emma.schmitt@example-bank.test, phone +33 6 12 67 13 87). RIB: 11386 98185 10291851443 62. Compliance review required."}
+{"id": "doc0016", "lang": "en", "group": "retail", "pii": true, "dup_of": null, "text": "Internal note — client Ethan Schmitt (ethan.schmitt@example-bank.test, phone +33 6 52 42 69 59). RIB: 29769 40311 19508855212 63. Compliance review required."}
+{"id": "doc0062", "lang": "en", "group": "retail", "pii": false, "dup_of": null, "text": "Our customer support hours are Monday to Friday, 9am to 6pm, excluding bank holidays."}
+{"id": "doc0127", "lang": "en", "group": "corporate", "pii": true, "dup_of": null, "text": "Internal note — client Hugo Khan (hugo.khan@example-bank.test, phone +33 6 65 57 62 05). RIB: 80809 47070 60553888179 75. Compliance review required."}
+{"id": "doc0194", "lang": "en", "group": "complaints", "pii": true, "dup_of": null, "text": "Internal note — client Louis Khan (louis.khan@example-bank.test, phone +33 6 92 56 75 74). RIB: 73577 77489 19088430337 40. Compliance review required."}
+{"id": "doc0196", "lang": "fr", "group": "complaints", "pii": false, "dup_of": null, "text": "Card payments above the contactless limit require PIN confirmation for security."}
+{"id": "doc0143", "lang": "fr", "group": "corporate", "pii": false, "dup_of": null, "text": "Our customer support hours are Monday to Friday, 9am to 6pm, excluding bank holidays."}
+{"id": "doc0136", "lang": "fr", "group": "corporate", "pii": false, "dup_of": null, "text": "Les conditions générales du compte courant sont disponibles en agence et sur l'espace client."}
+{"id": "doc0125", "lang": "en", "group": "corporate", "pii": false, "dup_of": null, "text": "Les conditions générales du compte courant sont disponibles en agence et sur l'espace client."}
+{"id": "doc0097", "lang": "fr", "group": "retail", "pii": false, "dup_of": null, "text": "Le taux d'intérêt du livret est révisé conformément à la réglementation en vigueur."}
+{"id": "doc0197", "lang": "fr", "group": "complaints", "pii": true, "dup_of": null, "text": "Demande de crédit de Louis Roy. Pièces reçues. Virement de référence vers FR7680686717731806325431074."}
+{"id": "doc0008", "lang": "fr", "group": "retail", "pii": true, "dup_of": null, "text": "Note interne — dossier client Adam Roy (adam.roy@example-bank.test, tél +33 6 67 20 07 65). RIB : 17492 16572 76933533114 74. Revue conformité requise."}
+{"id": "doc0207", "lang": "fr", "group": "wealth", "pii": false, "dup_of": "doc0171", "text": "Le taux d'intérêt du livret est révisé conformément à la réglementation en vigueur (copie)."}
+{"id": "doc0228", "lang": "en", "group": "retail", "pii": false, "dup_of": "doc0043", "text": "Our customer support hours are Monday to Friday, 9am to 6pm, excluding bank holidays (copie)."}
+{"id": "doc0034", "lang": "fr", "group": "retail", "pii": true, "dup_of": null, "text": "Bonjour Noah Roy, votre virement sur le compte FR7611382675869261796405377 a bien été enregistré. Contact : noah.roy@example-bank.test."}
+{"id": "doc0020", "lang": "en", "group": "retail", "pii": true, "dup_of": null, "text": "Wealth summary for Jules Benali (jules.benali@example-bank.test). Allocation reviewed this quarter."}
+{"id": "doc0162", "lang": "en", "group": "wealth", "pii": false, "dup_of": null, "text": "Le taux d'intérêt du livret est révisé conformément à la réglementation en vigueur."}
+{"id": "doc0184", "lang": "fr", "group": "complaints", "pii": true, "dup_of": null, "text": "Synthèse patrimoniale pour Tom Garcia (tom.garcia@example-bank.test). Allocation revue ce trimestre."}
+{"id": "doc0176", "lang": "en", "group": "wealth", "pii": true, "dup_of": null, "text": "Hello Léa Marchand, the transfer to account FR7657142241098813858542493 has been processed. Contact: léa.marchand@example-bank.test."}
+{"id": "doc0230", "lang": "en", "group": "retail", "pii": false, "dup_of": "doc0042", "text": "Le taux d'intérêt du livret est révisé conformément à la réglementation en vigueur (copie)."}
+{"id": "doc0086", "lang": "fr", "group": "retail", "pii": false, "dup_of": null, "text": "Le taux d'intérêt du livret est révisé conformément à la réglementation en vigueur."}
+{"id": "doc0064", "lang": "en", "group": "retail", "pii": true, "dup_of": null, "text": "Internal note — client Inès Marchand (inès.marchand@example-bank.test, phone +33 6 61 41 31 00). RIB: 52982 21368 31884512384 27. Compliance review required."}
+{"id": "doc0223", "lang": "fr", "group": "retail", "pii": true, "dup_of": "doc0013", "text": "Demande de crédit de Marco Silva. Pièces reçues. Virement de référence vers FR7629401965569816934060883 (copie)."}
+{"id": "doc0100", "lang": "fr", "group": "retail", "pii": true, "dup_of": null, "text": "Demande de crédit de Hugo Okafor. Pièces reçues. Virement de référence vers FR7648039652239559059929378."}
+{"id": "doc0149", "lang": "en", "group": "wealth", "pii": false, "dup_of": null, "text": "Card payments above the contactless limit require PIN confirmation for security."}
+{"id": "doc0063", "lang": "fr", "group": "retail", "pii": false, "dup_of": null, "text": "Le taux d'intérêt du livret est révisé conformément à la réglementation en vigueur."}
+{"id": "doc0071", "lang": "en", "group": "retail", "pii": true, "dup_of": null, "text": "Internal note — client Claire Costa (claire.costa@example-bank.test, phone +33 6 26 47 40 52). RIB: 71080 22924 77527252110 50. Compliance review required."}
+{"id": "doc0153", "lang": "fr", "group": "wealth", "pii": true, "dup_of": null, "text": "Demande de crédit de Jules Dubois. Pièces reçues. Virement de référence vers FR7632719500528127358573065."}
+{"id": "doc0108", "lang": "fr", "group": "corporate", "pii": false, "dup_of": null, "text": "Card payments above the contactless limit require PIN confirmation for security."}
+{"id": "doc0158", "lang": "fr", "group": "wealth", "pii": false, "dup_of": null, "text": "Card payments above the contactless limit require PIN confirmation for security."}
+{"id": "doc0026", "lang": "fr", "group": "retail", "pii": true, "dup_of": null, "text": "Bonjour Tom Haddad, votre virement sur le compte FR7665512567468071545168087 a bien été enregistré. Contact : tom.haddad@example-bank.test."}
+{"id": "doc0106", "lang": "en", "group": "corporate", "pii": true, "dup_of": null, "text": "Internal note — client Chloé Okafor (chloé.okafor@example-bank.test, phone +33 6 05 54 10 87). RIB: 31910 37772 39242116137 26. Compliance review required."}
+{"id": "doc0129", "lang": "en", "group": "corporate", "pii": false, "dup_of": null, "text": "Le taux d'intérêt du livret est révisé conformément à la réglementation en vigueur."}
+{"id": "doc0060", "lang": "en", "group": "retail", "pii": true, "dup_of": null, "text": "Internal note — client Chloé Müller (chloé.müller@example-bank.test, phone +33 6 14 24 02 56). RIB: 99224 41745 87445005639 99. Compliance review required."}
+{"id": "doc0170", "lang": "fr", "group": "wealth", "pii": true, "dup_of": null, "text": "Bonjour Hugo Marchand, votre virement sur le compte FR7649830220502099451016224 a bien été enregistré. Contact : hugo.marchand@example-bank.test."}
+{"id": "doc0174", "lang": "fr", "group": "wealth", "pii": true, "dup_of": null, "text": "Bonjour Sofia Silva, votre virement sur le compte FR7605682996291450461735743 a bien été enregistré. Contact : sofia.silva@example-bank.test."}
+{"id": "doc0107", "lang": "en", "group": "corporate", "pii": false, "dup_of": null, "text": "Card payments above the contactless limit require PIN confirmation for security."}
+{"id": "doc0035", "lang": "en", "group": "retail", "pii": true, "dup_of": null, "text": "Complaint from Amina Khan about fees on IBAN FR7690053293183933529042284. Call back at +33 6 45 30 75 41."}
+{"id": "doc0185", "lang": "fr", "group": "complaints", "pii": true, "dup_of": null, "text": "Demande de crédit de Emma Dubois. Pièces reçues. Virement de référence vers FR7629276637239504102767478."}
+{"id": "doc0208", "lang": "fr", "group": "complaints", "pii": true, "dup_of": "doc0179", "text": "Note interne — dossier client Chloé Faure (chloé.faure@example-bank.test, tél +33 6 82 84 07 11). RIB : 99850 88172 54577083390 73. Revue conformité requise (copie)."}
+{"id": "doc0001", "lang": "fr", "group": "retail", "pii": true, "dup_of": null, "text": "Demande de crédit de Camille Silva. Pièces reçues. Virement de référence vers FR7633218196001338908386379."}
+{"id": "doc0146", "lang": "en", "group": "wealth", "pii": true, "dup_of": null, "text": "Complaint from Jules Martin about fees on IBAN FR7661593998245587716947225. Call back at +33 6 09 10 20 43."}
+{"id": "doc0049", "lang": "fr", "group": "retail", "pii": false, "dup_of": null, "text": "Le taux d'intérêt du livret est révisé conformément à la réglementation en vigueur."}
+{"id": "doc0105", "lang": "fr", "group": "corporate", "pii": true, "dup_of": null, "text": "Réclamation de Marco Martin concernant des frais sur l'IBAN FR7632417146774186256527047. Rappel au +33 6 19 96 89 85."}
+{"id": "doc0205", "lang": "en", "group": "corporate", "pii": false, "dup_of": "doc0125", "text": "Les conditions générales du compte courant sont disponibles en agence et sur l'espace client (copie)."}
+{"id": "doc0043", "lang": "en", "group": "retail", "pii": false, "dup_of": null, "text": "Our customer support hours are Monday to Friday, 9am to 6pm, excluding bank holidays."}
+{"id": "doc0068", "lang": "fr", "group": "retail", "pii": true, "dup_of": null, "text": "Bonjour Camille Martin, votre virement sur le compte FR7647868633752431069033119 a bien été enregistré. Contact : camille.martin@example-bank.test."}
+{"id": "doc0218", "lang": "en", "group": "retail", "pii": true, "dup_of": "doc0067", "text": "Internal note — client Camille Lemoine (camille.lemoine@example-bank.test, phone +33 6 44 15 22 68). RIB: 59236 20518 29496146184 93. Compliance review required (copie)."}
+{"id": "doc0039", "lang": "fr", "group": "retail", "pii": false, "dup_of": null, "text": "Le taux d'intérêt du livret est révisé conformément à la réglementation en vigueur."}
+{"id": "doc0027", "lang": "fr", "group": "retail", "pii": true, "dup_of": null, "text": "Synthèse patrimoniale pour Léa Marchand (léa.marchand@example-bank.test). Allocation revue ce trimestre."}
+{"id": "doc0019", "lang": "en", "group": "retail", "pii": false, "dup_of": null, "text": "Les conditions générales du compte courant sont disponibles en agence et sur l'espace client."}
+{"id": "doc0179", "lang": "fr", "group": "complaints", "pii": true, "dup_of": null, "text": "Note interne — dossier client Chloé Faure (chloé.faure@example-bank.test, tél +33 6 82 84 07 11). RIB : 99850 88172 54577083390 73. Revue conformité requise."}
+{"id": "doc0077", "lang": "en", "group": "retail", "pii": true, "dup_of": null, "text": "Loan request from Liam Marchand. Documents received. Reference transfer to FR7686101581995604661839826."}
+{"id": "doc0180", "lang": "fr", "group": "complaints", "pii": true, "dup_of": null, "text": "Réclamation de Sofia Rossi concernant des frais sur l'IBAN FR7678469973354946519098624. Rappel au +33 6 00 90 71 45."}
+{"id": "doc0018", "lang": "fr", "group": "retail", "pii": false, "dup_of": null, "text": "Our customer support hours are Monday to Friday, 9am to 6pm, excluding bank holidays."}
+{"id": "doc0116", "lang": "en", "group": "corporate", "pii": true, "dup_of": null, "text": "Wealth summary for Louis Lemoine (louis.lemoine@example-bank.test). Allocation reviewed this quarter."}
+{"id": "doc0134", "lang": "en", "group": "corporate", "pii": true, "dup_of": null, "text": "Hello Tom Benali, the transfer to account FR7600518449892665918463865 has been processed. Contact: tom.benali@example-bank.test."}
+{"id": "doc0055", "lang": "fr", "group": "retail", "pii": true, "dup_of": null, "text": "Synthèse patrimoniale pour Adam Schmitt (adam.schmitt@example-bank.test). Allocation revue ce trimestre."}
+{"id": "doc0120", "lang": "fr", "group": "corporate", "pii": false, "dup_of": null, "text": "Card payments above the contactless limit require PIN confirmation for security."}
+{"id": "doc0192", "lang": "fr", "group": "complaints", "pii": false, "dup_of": null, "text": "Le taux d'intérêt du livret est révisé conformément à la réglementation en vigueur."}
+{"id": "doc0021", "lang": "en", "group": "retail", "pii": true, "dup_of": null, "text": "Hello Liam Martin, the transfer to account FR7683136783777014363495788 has been processed. Contact: liam.martin@example-bank.test."}
+{"id": "doc0037", "lang": "en", "group": "retail", "pii": false, "dup_of": null, "text": "Our customer support hours are Monday to Friday, 9am to 6pm, excluding bank holidays."}
+{"id": "doc0189", "lang": "en", "group": "complaints", "pii": false, "dup_of": null, "text": "Our customer support hours are Monday to Friday, 9am to 6pm, excluding bank holidays."}
+{"id": "doc0163", "lang": "fr", "group": "wealth", "pii": false, "dup_of": null, "text": "Le taux d'intérêt du livret est révisé conformément à la réglementation en vigueur."}
+{"id": "doc0054", "lang": "fr", "group": "retail", "pii": false, "dup_of": null, "text": "Our customer support hours are Monday to Friday, 9am to 6pm, excluding bank holidays."}
+{"id": "doc0133", "lang": "en", "group": "corporate", "pii": false, "dup_of": null, "text": "Le taux d'intérêt du livret est révisé conformément à la réglementation en vigueur."}
+{"id": "doc0152", "lang": "en", "group": "wealth", "pii": true, "dup_of": null, "text": "Wealth summary for Marco Schmitt (marco.schmitt@example-bank.test). Allocation reviewed this quarter."}
+{"id": "doc0173", "lang": "fr", "group": "wealth", "pii": false, "dup_of": null, "text": "Le taux d'intérêt du livret est révisé conformément à la réglementation en vigueur."}
+{"id": "doc0094", "lang": "en", "group": "retail", "pii": true, "dup_of": null, "text": "Loan request from Marco Schmitt. Documents received. Reference transfer to FR7602380617445187053494937."}
+{"id": "doc0028", "lang": "fr", "group": "retail", "pii": false, "dup_of": null, "text": "Card payments above the contactless limit require PIN confirmation for security."}
+{"id": "doc0012", "lang": "fr", "group": "retail", "pii": false, "dup_of": null, "text": "Le taux d'intérêt du livret est révisé conformément à la réglementation en vigueur."}
+{"id": "doc0151", "lang": "fr", "group": "wealth", "pii": false, "dup_of": null, "text": "Our customer support hours are Monday to Friday, 9am to 6pm, excluding bank holidays."}
+{"id": "doc0112", "lang": "en", "group": "corporate", "pii": false, "dup_of": null, "text": "Our customer support hours are Monday to Friday, 9am to 6pm, excluding bank holidays."}
+{"id": "doc0058", "lang": "en", "group": "retail", "pii": true, "dup_of": null, "text": "Wealth summary for Hugo Khan (hugo.khan@example-bank.test). Allocation reviewed this quarter."}
+{"id": "doc0187", "lang": "en", "group": "complaints", "pii": false, "dup_of": null, "text": "Card payments above the contactless limit require PIN confirmation for security."}
+{"id": "doc0226", "lang": "fr", "group": "retail", "pii": false, "dup_of": "doc0073", "text": "Le taux d'intérêt du livret est révisé conformément à la réglementation en vigueur (copie)."}
+{"id": "doc0202", "lang": "fr", "group": "wealth", "pii": true, "dup_of": "doc0168", "text": "Note interne — dossier client Nora Nguyen (nora.nguyen@example-bank.test, tél +33 6 78 20 48 70). RIB : 21181 78657 64577348252 75. Revue conformité requise (copie)."}
+{"id": "doc0073", "lang": "fr", "group": "retail", "pii": false, "dup_of": null, "text": "Le taux d'intérêt du livret est révisé conformément à la réglementation en vigueur."}
+{"id": "doc0004", "lang": "en", "group": "retail", "pii": false, "dup_of": null, "text": "Les conditions générales du compte courant sont disponibles en agence et sur l'espace client."}
+{"id": "doc0200", "lang": "fr", "group": "complaints", "pii": true, "dup_of": null, "text": "Synthèse patrimoniale pour Inès Dubois (inès.dubois@example-bank.test). Allocation revue ce trimestre."}
+{"id": "doc0099", "lang": "en", "group": "retail", "pii": false, "dup_of": null, "text": "Our customer support hours are Monday to Friday, 9am to 6pm, excluding bank holidays."}
+{"id": "doc0210", "lang": "en", "group": "corporate", "pii": false, "dup_of": "doc0141", "text": "Les conditions générales du compte courant sont disponibles en agence et sur l'espace client (copie)."}
+{"id": "doc0110", "lang": "fr", "group": "corporate", "pii": true, "dup_of": null, "text": "Demande de crédit de Tom Marchand. Pièces reçues. Virement de référence vers FR7655241406029333346800722."}
+{"id": "doc0175", "lang": "en", "group": "wealth", "pii": true, "dup_of": null, "text": "Internal note — client Nora Rossi (nora.rossi@example-bank.test, phone +33 6 97 39 81 26). RIB: 16047 23513 11342094845 83. Compliance review required."}
+{"id": "doc0102", "lang": "fr", "group": "corporate", "pii": true, "dup_of": null, "text": "Bonjour Sarah Müller, votre virement sur le compte FR7642209690295939172513552 a bien été enregistré. Contact : sarah.müller@example-bank.test."}
+{"id": "doc0093", "lang": "en", "group": "retail", "pii": true, "dup_of": null, "text": "Hello Inès Schmitt, the transfer to account FR7650792524191380003075622 has been processed. Contact: inès.schmitt@example-bank.test."}
+{"id": "doc0156", "lang": "en", "group": "wealth", "pii": false, "dup_of": null, "text": "Card payments above the contactless limit require PIN confirmation for security."}
+{"id": "doc0131", "lang": "fr", "group": "corporate", "pii": false, "dup_of": null, "text": "Card payments above the contactless limit require PIN confirmation for security."}
+{"id": "doc0188", "lang": "en", "group": "complaints", "pii": false, "dup_of": null, "text": "Les conditions générales du compte courant sont disponibles en agence et sur l'espace client."}
+{"id": "doc0126", "lang": "en", "group": "corporate", "pii": true, "dup_of": null, "text": "Hello Louis Faure, the transfer to account FR7648422940572025909479851 has been processed. Contact: louis.faure@example-bank.test."}
+{"id": "doc0155", "lang": "fr", "group": "wealth", "pii": false, "dup_of": null, "text": "Les conditions générales du compte courant sont disponibles en agence et sur l'espace client."}
+{"id": "doc0101", "lang": "fr", "group": "corporate", "pii": false, "dup_of": null, "text": "Our customer support hours are Monday to Friday, 9am to 6pm, excluding bank holidays."}
+{"id": "doc0132", "lang": "en", "group": "corporate", "pii": true, "dup_of": null, "text": "Wealth summary for Inès Haddad (inès.haddad@example-bank.test). Allocation reviewed this quarter."}
+{"id": "doc0023", "lang": "en", "group": "retail", "pii": false, "dup_of": null, "text": "Les conditions générales du compte courant sont disponibles en agence et sur l'espace client."}
+{"id": "doc0160", "lang": "fr", "group": "wealth", "pii": true, "dup_of": null, "text": "Synthèse patrimoniale pour Adam Müller (adam.müller@example-bank.test). Allocation revue ce trimestre."}
+{"id": "doc0229", "lang": "fr", "group": "wealth", "pii": false, "dup_of": "doc0159", "text": "Les conditions générales du compte courant sont disponibles en agence et sur l'espace client (copie)."}
+{"id": "doc0022", "lang": "fr", "group": "retail", "pii": true, "dup_of": null, "text": "Demande de crédit de Emma Nguyen. Pièces reçues. Virement de référence vers FR7682337498941343524082400."}
+{"id": "doc0006", "lang": "en", "group": "retail", "pii": false, "dup_of": null, "text": "Our customer support hours are Monday to Friday, 9am to 6pm, excluding bank holidays."}
+{"id": "doc0051", "lang": "en", "group": "retail", "pii": false, "dup_of": null, "text": "Card payments above the contactless limit require PIN confirmation for security."}
+{"id": "doc0072", "lang": "fr", "group": "retail", "pii": false, "dup_of": null, "text": "Les conditions générales du compte courant sont disponibles en agence et sur l'espace client."}
+{"id": "doc0161", "lang": "fr", "group": "wealth", "pii": false, "dup_of": null, "text": "Le taux d'intérêt du livret est révisé conformément à la réglementation en vigueur."}
+{"id": "doc0135", "lang": "en", "group": "corporate", "pii": false, "dup_of": null, "text": "Card payments above the contactless limit require PIN confirmation for security."}
+{"id": "doc0150", "lang": "fr", "group": "wealth", "pii": false, "dup_of": null, "text": "Les conditions générales du compte courant sont disponibles en agence et sur l'espace client."}
+{"id": "doc0050", "lang": "fr", "group": "retail", "pii": false, "dup_of": null, "text": "Card payments above the contactless limit require PIN confirmation for security."}
+{"id": "doc0015", "lang": "fr", "group": "retail", "pii": false, "dup_of": null, "text": "Le taux d'intérêt du livret est révisé conformément à la réglementation en vigueur."}
+{"id": "doc0084", "lang": "fr", "group": "retail", "pii": false, "dup_of": null, "text": "Card payments above the contactless limit require PIN confirmation for security."}
+{"id": "doc0024", "lang": "fr", "group": "retail", "pii": true, "dup_of": null, "text": "Réclamation de Claire Silva concernant des frais sur l'IBAN FR7612328120679740344713493. Rappel au +33 6 19 34 18 09."}
+{"id": "doc0092", "lang": "en", "group": "retail", "pii": false, "dup_of": null, "text": "Les conditions générales du compte courant sont disponibles en agence et sur l'espace client."}
+{"id": "doc0199", "lang": "fr", "group": "complaints", "pii": false, "dup_of": null, "text": "Les conditions générales du compte courant sont disponibles en agence et sur l'espace client."}
+{"id": "doc0057", "lang": "en", "group": "retail", "pii": true, "dup_of": null, "text": "Loan request from Sofia Haddad. Documents received. Reference transfer to FR7688153714732104696325953."}
+{"id": "doc0159", "lang": "fr", "group": "wealth", "pii": false, "dup_of": null, "text": "Les conditions générales du compte courant sont disponibles en agence et sur l'espace client."}
+{"id": "doc0103", "lang": "en", "group": "corporate", "pii": true, "dup_of": null, "text": "Hello Léa Nguyen, the transfer to account FR7600676267658617932710405 has been processed. Contact: léa.nguyen@example-bank.test."}
+{"id": "doc0193", "lang": "en", "group": "complaints", "pii": false, "dup_of": null, "text": "Our customer support hours are Monday to Friday, 9am to 6pm, excluding bank holidays."}
+{"id": "doc0079", "lang": "fr", "group": "retail", "pii": true, "dup_of": null, "text": "Demande de crédit de Emma Lemoine. Pièces reçues. Virement de référence vers FR7646519398280737416724342."}
+{"id": "doc0217", "lang": "fr", "group": "retail", "pii": false, "dup_of": "doc0044", "text": "Le taux d'intérêt du livret est révisé conformément à la réglementation en vigueur (copie)."}
+{"id": "doc0142", "lang": "en", "group": "corporate", "pii": true, "dup_of": null, "text": "Internal note — client Marco Silva (marco.silva@example-bank.test, phone +33 6 30 94 30 33). RIB: 85197 45268 75241272621 35. Compliance review required."}
+{"id": "doc0036", "lang": "fr", "group": "retail", "pii": false, "dup_of": null, "text": "Le taux d'intérêt du livret est révisé conformément à la réglementation en vigueur."}
+{"id": "doc0216", "lang": "fr", "group": "retail", "pii": true, "dup_of": "doc0079", "text": "Demande de crédit de Emma Lemoine. Pièces reçues. Virement de référence vers FR7646519398280737416724342 (copie)."}
+{"id": "doc0123", "lang": "en", "group": "corporate", "pii": false, "dup_of": null, "text": "Le taux d'intérêt du livret est révisé conformément à la réglementation en vigueur."}
+{"id": "doc0029", "lang": "en", "group": "retail", "pii": false, "dup_of": null, "text": "Our customer support hours are Monday to Friday, 9am to 6pm, excluding bank holidays."}
+{"id": "doc0087", "lang": "en", "group": "retail", "pii": true, "dup_of": null, "text": "Loan request from Tom Costa. Documents received. Reference transfer to FR7690175186363745458929750."}
+{"id": "doc0114", "lang": "fr", "group": "corporate", "pii": false, "dup_of": null, "text": "Our customer support hours are Monday to Friday, 9am to 6pm, excluding bank holidays."}
+{"id": "doc0145", "lang": "fr", "group": "corporate", "pii": true, "dup_of": null, "text": "Réclamation de Léa Okafor concernant des frais sur l'IBAN FR7686632270267288574489061. Rappel au +33 6 12 57 95 42."}
+{"id": "doc0190", "lang": "fr", "group": "complaints", "pii": true, "dup_of": null, "text": "Synthèse patrimoniale pour Liam Bernard (liam.bernard@example-bank.test). Allocation revue ce trimestre."}
+{"id": "doc0221", "lang": "fr", "group": "retail", "pii": false, "dup_of": "doc0096", "text": "Les conditions générales du compte courant sont disponibles en agence et sur l'espace client (copie)."}
+{"id": "doc0147", "lang": "en", "group": "wealth", "pii": false, "dup_of": null, "text": "Card payments above the contactless limit require PIN confirmation for security."}
+{"id": "doc0075", "lang": "fr", "group": "retail", "pii": false, "dup_of": null, "text": "Card payments above the contactless limit require PIN confirmation for security."}
+{"id": "doc0122", "lang": "en", "group": "corporate", "pii": false, "dup_of": null, "text": "Card payments above the contactless limit require PIN confirmation for security."}
+{"id": "doc0076", "lang": "en", "group": "retail", "pii": true, "dup_of": null, "text": "Loan request from Camille Silva. Documents received. Reference transfer to FR7677358662961943114262655."}
+{"id": "doc0181", "lang": "fr", "group": "complaints", "pii": false, "dup_of": null, "text": "Card payments above the contactless limit require PIN confirmation for security."}
+{"id": "doc0166", "lang": "en", "group": "wealth", "pii": false, "dup_of": null, "text": "Card payments above the contactless limit require PIN confirmation for security."}
+{"id": "doc0085", "lang": "fr", "group": "retail", "pii": false, "dup_of": null, "text": "Le taux d'intérêt du livret est révisé conformément à la réglementation en vigueur."}
+{"id": "doc0130", "lang": "fr", "group": "corporate", "pii": true, "dup_of": null, "text": "Bonjour Liam Marchand, votre virement sur le compte FR7621009968814353682223943 a bien été enregistré. Contact : liam.marchand@example-bank.test."}
+{"id": "doc0140", "lang": "fr", "group": "corporate", "pii": true, "dup_of": null, "text": "Synthèse patrimoniale pour Yanis Roy (yanis.roy@example-bank.test). Allocation revue ce trimestre."}
+{"id": "doc0002", "lang": "fr", "group": "retail", "pii": true, "dup_of": null, "text": "Bonjour Jules Haddad, votre virement sur le compte FR7694078161849593103413164 a bien été enregistré. Contact : jules.haddad@example-bank.test."}
+{"id": "doc0220", "lang": "en", "group": "corporate", "pii": false, "dup_of": "doc0124", "text": "Les conditions générales du compte courant sont disponibles en agence et sur l'espace client (copie)."}
+{"id": "doc0203", "lang": "en", "group": "wealth", "pii": false, "dup_of": "doc0166", "text": "Card payments above the contactless limit require PIN confirmation for security (copie)."}
+{"id": "doc0118", "lang": "fr", "group": "corporate", "pii": false, "dup_of": null, "text": "Card payments above the contactless limit require PIN confirmation for security."}
+{"id": "doc0201", "lang": "fr", "group": "retail", "pii": true, "dup_of": "doc0088", "text": "Bonjour Sofia Müller, votre virement sur le compte FR7624154152064361103712938 a bien été validé. Contact : sofia.müller@example-bank.test (copie)."}
+{"id": "doc0128", "lang": "en", "group": "corporate", "pii": false, "dup_of": null, "text": "Card payments above the contactless limit require PIN confirmation for security."}
+{"id": "doc0104", "lang": "en", "group": "corporate", "pii": false, "dup_of": null, "text": "Card payments above the contactless limit require PIN confirmation for security."}
+{"id": "doc0007", "lang": "en", "group": "retail", "pii": false, "dup_of": null, "text": "Our customer support hours are Monday to Friday, 9am to 6pm, excluding bank holidays."}
+{"id": "doc0032", "lang": "en", "group": "retail", "pii": false, "dup_of": null, "text": "Card payments above the contactless limit require PIN confirmation for security."}
+{"id": "doc0078", "lang": "en", "group": "retail", "pii": false, "dup_of": null, "text": "Card payments above the contactless limit require PIN confirmation for security."}
+{"id": "doc0137", "lang": "fr", "group": "corporate", "pii": true, "dup_of": null, "text": "Note interne — dossier client Tom Bernard (tom.bernard@example-bank.test, tél +33 6 10 36 76 69). RIB : 65769 27548 75517656043 39. Revue conformité requise."}
+{"id": "doc0219", "lang": "fr", "group": "retail", "pii": true, "dup_of": "doc0059", "text": "Synthèse patrimoniale pour Sofia Nguyen (sofia.nguyen@example-bank.test). Allocation revue ce trimestre (copie)."}
+{"id": "doc0139", "lang": "en", "group": "corporate", "pii": true, "dup_of": null, "text": "Wealth summary for Sofia Nguyen (sofia.nguyen@example-bank.test). Allocation reviewed this quarter."}
+{"id": "doc0115", "lang": "fr", "group": "corporate", "pii": true, "dup_of": null, "text": "Bonjour Jules Müller, votre virement sur le compte FR7621689421044789856257532 a bien été enregistré. Contact : jules.müller@example-bank.test."}
+{"id": "doc0096", "lang": "fr", "group": "retail", "pii": false, "dup_of": null, "text": "Les conditions générales du compte courant sont disponibles en agence et sur l'espace client."}
+{"id": "doc0038", "lang": "fr", "group": "retail", "pii": false, "dup_of": null, "text": "Le taux d'intérêt du livret est révisé conformément à la réglementation en vigueur."}
+{"id": "doc0089", "lang": "fr", "group": "retail", "pii": true, "dup_of": null, "text": "Bonjour Sarah Dubois, votre virement sur le compte FR7611554262218909275326973 a bien été enregistré. Contact : sarah.dubois@example-bank.test."}
+{"id": "doc0225", "lang": "fr", "group": "retail", "pii": false, "dup_of": "doc0091", "text": "Le taux d'intérêt du livret est révisé conformément à la réglementation en vigueur (copie)."}
+{"id": "doc0222", "lang": "en", "group": "retail", "pii": true, "dup_of": "doc0074", "text": "Hello Léa Lemoine, the transfer to account FR7615679334101666870021765 has been completed. Contact: léa.lemoine@example-bank.test (copie)."}
+{"id": "doc0009", "lang": "fr", "group": "retail", "pii": true, "dup_of": null, "text": "Note interne — dossier client Ethan Dubois (ethan.dubois@example-bank.test, tél +33 6 58 79 72 12). RIB : 69929 51441 22608882779 11. Revue conformité requise."}
+{"id": "doc0224", "lang": "fr", "group": "retail", "pii": false, "dup_of": "doc0038", "text": "Le taux d'intérêt du livret est révisé conformément à la réglementation en vigueur (copie)."}
+{"id": "doc0144", "lang": "en", "group": "corporate", "pii": false, "dup_of": null, "text": "Our customer support hours are Monday to Friday, 9am to 6pm, excluding bank holidays."}
+{"id": "doc0053", "lang": "fr", "group": "retail", "pii": true, "dup_of": null, "text": "Réclamation de Yanis Roy concernant des frais sur l'IBAN FR7686814473947312172715518. Rappel au +33 6 91 90 89 81."}
+{"id": "doc0048", "lang": "en", "group": "retail", "pii": true, "dup_of": null, "text": "Wealth summary for Sofia Rossi (sofia.rossi@example-bank.test). Allocation reviewed this quarter."}
+{"id": "doc0095", "lang": "fr", "group": "retail", "pii": true, "dup_of": null, "text": "Note interne — dossier client Hugo Marchand (hugo.marchand@example-bank.test, tél +33 6 50 09 75 72). RIB : 86122 22527 29350664910 91. Revue conformité requise."}
+{"id": "doc0067", "lang": "en", "group": "retail", "pii": true, "dup_of": null, "text": "Internal note — client Camille Lemoine (camille.lemoine@example-bank.test, phone +33 6 44 15 22 68). RIB: 59236 20518 29496146184 93. Compliance review required."}
+{"id": "doc0113", "lang": "en", "group": "corporate", "pii": true, "dup_of": null, "text": "Internal note — client Hugo Müller (hugo.müller@example-bank.test, phone +33 6 52 72 58 18). RIB: 29762 28004 40031905358 53. Compliance review required."}
+{"id": "doc0033", "lang": "fr", "group": "retail", "pii": true, "dup_of": null, "text": "Bonjour Sofia Okafor, votre virement sur le compte FR7668516048175496513709859 a bien été enregistré. Contact : sofia.okafor@example-bank.test."}
+{"id": "doc0148", "lang": "en", "group": "wealth", "pii": true, "dup_of": null, "text": "Hello Hugo Okafor, the transfer to account FR7647228200557784872829979 has been processed. Contact: hugo.okafor@example-bank.test."}
+{"id": "doc0082", "lang": "fr", "group": "retail", "pii": true, "dup_of": null, "text": "Bonjour Sarah Garcia, votre virement sur le compte FR7626609379660334191825537 a bien été enregistré. Contact : sarah.garcia@example-bank.test."}
+{"id": "doc0011", "lang": "fr", "group": "retail", "pii": false, "dup_of": null, "text": "Card payments above the contactless limit require PIN confirmation for security."}
+{"id": "doc0030", "lang": "fr", "group": "retail", "pii": true, "dup_of": null, "text": "Réclamation de Adam Nguyen concernant des frais sur l'IBAN FR7617240050455623869222196. Rappel au +33 6 18 29 59 81."}
+{"id": "doc0061", "lang": "en", "group": "retail", "pii": true, "dup_of": null, "text": "Loan request from Claire Faure. Documents received. Reference transfer to FR7689702838578652785854973."}
+{"id": "doc0042", "lang": "en", "group": "retail", "pii": false, "dup_of": null, "text": "Le taux d'intérêt du livret est révisé conformément à la réglementation en vigueur."}
+{"id": "doc0040", "lang": "en", "group": "retail", "pii": false, "dup_of": null, "text": "Our customer support hours are Monday to Friday, 9am to 6pm, excluding bank holidays."}
+{"id": "doc0204", "lang": "fr", "group": "retail", "pii": false, "dup_of": "doc0084", "text": "Card payments above the contactless limit require PIN confirmation for security (copie)."}
+{"id": "doc0171", "lang": "fr", "group": "wealth", "pii": false, "dup_of": null, "text": "Le taux d'intérêt du livret est révisé conformément à la réglementation en vigueur."}
+{"id": "doc0178", "lang": "en", "group": "complaints", "pii": true, "dup_of": null, "text": "Complaint from Inès Roy about fees on IBAN FR7601715772459928161581487. Call back at +33 6 31 70 20 61."}
+{"id": "doc0182", "lang": "en", "group": "complaints", "pii": true, "dup_of": null, "text": "Wealth summary for Ethan Faure (ethan.faure@example-bank.test). Allocation reviewed this quarter."}
+{"id": "doc0215", "lang": "fr", "group": "retail", "pii": true, "dup_of": "doc0034", "text": "Bonjour Noah Roy, votre virement sur le compte FR7611382675869261796405377 a bien été validé. Contact : noah.roy@example-bank.test (copie)."}
+{"id": "doc0045", "lang": "fr", "group": "retail", "pii": false, "dup_of": null, "text": "Les conditions générales du compte courant sont disponibles en agence et sur l'espace client."}
+{"id": "doc0047", "lang": "fr", "group": "retail", "pii": true, "dup_of": null, "text": "Bonjour Claire Rossi, votre virement sur le compte FR7640758181412478261375060 a bien été enregistré. Contact : claire.rossi@example-bank.test."}
+{"id": "doc0074", "lang": "en", "group": "retail", "pii": true, "dup_of": null, "text": "Hello Léa Lemoine, the transfer to account FR7615679334101666870021765 has been processed. Contact: léa.lemoine@example-bank.test."}
+{"id": "doc0138", "lang": "fr", "group": "corporate", "pii": false, "dup_of": null, "text": "Le taux d'intérêt du livret est révisé conformément à la réglementation en vigueur."}
+{"id": "doc0183", "lang": "en", "group": "complaints", "pii": false, "dup_of": null, "text": "Le taux d'intérêt du livret est révisé conformément à la réglementation en vigueur."}

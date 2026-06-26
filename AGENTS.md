@@ -16,7 +16,7 @@ doc:
     status: docs/MVP3_MVP4_IMPLEMENTATION.md
   related_paths: [README.md, docs/README-dev.md, CLAUDE.md]
   tags: [agents, orientation, raip, eu-ai-act]
-last_reviewed: "2026-06-15"
+last_reviewed: "2026-06-26"
 ---
 
 # AGENTS.md — RAIP
@@ -80,8 +80,9 @@ restate it elsewhere.
 | `src/raip/tasks/monitor.py` | On-demand drift/canary check |
 | `src/raip/graph/` | LangGraph supervisor (evaluate + aggregate nodes) |
 | `src/raip/benchmarks/` | `benchmarks_catalog.yaml`, `catalog.py`, runners (lm_eval, garak, hf_dynamic, …) |
-| `src/raip/governance/` | signing, **trust_factor**, **kill_switch**, **pdf_export**, datasheet |
-| `src/raip/store/` | Redis stores: `redis_run`, `redis_models`, `redis_hitl` |
+| `src/raip/governance/` | signing, **trust_factor**, **kill_switch**, **pdf_export**, datasheet, **energy** (CodeCarbon → N03) |
+| `src/raip/store/` | Redis stores: `redis_run` (carries `energy`), `redis_models`, `redis_hitl` (multi-criteria rubric), `redis_forms` |
+| `scripts/` | `setup_native.sh`, `gen_banking_corpus.py`, `run_paper_eval.py` (multi-model), `bench_gaas.py`; `manuscript/scripts/gen_paper_multi.py` |
 | `src/raip/artifacts/` | `s3io` (MinIO) + `local_fs` (lite fallback), backend selector |
 | `src/raip/dashboard/` | **Python** triage + score bands (NOT the UI) |
 | `dashboard/` | **Next.js** UI (App Router, TanStack Query, Tailwind, Recharts, Playwright) |
@@ -128,6 +129,32 @@ API `/admin/v1/*`; UI at `/governance`. Full guide: `docs/MVP4_GAAS_RUNTIME.md`.
 
 Native (no Docker): `make quickstart-native` prints the three commands (API, worker, `npm run dev`).
 Full dev setup: `docs/README-dev.md`. Dashboard design system + i18n: `dashboard/DESIGN_SYSTEM.md`.
+
+## Native evaluation & paper reproduction
+
+To run the **real** benchmark engines (not dynamic-probe fallbacks) and reproduce the paper numbers:
+
+```bash
+bash scripts/setup_native.sh              # installs .[benchmarks,lab,pdf] + checks Ollama/panel models
+RAIP_REQUIRE_NATIVE=1 python scripts/run_paper_eval.py   # multi-model panel, sequential
+python scripts/bench_gaas.py              # proxy overhead + agent detection + degradation
+python manuscript/scripts/gen_paper_multi.py             # tables + figures from the results JSON
+```
+
+Key flags (also in `.env.example`): **`RAIP_REQUIRE_NATIVE=1`** makes a run *fail* if a
+native-harness benchmark silently falls back (allow exceptions via `RAIP_NATIVE_ALLOW=garak`);
+`RAIP_HF_TRUST_REMOTE_CODE=true` for BBQ/BOLD/StereoSet; `RAIP_EVAL_MODELS` / `RAIP_EVAL_N` for the
+panel. **Serving caveat:** Ollama has no token log-probs, so R06/R10 use dynamic probes and native
+lm-eval is reserved for a vLLM backend (recorded in provenance) — see `lm_eval_runner.py`.
+
+- **R03–R05** run natively over the synthetic banking corpus `data/corpus/banking_synth.jsonl`
+  (regen: `scripts/gen_banking_corpus.py`; 100% synthetic, planted PII / near-dupes / imbalance).
+- **N03 energy** is measured automatically (CodeCarbon in `governance/energy.py`, wired in
+  `tasks/eval.py`) and auto-fills the N03 form; **N01/N02** use a multi-criteria HITL rubric
+  (`/hitl/rubrics`); the run summary's non-measurable strip reads real HITL/forms/energy state.
+
+Reproduction guides: `docs/EVALUATION_GUIDE.md`, `docs/NON_MEASURABLE_GUIDE.md`,
+`data/corpus/README.md`.
 
 ## The no-login guided dashboard
 
@@ -188,9 +215,10 @@ Unit tests use a **real Redis** (no mocking). Coverage gate is 80% on `raip`. CI
 ## MVP roadmap status
 
 MVP1 (inference core) and MVP2 (lab) — see `docs/MVP2_STATUS.md`. MVP3 (curves, HITL, forms, signed
-PDF, RBAC) and the **thin MVP4 slice** (Trust Factor, on-demand drift, kill-switch) — see the
-implemented-vs-deferred matrix in **`docs/MVP3_MVP4_IMPLEMENTATION.md`**. Full MVP4
-governance-as-a-service (Kafka/Kong/OPA/Wazuh/async proxy) is deliberately deferred.
+PDF, RBAC), the **thin MVP4 slice** (Trust Factor, on-demand drift, kill-switch), the **full MVP4
+GaaS runtime** (`make stack-gaas`: proxy, bus, agents, OPA, audit — built, profile-gated), and the
+**native-eval / banking** work (R03–R05, multi-model panel, measured GaaS bench) — see the
+implemented-vs-deferred matrix in **`docs/MVP3_MVP4_IMPLEMENTATION.md`**.
 
 ## Gotchas
 
@@ -209,4 +237,5 @@ When you change a documented surface, update the owning doc and bump its `last_r
 - New benchmark? → `benchmarks_catalog.yaml` + COMPL-AI mapping + `docs/MVP2_STATUS.md`.
 - New guided UI? → `USER_GUIDE.md` + the guided-dashboard section above.
 - New MVP3/MVP4 capability or deferral? → `docs/MVP3_MVP4_IMPLEMENTATION.md`.
+- New eval script / native-run flag / corpus? → `docs/EVALUATION_GUIDE.md` + this file's native-eval section.
 - New dependency/tooling? → verify the OSS/on-prem doctrine (`docs/CLAUDE.md §4`) first.

@@ -14,7 +14,7 @@ doc:
     mvp4: ./MVP4_governance_as_a_service.md
     agents: ../AGENTS.md
   tags: [raip, mvp3, mvp4, status]
-last_reviewed: "2026-06-22"
+last_reviewed: "2026-06-26"
 ---
 
 # MVP3 / MVP4 — état d'implémentation
@@ -42,8 +42,10 @@ last_reviewed: "2026-06-22"
 | Accueil guidé | `done` | `HomeOverview.tsx`, `app/(console)/home` | « ce que vous pouvez faire » |
 | Tableau récapitulatif des runs | `done` | `RunsOverviewTable.tsx`, `dashboard_routes.py` (`include_triage`) | triage + score en tête |
 | Courbes longitudinales | `done` | `/series`, `TrendCurve.tsx` | dérivé des runs Redis ; pas de fausse série < 2 points |
-| HITL N01 / N02 | `done` | `store/redis_hitl.py`, `/hitl/tasks`, `HitlReviewPanel.tsx` | file de revue + Likert 1–5 |
-| Formulaires déclaratifs N03–N06 | `done` | `schemas/declarative_forms.py`, `forms_routes.py`, `DeclarativeForms.tsx` | persistés par run |
+| HITL N01 / N02 | `done` | `store/redis_hitl.py`, `/hitl/tasks`, `/hitl/rubrics`, `HitlReviewPanel.tsx` | rubrique multi-critères 1–5 (N01 : faithfulness/completeness/clarity/actionability ; N02 : responsiveness/reversibility/oversight/safety) → Likert moyen ; Likert direct accepté en repli |
+| Formulaires déclaratifs N04–N06 | `done` | `schemas/declarative_forms.py`, `forms_routes.py`, `DeclarativeForms.tsx` | persistés par run |
+| Énergie N03 (mesurée) | `done` | `governance/energy.py`, `tasks/eval.py` (`_autofill_n03_energy`) | CodeCarbon autour de l'inférence → `kwh`/`co2eq` dans `RunRecord` → formulaire N03 auto-rempli ; dégradation gracieuse si CodeCarbon absent |
+| Bandeau N01–N06 (état réel) | `done` | `dashboard_routes.py::_non_measurable_slots`, `NonMeasurableStrip.tsx` | lit `RedisHitlStore` + `RedisFormStore` + `RunRecord.energy` — plus de placeholders statiques |
 | Export PDF d'audit signé | `partial` | `governance/pdf_export.py`, `GET /runs/{id}/audit-pdf` | sha256 self-attestation ; WeasyPrint optionnel (extra `pdf`) ; **pas** de signature eIDAS / TSA RFC 3161 |
 | 3 vues RBAC (compliance/cyber/ds) | `done` | `app/dashboards/*` | inchangées ; persona guidé passe les 3 lentilles |
 | Matrice RBAC Playwright | `done` | `dashboard/e2e/control-room.spec.ts` + `guided-mode.spec.ts` | 25 + 5 tests |
@@ -74,6 +76,21 @@ lite reste inchangée. Guide complet : [MVP4_GAAS_RUNTIME.md](./MVP4_GAAS_RUNTIM
 | Plan d'admin | `done` | `api/admin_routes.py` | `/admin/v1/{proxy/health,mode,trust,incidents,policy,kill-switch}` |
 | Profil `gaas` Docker | `done` | `docker-compose.gaas.yml`, `Dockerfile.gaas`, `make stack-gaas` | redpanda+opa+opensearch+proxy+agents+audit-sink |
 
+## Évaluation native & ancrage banque (branche `mvp4-eval-banking`)
+
+Suite native exécutable de bout en bout pour le papier (3 modèles), corpus bancaire synthétique
+pour R03–R05, et mesure du runtime GaaS. Repro : [EVALUATION_GUIDE.md](./EVALUATION_GUIDE.md).
+
+| Fonctionnalité | Statut | Module / script | Note |
+|---|---|---|---|
+| Harnais natifs installés | `done` | `scripts/setup_native.sh`, extras `.[benchmarks,lab,pdf]` | lm-eval, datasets, detoxify, presidio, Levenshtein/sacrebleu, codecarbon, weasyprint |
+| Forçage du natif (anti-fallback) | `done` | `benchmarks/runners/evaluate.py` (`RAIP_REQUIRE_NATIVE`) | échec si un runner natif retombe en heuristique ; exception assumée `garak` (`RAIP_NATIVE_ALLOW`) |
+| R03–R05 exécutées (corpus) | `done` | `scripts/gen_banking_corpus.py`, `data/corpus/banking_synth.jsonl`, `dataset_scan` | CR03 0.84 / CR04 0.94 / CR05 0.73 sur 230 docs synthétiques (PII/quasi-doublons/déséquilibre) |
+| Harnais multi-modèles | `done` | `scripts/run_paper_eval.py` | panel séquentiel (qwen/mistral/llama…), `RAIP_EVAL_MODELS`/`_N`, JSON consolidé |
+| Benchmark du runtime GaaS | `done` | `scripts/bench_gaas.py` | overhead proxy p50 5.7 ms, détection 3/3, OPA enforce + bus Redis-Streams vérifiés |
+| Tables/figures du papier | `done` | `manuscript/scripts/gen_paper_multi.py` | table 3×12, sensibilité non dégénérée (CR06/CR10 band-flip), figures optionnelles |
+| Caveat serving (Ollama) | `done` | `benchmarks/runners/lm_eval_runner.py` | pas de logprobs → R06/R10 en sondes dynamiques ; natif lm-eval réservé à vLLM (tracé en provenance) |
+
 ## Restyle & internationalisation
 
 | Fonctionnalité | Statut | Module | Note |
@@ -96,7 +113,9 @@ lite reste inchangée. Guide complet : [MVP4_GAAS_RUNTIME.md](./MVP4_GAAS_RUNTIM
 
 ## Tests (dernière exécution locale)
 
-- `pytest tests/unit/` — 99 passés (Redis requis ; inclut bus/agents/proxy/policy/audit/admin).
+- `pytest tests/unit/` — 104 passés (Redis requis ; inclut bus/agents/proxy/policy/audit/admin
+  + `test_native_energy_nonmeasurable.py` : require-native, énergie N03, rubrique HITL, bandeau N).
 - `npx playwright test` — 35 passés (25 RBAC + mode guidé + gouvernance + bascule de langue).
-- `ruff check` — propre sur les nouveaux modules.
+- `ruff check` — propre sur les fichiers de la branche (scripts en ignore `E402`/`E501` ; CI ne lance pas ruff).
 - `make stack-gaas` — pipeline gouverné de bout en bout (proxy:8100, OPA, Redpanda, OpenSearch).
+- `scripts/bench_gaas.py` — overhead proxy + détection + dégradation chiffrés (`manuscript/results/gaas_bench.json`).

@@ -44,6 +44,16 @@ vivid green), icons from **lucide-react** (linear, `strokeWidth={1.75}`).
 
 Recharts use the hex tokens directly (see `CoverageBar.tsx`, `TrendCurve.tsx`).
 
+## Non-measurable surfaces (N01–N06)
+
+- **HITL rubric grid** (`HitlReviewPanel.tsx`): N01/N02 reviews use a multi-criteria grid (1–5 per
+  criterion, fetched from `/hitl/rubrics`) rather than a single Likert; the mean becomes the stored
+  score. Render criteria as compact labelled rows reusing `.input`; show the running mean as a
+  `.kpi-value`. A direct Likert field remains as a fallback.
+- **Non-measurable strip** (`NonMeasurableStrip.tsx`): six slots (N01/N02 HITL, N03 energy,
+  N04–N06 forms) coloured by the semantic status tokens — `status-ok` reviewed/completed,
+  `status-partial` queued/measured, `status-neutral` empty. N03 shows measured `kwh`/`co2eq`.
+
 ## i18n (FR/EN)
 
 `src/lib/i18n.tsx` — `I18nProvider` (in `providers.tsx`), `useI18n()`, `useT()`. Dictionaries `EN`

@@ -16,7 +16,7 @@ doc:
     status: ./MVP3_MVP4_IMPLEMENTATION.md
     agents: ../AGENTS.md
   tags: [mvp4, gaas, opa, kafka, redpanda, opensearch, proxy, audit, trust-factor]
-last_reviewed: "2026-06-22"
+last_reviewed: "2026-06-26"
 ---
 
 # MVP4 — Governance-as-a-Service runtime (built)
@@ -100,12 +100,27 @@ Ports: proxy `:8100`, OPA `:8181`, OpenSearch `:9200`, Redpanda `:9092`.
 | OpenSearch (`OPENSEARCH_URL`) | indexed audit | **signed JSONL** chain only |
 | TimescaleDB | trust time-points persisted | Redis series only |
 
-## 7. Environment
+## 7. Measured performance & detection
+
+`scripts/bench_gaas.py` exercises the real components in-process (no Docker needed; Redis + Ollama)
+and writes `manuscript/results/gaas_bench.json`. Latest run (model `phi3:mini`):
+
+| Property | Measurement |
+|---|---|
+| Proxy governance overhead | **p50 5.7 ms**, p95 8.2 ms on top of ~280 ms local generation (≈2%) |
+| Agent detection on planted abuse | **3/3** — cyber (jailbreak, 0.20), privacy (synthetic IBAN/PII via Presidio, 0.20), ethics (toxicity via Detoxify, 0.01); all below the 0.70 trust threshold |
+| Policy enforcement | `enforcement` + kill-switch → `deny`; `shadow` + high trust → `allow` |
+| Bus degradation | no Kafka/Redpanda present → **Redis-Streams fallback**, probe round-trips end-to-end |
+
+Overhead is the governed-path time minus the forwarding time it wraps (governance machinery only).
+Run it with `RAIP_BENCH_MODEL` / `RAIP_BENCH_N`. The §6 degradation paths are asserted under test.
+
+## 8. Environment
 
 `RAIP_GAAS_ENABLED`, `KAFKA_BROKER_URL`, `OPA_URL`, `OPENSEARCH_URL`, `RAIP_GOVERNANCE_MODE`
 (`shadow`|`advisory`|`enforcement`), `RAIP_CANARY_CRON`, `RAIP_PROXY_TARGET_URL`. See `.env.example`.
 
-## 8. Hardening (operator tasks — not in this build)
+## 9. Hardening (operator tasks — not in this build)
 
 Production SIEM (Wazuh + clustered OpenSearch + correlation rules); high-throughput streaming
 (Flink/Kafka-Streams); qualified signing (OpenBao Transit + RFC 3161/eIDAS); edge gateway + mTLS

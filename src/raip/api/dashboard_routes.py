@@ -80,19 +80,52 @@ def _artifact_uris(run_id: str, settings: Settings) -> dict[str, str]:
 
 
 def _non_measurable_slots(rec: RunRecord) -> dict[str, Any]:
-    payload = rec.payload or {}
-    dataset_id = payload.get("dataset_id") or rec.run_id
+    """Reflect the *real* state of the non-measurable requirements: N01/N02 from the HITL review
+    queue, N03 from the measured energy, N04–N06 from the declarative forms."""
+    from raip.schemas.declarative_forms import RedisFormStore
+    from raip.store.redis_hitl import RedisHitlStore
+
+    settings = get_settings()
+    try:
+        tasks = RedisHitlStore().list(run_id=rec.run_id)
+    except Exception:
+        tasks = []
+    try:
+        forms = RedisFormStore().get_all(rec.run_id)
+    except Exception:
+        forms = {}
+
+    def hitl_slot(req: str) -> dict[str, Any]:
+        rs = [t for t in tasks if t.requirement == req]
+        done = [t for t in rs if t.status == "done" and t.likert_score is not None]
+        avg = round(sum(int(t.likert_score) for t in done) / len(done), 2) if done else None
+        status = "reviewed" if done else ("queued" if rs else "pending")
+        return {"status": status, "queue_count": len(rs), "reviewed": len(done), "avg_likert": avg}
+
+    def form_slot(fid: str) -> dict[str, Any]:
+        f = forms.get(fid) or {}
+        status = "completed" if f.get("completed") else ("draft" if f.get("fields") else "pending")
+        return {"status": status, "fields": f.get("fields") or {}}
+
+    if rec.energy and rec.energy.get("kwh") is not None:
+        n03 = {
+            "status": "measured",
+            "kwh": rec.energy.get("kwh"),
+            "co2eq_kg": rec.energy.get("co2eq_kg"),
+            "source": rec.energy.get("source"),
+        }
+    else:
+        n03 = form_slot("N03")
+
+    n04 = form_slot("N04")
+    n04["model_card_uri"] = _artifact_uris(rec.run_id, settings).get("model_card")
     return {
-        "n01": {"status": "pending", "queue_count": 0, "tasks": []},
-        "n02": {"status": "pending", "queue_count": 0, "tasks": []},
-        "n03": {"status": "n/a", "ref": "CodeCarbon when lab train"},
-        "n04": {
-            "status": "available" if rec.card_markdown else "pending",
-            "model_card_uri": _artifact_uris(rec.run_id, get_settings()).get("model_card"),
-            "datasheet_uri": f"s3://{get_settings().minio_bucket}/datasets/{dataset_id}/datasheet.md",
-        },
-        "n05": {"status": "mvp3_deferred"},
-        "n06": {"status": "mvp3_deferred"},
+        "n01": hitl_slot("N01"),
+        "n02": hitl_slot("N02"),
+        "n03": n03,
+        "n04": n04,
+        "n05": form_slot("N05"),
+        "n06": form_slot("N06"),
     }
 
 
@@ -534,9 +567,17 @@ class HitlCreateBody(BaseModel):
 
 
 class HitlReviewBody(BaseModel):
-    likert_score: int
+    likert_score: int | None = None
+    criteria: dict[str, int] | None = None  # rubric: criterion -> 1..5; Likert = mean
     comment: str = ""
     reviewer: str = "guided-reviewer"
+
+
+@router.get("/hitl/rubrics")
+def hitl_rubrics(_user: Annotated[AuthUser, Depends(get_current_user)]) -> dict[str, Any]:
+    from raip.store.redis_hitl import RUBRICS
+
+    return {"rubrics": RUBRICS}
 
 
 @router.post("/hitl/tasks")
@@ -565,12 +606,16 @@ def review_hitl_task(
 ) -> dict[str, Any]:
     from raip.store.redis_hitl import RedisHitlStore
 
-    if not 1 <= body.likert_score <= 5:
-        raise HTTPException(status_code=400, detail="likert_score must be 1..5")
+    if body.criteria:
+        if not all(1 <= int(v) <= 5 for v in body.criteria.values()):
+            raise HTTPException(status_code=400, detail="each rubric criterion must be 1..5")
+    elif body.likert_score is None or not 1 <= body.likert_score <= 5:
+        raise HTTPException(status_code=400, detail="provide criteria or a likert_score in 1..5")
     task = RedisHitlStore().submit_review(
         task_id,
         reviewer=body.reviewer,
         likert_score=body.likert_score,
+        criteria=body.criteria,
         comment=body.comment,
     )
     if not task:

@@ -14,6 +14,7 @@ from raip.artifacts.s3io import upload_bytes
 from raip.benchmarks.catalog import catalog_version as get_catalog_version
 from raip.celery_app import celery_app
 from raip.config import get_settings
+from raip.governance.energy import start_energy_tracker, stop_energy_tracker
 from raip.governance.kill_switch import kill_switch_status
 from raip.governance.signing import image_digest_from_env, sign_artifact
 from raip.governance.trust_factor import compute_trust_factor
@@ -59,6 +60,25 @@ def _resolve_benchmarks(req: RunCreateRequest) -> tuple[list[str], list[str]]:
         if req.dataset_corpus:
             requested += list(_DATASET_REQUIREMENTS)
     return _benchmarks_for_requirements(requested), requested
+
+
+def _autofill_n03_energy(run_id: str, energy: dict[str, Any], settings) -> None:
+    """Populate the N03 declarative form from the measured energy report (no manual entry)."""
+    try:
+        from raip.schemas.declarative_forms import DeclarativeFormBody, RedisFormStore
+
+        if not energy or energy.get("kwh") is None:
+            return
+        fields = {
+            "kwh": energy.get("kwh"),
+            "co2eq_kg": energy.get("co2eq_kg"),
+            "source": energy.get("source"),
+            "region": energy.get("region"),
+        }
+        body = DeclarativeFormBody(fields=fields, completed=True)
+        RedisFormStore(settings).put(run_id, "N03", body)
+    except Exception:
+        pass  # N03 stays manually editable if measurement/storage is unavailable
 
 
 def _git_sha() -> str:
@@ -271,7 +291,9 @@ def run_benchmark_job(self, run_id: str, payload: dict[str, Any]) -> dict[str, A
             },
         }
         store.append_stage(run_id, "evaluate")
+        energy_tracker = start_energy_tracker(f"raip-eval-{run_id}")
         state = run_evaluation_graph(initial, llm=LLMClient(s))
+        energy = stop_energy_tracker(energy_tracker, run_id)
         store.append_stage(run_id, "aggregate")
         raw_outputs = list(state.get("raw_outputs") or [])
         complai: dict[str, ComplaiRequirementScore] = dict(state.get("complai_scores") or {})
@@ -366,7 +388,10 @@ def run_benchmark_job(self, run_id: str, payload: dict[str, Any]) -> dict[str, A
             signature=sig,
             git_sha=git_sha,
             trust_factor=trust_factor,
+            energy=energy,
         )
+        # N03 (environmental impact) is now measured, not declared: auto-fill from CodeCarbon.
+        _autofill_n03_energy(run_id, energy, s)
         store.append_stage(run_id, "completed")
         return {"run_id": run_id, "status": "completed", "aggregate_scores": agg}
     except Exception as e:

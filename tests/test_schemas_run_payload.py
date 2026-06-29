@@ -11,7 +11,7 @@ SRC = PROJECT_ROOT / "src"
 if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
-from raip.schemas.run_payload import RunCreateRequest
+from vera.schemas.run_payload import RunCreateRequest
 
 
 class TestSchemasRunPayload(unittest.TestCase):

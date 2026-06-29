@@ -9,7 +9,7 @@ import { createContext, useCallback, useContext, useEffect, useState } from "rea
 export type Locale = "en" | "fr";
 
 const EN = {
-  "app.title": "RAIP Control Room",
+  "app.title": "VERA Control Room",
   "nav.home": "Home",
   "nav.launch": "Launch evaluation",
   "nav.runs": "Runs",
@@ -20,9 +20,9 @@ const EN = {
   "nav.guided": "Guided mode · no login",
   "nav.signout": "Sign out",
 
-  "home.welcome": "Welcome to RAIP",
+  "home.welcome": "Welcome to VERA",
   "home.intro":
-    "RAIP checks whether an AI model meets the EU AI Act requirements. Launch an evaluation on a connected model and read a clear summary — no code, no login.",
+    "VERA checks whether an AI model meets the EU AI Act requirements. Launch an evaluation on a connected model and read a clear summary — no code, no login.",
   "home.kpi.models": "Connected models",
   "home.kpi.connected": "connected",
   "home.kpi.completed": "Completed runs",
@@ -69,7 +69,7 @@ const EN = {
 type Key = keyof typeof EN;
 
 const FR: Record<Key, string> = {
-  "app.title": "RAIP — Salle de pilotage",
+  "app.title": "VERA — Salle de pilotage",
   "nav.home": "Accueil",
   "nav.launch": "Lancer une évaluation",
   "nav.runs": "Évaluations",
@@ -80,9 +80,9 @@ const FR: Record<Key, string> = {
   "nav.guided": "Mode guidé · sans connexion",
   "nav.signout": "Se déconnecter",
 
-  "home.welcome": "Bienvenue dans RAIP",
+  "home.welcome": "Bienvenue dans VERA",
   "home.intro":
-    "RAIP vérifie si un modèle d’IA respecte les exigences de l’EU AI Act. Lancez une évaluation sur un modèle connecté et lisez un résumé clair — sans code, sans connexion.",
+    "VERA vérifie si un modèle d’IA respecte les exigences de l’EU AI Act. Lancez une évaluation sur un modèle connecté et lisez un résumé clair — sans code, sans connexion.",
   "home.kpi.models": "Modèles connectés",
   "home.kpi.connected": "connectés",
   "home.kpi.completed": "Évaluations terminées",
@@ -146,13 +146,13 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
   const [locale, setLocaleState] = useState<Locale>(defaultLocale());
 
   useEffect(() => {
-    const saved = typeof window !== "undefined" ? (localStorage.getItem("raip-locale") as Locale | null) : null;
+    const saved = typeof window !== "undefined" ? (localStorage.getItem("vera-locale") as Locale | null) : null;
     if (saved === "fr" || saved === "en") setLocaleState(saved);
   }, []);
 
   const setLocale = useCallback((l: Locale) => {
     setLocaleState(l);
-    if (typeof window !== "undefined") localStorage.setItem("raip-locale", l);
+    if (typeof window !== "undefined") localStorage.setItem("vera-locale", l);
   }, []);
 
   const toggle = useCallback(() => setLocale(locale === "en" ? "fr" : "en"), [locale, setLocale]);

@@ -79,7 +79,7 @@ export function LaunchWizard() {
     <div data-testid="launch-wizard" className="mx-auto max-w-3xl">
       <h1 className="mb-1 text-sm font-medium text-ink">Launch an evaluation</h1>
       <p className="mb-4 text-xs text-ink-secondary">
-        Pick a connected model and what to check. RAIP runs the benchmarks and shows a compliance
+        Pick a connected model and what to check. VERA runs the benchmarks and shows a compliance
         summary — no configuration files needed.
       </p>
 

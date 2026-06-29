@@ -44,7 +44,7 @@ for (const view of VIEWS) {
     test(`${view.path} · ${role} → ${shouldAllow ? "allow" : "403"}`, async ({ page }) => {
       await page.goto(urlWithRole(view.path, role));
       if (shouldAllow) {
-        await expect(page.getByText("RAIP Control Room")).toBeVisible();
+        await expect(page.getByText("VERA Control Room")).toBeVisible();
         await expect(page.getByTestId("run-summary-view")).toBeVisible({ timeout: 15_000 });
       } else {
         await expect(page.getByTestId("auth-forbidden")).toBeVisible({ timeout: 15_000 });

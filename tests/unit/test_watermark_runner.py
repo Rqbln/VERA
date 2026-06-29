@@ -5,9 +5,9 @@ from __future__ import annotations
 import os
 import unittest
 
-from raip.benchmarks.runners.base import RunContext
-from raip.benchmarks.runners.watermark import run_watermark, run_watermark_na
-from raip.llm.client import CompletionResult
+from vera.benchmarks.runners.base import RunContext
+from vera.benchmarks.runners.watermark import run_watermark, run_watermark_na
+from vera.llm.client import CompletionResult
 
 
 class _StubLLM:
@@ -25,8 +25,8 @@ class TestWatermarkRunner(unittest.TestCase):
         self.assertEqual(raw[0]["status"], "NA")
 
     def test_statistical_returns_tpr(self) -> None:
-        prev = os.environ.get("RAIP_WATERMARK_MODE")
-        os.environ["RAIP_WATERMARK_MODE"] = "statistical"
+        prev = os.environ.get("VERA_WATERMARK_MODE")
+        os.environ["VERA_WATERMARK_MODE"] = "statistical"
         try:
             ctx = RunContext(
                 model_id="stub/model",
@@ -45,9 +45,9 @@ class TestWatermarkRunner(unittest.TestCase):
             self.assertLessEqual(tpr_rows[0]["TPR"], 1.0)
         finally:
             if prev is None:
-                os.environ.pop("RAIP_WATERMARK_MODE", None)
+                os.environ.pop("VERA_WATERMARK_MODE", None)
             else:
-                os.environ["RAIP_WATERMARK_MODE"] = prev
+                os.environ["VERA_WATERMARK_MODE"] = prev
 
 
 if __name__ == "__main__":

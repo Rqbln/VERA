@@ -1,6 +1,6 @@
 import pytest
 
-from raip.data.pipeline import scan_dataset
+from vera.data.pipeline import scan_dataset
 
 
 @pytest.mark.lab

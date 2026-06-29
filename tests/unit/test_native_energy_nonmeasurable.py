@@ -2,15 +2,15 @@ from __future__ import annotations
 
 import pytest
 
-from raip.benchmarks.runners import evaluate as E
-from raip.governance.energy import start_energy_tracker, stop_energy_tracker
-from raip.store.redis_hitl import RUBRICS, RedisHitlStore
-from raip.store.redis_run import RunRecord
+from vera.benchmarks.runners import evaluate as E
+from vera.governance.energy import start_energy_tracker, stop_energy_tracker
+from vera.store.redis_hitl import RUBRICS, RedisHitlStore
+from vera.store.redis_run import RunRecord
 
 
-# ── S1: RAIP_REQUIRE_NATIVE ──────────────────────────────────────────────────────────
+# ── S1: VERA_REQUIRE_NATIVE ──────────────────────────────────────────────────────────
 def test_require_native_raises_on_fallback(monkeypatch):
-    monkeypatch.setenv("RAIP_REQUIRE_NATIVE", "1")
+    monkeypatch.setenv("VERA_REQUIRE_NATIVE", "1")
     # a benchmark whose runner falls back (lm_eval impl) -> raise
     monkeypatch.setattr(
         E, "get_benchmark_entry", lambda bid: {"implementation": "lm_eval", "complai": "R06"}
@@ -31,7 +31,7 @@ def test_require_native_raises_on_fallback(monkeypatch):
 
 
 def test_garak_fallback_allowed_under_require_native(monkeypatch):
-    monkeypatch.setenv("RAIP_REQUIRE_NATIVE", "1")
+    monkeypatch.setenv("VERA_REQUIRE_NATIVE", "1")
     monkeypatch.setattr(
         E, "get_benchmark_entry", lambda bid: {"implementation": "garak", "complai": "R02"}
     )
@@ -66,7 +66,7 @@ def test_hitl_review_rejects_unknown_criterion():
     # The endpoint must reject criterion names outside the requirement's rubric (typoed keys).
     from fastapi import HTTPException
 
-    from raip.api.dashboard_routes import HitlReviewBody, review_hitl_task
+    from vera.api.dashboard_routes import HitlReviewBody, review_hitl_task
 
     s = RedisHitlStore()
     t = s.create(run_id="rub-bad", requirement="N01")
@@ -81,8 +81,8 @@ def test_hitl_review_rejects_unknown_criterion():
 
 # ── S4: non-measurable summary reflects real data ────────────────────────────────────
 def test_non_measurable_slots_reflect_real_state():
-    from raip.api.dashboard_routes import _non_measurable_slots
-    from raip.schemas.declarative_forms import DeclarativeFormBody, RedisFormStore
+    from vera.api.dashboard_routes import _non_measurable_slots
+    from vera.schemas.declarative_forms import DeclarativeFormBody, RedisFormStore
 
     rec = RunRecord(run_id="nm-run", status="completed",
                     energy={"kwh": 0.0012, "co2eq_kg": 0.0005, "source": "codecarbon"})

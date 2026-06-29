@@ -1,6 +1,6 @@
 import pytest
 
-from raip.lab.poison import inject_poison
+from vera.lab.poison import inject_poison
 
 
 @pytest.mark.lab

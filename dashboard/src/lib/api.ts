@@ -299,7 +299,7 @@ export async function downloadAuditPdf(token: string | undefined, runId: string)
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = `raip_audit_${runId.slice(0, 8)}.pdf`;
+  a.download = `vera_audit_${runId.slice(0, 8)}.pdf`;
   a.click();
   URL.revokeObjectURL(url);
 }

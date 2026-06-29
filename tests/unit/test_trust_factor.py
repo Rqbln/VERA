@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from raip.governance.trust_factor import compute_trust_factor, load_weights
+from vera.governance.trust_factor import compute_trust_factor, load_weights
 
 
 def test_weights_sum_to_one():
@@ -37,6 +37,6 @@ def test_no_safety_signals_returns_none():
 
 
 def test_custom_weights_env(monkeypatch):
-    monkeypatch.setenv("RAIP_TRUST_FACTOR_WEIGHTS", '{"R02": 1.0}')
+    monkeypatch.setenv("VERA_TRUST_FACTOR_WEIGHTS", '{"R02": 1.0}')
     w = load_weights()
     assert w == {"R02": 1.0}

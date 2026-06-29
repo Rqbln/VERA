@@ -1,1 +1,1 @@
-"""Integration tests — live Redis, MinIO (RAIP_INTEGRATION=1)."""
+"""Integration tests — live Redis, MinIO (VERA_INTEGRATION=1)."""

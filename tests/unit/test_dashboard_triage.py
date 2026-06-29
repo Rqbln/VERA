@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from raip.dashboard.triage import (
+from vera.dashboard.triage import (
     build_requirement_rows,
     is_pilote_run,
     triage_status,

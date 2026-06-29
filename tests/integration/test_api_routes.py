@@ -7,9 +7,9 @@ import uuid
 import pytest
 from fastapi.testclient import TestClient
 
-from raip.api import main as api_main
-from raip.config import get_settings
-from raip.store.redis_run import RedisRunStore
+from vera.api import main as api_main
+from vera.config import get_settings
+from vera.store.redis_run import RedisRunStore
 
 MVP2_MODEL = "ollama/llama3.1:8b-instruct-q8_0"
 
@@ -35,8 +35,8 @@ def test_get_run_and_delete_with_real_redis(integration_stack: None) -> None:  #
 @pytest.mark.integration
 def test_settings_default_model_matches_mvp2(integration_stack: None) -> None:  # noqa: ARG001
     s = get_settings()
-    assert s.raip_target_model == MVP2_MODEL
-    assert s.mlflow_experiment == "raip-mvp2"
+    assert s.vera_target_model == MVP2_MODEL
+    assert s.mlflow_experiment == "vera-mvp2"
 
 
 @pytest.mark.integration

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from raip.schemas.run_payload import RunCreateRequest
-from raip.tasks.eval import _benchmarks_for_requirements, _resolve_benchmarks
+from vera.schemas.run_payload import RunCreateRequest
+from vera.tasks.eval import _benchmarks_for_requirements, _resolve_benchmarks
 
 
 def test_expand_requirement_to_benchmarks():

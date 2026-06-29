@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from raip.governance.policy import builtin_decision
+from vera.governance.policy import builtin_decision
 
 
 def test_allow_when_healthy():

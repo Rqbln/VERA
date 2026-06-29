@@ -1,4 +1,4 @@
-# Minimal payload for integration tests (RAIP_INTEGRATION_OLLAMA=1).
+# Minimal payload for integration tests (VERA_INTEGRATION_OLLAMA=1).
 
 model_id: ollama/llama3.1:8b-instruct-q8_0
 

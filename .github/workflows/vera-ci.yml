@@ -1,0 +1,93 @@
+name: VERA CI
+
+on:
+  push:
+    branches: [main, MVP2, mvp3-mvp4, mvp4-gaas]
+  pull_request:
+    branches: [main, MVP2, mvp3-mvp4]
+
+jobs:
+  unit:
+    runs-on: ubuntu-latest
+    # The dashboard read API + governance stores are backed by Redis.
+    services:
+      redis:
+        image: redis:7-alpine
+        ports: ["6379:6379"]
+    env:
+      REDIS_URL: redis://localhost:6379/0
+      VERA_AUTH_MODE: guided
+      VERA_ARTIFACT_BACKEND: local
+      VERA_MLFLOW_DISABLED: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -e ".[dev]"
+      - run: pytest tests/unit/ tests/lab/ -m "not gpu and not slow" -q
+
+  integration:
+    runs-on: ubuntu-latest
+    services:
+      redis:
+        image: redis:7-alpine
+        ports: ["6379:6379"]
+      minio:
+        image: minio/minio:RELEASE.2024-12-18T13-15-44Z
+        env:
+          MINIO_ROOT_USER: minioadmin
+          MINIO_ROOT_PASSWORD: minioadmin
+        ports: ["9000:9000"]
+    env:
+      VERA_INTEGRATION: "1"
+      REDIS_URL: redis://localhost:6379/0
+      MINIO_ENDPOINT_URL: http://localhost:9000
+      MINIO_ACCESS_KEY: minioadmin
+      MINIO_SECRET_KEY: minioadmin
+      MINIO_BUCKET: vera
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -e ".[dev]"
+      - run: pytest tests/integration/ -m integration -q
+
+  dashboard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: dashboard/package-lock.json
+      # The lockfile is generated on macOS; some Linux-only optional deps (e.g. @emnapi/*)
+      # are absent, which `npm ci` rejects on Linux. Fall back to a reconciling install.
+      - run: npm ci --no-audit --no-fund || npm install --no-audit --no-fund
+        working-directory: dashboard
+      - run: npm run build
+        working-directory: dashboard
+        env:
+          NEXT_PUBLIC_AUTH_MODE: guided
+      - run: npx playwright install chromium
+        working-directory: dashboard
+      - run: npx playwright test
+        working-directory: dashboard
+        env:
+          CI: "1"
+          NEXT_PUBLIC_AUTH_DISABLED: "1"
+
+  e2e-ollama:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/MVP2'
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -e ".[dev,benchmarks]"
+      - run: echo "VERA_E2E_OLLAMA=1 — run on self-hosted with Ollama"
+      - run: pytest tests/e2e/ -m "e2e" --collect-only -q

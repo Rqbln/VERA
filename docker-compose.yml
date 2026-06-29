@@ -39,26 +39,26 @@ services:
       -c "
       sleep 5 &&
       mc alias set local http://minio:9000 minioadmin minioadmin &&
-      mc mb -p local/raip || true &&
+      mc mb -p local/vera || true &&
       mc mb -p local/mlflow || true &&
-      mc mb -p local/raip-datasets-clean || true &&
-      mc mb -p local/raip-datasets-poisoned || true &&
-      mc mb -p local/raip-checkpoints || true
+      mc mb -p local/vera-datasets-clean || true &&
+      mc mb -p local/vera-datasets-poisoned || true &&
+      mc mb -p local/vera-checkpoints || true
       "
 
-  postgres-raip:
+  postgres-vera:
     image: postgres:16-alpine
     environment:
-      POSTGRES_USER: raip
-      POSTGRES_PASSWORD: raip
-      POSTGRES_DB: raip
+      POSTGRES_USER: vera
+      POSTGRES_PASSWORD: vera
+      POSTGRES_DB: vera
     ports:
       - "5433:5432"
     volumes:
-      - pg_raip:/var/lib/postgresql/data
-      - ./infra/sql/raip:/docker-entrypoint-initdb.d:ro
+      - pg_vera:/var/lib/postgresql/data
+      - ./infra/sql/vera:/docker-entrypoint-initdb.d:ro
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U raip"]
+      test: ["CMD-SHELL", "pg_isready -U vera"]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -66,16 +66,16 @@ services:
   timescaledb:
     image: timescale/timescaledb:latest-pg16
     environment:
-      POSTGRES_USER: raip
-      POSTGRES_PASSWORD: raip
-      POSTGRES_DB: raip_ts
+      POSTGRES_USER: vera
+      POSTGRES_PASSWORD: vera
+      POSTGRES_DB: vera_ts
     ports:
       - "5434:5432"
     volumes:
       - tsdata:/var/lib/postgresql/data
       - ./infra/sql/timescale:/docker-entrypoint-initdb.d:ro
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U raip"]
+      test: ["CMD-SHELL", "pg_isready -U vera"]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -109,36 +109,36 @@ services:
       KEYCLOAK_ADMIN_PASSWORD: admin
       KC_HTTP_PORT: 8080
     volumes:
-      - ./infra/keycloak/raip-realm.json:/opt/keycloak/data/import/raip-realm.json:ro
+      - ./infra/keycloak/vera-realm.json:/opt/keycloak/data/import/vera-realm.json:ro
     ports:
       - "8080:8080"
 
   api:
     build: .
-    command: uvicorn raip.api.main:app --host 0.0.0.0 --port 8000
+    command: uvicorn vera.api.main:app --host 0.0.0.0 --port 8000
     environment:
       KEYCLOAK_URL: http://keycloak:8080
-      KEYCLOAK_REALM: raip
-      KEYCLOAK_CLIENT_ID: raip-dashboard
-      RAIP_AUTH_MODE: enterprise
-      RAIP_AUTH_DISABLED: "0"
+      KEYCLOAK_REALM: vera
+      KEYCLOAK_CLIENT_ID: vera-dashboard
+      VERA_AUTH_MODE: enterprise
+      VERA_AUTH_DISABLED: "0"
       REDIS_URL: redis://redis:6379/0
       CELERY_BROKER_URL: redis://redis:6379/0
       CELERY_RESULT_BACKEND: redis://redis:6379/0
       MLFLOW_TRACKING_URI: http://mlflow:5000
-      MLFLOW_EXPERIMENT: raip-mvp2
+      MLFLOW_EXPERIMENT: vera-mvp2
       MINIO_ENDPOINT_URL: http://minio:9000
       MINIO_ACCESS_KEY: minioadmin
       MINIO_SECRET_KEY: minioadmin
-      MINIO_BUCKET: raip
+      MINIO_BUCKET: vera
       AWS_ACCESS_KEY_ID: minioadmin
       AWS_SECRET_ACCESS_KEY: minioadmin
       MLFLOW_S3_ENDPOINT_URL: http://minio:9000
       AWS_DEFAULT_REGION: us-east-1
       OLLAMA_API_BASE: http://host.docker.internal:11434
-      RAIP_TARGET_MODEL: ollama/llama3.1:8b-instruct-q8_0
-      RAIP_POSTGRES_URL: postgresql://raip:raip@postgres-raip:5432/raip
-      RAIP_TIMESCALE_URL: postgresql://raip:raip@timescaledb:5432/raip_ts
+      VERA_TARGET_MODEL: ollama/llama3.1:8b-instruct-q8_0
+      VERA_POSTGRES_URL: postgresql://vera:vera@postgres-vera:5432/vera
+      VERA_TIMESCALE_URL: postgresql://vera:vera@timescaledb:5432/vera_ts
     extra_hosts:
       - "host.docker.internal:host-gateway"
     ports:
@@ -162,13 +162,13 @@ services:
         NEXT_PUBLIC_AUTH_MODE: enterprise
         NEXT_PUBLIC_API_URL: http://localhost:8000
         NEXT_PUBLIC_KEYCLOAK_URL: http://localhost:8080
-        NEXT_PUBLIC_KEYCLOAK_REALM: raip
-        NEXT_PUBLIC_KEYCLOAK_CLIENT_ID: raip-dashboard
+        NEXT_PUBLIC_KEYCLOAK_REALM: vera
+        NEXT_PUBLIC_KEYCLOAK_CLIENT_ID: vera-dashboard
     environment:
       NEXT_PUBLIC_API_URL: http://localhost:8000
       NEXT_PUBLIC_KEYCLOAK_URL: http://localhost:8080
-      NEXT_PUBLIC_KEYCLOAK_REALM: raip
-      NEXT_PUBLIC_KEYCLOAK_CLIENT_ID: raip-dashboard
+      NEXT_PUBLIC_KEYCLOAK_REALM: vera
+      NEXT_PUBLIC_KEYCLOAK_CLIENT_ID: vera-dashboard
     ports:
       - "3000:3000"
     depends_on:
@@ -177,25 +177,25 @@ services:
 
   worker:
     build: .
-    command: celery -A raip.celery_app worker --loglevel=INFO
+    command: celery -A vera.celery_app worker --loglevel=INFO
     environment:
       REDIS_URL: redis://redis:6379/0
       CELERY_BROKER_URL: redis://redis:6379/0
       CELERY_RESULT_BACKEND: redis://redis:6379/0
       MLFLOW_TRACKING_URI: http://mlflow:5000
-      MLFLOW_EXPERIMENT: raip-mvp2
+      MLFLOW_EXPERIMENT: vera-mvp2
       MINIO_ENDPOINT_URL: http://minio:9000
       MINIO_ACCESS_KEY: minioadmin
       MINIO_SECRET_KEY: minioadmin
-      MINIO_BUCKET: raip
+      MINIO_BUCKET: vera
       AWS_ACCESS_KEY_ID: minioadmin
       AWS_SECRET_ACCESS_KEY: minioadmin
       MLFLOW_S3_ENDPOINT_URL: http://minio:9000
       AWS_DEFAULT_REGION: us-east-1
       OLLAMA_API_BASE: http://host.docker.internal:11434
-      RAIP_TARGET_MODEL: ollama/llama3.1:8b-instruct-q8_0
-      RAIP_POSTGRES_URL: postgresql://raip:raip@postgres-raip:5432/raip
-      RAIP_TIMESCALE_URL: postgresql://raip:raip@timescaledb:5432/raip_ts
+      VERA_TARGET_MODEL: ollama/llama3.1:8b-instruct-q8_0
+      VERA_POSTGRES_URL: postgresql://vera:vera@postgres-vera:5432/vera
+      VERA_TIMESCALE_URL: postgresql://vera:vera@timescaledb:5432/vera_ts
     extra_hosts:
       - "host.docker.internal:host-gateway"
     depends_on:
@@ -208,7 +208,7 @@ services:
 
 volumes:
   pgdata:
-  pg_raip:
+  pg_vera:
   tsdata:
   minio_data:
   mlflow_data:

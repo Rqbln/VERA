@@ -14,7 +14,7 @@ import {
 import { getSeries } from "@/lib/api";
 import { getToken } from "@/lib/auth";
 
-// Mirrors RAIP_BAND_GREEN_MIN / RAIP_BAND_ORANGE_MIN defaults in score_bands.py.
+// Mirrors VERA_BAND_GREEN_MIN / VERA_BAND_ORANGE_MIN defaults in score_bands.py.
 const GREEN_MIN = 0.7;
 const ORANGE_MIN = 0.4;
 

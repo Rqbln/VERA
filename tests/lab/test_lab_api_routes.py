@@ -1,7 +1,7 @@
 import pytest
 from fastapi.testclient import TestClient
 
-from raip.api.main import app
+from vera.api.main import app
 
 
 @pytest.mark.lab

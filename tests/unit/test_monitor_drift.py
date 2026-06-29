@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import pytest
 
-from raip.store.redis_run import RedisRunStore
-from raip.tasks.monitor import compute_drift
+from vera.store.redis_run import RedisRunStore
+from vera.tasks.monitor import compute_drift
 
 MODEL = "ollama/drift-test-model"
 

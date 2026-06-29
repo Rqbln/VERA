@@ -52,9 +52,9 @@ test("governance page renders the runtime panel", async ({ page }) => {
 test("language toggle switches EN to FR", async ({ page }) => {
   await page.goto("/home");
   await expect(page.getByTestId("home-overview")).toBeVisible({ timeout: 20_000 });
-  await expect(page.getByText("Welcome to RAIP")).toBeVisible();
+  await expect(page.getByText("Welcome to VERA")).toBeVisible();
   await page.getByTestId("lang-toggle").click();
-  await expect(page.getByText("Bienvenue dans RAIP")).toBeVisible({ timeout: 10_000 });
+  await expect(page.getByText("Bienvenue dans VERA")).toBeVisible({ timeout: 10_000 });
 });
 
 test("root redirects to guided home", async ({ page }) => {

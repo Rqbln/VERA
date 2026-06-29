@@ -1,4 +1,4 @@
-# RAIP dashboard — design system
+# VERA dashboard — design system
 
 Light, airy, decision-maker oriented. BNP-Paribas green. Status-first information design preserved
 from the control-room era, but on white.

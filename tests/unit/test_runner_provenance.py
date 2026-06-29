@@ -4,10 +4,10 @@ from __future__ import annotations
 
 import unittest
 
-from raip.benchmarks.runners.base import RunContext
-from raip.benchmarks.runners.garak_runner import run_garak
-from raip.benchmarks.runners.lm_eval_runner import run_lm_eval
-from raip.llm.client import CompletionResult
+from vera.benchmarks.runners.base import RunContext
+from vera.benchmarks.runners.garak_runner import run_garak
+from vera.benchmarks.runners.lm_eval_runner import run_lm_eval
+from vera.llm.client import CompletionResult
 
 
 class _StubLLM:

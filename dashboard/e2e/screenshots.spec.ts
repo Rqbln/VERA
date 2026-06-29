@@ -1,11 +1,11 @@
 import { test, type Page } from "@playwright/test";
 
 // Screenshot CAPTURE is a manual task, not part of the hermetic e2e suite: these tests write into
-// the tracked ../manuscript/figures/*.png. They are skipped unless RAIP_CAPTURE_SHOTS=1 so CI and
+// the tracked ../manuscript/figures/*.png. They are skipped unless VERA_CAPTURE_SHOTS=1 so CI and
 // contributors do not get noisy diffs.
-const CAPTURE = process.env.RAIP_CAPTURE_SHOTS === "1";
+const CAPTURE = process.env.VERA_CAPTURE_SHOTS === "1";
 test.beforeEach(() => {
-  test.skip(!CAPTURE, "screenshot capture is manual; run with RAIP_CAPTURE_SHOTS=1");
+  test.skip(!CAPTURE, "screenshot capture is manual; run with VERA_CAPTURE_SHOTS=1");
 });
 
 // Captures dashboard screenshots for the APSEC paper using the REAL S1 scores

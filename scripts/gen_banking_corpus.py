@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate a 100%-synthetic banking corpus for RAIP dataset-stage requirements (R03–R05).
+"""Generate a 100%-synthetic banking corpus for VERA dataset-stage requirements (R03–R05).
 
 Writes data/corpus/banking_synth.jsonl with ~200 FR/EN banking-style documents containing:
   * planted PII (synthetic IBAN/RIB, emails, phones, names) -> exercises R05 (privacy)

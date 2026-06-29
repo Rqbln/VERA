@@ -3,12 +3,12 @@ from __future__ import annotations
 import pytest
 from fastapi.testclient import TestClient
 
-from raip.api.main import app
+from vera.api.main import app
 
 
 @pytest.fixture
 def client(monkeypatch):
-    monkeypatch.setenv("RAIP_AUTH_MODE", "guided")
+    monkeypatch.setenv("VERA_AUTH_MODE", "guided")
     return TestClient(app)
 
 
@@ -28,7 +28,7 @@ class _FakeResp:
 
 
 def test_connected_models_maps_to_litellm_ids(client, monkeypatch):
-    monkeypatch.setattr("raip.api.models_routes.httpx.get", lambda *a, **k: _FakeResp())
+    monkeypatch.setattr("vera.api.models_routes.httpx.get", lambda *a, **k: _FakeResp())
     body = client.get("/api/v1/models/connected").json()
     ids = [m["model_id"] for m in body["models"]]
     assert "ollama/llama3.1:8b-instruct-q8_0" in ids
@@ -41,7 +41,7 @@ def test_connected_models_empty_state_on_error(client, monkeypatch):
     def _boom(*a, **k):
         raise RuntimeError("ollama down")
 
-    monkeypatch.setattr("raip.api.models_routes.httpx.get", _boom)
+    monkeypatch.setattr("vera.api.models_routes.httpx.get", _boom)
     body = client.get("/api/v1/models/connected").json()
     assert body["models"] == []
     assert "error" in body

@@ -3,14 +3,14 @@ from __future__ import annotations
 import pytest
 from fastapi.testclient import TestClient
 
-from raip.api.main import app
-from raip.governance.audit import build_audit_event, persist_audit, recent_incidents
-from raip.governance.kill_switch import set_kill
+from vera.api.main import app
+from vera.governance.audit import build_audit_event, persist_audit, recent_incidents
+from vera.governance.kill_switch import set_kill
 
 
 @pytest.fixture
 def client(monkeypatch):
-    monkeypatch.setenv("RAIP_AUTH_MODE", "guided")
+    monkeypatch.setenv("VERA_AUTH_MODE", "guided")
     return TestClient(app)
 
 
@@ -23,8 +23,8 @@ def test_audit_event_is_signed_and_flags_incident():
 
 
 def test_persist_and_read_incident(tmp_path, monkeypatch):
-    monkeypatch.setenv("RAIP_LOCAL_ARTIFACTS_DIR", str(tmp_path))
-    from raip.config import get_settings
+    monkeypatch.setenv("VERA_LOCAL_ARTIFACTS_DIR", str(tmp_path))
+    from vera.config import get_settings
 
     get_settings.cache_clear()
     ev = build_audit_event(
@@ -55,11 +55,11 @@ def test_admin_mode_and_kill_switch(client):
 
 def test_admin_policy_returns_rego(client):
     body = client.get("/admin/v1/policy").json()
-    assert "package raip.governance" in body["policy"]
+    assert "package vera.governance" in body["policy"]
 
 
 def test_admin_requires_auth_in_enterprise(monkeypatch):
-    monkeypatch.setenv("RAIP_AUTH_MODE", "enterprise")
-    monkeypatch.delenv("RAIP_AUTH_DISABLED", raising=False)
+    monkeypatch.setenv("VERA_AUTH_MODE", "enterprise")
+    monkeypatch.delenv("VERA_AUTH_DISABLED", raising=False)
     c = TestClient(app)
     assert c.get("/admin/v1/proxy/health").status_code == 401

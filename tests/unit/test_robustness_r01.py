@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import unittest
 
-from raip.benchmarks.runners.robustness import _mean
+from vera.benchmarks.runners.robustness import _mean
 
 
 class TestRobustnessR01(unittest.TestCase):

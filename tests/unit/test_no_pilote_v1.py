@@ -11,14 +11,14 @@ SRC = ROOT / "src"
 
 class TestNoPiloteV1(unittest.TestCase):
     def test_pilote_package_absent(self) -> None:
-        self.assertFalse((SRC / "raip" / "benchmarks" / "pilote_v1").exists())
+        self.assertFalse((SRC / "vera" / "benchmarks" / "pilote_v1").exists())
 
     def test_no_pilote_imports_in_src(self) -> None:
         # The pilot marker is allowed only in the single canonical detection module, which
         # exists precisely to recognise and EXCLUDE pilot runs from compliance views.
-        allowed = {"src/raip/dashboard/triage.py"}
+        allowed = {"src/vera/dashboard/triage.py"}
         hits: list[str] = []
-        for path in (SRC / "raip").rglob("*.py"):
+        for path in (SRC / "vera").rglob("*.py"):
             rel = str(path.relative_to(ROOT))
             if rel in allowed:
                 continue

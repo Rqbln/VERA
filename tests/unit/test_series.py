@@ -3,15 +3,15 @@ from __future__ import annotations
 import pytest
 from fastapi.testclient import TestClient
 
-from raip.api.main import app
-from raip.store.redis_run import RedisRunStore
+from vera.api.main import app
+from vera.store.redis_run import RedisRunStore
 
 MODEL = "ollama/series-test-model"
 
 
 @pytest.fixture
 def client(monkeypatch):
-    monkeypatch.setenv("RAIP_AUTH_MODE", "guided")
+    monkeypatch.setenv("VERA_AUTH_MODE", "guided")
     return TestClient(app)
 
 

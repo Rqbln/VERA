@@ -1,4 +1,4 @@
-from raip.benchmarks.catalog import load_catalog
+from vera.benchmarks.catalog import load_catalog
 
 
 def test_catalog_has_r03_r04_r05():

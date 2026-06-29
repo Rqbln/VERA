@@ -1,6 +1,6 @@
 import pytest
 
-from raip.store.timescale import TimescaleWriter
+from vera.store.timescale import TimescaleWriter
 
 
 @pytest.mark.integration

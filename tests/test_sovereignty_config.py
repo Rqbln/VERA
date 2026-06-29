@@ -12,7 +12,7 @@ if str(SRC) not in sys.path:
 
 from pydantic_settings import SettingsConfigDict
 
-from raip.config import Settings  # noqa: E402
+from vera.config import Settings  # noqa: E402
 
 
 class _NoEnvFile(Settings):
@@ -24,11 +24,11 @@ def test_settings_has_no_hardcoded_proprietary_api_fields() -> None:
     assert not any("openai" in n for n in names)
     assert not any("anthropic" in n for n in names)
     assert "ollama_api_base" in names
-    assert "raip_target_model" in names
+    assert "vera_target_model" in names
 
 
 def test_default_target_is_llama31_8b_instruct_q8() -> None:
     s = _NoEnvFile()
-    assert s.raip_target_model == "ollama/llama3.1:8b-instruct-q8_0"
+    assert s.vera_target_model == "ollama/llama3.1:8b-instruct-q8_0"
 
 

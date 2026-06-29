@@ -1,8 +1,8 @@
 import pytest
 
-from raip.lab.injectors.base import TriggerSpec
-from raip.lab.injectors.registry import TRIGGER_TYPES, get_injector
-from raip.lab.triggers_repo import seed_default_triggers
+from vera.lab.injectors.base import TriggerSpec
+from vera.lab.injectors.registry import TRIGGER_TYPES, get_injector
+from vera.lab.triggers_repo import seed_default_triggers
 
 
 @pytest.mark.lab

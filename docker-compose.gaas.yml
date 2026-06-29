@@ -1,4 +1,4 @@
-# RAIP — Governance-as-a-Service (MVP4) overlay.
+# VERA — Governance-as-a-Service (MVP4) overlay.
 #
 #   docker compose -f docker-compose.yml -f docker-compose.gaas.yml up --build   (or: make stack-gaas)
 #
@@ -25,7 +25,7 @@ services:
 
   opa:
     image: openpolicyagent/opa:0.69.0
-    command: ["run", "--server", "--addr=0.0.0.0:8181", "/policies/raip.rego"]
+    command: ["run", "--server", "--addr=0.0.0.0:8181", "/policies/vera.rego"]
     volumes:
       - ./infra/opa:/policies:ro
     ports:
@@ -47,15 +47,15 @@ services:
       dockerfile: Dockerfile.gaas
     command: uvicorn services.proxy.main:app --host 0.0.0.0 --port 8000
     environment: &gaas_env
-      RAIP_GAAS_ENABLED: "1"
+      VERA_GAAS_ENABLED: "1"
       REDIS_URL: redis://redis:6379/0
       KAFKA_BROKER_URL: redpanda:9092
       OPA_URL: http://opa:8181
       OPENSEARCH_URL: http://opensearch:9200
-      RAIP_GOVERNANCE_MODE: shadow
+      VERA_GOVERNANCE_MODE: shadow
       OLLAMA_API_BASE: http://host.docker.internal:11434
-      RAIP_TARGET_MODEL: ollama/llama3.1:8b-instruct-q8_0
-      RAIP_LOCAL_ARTIFACTS_DIR: /data/artifacts
+      VERA_TARGET_MODEL: ollama/llama3.1:8b-instruct-q8_0
+      VERA_LOCAL_ARTIFACTS_DIR: /data/artifacts
     extra_hosts:
       - "host.docker.internal:host-gateway"
     volumes:
@@ -97,7 +97,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.gaas
-    command: celery -A raip.celery_app beat --loglevel=INFO
+    command: celery -A vera.celery_app beat --loglevel=INFO
     environment: *gaas_env
     extra_hosts:
       - "host.docker.internal:host-gateway"

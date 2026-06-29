@@ -16,7 +16,7 @@ if str(SRC) not in sys.path:
 
 from pydantic_settings import SettingsConfigDict
 
-from raip.config import Settings, get_settings
+from vera.config import Settings, get_settings
 
 
 class IsolatedSettings(Settings):
@@ -33,14 +33,14 @@ _ENV_KEYS_TO_MASK = (
     "REDIS_URL",
     "CELERY_BROKER_URL",
     "CELERY_RESULT_BACKEND",
-    "RAIP_TARGET_MODEL",
-    "RAIP_JUDGE_MODEL",
+    "VERA_TARGET_MODEL",
+    "VERA_JUDGE_MODEL",
     "OLLAMA_API_BASE",
 )
 
 
 @contextlib.contextmanager
-def _without_raip_env() -> Iterator[None]:
+def _without_vera_env() -> Iterator[None]:
     saved = {k: os.environ[k] for k in _ENV_KEYS_TO_MASK if k in os.environ}
     try:
         for k in _ENV_KEYS_TO_MASK:
@@ -57,20 +57,20 @@ class TestConfigSettings(unittest.TestCase):
         get_settings.cache_clear()
 
     def test_effective_judge_defaults_to_target(self) -> None:
-        with _without_raip_env():
-            s = IsolatedSettings(raip_target_model="ollama/foo", raip_judge_model=None)
+        with _without_vera_env():
+            s = IsolatedSettings(vera_target_model="ollama/foo", vera_judge_model=None)
         self.assertEqual(s.effective_judge_model, "ollama/foo")
 
     def test_effective_judge_override(self) -> None:
-        with _without_raip_env():
+        with _without_vera_env():
             s = IsolatedSettings(
-                raip_target_model="ollama/foo",
-                raip_judge_model="ollama/bar",
+                vera_target_model="ollama/foo",
+                vera_judge_model="ollama/bar",
             )
         self.assertEqual(s.effective_judge_model, "ollama/bar")
 
     def test_celery_broker_fallback(self) -> None:
-        with _without_raip_env():
+        with _without_vera_env():
             s = IsolatedSettings(redis_url="redis://localhost:9/0", celery_broker_url=None)
         self.assertEqual(s.celery_broker, "redis://localhost:9/0")
 

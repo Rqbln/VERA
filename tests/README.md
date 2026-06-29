@@ -1,12 +1,12 @@
-# Tests RAIP MVP2
+# Tests VERA MVP2
 
 ## Pyramide
 
 | Niveau | Répertoire | Flag | Services |
 |--------|------------|------|----------|
 | Unit | `tests/unit/` + `tests/test_*.py` | — | Aucun |
-| Integration | `tests/integration/` | `RAIP_INTEGRATION=1` | Redis + MinIO |
-| E2E | `tests/e2e/` | `RAIP_E2E_OLLAMA=1` | Compose + Ollama |
+| Integration | `tests/integration/` | `VERA_INTEGRATION=1` | Redis + MinIO |
+| E2E | `tests/e2e/` | `VERA_E2E_OLLAMA=1` | Compose + Ollama |
 | Lab | `tests/lab/` | `lab` (excl. `gpu`, `slow`) | Optionnel GPU |
 | Airgap | `tests/airgap/` | `airgap` | Fichiers compose enclave |
 
@@ -26,7 +26,7 @@ Doc lab : [docs/MVP2_LAB_RUNBOOK.md](../docs/MVP2_LAB_RUNBOOK.md).
 | `test_no_unittest_mock.py` | 1 | Aucun `@patch` / `MagicMock` dans `tests/` |
 | `test_dynamic_prompts.py` | 2 | Prompts générés à l’exécution (pas de JSONL) |
 | `test_graph_aggregate.py` | 2 | Agrégation bootstrap ; R09 `NA` exclu |
-| `test_config_defaults.py` | 3 | Défaut `llama3.1:8b-instruct-q8_0`, experiment `raip-mvp2` |
+| `test_config_defaults.py` | 3 | Défaut `llama3.1:8b-instruct-q8_0`, experiment `vera-mvp2` |
 
 ### `tests/test_*.py` — logique transverse
 
@@ -40,7 +40,7 @@ Doc lab : [docs/MVP2_LAB_RUNBOOK.md](../docs/MVP2_LAB_RUNBOOK.md).
 | `test_acceptance.py` | 2 | Imports API/Celery/CLI |
 | `test_sovereignty_config.py` | 2 | Pas de clés cloud ; modèle Ollama par défaut |
 | `test_airgap_notes.py` | 1 | Doc air-gap présente |
-| `test_external_ollama_optional.py` | 1 | Skip sauf `RAIP_RUN_OLLAMA_SMOKE=1` |
+| `test_external_ollama_optional.py` | 1 | Skip sauf `VERA_RUN_OLLAMA_SMOKE=1` |
 
 ```bash
 PYTHONPATH=src pytest tests/unit/ tests/test_*.py -q
@@ -50,8 +50,8 @@ PYTHONPATH=src pytest tests/unit/ tests/test_*.py -q
 
 ```bash
 docker compose up -d redis minio
-# Si MinIO crash (volume corrompu) : docker compose down && docker volume rm raip_minio_data
-export RAIP_INTEGRATION=1
+# Si MinIO crash (volume corrompu) : docker compose down && docker volume rm vera_minio_data
+export VERA_INTEGRATION=1
 PYTHONPATH=src pytest tests/integration/ -m integration -q
 ```
 
@@ -60,6 +60,6 @@ PYTHONPATH=src pytest tests/integration/ -m integration -q
 ```bash
 ollama pull llama3.1:8b-instruct-q8_0
 docker compose up -d --build
-export RAIP_E2E_OLLAMA=1
+export VERA_E2E_OLLAMA=1
 PYTHONPATH=src pytest tests/e2e/ -m "e2e and ollama" -q
 ```

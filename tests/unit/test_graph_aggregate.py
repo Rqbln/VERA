@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import unittest
 
-from raip.graph.supervisor import aggregate_node
+from vera.graph.supervisor import aggregate_node
 
 
 class TestGraphAggregate(unittest.TestCase):

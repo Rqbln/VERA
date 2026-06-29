@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import unittest
 
-from raip.benchmarks.dynamic_prompts import generate_items
+from vera.benchmarks.dynamic_prompts import generate_items
 
 
 class TestDynamicPrompts(unittest.TestCase):

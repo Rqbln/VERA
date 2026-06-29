@@ -8,7 +8,7 @@ import urllib.request
 
 import pytest
 
-from raip.celery_app import celery_app
+from vera.celery_app import celery_app
 
 
 @pytest.fixture
@@ -20,8 +20,8 @@ def celery_eager() -> None:
 
 
 def _require_e2e_flag() -> None:
-    if os.environ.get("RAIP_E2E_OLLAMA") != "1":
-        pytest.skip("Set RAIP_E2E_OLLAMA=1 on the self-hosted runner to execute E2E.")
+    if os.environ.get("VERA_E2E_OLLAMA") != "1":
+        pytest.skip("Set VERA_E2E_OLLAMA=1 on the self-hosted runner to execute E2E.")
 
 
 def _require_redis() -> None:

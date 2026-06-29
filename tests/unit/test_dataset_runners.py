@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import unittest
 
-from raip.benchmarks.runners.dataset_scan import run_dataset_scan
-from raip.graph.supervisor import aggregate_node
+from vera.benchmarks.runners.dataset_scan import run_dataset_scan
+from vera.graph.supervisor import aggregate_node
 
 
 class TestDatasetRunners(unittest.TestCase):

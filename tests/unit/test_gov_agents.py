@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from raip.governance.agents import score_cyber, score_event, score_privacy
+from vera.governance.agents import score_cyber, score_event, score_privacy
 
 
 def test_cyber_flags_jailbreak():

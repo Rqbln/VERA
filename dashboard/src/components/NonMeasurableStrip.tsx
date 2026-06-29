@@ -7,7 +7,16 @@ interface Props {
   runId: string;
 }
 
-const OK = new Set(["reviewed", "measured", "completed", "available"]);
+// Semantic status per DESIGN_SYSTEM.md: reviewed/completed are OK (green); measured/queued/available
+// are partial (amber) — N03 energy is informational, not equivalent to a completed human/form review.
+const STATUS_OK = new Set(["reviewed", "completed"]);
+const STATUS_PARTIAL = new Set(["measured", "queued", "available"]);
+
+function statusClass(status: string): string {
+  if (STATUS_OK.has(status)) return "text-status-ok";
+  if (STATUS_PARTIAL.has(status)) return "text-status-partial";
+  return "text-ink-secondary";
+}
 
 export function NonMeasurableStrip({ slots, runId }: Props) {
   const items: { id: string; title: string; slot: NonMeasurableSlot; kind: string }[] = [
@@ -36,12 +45,11 @@ export function NonMeasurableStrip({ slots, runId }: Props) {
 
 function Slot({ id, title, slot, kind }: { id: string; title: string; slot: NonMeasurableSlot; kind: string }) {
   const status = String(slot?.status ?? "pending");
-  const ok = OK.has(status);
   return (
     <div className="rounded border border-default p-2">
       <div className="flex items-center justify-between">
         <span className="font-mono text-ink-secondary">{id}</span>
-        <span className={ok ? "text-status-ok" : "text-ink-secondary"}>{status}</span>
+        <span className={statusClass(status)}>{status}</span>
       </div>
       <div className="text-ink">{title}</div>
       {kind === "hitl" ? (

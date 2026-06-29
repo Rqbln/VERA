@@ -212,13 +212,42 @@ No reference in \Cref{tab:related-work} addresses SC1--SC4 together; RAIP is des
 \label{sec:framework}
 
 \subsection{Conceptual Evaluation Model}
+At the highest level, RAIP is a single function from one input to one auditable output, shown in \Cref{fig:concept}.
+\textbf{Input:} an \emph{evaluation target}---a model endpoint, a training checkpoint, or a dataset corpus---together with the set of requirements to check.
+\textbf{Output:} a signed \emph{responsible-AI scorecard}---one score per measurable COMPL-AI requirement (CR01--CR12) with an uncertainty interval, the governance documents (model card, datasheet), and a full provenance trail (which benchmark and scorer produced each number, under which signed weights).
+Everything between is automated and reproducible; \Cref{fig:architecture} then shows the engineering that realises it.
+
+\begin{figure}[t]
+  \centering
+  \resizebox{\columnwidth}{!}{%
+  \begin{tikzpicture}[
+    font=\footnotesize, >={Stealth[round]},
+    io/.style={draw, rounded corners=2pt, align=center, inner sep=5pt, fill=blue!6, text width=20mm, minimum height=13mm},
+    core/.style={draw=brandgreen!70, rounded corners=3pt, align=center, inner sep=6pt, fill=brandgreen!12, line width=0.7pt, text width=24mm, minimum height=15mm},
+    outbox/.style={draw, rounded corners=2pt, align=center, inner sep=5pt, fill=green!8, text width=22mm, minimum height=13mm},
+    arr/.style={->, very thick, black!60},
+    lbl/.style={font=\scriptsize\itshape, text=black!55},
+  ]
+    \node[io]   (in)   at (0,0) {\textbf{INPUT}\\[2pt] Model, checkpoint, or dataset\\[2pt] $+$ requirements to check};
+    \node[core] (raip) at (3.7,0) {\textbf{RAIP}\\[2pt] run benchmarks $\rightarrow$ aggregate to CR01--CR12 (signed weights)};
+    \node[outbox] (out) at (7.4,0) {\textbf{OUTPUT}\\[2pt] Responsible-AI scorecard $+$ signed governance documents $+$ provenance};
+    \draw[arr] (in) -- (raip);
+    \draw[arr] (raip) -- (out);
+    \node[lbl] at (0,-1.2) {what you give it};
+    \node[lbl] at (3.7,-1.2) {one automated, reproducible job};
+    \node[lbl] at (7.4,-1.2) {what you get back};
+  \end{tikzpicture}%
+  }
+  \caption{RAIP in one picture: an evaluation target plus a list of requirements goes \emph{in}; a signed responsible-AI scorecard with governance documents and full provenance comes \emph{out}. \Cref{fig:architecture} details the pipeline inside the green box.}
+  \label{fig:concept}
+\end{figure}
 An \emph{evaluation target} (a model endpoint, a training checkpoint, or a dataset corpus) is tagged with a \emph{lifecycle stage} (\texttt{data}, \texttt{finetune}, \texttt{inference}, \ldots) in a declarative \texttt{benchmark\_run.yaml}.
 The COMPL-AI layer aggregates the twelve measurable identifiers CR01--CR12 from weighted benchmarks in the signed catalogue \texttt{mvp2-v1} (\Cref{sec:weighting}), with bootstrap 95\% confidence intervals.
 The artifact layer emits \texttt{benchmark\_run.yaml}, \texttt{model\_card.md}, \texttt{datasheet.md} for dataset runs, and \texttt{raw\_outputs.jsonl} with per-benchmark harness metadata.
 Compliance stakeholders consume requirement tables and signatures, engineers consume MLflow traces, and the control room (\Cref{sec:dashboard}) renders all of it for a release-gate audience.
 
 \subsection{System Architecture}
-\Cref{fig:architecture} shows how our platform turns a launch request into signed, auditor-facing evidence.
+\Cref{fig:architecture} expands the green box of \Cref{fig:concept}, showing how our platform turns a launch request into signed, auditor-facing evidence.
 A user enters through one of three surfaces we provide---the \texttt{raip-eval} CLI, the \texttt{POST /api/v1/runs} REST endpoint, or our no-login guided wizard---all of which enqueue the \emph{same} declarative job on Celery/Redis (a standard task queue that runs jobs in the background), where our run store also holds the governance kill-switch.
 A Celery worker then executes our LangGraph supervisor---a small two-step controller that first \emph{evaluates}, then \emph{aggregates}: the \texttt{evaluate} node resolves the requested requirements to benchmarks through our registry, dispatches each to its runner, and routes inference via LiteLLM (one adapter for many model back-ends) to a self-hosted target and judge; the \texttt{aggregate} node combines the cached per-item scores using the weights read from our signed catalogue \texttt{mvp2-v1} and attaches bootstrap intervals.
 The run emits our artifact set---\texttt{benchmark\_run.yaml}, \texttt{model\_card.md}, \texttt{raw\_outputs.jsonl}, and a content signature---to MinIO or, in our lite profile, the local filesystem, with MLflow tracking optional, and our read API serves it to the control room (\Cref{sec:dashboard}).

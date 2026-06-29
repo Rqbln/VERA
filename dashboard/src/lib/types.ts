@@ -45,13 +45,26 @@ export interface HarnessRow {
   fallback: string | boolean;
 }
 
+export interface NonMeasurableSlot {
+  status: string;
+  queue_count?: number;
+  reviewed?: number;
+  avg_likert?: number | null;
+  kwh?: number | null;
+  co2eq_kg?: number | null;
+  source?: string;
+  fields?: Record<string, unknown>;
+  model_card_uri?: string;
+  [key: string]: unknown;
+}
+
 export interface NonMeasurableSlots {
-  n01: { status: string; queue_count: number; tasks: unknown[] };
-  n02: { status: string; queue_count: number; tasks: unknown[] };
-  n03: { status: string; ref?: string };
-  n04: { status: string; model_card_uri?: string; datasheet_uri?: string };
-  n05: { status: string };
-  n06: { status: string };
+  n01: NonMeasurableSlot;
+  n02: NonMeasurableSlot;
+  n03: NonMeasurableSlot;
+  n04: NonMeasurableSlot;
+  n05: NonMeasurableSlot;
+  n06: NonMeasurableSlot;
 }
 
 export interface TrustFactor {

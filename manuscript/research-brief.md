@@ -4,7 +4,7 @@
 > **Target venue:** APSEC 2026 Technical Track (IEEE two-column, 10 pages incl. references, double-blind).  
 > **Profile:** `skills/SciOrchestrator/assets/venue-profiles/apsec2026-technical-raip.yaml`  
 > **Playbook:** `skills/SciOrchestrator/skills/sci-orchestrator/apsec-raip-playbook.md`  
-> **Last updated:** 2026-05-27 (from repository discovery; no empirical numbers invented)
+> **Last updated:** 2026-06-26 (native 3-model run + banking + measured GaaS; earlier 2026-05-27 discovery retained for history)
 
 ---
 
@@ -97,17 +97,22 @@ REVIEW: Use a **compliance engineer** preparing an internal release gate for an 
 |----|--------------|-----------|----------------------------|
 | **C1** | **Conceptual framework** — lifecycle-aware responsible-AI evaluation model aligning EU AI Act principles, COMPL-AI requirement IDs, lifecycle stages, and stakeholder views | `docs/ROADMAP.md` §1–3, `docs/framework_open_source_ia_responsable.md` §5–8 | Conceptual + mapping tables; no new theory beyond operationalization |
 | **C2** | **RAIP platform** — integrated implementation: CLI (`raip-eval`), REST API, Celery workers, LangGraph supervisor, benchmark registry, optional lm-eval/Garak/hf runners, lab routes, MinIO/MLflow/Timescale | `src/raip/*`, `docker-compose.yml`, `examples/*.yaml` | Architecture figure + component table; open-source availability |
-| **C3** | **Empirical evaluation** — (i) technical evaluation on representative LLM targets and scenarios; (ii) optional practitioner questionnaire on usability for compliance workflows | Code supports Ollama E2E; tests 42+ unit/lab passed (doc); **numeric study results TODO** | **TODO: [USER: provide experimental runs, tables, and/or user study]** |
+| **C3** | **Empirical evaluation** — native 3-model panel (RQ1 cross-model scores), non-degenerate weighting sensitivity (RQ2), design-validation walkthrough (RQ3), data-stage results on a synthetic banking corpus, and an in-process GaaS-runtime benchmark; grounded by an EU AI Act ↔ DORA/EBA/ACPR mapping | `scripts/run_paper_eval.py`, `scripts/bench_gaas.py`, `data/corpus/banking_synth.jsonl`, `manuscript/results/*.json` | **DONE** — `tab:complai-multi` (12×3), `tab:triage-stability` (CR06/CR10 band-flip), `sec:banking` (CR03 0.84 / CR04 0.94 / CR05 0.73), GaaS overhead 5.7 ms / detection 3/3 |
 
 ---
 
 ## 6. Research questions (RQ1–RQ3)
 
+> **NOTE (2026-06-26):** the final paper (`main.tex`) re-scoped the RQs for the software/dashboard
+> focus — **RQ2 is now weighting sensitivity** (not lifecycle coverage) and **RQ3 is a
+> design-validation walkthrough**. The rows below keep the original planning wording for history; the
+> "Evidence status" column points to what actually shipped.
+
 | RQ | Question | Maps to | Primary metrics / artifacts | Evidence status |
 |----|----------|---------|----------------------------|-----------------|
-| **RQ1** | Can RAIP **automatically produce reproducible, COMPL-AI-aligned scores** across the 12 measurable requirements for a given LLM target under a declarative configuration? | C2, platform R2–R3 | Per-requirement score `s ∈ [0,1]`; bootstrap 95% CI; `benchmark_run.yaml`; MLflow metrics; `raw_outputs.jsonl` with `harness` / `fallback` | **Engineering validated** (tests, E2E config); **paper numbers TODO** |
-| **RQ2** | Does **lifecycle extension** (dataset scans R03–R05 + checkpoint evaluation + poisoning/BSR lab) improve **risk coverage** compared to inference-only evaluation? | C1, platform R1 | Coverage = set of requirement IDs with non-empty aggregates; BSR for R02 extension; Timescale trajectories | **Qualitative argument + scenario design**; **comparative numbers TODO** |
-| **RQ3** | Is RAIP **usable and interpretable** for practitioners responsible for compliance documentation (model cards, datasheets, audit trails)? | C3, platform R2 | Task time, SUS or Likert questionnaire (Histree-style Q1–Qn); correctness of artifact interpretation | **TODO: [USER: user study design — participants, tasks, N, questionnaire]** |
+| **RQ1** | Can RAIP **automatically produce reproducible, COMPL-AI-aligned scores** across the 12 measurable requirements for a given LLM target under a declarative configuration? | C2, platform R2–R3 | Per-requirement score `s ∈ [0,1]`; bootstrap 95% CI; `benchmark_run.yaml`; MLflow metrics; `raw_outputs.jsonl` with `harness` / `fallback` | **DONE** — native 3-model panel, `tab:complai-multi`, determinism check |
+| **RQ2** | *(final: weighting sensitivity)* How sensitive are scores/bands/triage to the aggregation weights, and is that auditable? | C2 | Per-requirement spread `Δ`, reweighting range, band-flips (`tab:triage-stability`) | **DONE** — non-degenerate: CR01 invariant (Δ=0), CR06/CR10 flip band (Δ=1.0) |
+| **RQ3** | Is RAIP **usable and interpretable** for practitioners responsible for compliance documentation (model cards, datasheets, audit trails)? | C3, platform R2 | Task time, Likert/triage tasks; correctness of artifact interpretation | **DONE** — design-validation walkthrough (8 triage tasks); external N-participant study deferred |
 
 **Alternative (if no user study):** Replace RQ3 with a **case study** on documented scenarios (e.g., clean vs poisoned checkpoint, dataset with injected PII) — REVIEW: confirm with authors.
 

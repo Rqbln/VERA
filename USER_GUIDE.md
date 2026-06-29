@@ -13,7 +13,7 @@ doc:
     agents: ./AGENTS.md
     dev: ./docs/README-dev.md
   tags: [raip, guide, utilisateur, eu-ai-act]
-last_reviewed: "2026-06-15"
+last_reviewed: "2026-06-26"
 ---
 
 # Guide utilisateur RAIP
@@ -102,9 +102,14 @@ ligne pour ouvrir le détail (benchmarks utilisés, justification, échantillon 
 En bas de la page d'un run, la section **Governance & trends (MVP3)** permet de :
 
 - voir la **tendance** d'une exigence sur plusieurs runs (dès qu'il y a au moins 2 runs du modèle) ;
-- enregistrer une **revue humaine** pour N01 (explicabilité) et N02 (corrigibilité) ;
-- remplir les **formulaires déclaratifs** N03–N06 ;
+- enregistrer une **revue humaine** pour N01 (explicabilité) et N02 (corrigibilité) : une **grille de
+  critères** notés de 1 à 5 (la moyenne donne le score), plutôt qu'une note unique ;
+- remplir les **formulaires déclaratifs** N04–N06 (l'énergie **N03 est mesurée automatiquement**
+  pendant l'évaluation, vous n'avez rien à saisir) ;
 - **télécharger un rapport PDF** signé pour l'audit (nécessite l'option `pdf` côté serveur).
+
+Le bandeau **N01–N06** sur le récapitulatif d'un run reflète l'état réel (revues en file/faites,
+énergie mesurée, formulaires remplis) — il n'affiche plus de valeurs par défaut.
 
 Le **kill-switch** permet de bloquer toute nouvelle évaluation en un clic.
 
@@ -139,3 +144,7 @@ Ce runtime est optionnel et destiné aux équipes avancées : `make stack-gaas` 
 - Documentation complète : [docs/README.md](./docs/README.md)
 - Guide pour agents IA : [AGENTS.md](./AGENTS.md)
 - Mode entreprise (Keycloak/RBAC) : voir [docs/README-dev.md](./docs/README-dev.md)
+- **Évaluation native complète** (tous les benchmarks R03–R12 réellement exécutés, panel
+  multi-modèles, corpus bancaire, reproduction des chiffres du papier) :
+  [docs/EVALUATION_GUIDE.md](./docs/EVALUATION_GUIDE.md)
+- Remplir les exigences non-mesurables N01–N06 : [docs/NON_MEASURABLE_GUIDE.md](./docs/NON_MEASURABLE_GUIDE.md)

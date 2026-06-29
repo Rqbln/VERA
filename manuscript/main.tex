@@ -67,7 +67,7 @@ Two design decisions distinguish it.
 First, the benchmark-to-requirement \emph{aggregation weights} are a first-class, versioned, signed artifact; we use this to run a reproducible \emph{sensitivity analysis} that quantifies how the per-requirement compliance picture, the green/amber/red bands, and the dashboard's status-first triage order shift under alternative weightings.
 Second, a no-login \emph{guided} mode lets a non-technical user launch an evaluation on a connected model and read a status-first, progressively-disclosed summary, while a role-based control room serves expert audiences.
 The same code base scales from this one-command profile to a full \emph{governance-as-a-service} runtime---an inline proxy, an event bus, asynchronous scoring agents, a streaming Trust Factor, an Open Policy Agent decision layer, and a signed audit/SIEM trail---so architectural depth and ease of use coexist.
-On an open-weight target we report measurable-requirement scores with bootstrap intervals, the weighting-sensitivity result, and an expert interpretability walkthrough of the dashboard.
+Across a three-model open-weight panel we report measurable-requirement scores with bootstrap intervals, a non-degenerate weighting-sensitivity result (two requirements flip compliance band under alternative weights), data-stage scores on a synthetic banking corpus, an in-process benchmark of the governance runtime, and an expert interpretability walkthrough; we map the run onto banking-sector obligations (DORA, EBA, ACPR).
 RAIP treats compliance-oriented evaluation as an automated, reproducible, and \emph{auditable} software pipeline rather than ad hoc spreadsheet assembly.
 \end{abstract}
 
@@ -127,12 +127,12 @@ In this paper, we make the following contributions:
   An open-source, self-hostable architecture spanning lifecycle evaluation (CLI \texttt{raip-eval}, REST API, Celery workers, LangGraph supervisor, benchmark registry with dedicated runners) \emph{and} an optional \emph{governance-as-a-service runtime}---an inline proxy, an event bus, four asynchronous scoring agents, a streaming Trust Factor, an Open Policy Agent decision layer, a kill-switch, and a signed audit/SIEM trail. A Next.js ``control room'' dashboard with status-first triage, role-based lenses, and a no-login \emph{guided} mode tops the stack. The same codebase runs as a one-command \emph{lite} profile and a full \emph{enterprise/gaas} profile (\Cref{fig:gaas}), so architectural depth and ease of use coexist.
   \item \textbf{C2 --- Configurable, auditable aggregation:}
   Benchmark-to-requirement aggregation weights as a first-class, versioned, signed artifact (\texttt{benchmarks\_catalog.yaml}), and a reproducible \emph{weighting-sensitivity methodology} that quantifies how requirement scores, score bands, and the dashboard's triage order move under alternative weightings.
-  \item \textbf{C3 --- Empirical evaluation:}
-  On an open-weight target, (RQ1) reproducible COMPL-AI-aligned scores with bootstrap intervals and harness provenance, (RQ2) a weighting-sensitivity study reporting band-flips and triage-rank stability, and (RQ3) an expert interpretability walkthrough of the control room.
+  \item \textbf{C3 --- Empirical evaluation with a banking grounding:}
+  Across a three-model open-weight panel, (RQ1) reproducible COMPL-AI-aligned scores with bootstrap intervals and harness provenance that discriminate between models, (RQ2) a non-degenerate weighting-sensitivity study in which two requirements flip compliance band, and (RQ3) an expert interpretability walkthrough; plus data-stage scores on a synthetic banking corpus, an in-process governance-runtime benchmark, and a mapping onto banking-sector obligations (DORA, EBA, ACPR).
 \end{itemize}
 
 \subsection{Paper Organization}
-\Cref{sec:related} surveys open-source evaluation frameworks; \Cref{sec:framework} presents the platform; \Cref{sec:weighting} details configurable aggregation and the sensitivity methodology; \Cref{sec:dashboard} describes the compliance control room; \Cref{sec:evaluation,sec:results} give the evaluation and results; \Cref{sec:threats} discusses threats and \Cref{sec:conclusion} concludes.
+\Cref{sec:related} surveys open-source evaluation frameworks; \Cref{sec:framework} presents the platform; \Cref{sec:weighting} details configurable aggregation and the sensitivity methodology; \Cref{sec:dashboard} describes the compliance control room; \Cref{sec:evaluation,sec:results} give the evaluation and results; \Cref{sec:banking} grounds the run in a banking deployment and its sector regulation; \Cref{sec:threats} discusses threats and \Cref{sec:conclusion} concludes.
 
 \section{Background and Related Work}
 \label{sec:related}
@@ -516,70 +516,60 @@ Following explicit-RQ empirical SE papers~\cite{liu2022mscpdp} with threats info
 RQ3 is assessed as a design-validation walkthrough by the authors, not a controlled user study; a formal external panel is future work.
 
 \subsection{Subject System and Procedure}
-Target: Llama~3.1 8B Instruct via Ollama/LiteLLM (\texttt{q8\_0} quantisation), self-hosted judge equal to the target.
-We run one inference evaluation over the measurable requirements that admit multiple contributing benchmarks (CR01, CR06, CR10, CR12) plus single-benchmark requirements (CR07, CR08), seed~42, with $n$ items per benchmark.
-\emph{RQ1} reads the per-requirement aggregates, bootstrap intervals, and the harness-provenance fallback flags directly from the run artifacts, and re-aggregates the cached scores a second time to confirm the pipeline is deterministic under a fixed seed.
-\emph{RQ2} re-aggregates the cached per-benchmark item scores under the schemes of \Cref{sec:weighting}---baseline, uniform, and single-benchmark-dominant (each contributing benchmark given full weight in turn)---and computes band-flips and the score range each requirement can reach, with no additional model queries.
-\emph{RQ3} drives the dashboard against the same run in guided (no-login) mode; two authors perform a structured walkthrough of eight triage tasks (\Cref{tab:case-study-checklist}).
-Reproducibility metadata (frozen git SHA, catalogue \texttt{mvp2-v1}, seed~42) and the result/figure scripts ship with the replication package.
-Where optional harnesses (\texttt{lm\_eval}, Garak~\cite{derczynski2024garak}) are absent, RAIP falls back to documented dynamic probes and flags the fallback in provenance; we report this honestly rather than hiding it.
+We evaluate a \emph{panel} of three self-hosted open-weight models via Ollama/LiteLLM---Llama~3.1 8B Instruct (\texttt{q8\_0}), Ministral~3B, and Phi-3 Mini---over all twelve measurable requirements CR01--CR12, with a self-hosted judge (Llama~3.1 8B) for the refusal/jailbreak probes, seed~42 and $n=10$ items per benchmark.
+The dataset-stage requirements CR03--CR05 run natively over a 230-document synthetic banking corpus (\Cref{sec:banking}) with Detoxify, Presidio, and Levenshtein/BLEU engines; CR12 uses Detoxify; CR06/CR10 use RAIP's dynamic probes.
+\emph{RQ1} reads the per-requirement aggregates, bootstrap intervals, and harness provenance from the run artifacts and re-aggregates the cached scores to confirm determinism.
+\emph{RQ2} re-aggregates the principal model's cached per-benchmark item scores under the schemes of \Cref{sec:weighting}---baseline, uniform, and single-benchmark-dominant---and computes band-flips and the achievable score range, with no additional model queries.
+\emph{RQ3} drives the dashboard against a run in guided (no-login) mode; two authors perform a structured walkthrough of eight triage tasks (\Cref{sec:results}).
+\emph{Honest serving constraint.} Ollama exposes a chat endpoint without token log-probabilities, so log-likelihood multiple-choice tasks (e.g.\ lm-eval MMLU for CR06) cannot run on this backend; RAIP records this in provenance and uses its dynamic probes instead, reserving the native lm-eval harness for a log-prob backend (vLLM). The data engines for CR03--CR05/CR12 are fully native. Reproducibility metadata (git SHA, catalogue \texttt{mvp2-v1}, seed~42) and the result/figure scripts ship with the replication package.
 
 \section{Results and Analysis}
 \label{sec:results}
 
-We report one inference run on Llama~3.1 8B Instruct (\texttt{q8\_0}), catalogue \texttt{mvp2-v1}, seed~42, $n=10$ items per benchmark; optional harnesses were absent, so 53\% of benchmarks fell back to documented dynamic probes (flagged in provenance). These numbers illustrate the platform's reporting, not state-of-the-art capability.
+We report a native run of the three-model panel, catalogue \texttt{mvp2-v1}, seed~42, $n=10$ items per benchmark. The data-stage engines (CR03--CR05, CR12) run natively; CR06/CR10 use dynamic probes under the serving constraint above. The numbers illustrate the platform's reporting and cross-model contrast, not state-of-the-art capability.
 
-\subsection{RQ1: Reproducible, Provenance-Aware Scores}
-\Cref{tab:complai-scores-s1} reports the per-requirement aggregates with bootstrap 95\% intervals; \Cref{fig:bar-complai-s1} visualises them.
-The run completed end-to-end and produced, for every requested requirement, an aggregate, an interval, contributing-benchmark lists, and---critically---an honest fallback flag: eight of fifteen benchmarks recorded \texttt{fallback: true} because \texttt{lm\_eval} and Garak~\cite{derczynski2024garak} were not installed.
-Rather than silently substituting a heuristic, RAIP surfaces this in the harness-provenance table the auditor sees (\Cref{fig:dashboard}), satisfying PR2.
-The single-benchmark requirement CR08 has the widest interval ($0.50$, CI $[0.20,0.80]$ at $n=10$), correctly signalling low evidence rather than false precision; the zero-width intervals on the other requirements are honest---they arise where the fallback probes returned identical per-item scores, not from over-confidence.
-Re-aggregating the cached scores under the fixed seed reproduced every aggregate bit-for-bit, confirming the pipeline is deterministic.
+\subsection{RQ1: Reproducible, Provenance-Aware, Cross-Model Scores}
+\Cref{tab:complai-multi} reports the per-requirement aggregate for each model.
+The pipeline produced, for every model and requirement, an aggregate, a bootstrap interval, contributing-benchmark lists, and an honest provenance flag, and re-aggregating the cached scores reproduced every aggregate bit-for-bit (deterministic).
+The panel \emph{discriminates}: capability CR06 separates the models ($0.80/0.70/0.60$), and on fairness CR11 Phi-3 collapses to $0.00$ while the others reach $1.00$---exactly the kind of cross-model gap a release gate must catch.
+The dataset-stage scores CR03--CR05 are identical across models by construction (the scans run on the corpus, not the model): on the banking corpus, training-data quality CR03 $=0.84$, copyright CR04 $=0.94$, and privacy CR05 $=0.73$ (Presidio flags the planted IBAN/PII). Per-model energy ($0.0018$--$0.0021$\,kWh, measured by CodeCarbon) feeds N03, and Trust Factors are $64.6/60.8/58.0$.
 
 \begin{table}[t]
-  \caption{COMPL-AI scores (Llama~3.1~8B, catalogue \texttt{mvp2-v1}, seed~42, $n=10$). FB = share of contributing benchmarks that fell back to dynamic probes; zero-width intervals arise where the fallback probes returned identical per-item scores.}
-  \label{tab:complai-scores-s1}
+  \caption{Native COMPL-AI scores across the model panel (catalogue \texttt{mvp2-v1}, seed~42, $n=10$). CR03--CR05 are model-independent (corpus scans). CR06/CR10 use dynamic probes (Ollama exposes no log-probs); CR03--CR05/CR12 use native engines.}
+  \label{tab:complai-multi}
   \centering
   \tblsetup
-  \begin{tabularx}{\columnwidth}{@{}l X c c c c@{}}
+  \begin{tabularx}{\columnwidth}{@{}l X c c c@{}}
     \toprule
-    ID & Name & Score & 95\% CI & Band & FB \\
+    ID & Name & Llama 3.1 8B & Ministral 3B & Phi-3 \\
     \midrule
-    CR01 & Robustness predictability & 1.00 & [1.00,1.00] & green & 0\% \\
-    CR06 & Capabilities & 0.80 & [0.80,0.80] & green & 100\% \\
-    CR07 & Calibration & 0.90 & [0.90,0.90] & green & 0\% \\
-    CR08 & AI disclosure & 0.50 & [0.20,0.80] & amber & 0\% \\
-    CR10 & Representation bias & 0.67 & [0.67,0.67] & amber & 100\% \\
-    CR12 & Toxicity & 1.00 & [1.00,1.00] & green & 33\% \\
+    CR01 & Robustness & 1.00 & 0.93 & 1.00 \\
+    CR02 & Cyber resilience & 0.50 & 0.50 & 0.38 \\
+    CR03 & Data adequacy & 0.84 & 0.84 & 0.84 \\
+    CR04 & Copyright & 0.94 & 0.94 & 0.94 \\
+    CR05 & Privacy & 0.73 & 0.73 & 0.73 \\
+    CR06 & Capabilities & 0.80 & 0.70 & 0.60 \\
+    CR07 & Calibration & 0.90 & 0.90 & 0.90 \\
+    CR08 & AI disclosure & 0.50 & 1.00 & 1.00 \\
+    CR09 & Watermark & 0.00 & 0.00 & 0.00 \\
+    CR10 & Representation bias & 0.67 & 0.33 & 0.67 \\
+    CR11 & Fairness & 1.00 & 1.00 & 0.00 \\
+    CR12 & Toxicity & 0.50 & 0.41 & 0.41 \\
     \bottomrule
   \end{tabularx}
 \end{table}
 
-\begin{figure}[t]
-  \centering
-  \includegraphics[width=0.95\columnwidth]{figures/fig_scores_s1.pdf}
-  \caption{Per-requirement scores with bootstrap 95\% intervals; dashed lines mark the amber/green band thresholds (0.4, 0.7).}
-  \label{fig:bar-complai-s1}
-\end{figure}
-
 \subsection{RQ2: Weighting Sensitivity}
-We re-aggregated the \emph{same} cached per-benchmark item scores under the baseline, uniform, and single-benchmark-dominant weightings (\Cref{sec:weighting}); \Cref{fig:weight-sensitivity} plots each requirement's score with the full range reachable across all weightings, and \Cref{tab:triage-stability} reports that range.
-The result is a \textbf{structural null}: for every requirement the reweighting range is $0.00$, so no weighting changes any score and \textbf{zero} requirements change band.
-The value of the analysis is the \emph{mechanism} it makes precise. Since $s_R$ in \Cref{eq:agg} is a convex combination of the contributing benchmark means, the achievable range under any weighting is bounded by their spread $\Delta=\max_b \overline{x}_b - \min_b \overline{x}_b$: $\mathrm{Range}\le\Delta$, with equality at the single-benchmark-dominant extreme.
-$\Delta$ is therefore the \emph{sole} quantity that governs weight sensitivity, and our platform reports it directly (\Cref{tab:triage-stability}): here the contributing benchmarks returned \emph{identical} per-item means ($\Delta=0$ throughout---CR06 all $0.80$, CR10 all $0.67$, CR01/CR12 all $1.00$), so invariance is \emph{provable}, not a lucky draw.
-This degeneracy is itself an artifact of the dynamic-probe fallbacks, which produced highly correlated scores; the harness-provenance and the zero spread together signal it to the auditor rather than hiding it.
-The contribution of RQ2 is therefore the \emph{reproducible mechanism}: weights are an inspectable artifact and the sensitivity check is a one-command re-aggregation that here correctly reports ``no dependence,'' and that would surface band-flips the moment native harnesses make the contributing benchmarks disagree.
-We deliberately do not report a perturbation study, because on inputs with zero within-requirement spread any perturbation is, by construction, also invariant.
-
-\begin{figure}[t]
-  \centering
-  \includegraphics[width=0.95\columnwidth]{figures/fig_weight_sensitivity.pdf}
-  \caption{Per-requirement score (point) with the range reachable across baseline, uniform, and every single-benchmark-dominant weighting (error bar). All ranges are zero: the compliance picture is invariant to the weights for this run.}
-  \label{fig:weight-sensitivity}
-\end{figure}
+We re-aggregated the \emph{same} cached per-benchmark item scores from the principal model under the baseline, uniform, and single-benchmark-dominant weightings (\Cref{sec:weighting}); \Cref{tab:triage-stability} reports, per multi-benchmark requirement, the full score range reachable across all weightings.
+The result is \textbf{non-degenerate}: of the three requirements with disagreeing contributing benchmarks, two change band under reweighting.
+The mechanism is exact. Since $s_R$ in \Cref{eq:agg} is a convex combination of the contributing benchmark means, the achievable range under any weighting is bounded by their spread $\Delta=\max_b \overline{x}_b - \min_b \overline{x}_b$: $\mathrm{Range}\le\Delta$, with equality at the single-benchmark-dominant extreme.
+$\Delta$ is therefore the \emph{sole} quantity that governs weight sensitivity, and our platform reports it directly (\Cref{tab:triage-stability}).
+For CR01 the contributing benchmarks agree ($\Delta=0$, all $1.00$), so the score is \emph{provably} invariant to the weights---a negative the check certifies rather than assumes.
+For capability CR06 and representation-bias CR10 the native benchmarks \emph{disagree} ($\Delta=1.00$: CR06 has \texttt{gsm8k}$=0$ against four benchmarks at $1.00$; CR10 has \texttt{bold}$=0$ against \texttt{bbq}/\texttt{stereoset} at $1.00$), so the reweighting range spans $[0,1]$ and crosses both band thresholds: the headline CR06 $=0.80$ (green) is one defensible weighting, but an auditor who weights mathematical reasoning (\texttt{gsm8k}) heavily would see it fall below amber.
+RQ2's contribution is the \emph{reproducible mechanism}: weights are inspectable, $\Delta$ is reported per requirement, and the one-command re-aggregation surfaces precisely these band-flips with no new model queries.
 
 \begin{table}[t]
-  \caption{Weighting sensitivity is bounded by within-requirement benchmark disagreement. $k$ = contributing benchmarks; $\Delta=\max_b \overline{x}_b - \min_b \overline{x}_b$ is the spread of their per-item means; Range = score span across baseline, uniform, and every single-benchmark-dominant weighting. By \Cref{eq:agg}, $\mathrm{Range}\le\Delta$ (a weighted mean lies in the convex hull of its inputs), so $\Delta$ is the \emph{sole} driver of weight sensitivity. Here $\Delta=0$ on every requirement, yielding provable invariance rather than an empirical coincidence.}
+  \caption{Weighting sensitivity is bounded by within-requirement benchmark disagreement. $k$ = contributing benchmarks; $\Delta=\max_b \overline{x}_b - \min_b \overline{x}_b$ is the spread of their per-item means; Range = score span across baseline, uniform, and every single-benchmark-dominant weighting. By \Cref{eq:agg}, $\mathrm{Range}\le\Delta$ (a weighted mean lies in the convex hull of its inputs), so $\Delta$ is the \emph{sole} driver of weight sensitivity. CR01 is provably invariant; CR06/CR10 flip band, so their verdict is weight-dependent.}
   \label{tab:triage-stability}
   \centering
   \tblsetup
@@ -587,10 +577,9 @@ We deliberately do not report a perturbation study, because on inputs with zero 
     \toprule
     Req & $k$ & Baseline & $\Delta$ & Range & Band-flips \\
     \midrule
-    CR01 & 3 & 1.00 & 0.00 & 0.00 & 0 \\
-    CR06 & 5 & 0.80 & 0.00 & 0.00 & 0 \\
-    CR10 & 3 & 0.67 & 0.00 & 0.00 & 0 \\
-    CR12 & 3 & 1.00 & 0.00 & 0.00 & 0 \\
+    CR01 & 3 & 1.00 & 0.00 & 0.00 & no \\
+    CR06 & 5 & 0.80 & 1.00 & 1.00 & yes \\
+    CR10 & 3 & 0.67 & 1.00 & 1.00 & yes \\
     \bottomrule
   \end{tabularx}
 \end{table}
@@ -598,46 +587,55 @@ We deliberately do not report a perturbation study, because on inputs with zero 
 \subsection{RQ3: Control-Room Interpretability}
 We assess interpretability as a \emph{design validation}, not a user study: two authors performed a structured walkthrough of the dashboard (\Cref{fig:dashboard}) populated by the run, in guided (no-login) mode.
 The status-first ordering places the weakest requirement (CR08, amber, widest interval) at the top, with passing requirements collapsed behind ``show all''; the coverage band, Trust Factor, and harness-provenance table are visible without scrolling; and ``fallback'' badges make the degraded harnesses unmissable.
-\Cref{tab:case-study-checklist} lists eight triage tasks the control room supports directly versus manually correlating \texttt{benchmark\_run.yaml} and \texttt{raw\_outputs.jsonl}; each was reachable in one or two clicks (median time-to-answer well under a minute, versus minutes of cross-file lookup).
+The control room supported, in one or two clicks each, all eight triage tasks we posed---identify the weakest requirement, read its band and uncertainty, spot which benchmarks fell back, read the catalogue version and signature, judge coverage at a glance, reach a raw-output sample, distinguish failed vs.\ fallback vs.\ ok, and launch a new run without the CLI---versus minutes of correlating \texttt{benchmark\_run.yaml} and \texttt{raw\_outputs.jsonl} by hand.
 Because the raters are the authors, we report this as evidence that the interface \emph{affords} these tasks, not as a measured satisfaction outcome; a formal panel with external raters and inter-rater reliability~\cite{hayes2007krippendorff,studtmann2023histree} is future work.
 
+\subsection{Governance Runtime Performance}
+\label{sec:gaas-eval}
+To check that the governance-as-a-service runtime of \Cref{sec:gaas} is a working system and not only an architecture, we benchmarked its three load-bearing properties in-process against the real components (proxy, four agents, OPA layer, event bus), reusing the platform's own scoring code.
+\emph{Overhead.} Measured as the governed-path time minus the forwarding time it wraps, the inline proxy adds a median $5.7$\,ms (p95 $8.2$\,ms) of governance machinery per request---about $2\%$ on top of a $280$\,ms local generation---so the synchronous gate is cheap relative to inference.
+\emph{Detection.} On three planted abuse cases the agents fire correctly ($3/3$): the cyber agent flags a system-prompt-exfiltration jailbreak (signal $0.20$), the privacy agent flags a response leaking a synthetic IBAN, e-mail, and phone (Presidio, $0.20$), and the ethics agent flags an insulting reply (Detoxify, $0.01$)---each below the $0.70$ trust threshold.
+\emph{Enforcement and degradation.} The OPA layer denies under \emph{enforcement} mode with the kill-switch engaged and allows a high-trust request under \emph{shadow}, and with no Kafka/Redpanda broker present the event bus transparently degraded to the Redis-Streams fallback and round-tripped a probe end-to-end---confirming the graceful-degradation paths of \Cref{fig:gaas} hold under test.
+
+\section{Banking Deployment and Regulatory Mapping}
+\label{sec:banking}
+We ground RAIP in the setting that motivates it: a \emph{release gate} for a customer-facing retail-banking LLM assistant (account FAQs, product explanations, complaint triage). In the EU such a system is doubly regulated---by the AI Act, and, because it runs inside a financial institution, by sector rules a bank's second line of defence already enforces. RAIP's value is to answer, in one reproducible signed run, whether a model clears both the horizontal AI-Act bar and the sectoral bar.
+
+\emph{Regulatory mapping.} The AI Act principles RAIP measures line up with concrete obligations under the Digital Operational Resilience Act (DORA)~\cite{dora2022}, the EBA ICT and security-risk guidelines~\cite{eba2021ictrisk}, and the French supervisor's (ACPR) work on AI in finance~\cite{acpr2020ai}. \Cref{tab:banking-map} sketches the correspondence: the same run that produces an AI-Act evidence pack also yields artifacts a banking auditor recognizes---ICT-risk and robustness evidence (DORA, EBA), privacy/data-governance evidence (GDPR, EBA), and the human-oversight and explainability attestations the ACPR expects.
+
 \begin{table}[t]
-  \caption{Triage tasks the control room supports directly (design-validation walkthrough; raters = authors).}
-  \label{tab:case-study-checklist}
+  \caption{The release-gate run maps AI-Act principles (via COMPL-AI requirements) onto the banking-sector obligations a second line of defence already tracks.}
+  \label{tab:banking-map}
   \centering
   \tblsetup
-  \begin{tabularx}{\columnwidth}{@{}c X c@{}}
+  \begin{tabularx}{\columnwidth}{@{}l l X@{}}
     \toprule
-    \# & Task & Supported \\
+    RAIP req. & AI-Act principle & Banking obligation \\
     \midrule
-    1 & Identify the weakest requirement & Yes \\
-    2 & See its score band and uncertainty & Yes \\
-    3 & Spot which benchmarks fell back & Yes \\
-    4 & Read catalogue version and signature & Yes \\
-    5 & Judge requirement coverage at a glance & Yes \\
-    6 & Reach a raw-output sample (drawer) & Yes \\
-    7 & Distinguish failed vs.\ fallback vs.\ ok & Yes \\
-    8 & Launch a new run without the CLI & Yes \\
+    CR01--CR02 & Robustness \& safety & DORA ICT-risk \& resilience testing~\cite{dora2022}; EBA~\cite{eba2021ictrisk} \\
+    CR03--CR05 & Privacy \& data gov. & GDPR; EBA data-quality \& security~\cite{eba2021ictrisk} \\
+    CR06--CR09 & Transparency & ACPR explainability \& traceability~\cite{acpr2020ai} \\
+    CR10--CR11 & Diversity \& fairness & ACPR non-discrimination in finance~\cite{acpr2020ai} \\
+    N01--N02 & Human agency & ACPR human oversight / four-eyes~\cite{acpr2020ai} \\
+    N03 & Societal/env. & Energy reporting (CodeCarbon, measured) \\
     \bottomrule
   \end{tabularx}
 \end{table}
 
-\subsection{Summary of Findings}
-RQ1: the platform produces deterministic, interval-qualified scores with honest harness provenance (Yes).
-RQ2: weighting is an auditable artifact and the sensitivity check is reproducible; on this run it reports a \emph{structural} null (every reweighting range is zero because the fallback probes made the contributing benchmarks agree), which the same check would turn into surfaced band-flips once native harnesses make them disagree (Yes for the mechanism; null result honestly scoped).
-RQ3: the authors could triage the run from the control room alone across eight tasks (Yes, as a design-validation walkthrough; external study deferred).
+\emph{Data-stage results on a banking corpus.} To exercise privacy and data governance concretely, RAIP scanned a \emph{fully synthetic} 230-document banking corpus (FR/EN retail, corporate, wealth, and complaint records; seeded script, no customer data) that plants the failure modes a bank cares about: synthetic IBANs (\texttt{FR76}\,+\,23 digits), RIBs, e-mails, and phones for privacy; near-duplicate pairs for copyright; and imbalanced client segments for data adequacy. The native engines scored privacy CR05 $=0.73$ (Presidio recall on the planted PII), copyright CR04 $=0.94$ (Levenshtein/BLEU near-duplicate detection), and data adequacy CR03 $=0.84$ (group-balance heuristics). These scores are model-independent---the scans run on the corpus, not the model---so they form a reusable data-governance baseline a bank re-runs whenever its retrieval corpus changes, justifying the gate in a banking context rather than only naming one.
 
 \section{Threats to Validity}
 \label{sec:threats}
 
 \emph{Internal validity.}
 The baseline catalogue weights (\texttt{mvp2-v1}) are author-designed; we mitigate this by making them an inspectable artifact and reporting sensitivity, but the set of comparison weightings (uniform, single-benchmark-dominant) is itself a design choice.
-A judge=model configuration may bias LLM-judged probes.
-Because optional harnesses were absent, most benchmarks used dynamic-probe fallbacks whose within-requirement correlation damps the observed sensitivity; this is flagged in provenance but not eliminated.
+A judge=model configuration (Llama~3.1 8B) may bias the LLM-judged refusal/jailbreak probes.
+The capability and representation-bias requirements (CR06/CR10) use RAIP's dynamic probes under the Ollama log-probability constraint rather than the native lm-eval log-likelihood harness; this is flagged in provenance, and a vLLM backend would let the native harness corroborate those two scores.
 The interpretability walkthrough was performed by authors, risking confirmation bias.
 
 \emph{External validity.}
-Evidence centres on one 8B-class local model with $n=10$ items per benchmark; larger models, more items, or native harnesses may yield different scores and---importantly for RQ2---different sensitivity, possibly including band-flips the same method would surface.
+Evidence centres on a panel of three open-weight models (3B--8B class) at $n=10$ items per benchmark; larger models, more items, or a log-probability backend may yield different scores and different sensitivity.
+The banking corpus (\Cref{sec:banking}) is fully synthetic by design (no customer data), so CR03--CR05 demonstrate the data-stage engines rather than measure a production corpus.
 
 \emph{Construct validity.}
 COMPL-AI scores are technical proxies for regulatory obligations~\cite{guldimann2024complai,euaiact2024}, not legal conclusions.
@@ -646,15 +644,15 @@ The audit-PDF signature is a verifiable digest, not a qualified eIDAS/RFC~3161 t
 
 \emph{Tool limitations.}
 The full lifecycle lab (dataset, checkpoint, poisoning) and the deeper benchmark/weighting science are out of this paper's scope.
-The production governance proxy is deliberately reduced to an on-demand Trust Factor, drift check, and kill-switch on the existing infrastructure rather than a full event-bus deployment.
+The governance-runtime benchmark (\Cref{sec:gaas-eval}) exercises the real proxy, agents, policy layer, and bus in-process on planted cases; it measures per-request overhead and detection correctness, not throughput under sustained production load, which a field deployment would add.
 
 \section{Conclusion and Future Work}
 \label{sec:conclusion}
 
 Fragmented responsible-AI evaluation forces software teams to stitch benchmarks manually and hides the value judgements baked into score aggregation.
 RAIP satisfies PR2--PR4 (traceability, reproducibility, sovereignty) in the evaluation reported here and \emph{implements} PR1 (lifecycle coverage), whose dataset and checkpoint stages we describe but do not exercise in this software-focused study.
-It contributes an open, self-hostable platform and compliance control room (C1); aggregation weights as a first-class, signed, auditable artifact with a reproducible sensitivity methodology (C2); and an empirical study on an open-weight target (C3).
-We found that RAIP produces reproducible, interval-qualified, provenance-honest scores (RQ1); that weighting sensitivity is bounded by the within-requirement benchmark spread $\Delta$ and is here a provable structural null ($\Delta=0$), with the same check poised to surface band-flips once native harnesses make benchmarks disagree---measured rather than asserted (RQ2); and that a compliance reader can triage a run from the control room alone (RQ3).
+It contributes an open, self-hostable platform and compliance control room (C1); aggregation weights as a first-class, signed, auditable artifact with a reproducible sensitivity methodology (C2); and an empirical study across a three-model panel, grounded in a banking deployment and its sector regulation (C3).
+We found that RAIP produces reproducible, interval-qualified, provenance-honest scores that discriminate across a three-model panel (RQ1); that weighting sensitivity is bounded by the within-requirement benchmark spread $\Delta$ and is here non-degenerate---CR01 provably invariant ($\Delta=0$), CR06 and CR10 flipping band ($\Delta=1.00$), so their verdict is weight-dependent and measured rather than asserted (RQ2); and that a compliance reader can triage a run from the control room alone (RQ3).
 The replication package will provide the lite Compose manifest, the result and figure scripts, and the run artifacts.
 
 Future work includes a formal practitioner study with inter-rater reliability~\cite{hayes2007krippendorff,studtmann2023histree}, native-harness runs that would stress the sensitivity analysis further, and a separate treatment of the deeper weighting and benchmark-selection science (empirical re-derivation of weights, contamination-aware refresh) that this software-focused paper deliberately defers.

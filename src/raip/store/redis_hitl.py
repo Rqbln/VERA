@@ -8,7 +8,7 @@ a Likert (1–5) judgement, and the aggregated result feeds the dashboard's non-
 from __future__ import annotations
 
 import json
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, field
 from datetime import UTC, datetime
 from typing import Any
 from uuid import uuid4
@@ -16,6 +16,14 @@ from uuid import uuid4
 import redis
 
 from raip.config import Settings, get_settings
+
+# Review rubrics: each non-measurable requirement is scored on several 1–5 criteria, and the Likert
+# score is the mean of the criteria. This gives N01/N02 a defensible, structured panel judgement
+# rather than a single opaque number.
+RUBRICS: dict[str, list[str]] = {
+    "N01": ["faithfulness", "completeness", "clarity", "actionability"],
+    "N02": ["responsiveness", "reversibility", "oversight", "safety"],
+}
 
 
 @dataclass
@@ -28,6 +36,7 @@ class HitlTask:
     status: str = "pending"  # pending | done
     reviewer: str = ""
     likert_score: int | None = None
+    criteria: dict[str, int] = field(default_factory=dict)
     comment: str = ""
     created_at: str = ""
     updated_at: str = ""
@@ -67,13 +76,24 @@ class RedisHitlStore:
         return HitlTask(**json.loads(raw)) if raw else None
 
     def submit_review(
-        self, task_id: str, *, reviewer: str, likert_score: int, comment: str = ""
+        self,
+        task_id: str,
+        *,
+        reviewer: str,
+        likert_score: int | None = None,
+        criteria: dict[str, int] | None = None,
+        comment: str = "",
     ) -> HitlTask | None:
         task = self.get(task_id)
         if not task:
             return None
         task.reviewer = reviewer
-        task.likert_score = likert_score
+        task.criteria = criteria or {}
+        # Likert is the mean of the rubric criteria when provided, else the explicit score.
+        if criteria:
+            task.likert_score = round(sum(int(v) for v in criteria.values()) / len(criteria))
+        else:
+            task.likert_score = likert_score
         task.comment = comment
         task.status = "done"
         task.updated_at = datetime.now(UTC).isoformat()

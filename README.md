@@ -14,7 +14,7 @@ doc:
     user_guide: ./USER_GUIDE.md
     dev_setup: ./docs/README-dev.md
   tags: [raip, readme, eu-ai-act]
-last_reviewed: "2026-06-15"
+last_reviewed: "2026-06-26"
 ---
 
 # RAIP - Responsible AI in Practice
@@ -49,6 +49,11 @@ Ce dépôt regroupe la **documentation** (dossier [`docs/`](docs/README.md)) et 
 
 1. `make stack-gaas` → stack complète + proxy inline (`:8100`), Redpanda, OPA, OpenSearch, agents
 2. Page **/governance** dans le dashboard ; guide : [docs/MVP4_GAAS_RUNTIME.md](docs/MVP4_GAAS_RUNTIME.md)
+
+**Évaluation native (benchmarks réels R03–R12, panel multi-modèles, corpus bancaire)** — reproduit les chiffres du papier :
+
+1. `bash scripts/setup_native.sh` (installe `.[benchmarks,lab,pdf]` + vérifie Ollama/modèles)
+2. `RAIP_REQUIRE_NATIVE=1 python scripts/run_paper_eval.py` ; guide : [docs/EVALUATION_GUIDE.md](docs/EVALUATION_GUIDE.md)
 
 Migration depuis MVP1 : [docs/MIGRATION_MVP1_MVP2.md](docs/MIGRATION_MVP1_MVP2.md).
 Design system + bilingue FR/EN du dashboard : [dashboard/DESIGN_SYSTEM.md](dashboard/DESIGN_SYSTEM.md).

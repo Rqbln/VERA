@@ -57,17 +57,21 @@
 
 We present **RAIP**, an open-source, self-hostable platform *and* a "compliance control room" dashboard for EU AI Act LLM evaluation that operationalizes the COMPL-AI measurable requirements through a LangGraph pipeline, makes the benchmark-to-requirement **aggregation weights a first-class, signed, auditable artifact** with a reproducible weighting-sensitivity check, and exposes a **no-login guided mode** so a non-technical user can launch an evaluation and read a status-first, progressively-disclosed summary.
 
-**Confidence:** `high` — real S1 run, sensitivity study, determinism check, and dashboard screenshots are in the compiled draft (`manuscript/main.pdf`, 8 pp.).
+**Confidence:** `high` — native multi-model run (3-model panel), non-degenerate sensitivity, determinism check, banking-corpus data-stage results, measured GaaS runtime, and dashboard screenshots are in the compiled draft (`manuscript/main.pdf`, 10 pp.).
+
+> **UPDATED 2026-06-26** (branch `mvp4-eval-banking`): the experiment is now a **native 3-model panel** (R03–R05 run on a synthetic banking corpus), RQ2 is **non-degenerate** (CR06/CR10 flip band), the **GaaS runtime is measured** (`bench_gaas.py`), and a **Banking Deployment** section maps the run onto DORA/EBA/ACPR. Rows below reflect this.
 
 **Fixed interpretive choices:**
 
 | Choice | Resolution |
 |--------|------------|
-| RQ1 | Reproducible/deterministic, provenance-honest scores |
-| RQ2 | Weighting sensitivity → structural null on this run (within-requirement spread 0), method is the contribution |
+| RQ1 | Reproducible/deterministic, provenance-honest scores that **discriminate across a 3-model panel** |
+| RQ2 | Weighting sensitivity → **non-degenerate** (CR01 provably invariant Δ=0; CR06/CR10 flip band Δ=1.0); method + result are the contribution |
 | RQ3 | Design-validation walkthrough by authors (8 triage tasks) — not an N-participant study |
-| C1–C3 | Platform+control room / configurable signed aggregation / empirical |
-| Default target | `ollama/llama3.1:8b-instruct-q8_0` (seed 42, n=10) |
+| C1–C3 | Platform+control room / configurable signed aggregation / empirical (panel + banking + measured GaaS) |
+| Target | **Panel:** `llama3.1:8b`, `ministral-3b`, `phi3` (seed 42, n=10); R03–R05 on `data/corpus/banking_synth.jsonl` |
+| Banking | Section `sec:banking`: release-gate use case + EU AI Act ↔ DORA/EBA/ACPR mapping + R03–R05 results |
+| GaaS | Measured in-process: proxy overhead p50 5.7 ms, detection 3/3, OPA enforce + bus degradation |
 
 **Previous lock (lifecycle headline, superseded):** lifecycle-aware operationalization of COMPL-AI with dataset/checkpoint evaluation — demoted to a described-but-unexercised capability (PR1).
 

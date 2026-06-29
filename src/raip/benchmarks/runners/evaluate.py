@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 from collections import defaultdict
 from typing import Any
 
@@ -17,6 +18,24 @@ from raip.benchmarks.runners.robustness import run_robustness_r01
 from raip.benchmarks.runners.toxicity import run_toxicity_r12
 from raip.benchmarks.runners.watermark import run_watermark, run_watermark_na
 from raip.llm.client import LLMClient
+
+# When RAIP_REQUIRE_NATIVE=1, a heuristic fallback on a benchmark that has a native harness is a
+# hard error (so a paper run is provably native) — except implementations listed here, which may
+# legitimately fall back (e.g. garak does not run on Apple Silicon). Override via RAIP_NATIVE_ALLOW.
+_DEFAULT_NATIVE_ALLOW = {"garak"}
+
+
+def _require_native() -> bool:
+    return os.environ.get("RAIP_REQUIRE_NATIVE", "").strip().lower() in ("1", "true", "yes")
+
+
+def _native_allow() -> set[str]:
+    extra = {x.strip() for x in os.environ.get("RAIP_NATIVE_ALLOW", "").split(",") if x.strip()}
+    return _DEFAULT_NATIVE_ALLOW | extra
+
+
+class NativeHarnessRequired(RuntimeError):
+    """Raised when RAIP_REQUIRE_NATIVE is set and a benchmark fell back to a heuristic."""
 
 
 def _merge_dict(a: SamplesByReq, b: SamplesByReq) -> SamplesByReq:
@@ -82,6 +101,16 @@ def evaluate_benchmarks(
             s, r = run_garak(ctx, bid)
         else:
             s, r = run_hf_dynamic(ctx, bid)
+
+        if _require_native() and impl not in _native_allow():
+            fell_back = [
+                str(row.get("fallback_reason") or "heuristic") for row in r if row.get("fallback")
+            ]
+            if fell_back:
+                raise NativeHarnessRequired(
+                    f"benchmark {bid!r} (impl={impl}) fell back to heuristic "
+                    f"({fell_back[0]}) but RAIP_REQUIRE_NATIVE is set"
+                )
 
         all_samples = _merge_dict(all_samples, s)
         all_raw.extend(r)

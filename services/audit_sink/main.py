@@ -6,7 +6,7 @@ configured, indexes it into OpenSearch. Run: ``python -m services.audit_sink.mai
 
 from __future__ import annotations
 
-from raip.governance.audit import run_audit_sink
+from vera.governance.audit import run_audit_sink
 
 
 def main() -> None:  # pragma: no cover - process entrypoint

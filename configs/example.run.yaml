@@ -1,4 +1,4 @@
-# Example run config for raip-eval (MVP2 dynamic benchmarks).
+# Example run config for vera-eval (MVP2 dynamic benchmarks).
 # Benchmark IDs must match the API registry. Full E2E: examples/mvp2_ollama_e2e.yaml
 
 model_id: ollama/llama3.1:8b-instruct-q8_0

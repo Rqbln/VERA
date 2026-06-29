@@ -4,7 +4,7 @@ alternative weight schemes — no model re-runs).
 
 Outputs JSON under manuscript/results/ for the LaTeX tables and figures.
 
-Run:  RAIP_AUTH_MODE=guided RAIP_MLFLOW_DISABLED=1 python manuscript/scripts/gen_results.py
+Run:  VERA_AUTH_MODE=guided VERA_MLFLOW_DISABLED=1 python manuscript/scripts/gen_results.py
 """
 
 from __future__ import annotations
@@ -15,13 +15,13 @@ from pathlib import Path
 
 import numpy as np
 
-from raip.benchmarks.catalog import catalog_version, weights_for_requirement
-from raip.benchmarks.runners.evaluate import evaluate_benchmarks
-from raip.config import get_settings
-from raip.dashboard.score_bands import load_score_bands
-from raip.dashboard.triage import triage_priority
-from raip.llm.client import LLMClient
-from raip.stats.bootstrap import bootstrap_weighted_requirement_ci_95, weighted_requirement_mean
+from vera.benchmarks.catalog import catalog_version, weights_for_requirement
+from vera.benchmarks.runners.evaluate import evaluate_benchmarks
+from vera.config import get_settings
+from vera.dashboard.score_bands import load_score_bands
+from vera.dashboard.triage import triage_priority
+from vera.llm.client import LLMClient
+from vera.stats.bootstrap import bootstrap_weighted_requirement_ci_95, weighted_requirement_mean
 
 OUT = Path(__file__).resolve().parents[1] / "results"
 OUT.mkdir(parents=True, exist_ok=True)
@@ -77,10 +77,10 @@ def triage_rank(scores: dict[str, dict]) -> list[str]:
 def main() -> None:
     settings = get_settings()
     llm = LLMClient(settings)
-    print(f"Running S1 on {settings.raip_target_model} (n={N_SAMPLES}/benchmark)...")
+    print(f"Running S1 on {settings.vera_target_model} (n={N_SAMPLES}/benchmark)...")
 
     req_samples, raw_outputs = evaluate_benchmarks(
-        model_id=settings.raip_target_model,
+        model_id=settings.vera_target_model,
         judge_model=settings.effective_judge_model,
         benchmarks=BENCHMARKS,
         n_samples_per_benchmark=N_SAMPLES,
@@ -207,7 +207,7 @@ def main() -> None:
     )
 
     results = {
-        "model": settings.raip_target_model,
+        "model": settings.vera_target_model,
         "catalog_version": catalog_version(),
         "seed": SEED,
         "n_samples": N_SAMPLES,

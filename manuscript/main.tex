@@ -34,7 +34,7 @@
 
 \begin{document}
 
-\title{RAIP: Responsible AI in Practice ---\\ An EU AI Act LLM Framework for Banking}
+\title{VERA: Verifiable Evaluation for Responsible AI ---\\ An EU AI Act LLM Framework for Banking}
 
 \author{%
   \IEEEauthorblockN{%
@@ -61,14 +61,14 @@
 \begin{abstract}
 Deploying large language models under the EU AI Act~\cite{euaiact2024} requires reproducible technical evidence across trustworthy-AI principles~\cite{hleg2019trustworthyai}.
 COMPL-AI~\cite{guldimann2024complai}, one community operationalization of these obligations, decomposes them into eighteen technical requirements, twelve of which admit measurable scores, but industrial practice still relies on fragmented benchmark scripts whose aggregation choices are opaque and whose results are hard for non-specialists to triage.
-We present RAIP, an open-source, self-hostable software-engineering platform \emph{and} a ``compliance control room'' dashboard for EU AI Act LLM evaluation.
-RAIP \emph{orchestrates} benchmarks---coordinating and running many of them as one reproducible job---through a pipeline (command line, web API, and background workers), routes inference to self-hosted models, and emits signed artifacts that record exactly which scorer produced each number.
+We present VERA, an open-source, self-hostable software-engineering platform \emph{and} a ``compliance control room'' dashboard for EU AI Act LLM evaluation.
+VERA \emph{orchestrates} benchmarks---coordinating and running many of them as one reproducible job---through a pipeline (command line, web API, and background workers), routes inference to self-hosted models, and emits signed artifacts that record exactly which scorer produced each number.
 Two design decisions distinguish it.
 First, the benchmark-to-requirement \emph{aggregation weights} are a first-class, versioned, signed artifact; we use this to run a reproducible \emph{sensitivity analysis} that quantifies how the per-requirement compliance picture, the green/amber/red bands, and the dashboard's status-first triage order shift under alternative weightings.
 Second, a no-login \emph{guided} mode lets a non-technical user launch an evaluation on a connected model and read a status-first, progressively-disclosed summary, while a role-based control room serves expert audiences.
 The same code base scales from this one-command profile to a full \emph{governance-as-a-service} runtime---an inline proxy, an event bus, asynchronous scoring agents, a streaming Trust Factor, an Open Policy Agent decision layer, and a signed audit/SIEM trail---so architectural depth and ease of use coexist.
 Across a three-model open-weight panel we report measurable-requirement scores with bootstrap intervals, a non-degenerate weighting-sensitivity result (two requirements flip compliance band under alternative weights), data-stage scores on a synthetic banking corpus, an in-process benchmark of the governance runtime, and an expert interpretability walkthrough; we map the run onto banking-sector obligations (DORA, EBA, ACPR).
-RAIP treats compliance-oriented evaluation as an automated, reproducible, and \emph{auditable} software pipeline rather than ad hoc spreadsheet assembly.
+VERA treats compliance-oriented evaluation as an automated, reproducible, and \emph{auditable} software pipeline rather than ad hoc spreadsheet assembly.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -79,14 +79,14 @@ Responsible AI, EU AI Act, COMPL-AI, software engineering tools, LLM evaluation,
 \label{sec:introduction}
 
 \subsection{Motivation}
-Dana is a compliance engineer at a European bank preparing to ship an LLM-based assistant for retail customers. Before the release gate she must answer one deceptively simple question---is this model compliant with the EU AI Act?---and today she cannot answer it defensibly. She can run a dozen open-source benchmarks, but each reports its own score on its own scale, none maps cleanly onto a regulatory requirement, and when an ACPR examiner later asks \emph{``why did you weight toxicity this way, and would a different choice have changed the verdict?''} she has no auditable answer. RAIP is built for Dana's problem: it turns a folder of disconnected benchmarks into one reproducible, signed responsible-AI scorecard whose every number---and whose very aggregation into a score---is traceable and inspectable.
+Dana is a compliance engineer at a European bank preparing to ship an LLM-based assistant for retail customers. Before the release gate she must answer one deceptively simple question---is this model compliant with the EU AI Act?---and today she cannot answer it defensibly. She can run a dozen open-source benchmarks, but each reports its own score on its own scale, none maps cleanly onto a regulatory requirement, and when an ACPR examiner later asks \emph{``why did you weight toxicity this way, and would a different choice have changed the verdict?''} she has no auditable answer. VERA is built for Dana's problem: it turns a folder of disconnected benchmarks into one reproducible, signed responsible-AI scorecard whose every number---and whose very aggregation into a score---is traceable and inspectable.
 
 Regulated and high-risk AI systems must demonstrate technical evidence before deployment.
 The EU AI Act~\cite{euaiact2024} and the Ethics Guidelines for Trustworthy AI~\cite{hleg2019trustworthyai} frame expectations across robustness, privacy, transparency, and fairness.
 Organizational frameworks such as the NIST AI Risk Management Framework~\cite{nist2023airmf} and ISO/IEC~42001~\cite{iso42001_2023} guide governance but do not provide an executable pipeline that runs LLM benchmarks, aggregates scores, and produces auditor-facing artifacts.
 COMPL-AI~\cite{guldimann2024complai} translates legal principles into eighteen technical requirements with associated benchmarks, twelve of which admit measurable scores.
 We stress that COMPL-AI is \emph{one} community operationalization of the EU AI Act---a useful, public interpretation of how its principles can be measured---not an official or exhaustive mapping; the Act itself prescribes no benchmark suite.
-Accordingly, RAIP does not re-derive the Act or claim legal coverage: it \emph{evaluates a model against this measurable interpretation and produces a responsible-AI score} that compliance stakeholders read alongside their own judgement.
+Accordingly, VERA does not re-derive the Act or claim legal coverage: it \emph{evaluates a model against this measurable interpretation and produces a responsible-AI score} that compliance stakeholders read alongside their own judgement.
 COMPL-AI, however, remains a measurement framework rather than an orchestration platform.
 Individual suites---for example DecodingTrust~\cite{wang2023decodingtrust}, the language-model evaluation \emph{harness}~\cite{gao2021lmevalharness} (a harness is the software that actually runs a benchmark against a model), and MMLU~\cite{hendrycks2021mmlu}---answer \emph{measurement} questions in isolation.
 They do not, by themselves, deliver \emph{orchestration} (coordinating and running many benchmarks as one reproducible job), requirement-level aggregation, or governance artifacts such as model cards~\cite{mitchell2019modelcard} and datasheets for datasets~\cite{gebru2021datasheets}.
@@ -122,13 +122,13 @@ We distinguish \emph{platform requirements} PR1--PR5, which an evaluation platfo
 \end{table}
 
 \subsection{Contributions}
-We present RAIP (\emph{Responsible AI in Practice}), an open-source platform that addresses PR1--PR5 while operationalizing COMPL-AI measurable requirements.
-Unlike prior LLM trustworthiness tools that focus primarily on single-shot model prompts without longitudinal or data-stage coverage~\cite{sunetnanta2025promptops}, RAIP unifies benchmark dispatch, weighted aggregation, and governance artifact generation in one self-hostable pipeline.
+We present VERA (\emph{Verifiable Evaluation for Responsible AI}), an open-source platform that addresses PR1--PR5 while operationalizing COMPL-AI measurable requirements.
+Unlike prior LLM trustworthiness tools that focus primarily on single-shot model prompts without longitudinal or data-stage coverage~\cite{sunetnanta2025promptops}, VERA unifies benchmark dispatch, weighted aggregation, and governance artifact generation in one self-hostable pipeline.
 
 In this paper, we make the following contributions, each leading with the concrete value it delivers to a team preparing a model for release:
 \begin{itemize}
   \item \textbf{C1 --- We standardize responsible-AI evaluation into one open-source platform.}
-  Instead of a folder of disconnected benchmark scripts, RAIP runs many established benchmarks as a single declarative, self-hostable job and reports one responsible-AI scorecard aligned to the twelve measurable COMPL-AI requirements (CR01--CR12), with uncertainty intervals. A non-technical user launches a run and reads a status-first summary through a no-login ``control room'' dashboard, while expert audiences get role-based views; the same codebase scales from a one-command deployment to a full governance runtime (\Cref{fig:gaas}).
+  Instead of a folder of disconnected benchmark scripts, VERA runs many established benchmarks as a single declarative, self-hostable job and reports one responsible-AI scorecard aligned to the twelve measurable COMPL-AI requirements (CR01--CR12), with uncertainty intervals. A non-technical user launches a run and reads a status-first summary through a no-login ``control room'' dashboard, while expert audiences get role-based views; the same codebase scales from a one-command deployment to a full governance runtime (\Cref{fig:gaas}).
   \item \textbf{C2 --- We bring auditability and provenance: every number is traceable.}
   Each score records \emph{which} benchmark and \emph{which} scorer produced it---including an honest flag when an optional scorer was missing and the pipeline fell back to a simpler check---and each run emits signed governance documents (a model card, and a datasheet for dataset runs) generated directly from the run rather than written by hand afterwards. An auditor can always answer ``where did this number come from?''.
   \item \textbf{C3 --- We make the aggregation into a single score inspectable and auditable.}
@@ -144,12 +144,12 @@ We back C1--C3 with an empirical study: across a three-model open-weight panel w
 
 \subsection{Regulatory Framing and COMPL-AI}
 The EU AI Act~\cite{euaiact2024} and the six HLEG trustworthy-AI principles~\cite{hleg2019trustworthyai} motivate technical evidence for high-risk systems.
-NIST and ISO frameworks~\cite{nist2023airmf,iso42001_2023} guide organizational risk management; RAIP implements the \emph{measure} slice---automated benchmarks and artifacts---not full governance programs.
+NIST and ISO frameworks~\cite{nist2023airmf,iso42001_2023} guide organizational risk management; VERA implements the \emph{measure} slice---automated benchmarks and artifacts---not full governance programs.
 COMPL-AI~\cite{guldimann2024complai} is one published, community interpretation of how these principles can be measured---not the official or only operationalization of the Act---and it maps legal principles to eighteen technical requirements, twelve with measurable scores in $[0,1]$, associating benchmarks and multi-model studies.
 COMPL-AI remains a benchmark \emph{framework}, not a lifecycle orchestration platform with signed audit chains.
 
 \subsection{Benchmark Suites and Metrics}
-RAIP orchestrates established suites rather than proposing new benchmark science.
+VERA orchestrates established suites rather than proposing new benchmark science.
 Capability probes (CR06) draw on MMLU~\cite{hendrycks2021mmlu}, GSM8K~\cite{cobbe2021gsm8k}, HumanEval~\cite{chen2021humaneval}, TruthfulQA~\cite{lin2022truthfulqa}, and BBH~\cite{suzgun2023bbh} via the language-model evaluation harness~\cite{gao2021lmevalharness}.
 Calibration (CR07) uses expected calibration error~\cite{guo2017calibration}.
 Fairness and bias (CR10--CR11) integrate BBQ~\cite{parrish2022bbq}, BOLD~\cite{dhamala2021bold}, StereoSet~\cite{nadeem2021stereoset}, and disparity metrics~\cite{hardt2016equality,wang2023decodingtrust}.
@@ -161,20 +161,20 @@ Cyber probes (CR02) may invoke Garak-class tools in implementation (no bibliogra
 \subsection{Governance Artifacts}
 Beyond raw scores, the EU AI Act expects \emph{technical documentation} for high-risk systems (Art.~11, Annex~IV), and the community has converged on two reusable formats: Model Cards~\cite{mitchell2019modelcard} (intended use, results, limitations) and Datasheets for Datasets~\cite{gebru2021datasheets} (a corpus's composition, collection, and recommended uses).
 Today these are written \emph{by hand} after the fact---slow, easily desynchronized from the run, and hard to audit.
-RAIP instead \emph{generates} a model card (and, for dataset runs, a datasheet) directly from each evaluation---populated with the requirement table, harness provenance, a content signature, and explicit limitations---so the artifact is a by-product of the pipeline, traceable to the exact run that produced it.
+VERA instead \emph{generates} a model card (and, for dataset runs, a datasheet) directly from each evaluation---populated with the requirement table, harness provenance, a content signature, and explicit limitations---so the artifact is a by-product of the pipeline, traceable to the exact run that produced it.
 
 \subsection{Open-Source LLM Evaluation Frameworks}
 A growing ecosystem of open-source frameworks evaluates LLMs, but they target different layers.
 HELM~\cite{liang2023helm} standardizes \emph{which} scenarios and metrics to report across many models; the language-model evaluation harness~\cite{gao2021lmevalharness} standardizes \emph{how} a capability benchmark is executed reproducibly; Garak~\cite{derczynski2024garak} is a security-probing framework for jailbreaks and prompt injection; DecodingTrust~\cite{wang2023decodingtrust} is a trustworthiness benchmark suite.
-These are excellent \emph{measurement building blocks}, and RAIP coordinates (orchestrates) them rather than competing with them.
+These are excellent \emph{measurement building blocks}, and VERA coordinates (orchestrates) them rather than competing with them.
 What turns such tools into a usable \emph{compliance framework}---rather than a collection of scripts---is, we argue, four engineering properties: (i) a permissive open-source license and self-hostable deployment; (ii) extensibility through a benchmark registry and pluggable runners; (iii) reproducibility via declarative runs, versioned and signed catalogues, and recorded provenance; and (iv) an interpretable \emph{restitution} surface---a results-presentation layer---that maps raw metrics to regulatory requirement identifiers for non-specialist stakeholders.
-RAIP's contribution is to assemble these four properties around the COMPL-AI requirement taxonomy and to make the \emph{aggregation policy} itself an auditable artifact.
+VERA's contribution is to assemble these four properties around the COMPL-AI requirement taxonomy and to make the \emph{aggregation policy} itself an auditable artifact.
 
 \subsection{Software Engineering Tool Papers}
-\Cref{tab:related-work} positions RAIP against neighboring evaluation tooling; here we state precisely what RAIP does better than the closest tools rather than merely differently.
+\Cref{tab:related-work} positions VERA against neighboring evaluation tooling; here we state precisely what VERA does better than the closest tools rather than merely differently.
 PromptOps~\cite{sunetnanta2025promptops} is the closest APSEC LLM-trustworthiness tool, but it is inference-centric and treats aggregation as an opaque internal step: a practitioner cannot inspect, diff, or re-sign the weighting, nor ask how sensitive a verdict is to it.
-RAIP improves on this in three measurable ways: (i) it maps results to the full COMPL-AI CR01--CR12 taxonomy rather than a tool-specific score set; (ii) it exposes the aggregation policy as a first-class signed artifact and ships a one-command sensitivity check over it; and (iii) it records per-benchmark harness provenance (including fallbacks) so every number is attributable.
-Relative to the measurement building blocks it coordinates, RAIP adds the requirement-level aggregation and interpretive results presentation that HELM~\cite{liang2023helm}, the evaluation harness~\cite{gao2021lmevalharness}, and Garak~\cite{derczynski2024garak} deliberately leave out.
+VERA improves on this in three measurable ways: (i) it maps results to the full COMPL-AI CR01--CR12 taxonomy rather than a tool-specific score set; (ii) it exposes the aggregation policy as a first-class signed artifact and ships a one-command sensitivity check over it; and (iii) it records per-benchmark harness provenance (including fallbacks) so every number is attributable.
+Relative to the measurement building blocks it coordinates, VERA adds the requirement-level aggregation and interpretive results presentation that HELM~\cite{liang2023helm}, the evaluation harness~\cite{gao2021lmevalharness}, and Garak~\cite{derczynski2024garak} deliberately leave out.
 Methodologically, Histree~\cite{studtmann2023histree} exemplifies APSEC tool-and-evaluation papers; controlled-experiment design~\cite{weninger2018usecase} and explicit RQ structures~\cite{liu2022mscpdp} inform our evaluation layout, and classic SE tool papers~\cite{hasselknippe2017guilayout} support technical validation without mandatory user studies.
 
 \begin{table*}[t]
@@ -192,7 +192,7 @@ Methodologically, Histree~\cite{studtmann2023histree} exemplifies APSEC tool-and
     Garak~\cite{derczynski2024garak} & CR02$^{\dagger}$ & Yes & --- & Partial & --- & Yes \\
     DecodingTrust~\cite{wang2023decodingtrust} & Several & Partial & Fixed & --- & --- & Yes \\
     PromptOps~\cite{sunetnanta2025promptops} & Partial & Yes & No & Limited & Limited & Yes \\
-    RAIP & CR01--12 & Yes & Yes (signed) & Yes & Control room & Yes \\
+    VERA & CR01--12 & Yes & Yes (signed) & Yes & Control room & Yes \\
     \bottomrule
   \end{tabularx}
   \footnotesize\par\smallskip
@@ -205,13 +205,13 @@ The gap in \Cref{tab:related-work} is not a missing benchmark but a set of unmet
 (SC2) \emph{auditable aggregation}---treating the benchmark-to-requirement weighting as versioned, signed, inspectable data rather than buried constants, and making its influence measurable;
 (SC3) \emph{end-to-end provenance and reproducibility}---declarative runs, deterministic re-aggregation, content signatures, and per-number harness attribution; and
 (SC4) \emph{interpretable results presentation}---mapping raw metrics onto regulatory requirement identifiers in a surface a non-specialist can triage.
-No reference in \Cref{tab:related-work} addresses SC1--SC4 together; RAIP is designed around exactly these four challenges.
+No reference in \Cref{tab:related-work} addresses SC1--SC4 together; VERA is designed around exactly these four challenges.
 
-\section{RAIP Framework and Architecture}
+\section{VERA Framework and Architecture}
 \label{sec:framework}
 
 \subsection{Conceptual Evaluation Model}
-At the highest level, RAIP is a single function from one input to one auditable output, shown in \Cref{fig:concept}.
+At the highest level, VERA is a single function from one input to one auditable output, shown in \Cref{fig:concept}.
 \textbf{Input:} an \emph{evaluation target}---a model endpoint, a training checkpoint, or a dataset corpus---together with the set of requirements to check.
 \textbf{Output:} a signed \emph{responsible-AI scorecard}---one score per measurable COMPL-AI requirement (CR01--CR12) with an uncertainty interval, the governance documents (model card, datasheet), and a full provenance trail (which benchmark and scorer produced each number, under which signed weights).
 Everything between is automated and reproducible; \Cref{fig:architecture} then shows the engineering that realises it.
@@ -228,16 +228,16 @@ Everything between is automated and reproducible; \Cref{fig:architecture} then s
     lbl/.style={font=\scriptsize\itshape, text=black!55},
   ]
     \node[io]   (in)   at (0,0) {\textbf{INPUT}\\[2pt] Model, checkpoint, or dataset\\[2pt] $+$ requirements to check};
-    \node[core] (raip) at (3.7,0) {\textbf{RAIP}\\[2pt] run benchmarks $\rightarrow$ aggregate to CR01--CR12 (signed weights)};
+    \node[core] (vera) at (3.7,0) {\textbf{VERA}\\[2pt] run benchmarks $\rightarrow$ aggregate to CR01--CR12 (signed weights)};
     \node[outbox] (out) at (7.4,0) {\textbf{OUTPUT}\\[2pt] Responsible-AI scorecard $+$ signed governance documents $+$ provenance};
-    \draw[arr] (in) -- (raip);
-    \draw[arr] (raip) -- (out);
+    \draw[arr] (in) -- (vera);
+    \draw[arr] (vera) -- (out);
     \node[lbl] at (0,-1.2) {what you give it};
     \node[lbl] at (3.7,-1.2) {one automated, reproducible job};
     \node[lbl] at (7.4,-1.2) {what you get back};
   \end{tikzpicture}%
   }
-  \caption{RAIP in one picture: an evaluation target plus a list of requirements goes \emph{in}; a signed responsible-AI scorecard with governance documents and full provenance comes \emph{out}. \Cref{fig:architecture} details the pipeline inside the green box.}
+  \caption{VERA in one picture: an evaluation target plus a list of requirements goes \emph{in}; a signed responsible-AI scorecard with governance documents and full provenance comes \emph{out}. \Cref{fig:architecture} details the pipeline inside the green box.}
   \label{fig:concept}
 \end{figure}
 Concretely, the target is tagged with a \emph{lifecycle stage} (\texttt{data}, \texttt{finetune}, \texttt{inference}, \ldots) in a declarative \texttt{benchmark\_run.yaml}; the COMPL-AI layer aggregates CR01--CR12 from weighted benchmarks in the signed catalogue \texttt{mvp2-v1} (\Cref{sec:weighting}) with bootstrap 95\% intervals; and the artifact layer emits \texttt{model\_card.md}, a datasheet for dataset runs, and \texttt{raw\_outputs.jsonl} carrying per-benchmark harness metadata.
@@ -245,7 +245,7 @@ Compliance stakeholders read requirement tables and signatures, engineers read M
 
 \subsection{System Architecture}
 \Cref{fig:architecture} expands the green box of \Cref{fig:concept}, showing how our platform turns a launch request into signed, auditor-facing evidence.
-A user enters through one of three surfaces we provide---the \texttt{raip-eval} CLI, the \texttt{POST /runs} REST endpoint, or our no-login guided wizard---all of which enqueue the \emph{same} declarative job on Celery/Redis (a standard task queue that runs jobs in the background), where our run store also holds the governance kill-switch.
+A user enters through one of three surfaces we provide---the \texttt{vera-eval} CLI, the \texttt{POST /runs} REST endpoint, or our no-login guided wizard---all of which enqueue the \emph{same} declarative job on Celery/Redis (a standard task queue that runs jobs in the background), where our run store also holds the governance kill-switch.
 A Celery worker then executes our LangGraph supervisor---a small two-step controller that first \emph{evaluates}, then \emph{aggregates}: the \texttt{evaluate} node resolves the requested requirements to benchmarks through our registry, dispatches each to its runner, and routes inference via LiteLLM (one adapter for many model backends) to a self-hosted target and judge; the \texttt{aggregate} node combines the cached per-item scores using the weights read from our signed catalogue \texttt{mvp2-v1} and attaches bootstrap intervals.
 The run emits our artifact set---\texttt{benchmark\_run.yaml}, \texttt{model\_card.md}, \texttt{raw\_outputs.jsonl}, and a content signature---to MinIO or, in our lite profile, the local filesystem, with MLflow tracking optional, and our read API serves it to the control room (\Cref{sec:dashboard}).
 The boundary we draw is deliberate: weights and provenance cross the boundary (\emph{seam}) between the \texttt{evaluate} and \texttt{aggregate} steps as inspectable data, which is precisely what makes our aggregation auditable (SC2) and our fallbacks visible (SC1, SC3).
@@ -269,7 +269,7 @@ The boundary we draw is deliberate: weights and provenance cross the boundary (\
     arr/.style={->, semithick, black!60},
   ]
     % invocation surfaces (stacked, far left)
-    \node[surf] (cli) at (0,0.9) {CLI \texttt{raip-eval}};
+    \node[surf] (cli) at (0,0.9) {CLI \texttt{vera-eval}};
     \node[surf] (api) at (0,0) {REST \texttt{POST /runs}};
     \node[surf] (wiz) at (0,-0.9) {Guided wizard};
     % horizontal spine (y=0)
@@ -321,11 +321,11 @@ The boundary we draw is deliberate: weights and provenance cross the boundary (\
 \subsection{Compliance Pillars}
 Having described \emph{how} our pipeline executes, we make explicit \emph{what} it covers.
 The EU AI Act / HLEG guidance and COMPL-AI organise trustworthy-AI obligations into five principle areas; our requirement identifiers are grouped under exactly these pillars in code (\texttt{triage.py}, \texttt{declarative\_forms.py}).
-\Cref{tab:pillars} maps each pillar to the requirements RAIP scores and to the components that serve it.
+\Cref{tab:pillars} maps each pillar to the requirements VERA scores and to the components that serve it.
 These pillars are the functional axes along which a release-gate audience reads a run: the architecture above is the \emph{means}, the pillars are the \emph{coverage} it must demonstrate, and the control room (\Cref{sec:dashboard}) groups its lenses along them.
 
 \begin{table}[t]
-  \caption{The five compliance pillars RAIP covers, the COMPL-AI requirements grouped under each (measurable CR; declarative N), and the components that serve them.}
+  \caption{The five compliance pillars VERA covers, the COMPL-AI requirements grouped under each (measurable CR; declarative N), and the components that serve them.}
   \label{tab:pillars}
   \centering
   \tblsetup
@@ -351,7 +351,7 @@ Dataset scans populate CR03--CR05 in-graph---toxicity via Detoxify~\cite{hanu202
 
 \subsection{Governance Runtime (Profile-Gated)}
 \label{sec:gaas}
-Evaluation answers ``is this model compliant \emph{now}?''; production deployment also needs ``is it \emph{staying} compliant?''. RAIP's enterprise profile therefore adds an optional \emph{governance-as-a-service} (GaaS) runtime around the same pipeline (\Cref{fig:gaas}), built from standard open-source parts and reusing the platform's scoring code.
+Evaluation answers ``is this model compliant \emph{now}?''; production deployment also needs ``is it \emph{staying} compliant?''. VERA's enterprise profile therefore adds an optional \emph{governance-as-a-service} (GaaS) runtime around the same pipeline (\Cref{fig:gaas}), built from standard open-source parts and reusing the platform's scoring code.
 An \emph{inline proxy} (OpenAI-compatible) sits in front of the target: on the synchronous path it consults the policy layer, forwards the request via LiteLLM, and returns the response; off-band it publishes the request/response to an event bus.
 Four asynchronous \emph{agents} consume that stream---cyber (CR02, jailbreak/injection), ethics (CR12, toxicity via Detoxify~\cite{hanu2020detoxify}), privacy (CR05, PII via Presidio~\cite{microsoft2023presidio}), and drift (CR01)---and emit scored signals that a streaming aggregator folds into a live \emph{Trust Factor}.
 An Open Policy Agent~\cite{opa2024} layer turns \{mode, kill-switch, live Trust Factor\} into an \texttt{allow}/\texttt{flag}/\texttt{deny} decision under three escalating \emph{modes}---\emph{shadow} (observe), \emph{advisory} (alert), \emph{enforcement} (block)---and every request, signal, and decision becomes a \emph{signed, append-only audit record} indexed for SIEM. A scheduled canary feeds synthetic golden traffic so the signal continues without organic load.
@@ -431,9 +431,9 @@ Datasheets~\cite{gebru2021datasheets} attach to corpus scans.
 Environmental hooks record per-run energy and emissions for N03.
 
 \subsection{Implementation and Deployment Profiles}
-The \texttt{raip} package targets Python~3.11 and ships three deployment profiles over one code base: a single-command \emph{lite} stack (Redis + API + worker + Next.js dashboard, local-filesystem artifacts, no login); a full \emph{enterprise} Docker Compose stack (adding Keycloak RBAC, MLflow, MinIO, TimescaleDB); and a \emph{gaas} overlay that adds the governance runtime of \Cref{sec:gaas} (inline proxy, Redpanda/Kafka, OPA, agents, OpenSearch). Every layer degrades gracefully---absent MinIO/MLflow fall back to local artifacts and no tracking; an absent broker, policy server, or audit index fall back as in \Cref{fig:gaas}---so partial deployments still run.
+The \texttt{vera} package targets Python~3.11 and ships three deployment profiles over one code base: a single-command \emph{lite} stack (Redis + API + worker + Next.js dashboard, local-filesystem artifacts, no login); a full \emph{enterprise} Docker Compose stack (adding Keycloak RBAC, MLflow, MinIO, TimescaleDB); and a \emph{gaas} overlay that adds the governance runtime of \Cref{sec:gaas} (inline proxy, Redpanda/Kafka, OPA, agents, OpenSearch). Every layer degrades gracefully---absent MinIO/MLflow fall back to local artifacts and no tracking; an absent broker, policy server, or audit index fall back as in \Cref{fig:gaas}---so partial deployments still run.
 The control-room front-end (\Cref{sec:dashboard}) consumes a dedicated read API and admin control plane (\texttt{/admin/v1}).
-The platform is validated by 99 backend unit tests (including the governance bus, agents, proxy, policy, and audit) and a 35-case Playwright matrix (role-based access, the guided surfaces, the governance panel, and the language toggle); the optional \texttt{RAIP\_E2E\_OLLAMA} path replicates a full run.
+The platform is validated by 99 backend unit tests (including the governance bus, agents, proxy, policy, and audit) and a 35-case Playwright matrix (role-based access, the guided surfaces, the governance panel, and the language toggle); the optional \texttt{VERA\_E2E\_OLLAMA} path replicates a full run.
 
 \section{Configurable Aggregation and Weighting Sensitivity}
 \label{sec:weighting}
@@ -451,7 +451,7 @@ Bootstrap 95\% confidence intervals propagate per-item sampling uncertainty thro
 
 \subsection{Why the Weights Matter}
 COMPL-AI and similar suites publish a default weighting, but the choice is a value judgement: weighting a cyber-robustness requirement towards jailbreak probes versus prompt-injection probes can change whether a model lands in the green or red band.
-Because RAIP exposes the weights as data, it can answer an auditor's natural question---\emph{how much does the compliance picture depend on this choice?}---as a reproducible computation rather than an opinion.
+Because VERA exposes the weights as data, it can answer an auditor's natural question---\emph{how much does the compliance picture depend on this choice?}---as a reproducible computation rather than an opinion.
 We treat this as a software and methodology contribution; deriving ``better'' weights is out of scope and reserved for future work.
 
 \subsection{Sensitivity Methodology}
@@ -489,7 +489,7 @@ Three lenses (compliance, cyber, data-science) filter the requirement set per au
 \subsection{Research Questions}
 Following explicit-RQ empirical SE papers~\cite{liu2022mscpdp} with threats informed by controlled experiments~\cite{weninger2018usecase}:
 \begin{itemize}
-  \item \emph{RQ1 (reproducibility):} Can RAIP automatically produce reproducible, COMPL-AI-aligned scores~\cite{guldimann2024complai} with bootstrap intervals and honest harness provenance under declarative configuration? (C1; PR2--PR3)
+  \item \emph{RQ1 (reproducibility):} Can VERA automatically produce reproducible, COMPL-AI-aligned scores~\cite{guldimann2024complai} with bootstrap intervals and honest harness provenance under declarative configuration? (C1; PR2--PR3)
   \item \emph{RQ2 (sensitivity):} How sensitive are the per-requirement scores, score bands, and the dashboard's triage order to the choice of aggregation weights, and does exposing weights as a first-class artifact make that sensitivity auditable? (C3)
   \item \emph{RQ3 (interpretability):} Can a compliance-oriented reader triage a run---identify the weakest requirement, spot a fallback, judge coverage, reach the source artifact---from the control room? (C1; PR2)
 \end{itemize}
@@ -497,11 +497,11 @@ RQ3 is assessed as a design-validation walkthrough by the authors, not a control
 
 \subsection{Subject System and Procedure}
 We evaluate a \emph{panel} of three self-hosted open-weight models via Ollama/LiteLLM---Llama~3.1 8B Instruct (\texttt{q8\_0}), Ministral~3B, and Phi-3 Mini---over all twelve measurable requirements CR01--CR12, with a self-hosted judge (Llama~3.1 8B) for the refusal/jailbreak probes, seed~42 and $n=10$ items per benchmark.
-The dataset-stage requirements CR03--CR05 run natively over a 230-document synthetic banking corpus (\Cref{sec:banking}) with Detoxify, Presidio, and Levenshtein/BLEU engines; CR12 uses Detoxify; CR06/CR10 use RAIP's dynamic probes.
+The dataset-stage requirements CR03--CR05 run natively over a 230-document synthetic banking corpus (\Cref{sec:banking}) with Detoxify, Presidio, and Levenshtein/BLEU engines; CR12 uses Detoxify; CR06/CR10 use VERA's dynamic probes.
 \emph{RQ1} reads the per-requirement aggregates, bootstrap intervals, and harness provenance from the run artifacts and re-aggregates the cached scores to confirm determinism.
 \emph{RQ2} re-aggregates the principal model's cached per-benchmark item scores under the schemes of \Cref{sec:weighting}---baseline, uniform, and single-benchmark-dominant---and computes band-flips and the achievable score range, with no additional model queries.
 \emph{RQ3} drives the dashboard against a run in guided (no-login) mode; two authors perform a structured walkthrough of eight triage tasks (\Cref{sec:results}).
-\emph{Honest serving constraint.} Ollama's chat endpoint exposes no token log-probabilities, so log-likelihood multiple-choice tasks (e.g.\ lm-eval MMLU for CR06) cannot run on it; RAIP records this in provenance and uses its dynamic probes instead, reserving native lm-eval for a log-prob backend (vLLM). The CR03--CR05/CR12 data engines are fully native. Reproducibility metadata (git SHA, catalogue \texttt{mvp2-v1}, seed~42) and the result/figure scripts ship with the replication package.
+\emph{Honest serving constraint.} Ollama's chat endpoint exposes no token log-probabilities, so log-likelihood multiple-choice tasks (e.g.\ lm-eval MMLU for CR06) cannot run on it; VERA records this in provenance and uses its dynamic probes instead, reserving native lm-eval for a log-prob backend (vLLM). The CR03--CR05/CR12 data engines are fully native. Reproducibility metadata (git SHA, catalogue \texttt{mvp2-v1}, seed~42) and the result/figure scripts ship with the replication package.
 
 \section{Results and Analysis}
 \label{sec:results}
@@ -579,9 +579,9 @@ To check that the governance-as-a-service runtime of \Cref{sec:gaas} is a workin
 
 \section{Banking Deployment and Regulatory Mapping}
 \label{sec:banking}
-We ground RAIP in the setting that motivates it: a \emph{release gate} for a customer-facing retail-banking LLM assistant (account FAQs, product explanations, complaint triage). In the EU such a system is doubly regulated---by the AI Act, and, because it runs inside a financial institution, by sector rules a bank's second line of defence already enforces. RAIP's value is to answer, in one reproducible signed run, whether a model clears both the horizontal AI-Act bar and the sectoral bar.
+We ground VERA in the setting that motivates it: a \emph{release gate} for a customer-facing retail-banking LLM assistant (account FAQs, product explanations, complaint triage). In the EU such a system is doubly regulated---by the AI Act, and, because it runs inside a financial institution, by sector rules a bank's second line of defence already enforces. VERA's value is to answer, in one reproducible signed run, whether a model clears both the horizontal AI-Act bar and the sectoral bar.
 
-\emph{Regulatory mapping.} The AI Act principles RAIP measures line up with concrete obligations under the Digital Operational Resilience Act (DORA)~\cite{dora2022}, the EBA ICT and security-risk guidelines~\cite{eba2021ictrisk}, and the French supervisor's (ACPR) work on AI in finance~\cite{acpr2020ai}; \Cref{tab:banking-map} sketches the correspondence, so the same run that produces an AI-Act evidence pack also yields artifacts a banking auditor recognizes.
+\emph{Regulatory mapping.} The AI Act principles VERA measures line up with concrete obligations under the Digital Operational Resilience Act (DORA)~\cite{dora2022}, the EBA ICT and security-risk guidelines~\cite{eba2021ictrisk}, and the French supervisor's (ACPR) work on AI in finance~\cite{acpr2020ai}; \Cref{tab:banking-map} sketches the correspondence, so the same run that produces an AI-Act evidence pack also yields artifacts a banking auditor recognizes.
 
 \begin{table}[t]
   \caption{The release-gate run maps AI-Act principles (via COMPL-AI requirements) onto the banking-sector obligations a second line of defence already tracks.}
@@ -590,7 +590,7 @@ We ground RAIP in the setting that motivates it: a \emph{release gate} for a cus
   \tblsetup
   \begin{tabularx}{\columnwidth}{@{}l l X@{}}
     \toprule
-    RAIP req. & AI-Act principle & Banking obligation \\
+    VERA req. & AI-Act principle & Banking obligation \\
     \midrule
     CR01--CR02 & Robustness \& safety & DORA ICT-risk \& resilience testing~\cite{dora2022}; EBA~\cite{eba2021ictrisk} \\
     CR03--CR05 & Privacy \& data gov. & GDPR; EBA data-quality \& security~\cite{eba2021ictrisk} \\
@@ -602,7 +602,7 @@ We ground RAIP in the setting that motivates it: a \emph{release gate} for a cus
   \end{tabularx}
 \end{table}
 
-\emph{Data-stage results on a banking corpus.} To exercise privacy and data governance concretely, RAIP scanned a \emph{fully synthetic} 230-document banking corpus (FR/EN retail, corporate, wealth, and complaint records; seeded script, no customer data) that plants the failure modes a bank cares about: synthetic IBANs (\texttt{FR76}\,+\,23 digits), RIBs, e-mails, and phones for privacy; near-duplicate pairs for copyright; and imbalanced client segments for data adequacy. The native engines scored privacy CR05 $=0.73$ (Presidio recall on the planted PII), copyright CR04 $=0.94$ (Levenshtein/BLEU near-duplicate detection), and data adequacy CR03 $=0.84$ (group-balance heuristics). These scores are model-independent---the scans run on the corpus, not the model---so they form a reusable data-governance baseline a bank re-runs whenever its retrieval corpus changes.
+\emph{Data-stage results on a banking corpus.} To exercise privacy and data governance concretely, VERA scanned a \emph{fully synthetic} 230-document banking corpus (FR/EN retail, corporate, wealth, and complaint records; seeded script, no customer data) that plants the failure modes a bank cares about: synthetic IBANs (\texttt{FR76}\,+\,23 digits), RIBs, e-mails, and phones for privacy; near-duplicate pairs for copyright; and imbalanced client segments for data adequacy. The native engines scored privacy CR05 $=0.73$ (Presidio recall on the planted PII), copyright CR04 $=0.94$ (Levenshtein/BLEU near-duplicate detection), and data adequacy CR03 $=0.84$ (group-balance heuristics). These scores are model-independent---the scans run on the corpus, not the model---so they form a reusable data-governance baseline a bank re-runs whenever its retrieval corpus changes.
 
 \section{Threats to Validity}
 \label{sec:threats}
@@ -610,7 +610,7 @@ We ground RAIP in the setting that motivates it: a \emph{release gate} for a cus
 \emph{Internal validity.}
 The baseline catalogue weights (\texttt{mvp2-v1}) are author-designed and the comparison weightings (uniform, single-benchmark-dominant) are themselves a design choice; we mitigate this by making the weights an inspectable artifact and reporting sensitivity.
 A judge-model configuration (Llama~3.1 8B) may bias the LLM-judged probes, and the interpretability walkthrough was performed by authors (confirmation-bias risk).
-CR06/CR10 use RAIP's dynamic probes under the Ollama log-probability constraint rather than native lm-eval; this is flagged in provenance, and a vLLM backend would let the native harness corroborate those two scores.
+CR06/CR10 use VERA's dynamic probes under the Ollama log-probability constraint rather than native lm-eval; this is flagged in provenance, and a vLLM backend would let the native harness corroborate those two scores.
 
 \emph{External validity.}
 Evidence centres on a panel of three open-weight models (3B--8B class) at $n=10$ items per benchmark; larger models, more items, or a log-probability backend may yield different scores and different sensitivity.
@@ -629,9 +629,9 @@ The governance-runtime benchmark (\Cref{sec:gaas-eval}) exercises the real proxy
 \label{sec:conclusion}
 
 Fragmented responsible-AI evaluation forces software teams to stitch benchmarks manually and hides the value judgements baked into score aggregation.
-RAIP satisfies PR2--PR4 (traceability, reproducibility, sovereignty) and \emph{implements} PR1 (lifecycle coverage)---we exercise its data stage and describe its checkpoint stage.
+VERA satisfies PR2--PR4 (traceability, reproducibility, sovereignty) and \emph{implements} PR1 (lifecycle coverage)---we exercise its data stage and describe its checkpoint stage.
 It contributes an open-source platform that \emph{standardizes} responsible-AI evaluation into one control room (C1); end-to-end \emph{auditability and provenance}, every number traceable to its scorer with signed governance documents generated per run (C2); and---the headline---\emph{aggregation made inspectable and auditable}: the weights become a versioned, signed artifact with a reproducible sensitivity check (C3); validated across a three-model panel and grounded in a banking case study.
-We found that RAIP produces reproducible, interval-qualified, provenance-honest scores that discriminate across a three-model panel (RQ1); that weighting sensitivity is bounded by the within-requirement benchmark spread $\Delta$ and is here non-degenerate---CR01 provably invariant ($\Delta=0$), CR06 and CR10 flipping band ($\Delta=1.00$), so their verdict is weight-dependent and measured rather than asserted (RQ2); and that a compliance reader can triage a run from the control room alone (RQ3).
+We found that VERA produces reproducible, interval-qualified, provenance-honest scores that discriminate across a three-model panel (RQ1); that weighting sensitivity is bounded by the within-requirement benchmark spread $\Delta$ and is here non-degenerate---CR01 provably invariant ($\Delta=0$), CR06 and CR10 flipping band ($\Delta=1.00$), so their verdict is weight-dependent and measured rather than asserted (RQ2); and that a compliance reader can triage a run from the control room alone (RQ3).
 Returning to Dana: the same run that yields these scores also yields the signed artifacts and the weight-sensitivity evidence she needs to defend the verdict before a regulator---the difference between a compliance claim she can stand behind and an arbitrary one.
 The replication package will provide the lite Compose manifest, the result and figure scripts, and the run artifacts.
 

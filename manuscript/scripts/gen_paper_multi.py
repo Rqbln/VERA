@@ -19,8 +19,8 @@ import numpy as np
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
 
-from raip.benchmarks.catalog import weights_for_requirement  # noqa: E402
-from raip.dashboard.score_bands import load_score_bands  # noqa: E402
+from vera.benchmarks.catalog import weights_for_requirement  # noqa: E402
+from vera.dashboard.score_bands import load_score_bands  # noqa: E402
 
 RES = Path(__file__).resolve().parents[1] / "results"
 FIG = Path(__file__).resolve().parents[1] / "figures"

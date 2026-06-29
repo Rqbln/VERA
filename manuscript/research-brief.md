@@ -1,9 +1,9 @@
-# RAIP Research Brief — APSEC 2026 Technical Track
+# VERA Research Brief — APSEC 2026 Technical Track
 
 > **Purpose:** Single source of truth for SciOrchestrator (`skills/sci-orchestrator/`) before outline/LaTeX.  
 > **Target venue:** APSEC 2026 Technical Track (IEEE two-column, 10 pages incl. references, double-blind).  
-> **Profile:** `skills/SciOrchestrator/assets/venue-profiles/apsec2026-technical-raip.yaml`  
-> **Playbook:** `skills/SciOrchestrator/skills/sci-orchestrator/apsec-raip-playbook.md`  
+> **Profile:** `skills/SciOrchestrator/assets/venue-profiles/apsec2026-technical-vera.yaml`  
+> **Playbook:** `skills/SciOrchestrator/skills/sci-orchestrator/apsec-vera-playbook.md`  
 > **Last updated:** 2026-06-26 (native 3-model run + banking + measured GaaS; earlier 2026-05-27 discovery retained for history)
 
 ---
@@ -12,9 +12,9 @@
 
 | Field | Value |
 |-------|--------|
-| Paper working title | **RAIP: A Lifecycle-Aware Open Platform for Responsible AI Evaluation Aligned with COMPL-AI and the EU AI Act** |
-| Artifact | Open-source evaluation platform + lab (Python package `raip`, v0.2.0) |
-| Repository | RAIP monorepo (`src/raip/`, `docs/`, `examples/`, `tests/`) |
+| Paper working title | **VERA: A Lifecycle-Aware Open Platform for Responsible AI Evaluation Aligned with COMPL-AI and the EU AI Act** |
+| Artifact | Open-source evaluation platform + lab (Python package `vera`, v0.2.0) |
+| Repository | VERA monorepo (`src/vera/`, `docs/`, `examples/`, `tests/`) |
 | Manuscript folder | `manuscript/` (main.tex, outline.md, references.bib) |
 | `references.bib` | **Not present** at workspace root — all `\cite{key}` blocked until authored |
 | `conference-papers/` | Present under `skills/SciOrchestrator/conference-papers/` (README + `.gitkeep` only; PDFs not in workspace) |
@@ -48,7 +48,7 @@
 ## 2. Central contribution (one sentence)
 
 **Draft (REVIEW — confirm):**  
-We present **RAIP**, an open-source, self-hostable software engineering platform that operationalizes the COMPL-AI technical requirements for the EU AI Act through a unified evaluation pipeline (CLI, API, asynchronous workers, LangGraph orchestration), extending inference-time benchmarking with **lifecycle-aware** dataset and checkpoint evaluation, signed governance artifacts, and explicit harness provenance—unlike prior LLM trustworthiness tools that focus primarily on single-shot model prompts without longitudinal or data-stage coverage.
+We present **VERA**, an open-source, self-hostable software engineering platform that operationalizes the COMPL-AI technical requirements for the EU AI Act through a unified evaluation pipeline (CLI, API, asynchronous workers, LangGraph orchestration), extending inference-time benchmarking with **lifecycle-aware** dataset and checkpoint evaluation, signed governance artifacts, and explicit harness provenance—unlike prior LLM trustworthiness tools that focus primarily on single-shot model prompts without longitudinal or data-stage coverage.
 
 ---
 
@@ -60,14 +60,14 @@ We present **RAIP**, an open-source, self-hostable software engineering platform
 - **COMPL-AI** (Guldimann et al., 2024; arXiv:2410.07959v2 — cited in `docs/ROADMAP.md`, `docs/framework_open_source_ia_responsable.md`) decomposes the Act into **18 technical requirements** (**12 measurable**, **6 non-measurable**).
 - Industrial practice still relies on **ad hoc** benchmark runs, spreadsheets, and non-reproducible scripts; scores are hard to tie to **lifecycle stages** (data curation, training checkpoints, inference, production).
 
-### 3.2 Pain points RAIP addresses (from project docs + code)
+### 3.2 Pain points VERA addresses (from project docs + code)
 
 | Pain point | Evidence in repo |
 |------------|------------------|
 | Fragmented tooling (cyber, fairness, capabilities, dataset quality) | MVP1 architecture lists Garak, lm-eval-harness, Detoxify, Presidio, BBQ, etc.; MVP2 adds dataset scans and poisoning lab |
 | Weak traceability from metric → requirement → artifact | `benchmark_run.yaml` schema in `docs/ROADMAP.md`; `benchmarks_catalog.yaml` signed weights; model card lists COMPL-AI rows |
 | “Pilot” evaluations that silently degrade (heuristic fallbacks) | MVP2 adds `fallback: true` and `harness` fields in `raw_outputs`; model card **Harness provenance** section |
-| No longitudinal view across training | TimescaleDB `metric_timeseries`; checkpoint eval in `src/raip/checkpoint/eval_job.py` |
+| No longitudinal view across training | TimescaleDB `metric_timeseries`; checkpoint eval in `src/vera/checkpoint/eval_job.py` |
 | Sovereignty / on-prem constraints | Roadmap doctrine: OSS self-hosted stack; LiteLLM → Ollama/vLLM default; proprietary APIs only as **evaluation targets** |
 
 ### 3.3 Running example (for Introduction — REVIEW)
@@ -80,11 +80,11 @@ REVIEW: Use a **compliance engineer** preparing an internal release gate for an 
 
 *These are **evaluation-platform requirements** for the APSEC paper (distinct from COMPL-AI requirement IDs R01–R12).*
 
-| ID | Requirement | Grounding in RAIP | Status |
+| ID | Requirement | Grounding in VERA | Status |
 |----|-------------|-------------------|--------|
 | **R1** | **Lifecycle coverage** — evaluate targets at multiple lifecycle stages (dataset, checkpoint, inference), not only a frozen model endpoint | MVP2 lab: `scan_dataset`, checkpoint eval, poisoning pipeline; `lifecycle_stage` in `benchmark_run` schema | **Implemented** (training GPU at scale → MVP2.2) |
 | **R2** | **Regulatory traceability** — every reported score maps to a COMPL-AI requirement ID with contributing benchmarks and bootstrap CI | LangGraph `aggregate_node`, `benchmarks_catalog.yaml`, `ComplaiRequirementScore`, model card table | **Implemented** |
-| **R3** | **Reproducibility and automation** — declarative runs (YAML), async jobs, versioned catalog, git SHA and signatures on artifacts | `raip-eval` CLI, `POST /api/v1/runs`, Celery, `sign_artifact`, Cosign hooks | **Implemented** (full OpenBao production → partial) |
+| **R3** | **Reproducibility and automation** — declarative runs (YAML), async jobs, versioned catalog, git SHA and signatures on artifacts | `vera-eval` CLI, `POST /api/v1/runs`, Celery, `sign_artifact`, Cosign hooks | **Implemented** (full OpenBao production → partial) |
 | **R4** | **Sovereign, self-hosted operation** — core path runs without mandatory cloud APIs; sensitive red-teaming stays on-prem | LiteLLM + Ollama default; Docker Compose stack; roadmap bans managed deps for infra | **Implemented** (MVP3 Next.js UI not in scope for this paper) |
 
 ---
@@ -96,7 +96,7 @@ REVIEW: Use a **compliance engineer** preparing an internal release gate for an 
 | ID | Contribution | Grounding | Empirical support in paper |
 |----|--------------|-----------|----------------------------|
 | **C1** | **Conceptual framework** — lifecycle-aware responsible-AI evaluation model aligning EU AI Act principles, COMPL-AI requirement IDs, lifecycle stages, and stakeholder views | `docs/ROADMAP.md` §1–3, `docs/framework_open_source_ia_responsable.md` §5–8 | Conceptual + mapping tables; no new theory beyond operationalization |
-| **C2** | **RAIP platform** — integrated implementation: CLI (`raip-eval`), REST API, Celery workers, LangGraph supervisor, benchmark registry, optional lm-eval/Garak/hf runners, lab routes, MinIO/MLflow/Timescale | `src/raip/*`, `docker-compose.yml`, `examples/*.yaml` | Architecture figure + component table; open-source availability |
+| **C2** | **VERA platform** — integrated implementation: CLI (`vera-eval`), REST API, Celery workers, LangGraph supervisor, benchmark registry, optional lm-eval/Garak/hf runners, lab routes, MinIO/MLflow/Timescale | `src/vera/*`, `docker-compose.yml`, `examples/*.yaml` | Architecture figure + component table; open-source availability |
 | **C3** | **Empirical evaluation** — native 3-model panel (RQ1 cross-model scores), non-degenerate weighting sensitivity (RQ2), design-validation walkthrough (RQ3), data-stage results on a synthetic banking corpus, and an in-process GaaS-runtime benchmark; grounded by an EU AI Act ↔ DORA/EBA/ACPR mapping | `scripts/run_paper_eval.py`, `scripts/bench_gaas.py`, `data/corpus/banking_synth.jsonl`, `manuscript/results/*.json` | **DONE** — `tab:complai-multi` (12×3), `tab:triage-stability` (CR06/CR10 band-flip), `sec:banking` (CR03 0.84 / CR04 0.94 / CR05 0.73), GaaS overhead 5.7 ms / detection 3/3 |
 
 ---
@@ -110,22 +110,22 @@ REVIEW: Use a **compliance engineer** preparing an internal release gate for an 
 
 | RQ | Question | Maps to | Primary metrics / artifacts | Evidence status |
 |----|----------|---------|----------------------------|-----------------|
-| **RQ1** | Can RAIP **automatically produce reproducible, COMPL-AI-aligned scores** across the 12 measurable requirements for a given LLM target under a declarative configuration? | C2, platform R2–R3 | Per-requirement score `s ∈ [0,1]`; bootstrap 95% CI; `benchmark_run.yaml`; MLflow metrics; `raw_outputs.jsonl` with `harness` / `fallback` | **DONE** — native 3-model panel, `tab:complai-multi`, determinism check |
+| **RQ1** | Can VERA **automatically produce reproducible, COMPL-AI-aligned scores** across the 12 measurable requirements for a given LLM target under a declarative configuration? | C2, platform R2–R3 | Per-requirement score `s ∈ [0,1]`; bootstrap 95% CI; `benchmark_run.yaml`; MLflow metrics; `raw_outputs.jsonl` with `harness` / `fallback` | **DONE** — native 3-model panel, `tab:complai-multi`, determinism check |
 | **RQ2** | *(final: weighting sensitivity)* How sensitive are scores/bands/triage to the aggregation weights, and is that auditable? | C2 | Per-requirement spread `Δ`, reweighting range, band-flips (`tab:triage-stability`) | **DONE** — non-degenerate: CR01 invariant (Δ=0), CR06/CR10 flip band (Δ=1.0) |
-| **RQ3** | Is RAIP **usable and interpretable** for practitioners responsible for compliance documentation (model cards, datasheets, audit trails)? | C3, platform R2 | Task time, Likert/triage tasks; correctness of artifact interpretation | **DONE** — design-validation walkthrough (8 triage tasks); external N-participant study deferred |
+| **RQ3** | Is VERA **usable and interpretable** for practitioners responsible for compliance documentation (model cards, datasheets, audit trails)? | C3, platform R2 | Task time, Likert/triage tasks; correctness of artifact interpretation | **DONE** — design-validation walkthrough (8 triage tasks); external N-participant study deferred |
 
 **Alternative (if no user study):** Replace RQ3 with a **case study** on documented scenarios (e.g., clean vs poisoned checkpoint, dataset with injected PII) — REVIEW: confirm with authors.
 
 ---
 
-## 7. RAIP system — architecture facts (from code)
+## 7. VERA system — architecture facts (from code)
 
 *Use for Approach section; no invented components.*
 
 ### 7.1 High-level flow
 
 ```text
-User / CI → CLI (raip-eval) or POST /api/v1/runs
+User / CI → CLI (vera-eval) or POST /api/v1/runs
          → Redis queue → Celery worker
          → LangGraph: evaluate → aggregate
          → LiteLLM → target model (default Ollama llama3.1:8b-instruct-q8_0)
@@ -136,23 +136,23 @@ User / CI → CLI (raip-eval) or POST /api/v1/runs
 
 | Component | Path / technology | Role |
 |-----------|-------------------|------|
-| CLI | `src/raip/cli/main.py` | Local run launch |
-| API | `src/raip/api/main.py`, `lab_routes.py` | Runs, registry, lab dataset scan |
-| Orchestration | `src/raip/graph/supervisor.py` (LangGraph) | Benchmark dispatch + COMPL-AI aggregation |
-| Runner dispatch | `src/raip/benchmarks/runners/evaluate.py` | `lm_eval`, `garak`, `hf_dynamic`, `dataset_scan`, `robustness_r01`, `hf_bbq`, `fairness_r11`, `toxicity_r12`, `watermark` |
-| Registry | `src/raip/api/benchmark_registry.py` | Benchmark ID → implementation |
-| Weights | `src/raip/benchmarks/benchmarks_catalog.yaml` | Signed catalogue `mvp2-v1` |
-| Dataset agent | `src/raip/data/pipeline.py` | R03–R05 scans + datasheet |
-| Poisoning lab | `src/raip/lab/poison.py`, injectors | Backdoor/trigger experiments |
-| Training stubs | `src/raip/training/peft_sft.py`, `dpo.py` | Signed manifests; micro-run if `RAIP_LAB_TRAIN=1` |
-| Checkpoint eval | `src/raip/checkpoint/eval_job.py` | Reuses graph; writes Timescale |
-| Governance | `src/raip/governance/signing.py`, `energy.py`, `datasheet.py` | Signatures, N03/N04 templates |
+| CLI | `src/vera/cli/main.py` | Local run launch |
+| API | `src/vera/api/main.py`, `lab_routes.py` | Runs, registry, lab dataset scan |
+| Orchestration | `src/vera/graph/supervisor.py` (LangGraph) | Benchmark dispatch + COMPL-AI aggregation |
+| Runner dispatch | `src/vera/benchmarks/runners/evaluate.py` | `lm_eval`, `garak`, `hf_dynamic`, `dataset_scan`, `robustness_r01`, `hf_bbq`, `fairness_r11`, `toxicity_r12`, `watermark` |
+| Registry | `src/vera/api/benchmark_registry.py` | Benchmark ID → implementation |
+| Weights | `src/vera/benchmarks/benchmarks_catalog.yaml` | Signed catalogue `mvp2-v1` |
+| Dataset agent | `src/vera/data/pipeline.py` | R03–R05 scans + datasheet |
+| Poisoning lab | `src/vera/lab/poison.py`, injectors | Backdoor/trigger experiments |
+| Training stubs | `src/vera/training/peft_sft.py`, `dpo.py` | Signed manifests; micro-run if `VERA_LAB_TRAIN=1` |
+| Checkpoint eval | `src/vera/checkpoint/eval_job.py` | Reuses graph; writes Timescale |
+| Governance | `src/vera/governance/signing.py`, `energy.py`, `datasheet.py` | Signatures, N03/N04 templates |
 | Storage | Redis runs, MinIO, MLflow, TimescaleDB | Per roadmap |
 
 ### 7.3 Default evaluation target (documented)
 
-- **Model:** `ollama/llama3.1:8b-instruct-q8_0` (`RAIP_TARGET_MODEL`, `examples/mvp2_ollama_e2e_full.yaml`)
-- **Judge:** same as target unless `RAIP_JUDGE_MODEL` set (dev only; production should use separate judge per MVP1 spec)
+- **Model:** `ollama/llama3.1:8b-instruct-q8_0` (`VERA_TARGET_MODEL`, `examples/mvp2_ollama_e2e_full.yaml`)
+- **Judge:** same as target unless `VERA_JUDGE_MODEL` set (dev only; production should use separate judge per MVP1 spec)
 
 ### 7.4 MVP scope for the paper (honest boundary)
 
@@ -170,7 +170,7 @@ User / CI → CLI (raip-eval) or POST /api/v1/runs
 
 *Map every planned metric to COMPL-AI ID (paper Evaluation Setup table).*
 
-| COMPL-AI ID | Name (short) | RAIP benchmark(s) | Runner / harness | Score formula (from docs/code) |
+| COMPL-AI ID | Name (short) | VERA benchmark(s) | Runner / harness | Score formula (from docs/code) |
 |-------------|--------------|-------------------|------------------|------------------------------|
 | **R01** | Robustness predictability | `r01_robustness`, `mmlu_robust`, `boolq_contrast` | `robustness_r01`, lm_eval/hf_dynamic | `s = acc_perturbed / max(acc_clean, ε)` |
 | **R02** | Cyber resilience | advbench, tensortrust, llm_rules, decodingtrust_adv | garak / hf_dynamic (+ BSR lab) | Attack success → `s = 1 - ASR`; BSR = ASR_post/ASR_pre |
@@ -187,7 +187,7 @@ User / CI → CLI (raip-eval) or POST /api/v1/runs
 
 **Non-measurable (N01–N06) — paper handling:**
 
-| ID | RAIP status | Paper treatment |
+| ID | VERA status | Paper treatment |
 |----|-------------|-----------------|
 | N01, N02 | MVP3 HITL | Future work |
 | N03 | `energy.py`, CodeCarbon hook | Declarative / inference-only placeholder in model card unless lab train run |
@@ -221,7 +221,7 @@ User / CI → CLI (raip-eval) or POST /api/v1/runs
 |----------|-------------------|
 | Evaluation mode | inference-only vs inference + dataset scan vs checkpoint (+ poisoned) |
 | Harness availability | lm-eval installed vs fallback hf_dynamic (`fallback: true`) |
-| Watermark mode | `RAIP_WATERMARK_MODE=statistical` vs `na` |
+| Watermark mode | `VERA_WATERMARK_MODE=statistical` vs `na` |
 | Lab extras | `[lab]` installed (Detoxify, Presidio) vs heuristic_fallback |
 
 ### 9.4 Dependent variables (metrics)
@@ -239,13 +239,13 @@ User / CI → CLI (raip-eval) or POST /api/v1/runs
 
 1. `docker compose up` (Redis, MinIO, MLflow, Postgres/Timescale per compose file).  
 2. `pip install -e ".[dev,lab,benchmarks]"` (Python 3.11).  
-3. `raip-eval run examples/mvp2_ollama_e2e_full.yaml` and/or API `POST /api/v1/runs`.  
+3. `vera-eval run examples/mvp2_ollama_e2e_full.yaml` and/or API `POST /api/v1/runs`.  
 4. Collect `runs/{run_id}/model_card.md`, `benchmark_run.yaml`, MLflow run.  
 5. **TODO: [USER: freeze commit SHA, catalog version, and environment for paper replication package]**
 
 ### 9.6 Hypotheses (draft — REVIEW, no numbers)
 
-- **H1 (RQ1):** RAIP completes an end-to-end run producing all requested COMPL-AI requirement scores with documented provenance.  
+- **H1 (RQ1):** VERA completes an end-to-end run producing all requested COMPL-AI requirement scores with documented provenance.  
 - **H2 (RQ2):** Lifecycle configuration yields strictly broader requirement coverage than inference-only (includes R03–R05 and checkpoint-linked metrics).  
 - **H3 (RQ3):** Practitioners rate interpretability of model card / COMPL-AI table above neutral threshold — **TODO: [USER: define threshold and instrument]**
 
@@ -262,7 +262,7 @@ User / CI → CLI (raip-eval) or POST /api/v1/runs
 | Unit + lab tests | **42 passed** (2 deselected) | `docs/MVP2_STATUS.md`, pytest run 2026-05-27 |
 | Test command | `pytest tests/unit/ tests/lab/ -m "not gpu and not slow"` | `docs/MVP2_LAB_RUNBOOK.md` |
 | Integration tests | Redis, MinIO, CLI, Timescale memory | `tests/integration/`, `tests/lab/` |
-| E2E | `RAIP_E2E_OLLAMA=1` workflow (self-hosted Ollama) | `.github/workflows/raip-ci.yml`, MVP2_STATUS |
+| E2E | `VERA_E2E_OLLAMA=1` workflow (self-hosted Ollama) | `.github/workflows/vera-ci.yml`, MVP2_STATUS |
 | pilote_v1 removed | Registry dispatch tests | `tests/unit/test_registry_dispatch.py` |
 
 ### 10.2 Qualitative / informal results (conversation & docs — NOT for numeric tables)
@@ -283,7 +283,7 @@ User / CI → CLI (raip-eval) or POST /api/v1/runs
 
 | Fig | Description | Status |
 |-----|-------------|--------|
-| Fig 1 | RAIP architecture (CLI, API, Celery, LangGraph, LiteLLM, stores) | Draw from §7 |
+| Fig 1 | VERA architecture (CLI, API, Celery, LangGraph, LiteLLM, stores) | Draw from §7 |
 | Fig 2 | Evaluation workflow sequence (run → aggregate → artifacts) | Draw from code |
 | Fig 3 | Bar chart: COMPL-AI scores by requirement | **TODO: data** |
 | Fig 4 | UI screenshots | **TODO: [USER: MVP3 UI or API/MLflow screenshots?]** |
@@ -294,7 +294,7 @@ User / CI → CLI (raip-eval) or POST /api/v1/runs
 
 **Positioning axes (for Related Work table columns):**
 
-| Axis | RAIP claim |
+| Axis | VERA claim |
 |------|------------|
 | Regulatory mapping | Explicit COMPL-AI + EU AI Act article fields in artifacts |
 | Lifecycle | Data + checkpoint + inference vs inference-only benchmarks |
@@ -304,12 +304,12 @@ User / CI → CLI (raip-eval) or POST /api/v1/runs
 
 **Comparison families (cite when `references.bib` exists):**
 
-| Family | Examples (literature names only — keys TODO) | Gap vs RAIP |
+| Family | Examples (literature names only — keys TODO) | Gap vs VERA |
 |--------|-----------------------------------------------|-------------|
-| LLM trustworthiness tools | PromptOps-class (APSEC 2025 reference paper) | RAIP adds COMPL-AI breadth + lifecycle + lab |
-| Experiment tracking | Histree-class | RAIP targets compliance metrics not only ML experiments |
-| Benchmark suites | COMPL-AI, DecodingTrust, Garak, lm-eval-harness | RAIP **integrates** rather than replaces |
-| RAI governance frameworks | NIST AI RMF, ISO 42001 mappings in docs | RAIP **implements** measurement pipeline |
+| LLM trustworthiness tools | PromptOps-class (APSEC 2025 reference paper) | VERA adds COMPL-AI breadth + lifecycle + lab |
+| Experiment tracking | Histree-class | VERA targets compliance metrics not only ML experiments |
+| Benchmark suites | COMPL-AI, DecodingTrust, Garak, lm-eval-harness | VERA **integrates** rather than replaces |
+| RAI governance frameworks | NIST AI RMF, ISO 42001 mappings in docs | VERA **implements** measurement pipeline |
 
 **`references.bib` status:** **File missing.** Suggested keys to add (do not cite until in bib):
 
@@ -351,7 +351,7 @@ User / CI → CLI (raip-eval) or POST /api/v1/runs
 
 ## 13. Conclusion and future work (bullet plan)
 
-- Summarize C1–C3: framework, RAIP platform, empirical lessons.  
+- Summarize C1–C3: framework, VERA platform, empirical lessons.  
 - Emphasize **reproducible COMPL-AI-aligned artifacts** as the practical contribution for software engineering compliance workflows.  
 - Future work: MVP3 dashboards + HITL, MVP4 production governance, full SynthID/LiRA, multi-model benchmark campaign, formal user study with compliance officers.
 
@@ -390,13 +390,13 @@ The writing agent **must not** without user data:
 | Area searched | Key paths | Findings |
 |---------------|-----------|----------|
 | Docs | `docs/ROADMAP.md`, `MVP1_*.md`, `MVP2_*.md`, `framework_open_source_ia_responsable.md` | Full vision, COMPL-AI mapping, MVP boundaries |
-| Code | `src/raip/` | MVP2 platform implemented |
+| Code | `src/vera/` | MVP2 platform implemented |
 | Examples | `examples/mvp2_ollama_e2e_full.yaml`, `mvp2_dataset_eval.yaml` | Runnable configs |
 | Tests | `tests/unit/`, `tests/lab/`, `tests/integration/` | 42+ tests; no paper result bundle |
 | Slides / manuscript | — | **Not found** |
 | Thesis | — | **Not found** |
 | `references.bib` | — | **Not found** |
-| SciOrchestrator | `skills/SciOrchestrator/` | Venue profile, playbook, prompts; template `research-brief-raip.template.md` **not found** (structure inferred from task + playbook) |
+| SciOrchestrator | `skills/SciOrchestrator/` | Venue profile, playbook, prompts; template `research-brief-vera.template.md` **not found** (structure inferred from task + playbook) |
 
 ---
 

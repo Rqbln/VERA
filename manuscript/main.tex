@@ -62,7 +62,7 @@
 Deploying large language models under the EU AI Act~\cite{euaiact2024} requires reproducible technical evidence across trustworthy-AI principles~\cite{hleg2019trustworthyai}.
 COMPL-AI~\cite{guldimann2024complai}, one community operationalization of these obligations, decomposes them into eighteen technical requirements, twelve of which admit measurable scores, but industrial practice still relies on fragmented benchmark scripts whose aggregation choices are opaque and whose results are hard for non-specialists to triage.
 We present RAIP, an open-source, self-hostable software-engineering platform \emph{and} a ``compliance control room'' dashboard for EU AI Act LLM evaluation.
-RAIP orchestrates benchmarks through a LangGraph pipeline (CLI, REST API, Celery workers), routes inference via LiteLLM to self-hosted models, and emits signed artifacts with explicit harness provenance.
+RAIP \emph{orchestrates} benchmarks---coordinating and running many of them as one reproducible job---through a pipeline (command line, web API, and background workers), routes inference to self-hosted models, and emits signed artifacts that record exactly which scorer produced each number.
 Two design decisions distinguish it.
 First, the benchmark-to-requirement \emph{aggregation weights} are a first-class, versioned, signed artifact; we use this to run a reproducible \emph{sensitivity analysis} that quantifies how the per-requirement compliance picture, the green/amber/red bands, and the dashboard's status-first triage order shift under alternative weightings.
 Second, a no-login \emph{guided} mode lets a non-technical user launch an evaluation on a connected model and read a status-first, progressively-disclosed summary, while a role-based control room serves expert audiences.
@@ -86,15 +86,15 @@ COMPL-AI~\cite{guldimann2024complai} translates legal principles into eighteen t
 We stress that COMPL-AI is \emph{one} community operationalization of the EU AI Act---a useful, public interpretation of how its principles can be measured---not an official or exhaustive mapping; the Act itself prescribes no benchmark suite.
 Accordingly, RAIP does not re-derive the Act or claim legal coverage: it \emph{evaluates a model against this measurable interpretation and produces a responsible-AI score} that compliance stakeholders read alongside their own judgement.
 COMPL-AI, however, remains a measurement framework rather than an orchestration platform.
-Individual suites---for example DecodingTrust~\cite{wang2023decodingtrust}, the language-model evaluation harness~\cite{gao2021lmevalharness}, and MMLU~\cite{hendrycks2021mmlu}---answer \emph{measurement} questions in isolation.
-They do not, by themselves, deliver orchestration, requirement-level aggregation, or governance artifacts such as model cards~\cite{mitchell2019modelcard} and datasheets for datasets~\cite{gebru2021datasheets}.
+Individual suites---for example DecodingTrust~\cite{wang2023decodingtrust}, the language-model evaluation \emph{harness}~\cite{gao2021lmevalharness} (a harness is the software that actually runs a benchmark against a model), and MMLU~\cite{hendrycks2021mmlu}---answer \emph{measurement} questions in isolation.
+They do not, by themselves, deliver \emph{orchestration} (coordinating and running many benchmarks as one reproducible job), requirement-level aggregation, or governance artifacts such as model cards~\cite{mitchell2019modelcard} and datasheets for datasets~\cite{gebru2021datasheets}.
 
 \subsection{Problem Statement}
 A team preparing an LLM for a release gate under the EU AI Act faces three concrete questions that have no turnkey answer today; each yields a requirement on the tool we set out to build.
 \begin{itemize}
-  \item \emph{Q1 (orchestration).} How can disconnected benchmark scripts be executed, aggregated to regulatory requirement identifiers, and reproduced bit-for-bit across release gates without error-prone manual spreadsheet assembly?\\ \textbf{Need~R$_a$:} a declarative, automated, self-hostable evaluation pipeline.
+  \item \emph{Q1 (running benchmarks as one job).} How can disconnected benchmark scripts be executed, aggregated to regulatory requirement identifiers, and reproduced bit-for-bit across release gates without error-prone manual spreadsheet assembly?\\ \textbf{Need~R$_a$:} a declarative, automated, self-hostable evaluation pipeline.
   \item \emph{Q2 (auditable aggregation).} When a requirement score is a weighted average of several benchmarks, \emph{who} chooses the weighting, and how much does the green/amber/red verdict actually depend on that choice?\\ \textbf{Need~R$_b$:} aggregation weights as an inspectable, versioned, signed artifact, plus a reproducible sensitivity check.
-  \item \emph{Q3 (honest provenance).} When an optional scorer is missing and the pipeline degrades to a heuristic fallback, how does an auditor discover \emph{which} harness produced each number?\\ \textbf{Need~R$_c$:} per-benchmark harness provenance recorded with every score.
+  \item \emph{Q3 (honest provenance).} When an optional scorer is missing and the pipeline degrades to a heuristic fallback, how does an auditor discover \emph{which} scorer (benchmark harness) produced each number?\\ \textbf{Need~R$_c$:} per-benchmark harness provenance recorded with every score.
 \end{itemize}
 Concretely, a compliance engineer must attach a model card showing robustness (CR01), fairness and toxicity (CR10--CR12), and signed run metadata before approving an instruction-tuned LLM, and must justify \emph{how} the per-requirement scores were aggregated---work that today often means days of ad hoc scripting and undocumented weighting choices.
 
@@ -167,15 +167,15 @@ RAIP instead \emph{generates} a model card (and, for dataset runs, a datasheet) 
 \subsection{Open-Source LLM Evaluation Frameworks}
 A growing ecosystem of open-source frameworks evaluates LLMs, but they target different layers.
 HELM~\cite{liang2023helm} standardizes \emph{which} scenarios and metrics to report across many models; the language-model evaluation harness~\cite{gao2021lmevalharness} standardizes \emph{how} a capability benchmark is executed reproducibly; Garak~\cite{derczynski2024garak} is a security-probing framework for jailbreaks and prompt injection; DecodingTrust~\cite{wang2023decodingtrust} is a trustworthiness benchmark suite.
-These are excellent \emph{measurement} substrates, and RAIP orchestrates them rather than competing with them.
-What turns such tools into a usable \emph{compliance framework}---rather than a collection of scripts---is, we argue, four engineering properties: (i) a permissive open license and self-hostable deployment; (ii) extensibility through a benchmark registry and pluggable runners; (iii) reproducibility via declarative runs, versioned and signed catalogues, and recorded provenance; and (iv) an interpretable restitution surface that maps raw metrics to regulatory requirement identifiers for non-specialist stakeholders.
+These are excellent \emph{measurement building blocks}, and RAIP coordinates (orchestrates) them rather than competing with them.
+What turns such tools into a usable \emph{compliance framework}---rather than a collection of scripts---is, we argue, four engineering properties: (i) a permissive open license and self-hostable deployment; (ii) extensibility through a benchmark registry and pluggable runners; (iii) reproducibility via declarative runs, versioned and signed catalogues, and recorded provenance; and (iv) an interpretable \emph{restitution} surface---a results-presentation layer---that maps raw metrics to regulatory requirement identifiers for non-specialist stakeholders.
 RAIP's contribution is to assemble these four properties around the COMPL-AI requirement taxonomy and to make the \emph{aggregation policy} itself an auditable artifact.
 
 \subsection{Software Engineering Tool Papers}
 \Cref{tab:related-work} positions RAIP against neighboring evaluation tooling; here we state precisely what RAIP does better than the closest tools rather than merely differently.
 PromptOps~\cite{sunetnanta2025promptops} is the closest APSEC LLM-trustworthiness tool, but it is inference-centric and treats aggregation as an opaque internal step: a practitioner cannot inspect, diff, or re-sign the weighting, nor ask how sensitive a verdict is to it.
 RAIP improves on this in three measurable ways: (i) it maps results to the full COMPL-AI CR01--CR12 taxonomy rather than a tool-specific score set; (ii) it exposes the aggregation policy as a first-class signed artifact and ships a one-command sensitivity check over it; and (iii) it records per-benchmark harness provenance (including fallbacks) so every number is attributable.
-Relative to the measurement substrates it orchestrates, RAIP adds the requirement-level aggregation and interpretive restitution that HELM~\cite{liang2023helm}, the evaluation harness~\cite{gao2021lmevalharness}, and Garak~\cite{derczynski2024garak} deliberately leave out.
+Relative to the measurement building blocks it coordinates, RAIP adds the requirement-level aggregation and interpretive results presentation that HELM~\cite{liang2023helm}, the evaluation harness~\cite{gao2021lmevalharness}, and Garak~\cite{derczynski2024garak} deliberately leave out.
 Methodologically, Histree~\cite{studtmann2023histree} exemplifies APSEC tool-and-evaluation papers; controlled-experiment design~\cite{weninger2018usecase} and explicit RQ structures~\cite{liu2022mscpdp} inform our evaluation layout, and classic SE tool papers~\cite{hasselknippe2017guilayout} support technical validation without mandatory user studies.
 
 \begin{table*}[t]
@@ -201,11 +201,11 @@ Methodologically, Histree~\cite{studtmann2023histree} exemplifies APSEC tool-and
 \end{table*}
 
 \subsection{Software Engineering Challenges}
-The gap in \Cref{tab:related-work} is not a missing benchmark but a set of unmet \emph{software-engineering} challenges in turning measurement substrates into an auditable compliance tool:
+The gap in \Cref{tab:related-work} is not a missing benchmark but a set of unmet \emph{software-engineering} challenges in turning these measurement building blocks into an auditable compliance tool:
 (SC1) \emph{heterogeneous-harness integration}---dispatching benchmarks with incompatible interfaces behind one registry while degrading gracefully when optional engines are absent;
 (SC2) \emph{auditable aggregation}---treating the benchmark-to-requirement weighting as versioned, signed, inspectable data rather than buried constants, and making its influence measurable;
 (SC3) \emph{end-to-end provenance and reproducibility}---declarative runs, deterministic re-aggregation, content signatures, and per-number harness attribution; and
-(SC4) \emph{interpretable restitution}---mapping raw metrics onto regulatory requirement identifiers in a surface a non-specialist can triage.
+(SC4) \emph{interpretable results presentation}---mapping raw metrics onto regulatory requirement identifiers in a surface a non-specialist can triage.
 No reference in \Cref{tab:related-work} addresses SC1--SC4 together; RAIP is designed around exactly these four challenges.
 
 \section{RAIP Framework and Architecture}
@@ -219,10 +219,10 @@ Compliance stakeholders consume requirement tables and signatures, engineers con
 
 \subsection{System Architecture}
 \Cref{fig:architecture} shows how our platform turns a launch request into signed, auditor-facing evidence.
-A user enters through one of three surfaces we provide---the \texttt{raip-eval} CLI, the \texttt{POST /api/v1/runs} REST endpoint, or our no-login guided wizard---all of which enqueue the \emph{same} declarative job on Celery/Redis, where our run store also holds the governance kill-switch.
-A Celery worker then executes our LangGraph supervisor, whose two nodes separate concerns: the \texttt{evaluate} node resolves the requested requirements to benchmarks through our registry, dispatches each to its runner, and routes inference via LiteLLM to a self-hosted target and judge; the \texttt{aggregate} node combines the cached per-item scores using the weights read from our signed catalogue \texttt{mvp2-v1} and attaches bootstrap intervals.
+A user enters through one of three surfaces we provide---the \texttt{raip-eval} CLI, the \texttt{POST /api/v1/runs} REST endpoint, or our no-login guided wizard---all of which enqueue the \emph{same} declarative job on Celery/Redis (a standard task queue that runs jobs in the background), where our run store also holds the governance kill-switch.
+A Celery worker then executes our LangGraph supervisor---a small two-step controller that first \emph{evaluates}, then \emph{aggregates}: the \texttt{evaluate} node resolves the requested requirements to benchmarks through our registry, dispatches each to its runner, and routes inference via LiteLLM (one adapter for many model back-ends) to a self-hosted target and judge; the \texttt{aggregate} node combines the cached per-item scores using the weights read from our signed catalogue \texttt{mvp2-v1} and attaches bootstrap intervals.
 The run emits our artifact set---\texttt{benchmark\_run.yaml}, \texttt{model\_card.md}, \texttt{raw\_outputs.jsonl}, and a content signature---to MinIO or, in our lite profile, the local filesystem, with MLflow tracking optional, and our read API serves it to the control room (\Cref{sec:dashboard}).
-The boundary we draw is deliberate: weights and provenance cross the \texttt{evaluate}/\texttt{aggregate} seam as inspectable data, which is precisely what makes our aggregation auditable (SC2) and our fallbacks visible (SC1, SC3).
+The boundary we draw is deliberate: weights and provenance cross the boundary (\emph{seam}) between the \texttt{evaluate} and \texttt{aggregate} steps as inspectable data, which is precisely what makes our aggregation auditable (SC2) and our fallbacks visible (SC1, SC3).
 
 \begin{figure*}[t]
   \centering
@@ -285,7 +285,7 @@ The boundary we draw is deliberate: weights and provenance cross the \texttt{eva
     \node[lbl] at (5.9,0.95) {orchestration};
     \node[lbl] at (8.6,0.95) {execution};
     \node[lbl] at (14.4,0.95) {outputs};
-    \node[lbl] at (17.4,0.95) {restitution};
+    \node[lbl] at (17.4,0.95) {results presentation};
   \end{tikzpicture}%
   }
   \caption{Our runtime pipeline. Three invocation surfaces enqueue one declarative job; the LangGraph supervisor splits into an \texttt{evaluate} node (registry $\rightarrow$ runners $\rightarrow$ LiteLLM $\rightarrow$ self-hosted models) and an \texttt{aggregate} node that combines cached item scores with weights read from the signed catalogue. Scores and signed artifacts flow through our read API to the control room. Weights (red) and provenance cross the evaluate/aggregate seam as data, making aggregation auditable and fallbacks visible.}
@@ -479,7 +479,7 @@ Selection of contributing benchmarks (and the cadence at which a benchmark is re
 \section{The Compliance Control Room}
 \label{sec:dashboard}
 
-The restitution surface is a Next.js dashboard. Its design follows established information-visualization guidance---``overview first, zoom and filter, then details on demand''~\cite{shneiderman1996eyes}---specialised for a release-gate audience. We highlight the decisions that shaped \emph{what} is displayed.
+The results-presentation surface is a Next.js dashboard. Its design follows established information-visualization guidance---``overview first, zoom and filter, then details on demand''~\cite{shneiderman1996eyes}---specialised for a release-gate audience. We highlight the decisions that shaped \emph{what} is displayed.
 
 \paragraph{Status-first triage}
 The requirement table is sorted by triage state (failed $\rightarrow$ fallback $\rightarrow$ uncovered $\rightarrow$ ok $\rightarrow$ n/a) rather than by identifier, so the weakest evidence surfaces first; passing rows are collapsed behind a ``show all'' control. Scores are rendered as green/amber/red \emph{bands}, never as a binary pass/fail, reflecting the framework's stance that release decisions are human trade-offs, not threshold cliffs.

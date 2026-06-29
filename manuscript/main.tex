@@ -60,7 +60,7 @@
 
 \begin{abstract}
 Deploying large language models under the EU AI Act~\cite{euaiact2024} requires reproducible technical evidence across trustworthy-AI principles~\cite{hleg2019trustworthyai}.
-COMPL-AI~\cite{guldimann2024complai} decomposes these obligations into eighteen technical requirements, twelve of which admit measurable scores, but industrial practice still relies on fragmented benchmark scripts whose aggregation choices are opaque and whose results are hard for non-specialists to triage.
+COMPL-AI~\cite{guldimann2024complai}, one community operationalization of these obligations, decomposes them into eighteen technical requirements, twelve of which admit measurable scores, but industrial practice still relies on fragmented benchmark scripts whose aggregation choices are opaque and whose results are hard for non-specialists to triage.
 We present RAIP, an open-source, self-hostable software-engineering platform \emph{and} a ``compliance control room'' dashboard for EU AI Act LLM evaluation.
 RAIP orchestrates benchmarks through a LangGraph pipeline (CLI, REST API, Celery workers), routes inference via LiteLLM to self-hosted models, and emits signed artifacts with explicit harness provenance.
 Two design decisions distinguish it.
@@ -82,7 +82,10 @@ Responsible AI, EU AI Act, COMPL-AI, software engineering tools, LLM evaluation,
 Regulated and high-risk AI systems must demonstrate technical evidence before deployment.
 The EU AI Act~\cite{euaiact2024} and the Ethics Guidelines for Trustworthy AI~\cite{hleg2019trustworthyai} frame expectations across robustness, privacy, transparency, and fairness.
 Organizational frameworks such as the NIST AI Risk Management Framework~\cite{nist2023airmf} and ISO/IEC~42001~\cite{iso42001_2023} guide governance but do not provide an executable pipeline that runs LLM benchmarks, aggregates scores, and produces auditor-facing artifacts.
-COMPL-AI~\cite{guldimann2024complai} translates legal principles into eighteen technical requirements with associated benchmarks, yet remains a measurement framework rather than an orchestration platform.
+COMPL-AI~\cite{guldimann2024complai} translates legal principles into eighteen technical requirements with associated benchmarks, twelve of which admit measurable scores.
+We stress that COMPL-AI is \emph{one} community operationalization of the EU AI Act---a useful, public interpretation of how its principles can be measured---not an official or exhaustive mapping; the Act itself prescribes no benchmark suite.
+Accordingly, RAIP does not re-derive the Act or claim legal coverage: it \emph{evaluates a model against this measurable interpretation and produces a responsible-AI score} that compliance stakeholders read alongside their own judgement.
+COMPL-AI, however, remains a measurement framework rather than an orchestration platform.
 Individual suites---for example DecodingTrust~\cite{wang2023decodingtrust}, the language-model evaluation harness~\cite{gao2021lmevalharness}, and MMLU~\cite{hendrycks2021mmlu}---answer \emph{measurement} questions in isolation.
 They do not, by themselves, deliver orchestration, requirement-level aggregation, or governance artifacts such as model cards~\cite{mitchell2019modelcard} and datasheets for datasets~\cite{gebru2021datasheets}.
 
@@ -140,7 +143,7 @@ In this paper, we make the following contributions:
 \subsection{Regulatory Framing and COMPL-AI}
 The EU AI Act~\cite{euaiact2024} and the six HLEG trustworthy-AI principles~\cite{hleg2019trustworthyai} motivate technical evidence for high-risk systems.
 NIST and ISO frameworks~\cite{nist2023airmf,iso42001_2023} guide organizational risk management; RAIP implements the \emph{measure} slice---automated benchmarks and artifacts---not full governance programs.
-COMPL-AI~\cite{guldimann2024complai} maps legal principles to eighteen technical requirements, twelve with measurable scores in $[0,1]$, and associates benchmarks and multi-model studies.
+COMPL-AI~\cite{guldimann2024complai} is one published, community interpretation of how these principles can be measured---not the official or only operationalization of the Act---and it maps legal principles to eighteen technical requirements, twelve with measurable scores in $[0,1]$, associating benchmarks and multi-model studies.
 COMPL-AI remains a benchmark \emph{framework}, not a lifecycle orchestration platform with signed audit chains.
 
 \subsection{Benchmark Suites and Metrics}

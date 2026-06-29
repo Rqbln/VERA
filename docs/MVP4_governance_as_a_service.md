@@ -52,7 +52,7 @@ last_reviewed: "2026-06-22"
 
 | Réf. ROADMAP | Action obligatoire |
 |---|---|
-| **M11** | Trust Factor, canary set (200×5), LLM-judge live et embeddings : **uniquement** métriques issues du catalogue signé MVP2+ ; **aucun** import `raip.benchmarks.pilote_v1` dans le service proxy. |
+| **M11** | Trust Factor, canary set (200×5), LLM-judge live et embeddings : **uniquement** métriques issues du catalogue signé MVP2+ ; **aucun** import `vera.benchmarks.pilote_v1` dans le service proxy. |
 | **M8** (extension) | Chaos / load tests : vérification qu’aucune route du proxy ne référence des réponses « stub » ou corpus synthétique. |
 | **M10** (extension) | Vue Production MVP3 alimentée exclusivement par télémétrie live **non pilote** ; corrélation avec trigger registry MVP2 réelle. |
 
@@ -64,7 +64,7 @@ last_reviewed: "2026-06-22"
 flowchart TB
     USER[Utilisateur final<br/>app métier] --> GW[API Gateway<br/>Kong / Envoy]
 
-    GW --> PROXY[RAIP Proxy<br/>FastAPI async + httpx<br/>shadow inspection]
+    GW --> PROXY[VERA Proxy<br/>FastAPI async + httpx<br/>shadow inspection]
 
     PROXY -->|forward sync| LLM[LLM cible<br/>vLLM self-hosted - défaut<br/>ou Anthropic / OpenAI / Mistral / Gemini]
     LLM --> PROXY
@@ -218,7 +218,7 @@ POST /admin/v1/mode/{model}          # passe Shadow|Advisory|Enforcement
 ## 8. Politique OPA (exemple)
 
 ```rego
-package raip.gaas
+package vera.gaas
 
 default allow = false
 
@@ -298,7 +298,7 @@ audit[event] {
 | Faux positifs Trust Factor → blocage abusif | Mode shadow long, calibration Platt, override humain Compliance |
 | Détection de backdoor échouée (zero-day trigger) | Defense-in-depth : LLM-judge + drift + canary set + agents indépendants |
 | Régressions silencieuses sur upgrades providers | Golden canary set 200 prompts × heure, alertes drift > 0.15 |
-| Latence proxy dégradée sous charge | Benchmark continu, scaling horizontal Swarm (`docker service scale raip-proxy=N` piloté par alertes Prometheus + script de réconciliation), cache Redis sur fingerprints |
+| Latence proxy dégradée sous charge | Benchmark continu, scaling horizontal Swarm (`docker service scale vera-proxy=N` piloté par alertes Prometheus + script de réconciliation), cache Redis sur fingerprints |
 | Coût LLM-judge en production | Sampling 10 % par défaut, escalade 100 % si Trust Factor litigieux |
 | Empoisonnement du canary set | Hash signé + revue manuelle Compliance avant rotation |
 | Bypass via streaming SSE | Inspection chunk-by-chunk + buffering jusqu'à fin de stream pour scoring |

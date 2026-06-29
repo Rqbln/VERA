@@ -1,13 +1,13 @@
-# RAIP — Dossier technique exhaustif (support du rapport de Semestre 2)
+# VERA — Dossier technique exhaustif (support du rapport de Semestre 2)
 
-> **Objet.** Document de référence unique et exhaustif sur le projet **RAIP (Responsible AI in Practice)**,
+> **Objet.** Document de référence unique et exhaustif sur le projet **VERA (Verifiable Evaluation for Responsible AI)**,
 > destiné à servir de matière première pour la rédaction du rapport d'apprentissage du second semestre
 > (ECE Paris — ING4 / Semestre 8, BNP Paribas Research Team).
 >
 > **Auteur du projet / apprenti :** Robin Quériaux — Research Scientist (Generative AI), BNP Paribas Research.
 > **Tutrice entreprise :** Mariam Barry. **Tuteur école :** Jeremy Hokayem.
 >
-> **Convention de lecture (importante).** RAIP a une **vision cible** ambitieuse (roadmap 18 mois,
+> **Convention de lecture (importante).** VERA a une **vision cible** ambitieuse (roadmap 18 mois,
 > stack complète « governance-as-a-service ») et une **implémentation réelle** plus resserrée
 > (branche `mvp3-mvp4`, stack « lite » sans login). Tout au long du document, on distingue
 > explicitement :
@@ -24,7 +24,7 @@
 1. [Synthèse exécutive](#1-synthèse-exécutive)
 2. [Contexte et problématique](#2-contexte-et-problématique)
 3. [Objectifs scientifiques et contributions](#3-objectifs-scientifiques-et-contributions)
-4. [Le paradigme RAIP : supervision longitudinale et multi-rôle](#4-le-paradigme-raip)
+4. [Le paradigme VERA : supervision longitudinale et multi-rôle](#4-le-paradigme-vera)
 5. [Architecture technique](#5-architecture-technique)
 6. [Le référentiel d'évaluation : 6 principes → 18 exigences COMPL-AI](#6-le-référentiel-dévaluation--18-exigences-compl-ai)
 7. [Les quatre MVP : du noyau statique à la gouvernance](#7-les-quatre-mvp)
@@ -43,7 +43,7 @@
 
 ## 1. Synthèse exécutive
 
-**RAIP (Responsible AI in Practice)** est une **plateforme open-source et auto-hébergeable d'évaluation
+**VERA (Verifiable Evaluation for Responsible AI)** est une **plateforme open-source et auto-hébergeable d'évaluation
 de conformité des LLM à l'EU AI Act**. Sa thèse fondatrice : l'IA responsable ne peut pas se réduire à
 un test ponctuel en fin de chaîne ; elle doit être une **supervision longitudinale sur tout le cycle de
 vie** d'un modèle (données → pré-entraînement → fine-tuning → inférence → production), opérée par un
@@ -53,7 +53,7 @@ adaptés aux métiers**.
 L'épine dorsale d'évaluation est le framework académique **COMPL-AI** (Guldimann et al., 2024), qui
 traduit les **6 principes éthiques** de l'EU AI Act en **18 exigences techniques** : **12 mesurables**
 (R01–R12, chacune produisant un score normalisé dans [0,1]) et **6 non mesurables** (N01–N06, formulaires
-déclaratifs ou revue humaine). RAIP est, à notre connaissance, la première plateforme à assembler en un
+déclaratifs ou revue humaine). VERA est, à notre connaissance, la première plateforme à assembler en un
 seul outil auto-hébergeable : une cartographie COMPL-AI complète, un pipeline d'évaluation déclaratif et
 reproductible, des **poids d'agrégation configurables et signés**, une **traçabilité du harnais**
 (provenance) et un **tableau de bord de conformité interprétable** pour des publics non spécialistes.
@@ -71,7 +71,7 @@ reproductible, des **poids d'agrégation configurables et signés**, une **traç
 | Modèle cible par défaut | `ollama/llama3.1:8b-instruct-q8_0` | `config.py` |
 | Publications | **APSEC 2026** (papier outil, rédigé) + **ICLR** (science approfondie, différée) | `manuscript/` |
 
-RAIP transforme l'évaluation de conformité d'un **assemblage manuel de tableurs** vers un **pipeline
+VERA transforme l'évaluation de conformité d'un **assemblage manuel de tableurs** vers un **pipeline
 logiciel automatisé, reproductible et auditable**.
 
 ---
@@ -98,13 +98,13 @@ Le défi : **transformer l'IA en levier de performance tout en garantissant un n
 compatible avec un environnement régulé** — il ne suffit pas qu'un dispositif « fonctionne », il doit
 pouvoir être **évalué, justifié et prouvé**.
 
-### 2.2 Le « gap » que RAIP comble
+### 2.2 Le « gap » que VERA comble
 
 Les principes de l'EU AI Act sont **juridiques, non opérationnels**. Le framework **COMPL-AI** en donne la
 première traduction technique (18 exigences, benchmarks associés), mais reste un **framework de mesure**,
 pas une **plateforme d'orchestration** dotée d'une chaîne d'audit signée.
 
-Trois lacunes concrètes motivent RAIP :
+Trois lacunes concrètes motivent VERA :
 
 1. **Outillage fragmenté.** Les équipes conformité et data science assemblent manuellement des scores
    issus d'outils déconnectés (Garak pour le cyber, lm-eval-harness pour les capacités, Detoxify pour la
@@ -122,8 +122,8 @@ Trois lacunes concrètes motivent RAIP :
 
 ### 2.3 Positionnement par rapport à l'état de l'art
 
-RAIP **n'invente pas de nouvelle science de benchmark** : il **orchestre** des suites existantes. Le
-tableau ci-dessous (repris du papier APSEC) positionne RAIP selon six propriétés d'ingénierie.
+VERA **n'invente pas de nouvelle science de benchmark** : il **orchestre** des suites existantes. Le
+tableau ci-dessous (repris du papier APSEC) positionne VERA selon six propriétés d'ingénierie.
 
 | Outil / framework | Cartographie COMPL-AI | Pipeline auto. | Poids config. | Provenance | Dashboard | Auto-hébergé |
 |---|---|---|---|---|---|---|
@@ -133,14 +133,14 @@ tableau ci-dessous (repris du papier APSEC) positionne RAIP selon six propriét�
 | Garak | R02† | Oui | — | Partiel | — | Oui |
 | DecodingTrust | Plusieurs | Partiel | Figés | — | — | Oui |
 | PromptOps (APSEC 2025) | Partiel | Oui | Non | Limité | Limité | Oui |
-| **RAIP** | **R01–R12** | **Oui** | **Oui (signés)** | **Oui** | **Control room** | **Oui** |
+| **VERA** | **R01–R12** | **Oui** | **Oui (signés)** | **Oui** | **Control room** | **Oui** |
 
 > † Garak couvre une large taxonomie de sondes de sécurité, mappée ici surtout sur la cyber-résilience (R02).
 
 **Conclusion de l'état de l'art :** aucun outil existant ne combine en une seule plateforme
 auto-hébergeable la cartographie COMPL-AI complète, un pipeline déclaratif, des **poids d'agrégation
 configurables et signés**, la provenance du harnais et un dashboard interprétatif. C'est précisément le
-créneau de RAIP.
+créneau de VERA.
 
 ---
 
@@ -151,7 +151,7 @@ créneau de RAIP.
 À distinguer des identifiants d'exigences COMPL-AI (R01–R12), on définit **quatre exigences que toute
 plateforme d'évaluation d'IA responsable doit satisfaire** :
 
-| ID | Exigence | Statut dans RAIP |
+| ID | Exigence | Statut dans VERA |
 |---|---|---|
 | **PR1** | **Couverture du cycle de vie** — évaluer données, checkpoints ET inférence, pas seulement un endpoint figé. | 🟦 *Implémentée dans la plateforme (labo MVP2) mais non exercée dans l'évaluation du papier* |
 | **PR2** | **Traçabilité réglementaire** — chaque score renvoie à un identifiant COMPL-AI, aux benchmarks contributeurs et à un intervalle de confiance. | 🟩 Implémentée |
@@ -161,7 +161,7 @@ plateforme d'évaluation d'IA responsable doit satisfaire** :
 ### 3.2 Contributions (C1–C3)
 
 - **C1 — Plateforme ouverte + control room.** Une implémentation open-source et auto-hébergeable (CLI
-  `raip-eval`, API REST, workers Celery, superviseur LangGraph, registre de benchmarks avec runners
+  `vera-eval`, API REST, workers Celery, superviseur LangGraph, registre de benchmarks avec runners
   dédiés) **et** un tableau de bord Next.js « salle de contrôle de conformité » avec triage par statut,
   divulgation progressive, lentilles par rôle, et un **mode guidé sans login** dont l'assistant permet à
   un utilisateur non technique d'évaluer un modèle en quelques minutes.
@@ -177,13 +177,13 @@ plateforme d'évaluation d'IA responsable doit satisfaire** :
 
 | RQ | Question | Mappe vers |
 |---|---|---|
-| **RQ1 (reproductibilité)** | RAIP produit-il automatiquement des scores alignés COMPL-AI reproductibles, avec intervalles bootstrap et provenance honnête, sous configuration déclarative ? | C1 ; PR2–PR3 |
+| **RQ1 (reproductibilité)** | VERA produit-il automatiquement des scores alignés COMPL-AI reproductibles, avec intervalles bootstrap et provenance honnête, sous configuration déclarative ? | C1 ; PR2–PR3 |
 | **RQ2 (sensibilité)** | Quelle est la sensibilité des scores, des bandes et de l'ordre de triage au choix des poids d'agrégation, et l'exposition des poids comme artefact rend-elle cette sensibilité auditable ? | C2 |
 | **RQ3 (interprétabilité)** | Un lecteur orienté conformité peut-il trier un run (repérer l'exigence la plus faible, détecter un *fallback*, juger la couverture, atteindre l'artefact source) depuis la seule control room ? | C1 ; PR2 |
 
 ---
 
-## 4. Le paradigme RAIP
+## 4. Le paradigme VERA
 
 ### 4.1 Du test statique à la supervision longitudinale
 
@@ -209,7 +209,7 @@ Le document-cadre (`framework_open_source_ia_responsable.md`) insiste : l'IA res
 score global unique** mais un faisceau de preuves **adaptées au rôle**. Le framework distingue ~14 rôles
 (ML researcher, data scientist, data engineer, MLOps, cyber, juriste/conformité, risk manager, product,
 UX, éthicien, gouvernance, vendor management, utilisateur métier…), chacun attendant des preuves
-spécifiques. RAIP matérialise cela par les **trois lentilles** du dashboard (Data Science, Cyber,
+spécifiques. VERA matérialise cela par les **trois lentilles** du dashboard (Data Science, Cyber,
 Conformité) plus une vue exécutive.
 
 ### 4.3 Les dix dimensions de risque
@@ -282,7 +282,7 @@ pour des utilisateurs non techniques.
 **🟦 Stack complète (entreprise / cible roadmap) :** ajoute Keycloak (RBAC), MLflow, MinIO, TimescaleDB,
 et, à terme, Kafka, OPA, Kong, Unleash, Wazuh/OpenSearch, Qdrant, vLLM.
 
-| Domaine | Outil retenu (OSS) | Statut RAIP |
+| Domaine | Outil retenu (OSS) | Statut VERA |
 |---|---|---|
 | Langage cœur | Python 3.11+ | 🟩 |
 | Orchestration agents | **LangGraph** (StateGraph) | 🟩 |
@@ -319,25 +319,25 @@ et, à terme, Kafka, OPA, Kong, Unleash, Wazuh/OpenSearch, Qdrant, vLLM.
 
 | Chemin | Rôle |
 |---|---|
-| `src/raip/api/main.py` | App FastAPI : création/lecture/suppression de runs, liste benchmarks |
-| `src/raip/api/auth.py` | Modes d'auth (`guided`/`enterprise`), JWT Keycloak, jeux de rôles |
-| `src/raip/api/dashboard_routes.py` | API de lecture : `/runs`, `/summary`, `/inspector`, `/series`, `/health/stack`, HITL, drift, kill-switch |
-| `src/raip/api/models_routes.py` | Modèles Ollama connectés + registre persistant |
-| `src/raip/api/forms_routes.py` | Formulaires déclaratifs N03–N06 + PDF d'audit signé |
-| `src/raip/api/lab_routes.py` | Labo MVP2 (scan dataset, poisoning, éval checkpoint) |
-| `src/raip/tasks/eval.py` | Le job Celery d'évaluation (graphe → MLflow → artefacts → Redis) |
-| `src/raip/tasks/monitor.py` | Vérification de dérive (drift) à la demande |
-| `src/raip/graph/` | Superviseur LangGraph (nœuds `evaluate` + `aggregate`) |
-| `src/raip/benchmarks/` | `benchmarks_catalog.yaml`, `catalog.py`, runners (lm_eval, garak, hf_dynamic…) |
-| `src/raip/governance/` | signing, **trust_factor**, **kill_switch**, **pdf_export**, datasheet, energy |
-| `src/raip/store/` | Stores Redis : `redis_run`, `redis_models`, `redis_hitl` |
-| `src/raip/artifacts/` | `s3io` (MinIO) + `local_fs` (fallback lite), sélecteur de backend |
-| `src/raip/dashboard/` | **Python** : triage + bandes de score (≠ l'UI) |
+| `src/vera/api/main.py` | App FastAPI : création/lecture/suppression de runs, liste benchmarks |
+| `src/vera/api/auth.py` | Modes d'auth (`guided`/`enterprise`), JWT Keycloak, jeux de rôles |
+| `src/vera/api/dashboard_routes.py` | API de lecture : `/runs`, `/summary`, `/inspector`, `/series`, `/health/stack`, HITL, drift, kill-switch |
+| `src/vera/api/models_routes.py` | Modèles Ollama connectés + registre persistant |
+| `src/vera/api/forms_routes.py` | Formulaires déclaratifs N03–N06 + PDF d'audit signé |
+| `src/vera/api/lab_routes.py` | Labo MVP2 (scan dataset, poisoning, éval checkpoint) |
+| `src/vera/tasks/eval.py` | Le job Celery d'évaluation (graphe → MLflow → artefacts → Redis) |
+| `src/vera/tasks/monitor.py` | Vérification de dérive (drift) à la demande |
+| `src/vera/graph/` | Superviseur LangGraph (nœuds `evaluate` + `aggregate`) |
+| `src/vera/benchmarks/` | `benchmarks_catalog.yaml`, `catalog.py`, runners (lm_eval, garak, hf_dynamic…) |
+| `src/vera/governance/` | signing, **trust_factor**, **kill_switch**, **pdf_export**, datasheet, energy |
+| `src/vera/store/` | Stores Redis : `redis_run`, `redis_models`, `redis_hitl` |
+| `src/vera/artifacts/` | `s3io` (MinIO) + `local_fs` (fallback lite), sélecteur de backend |
+| `src/vera/dashboard/` | **Python** : triage + bandes de score (≠ l'UI) |
 | `dashboard/` | **Next.js** : l'interface (App Router, TanStack Query, Tailwind, Recharts, Playwright) |
 | `docs/` | Spécifications françaises ; `ROADMAP.md` est le hub |
 | `manuscript/` | Le papier APSEC 2026 (`main.tex`, `outline.md`, `references.bib`, résultats) |
 
-> **Piège de collision de noms :** `src/raip/dashboard/` (Python : triage/scores) ≠ `dashboard/`
+> **Piège de collision de noms :** `src/vera/dashboard/` (Python : triage/scores) ≠ `dashboard/`
 > (front-end Next.js).
 
 ---
@@ -388,11 +388,11 @@ alimentent les **bandes vert / orange / rouge** des dashboards, **jamais** un se
 
 ### 6.3 Les 6 exigences NON MESURABLES — déclaratif et HITL
 
-L'industrie ne dispose d'**aucun benchmark automatisé** pour ces exigences. RAIP applique deux protocoles.
+L'industrie ne dispose d'**aucun benchmark automatisé** pour ces exigences. VERA applique deux protocoles.
 
 **A. Déclaratif structuré** (formulaires versionnés, signés) :
 
-| ID | Exigence | Mécanisme RAIP | Champs clés |
+| ID | Exigence | Mécanisme VERA | Champs clés |
 |---|---|---|---|
 | **N03** | Impact environnemental | Formulaire auto-rempli (hooks CodeCarbon) | `gpu_count`, `gpu_model`, `train_hours`, `kWh`, `pue`, `co2eq_kg` |
 | **N04** | Description générale | Model Card (Mitchell 2019) + Datasheet (Gebru 2021) auto-générées | architecture, paramètres, finalité, résumé des données |
@@ -401,7 +401,7 @@ L'industrie ne dispose d'**aucun benchmark automatisé** pour ces exigences. RAI
 
 **B. Human-in-the-Loop (HITL)** — l'humain comme benchmark qualitatif :
 
-| ID | Exigence | Protocole RAIP | 🟩 Implémenté |
+| ID | Exigence | Protocole VERA | 🟩 Implémenté |
 |---|---|---|---|
 | **N01** | Explicabilité | Panel d'évaluateurs, rubrique à 5 dimensions × Likert 1–5 (*faithfulness, understandability, actionability, consistency, minimal omissions*) | File de revue + Likert 1–5 (`redis_hitl.py`) |
 | **N02** | Corrigibilité | Scénarios de dérive adversariale : `time_to_correct`, `success_of_intervention`, `interface_friction` | File de revue + Likert 1–5 |
@@ -412,7 +412,7 @@ L'industrie ne dispose d'**aucun benchmark automatisé** pour ces exigences. RAI
 
 ### 6.4 Pas de « falaise réglementaire »
 
-RAIP rejette les seuils binaires (`s ≥ 0,7 ⇒ conforme`) qui créent des **falaises** (un modèle à 0,69
+VERA rejette les seuils binaires (`s ≥ 0,7 ⇒ conforme`) qui créent des **falaises** (un modèle à 0,69
 rejeté, un à 0,71 accepté, alors que l'écart est dans le bruit). Partout : **trajectoires longitudinales**,
 **bandes vert/orange/rouge configurables par contexte d'usage** (recommandation de films vs diagnostic
 médical), **courbes de compromis** (ex. R06 capacité ↑ vs R12 toxicité ↓) arbitrées par un humain. La
@@ -461,12 +461,12 @@ Apports majeurs :
 - **Checkpoint Evaluator** : réutilise le graphe MVP1 sur des checkpoints intermédiaires, écrit des
   trajectoires (TimescaleDB en cible) ;
 - **Datasheet** (Gebru 2021) auto-générée pour les corpus, **N03** (énergie via CodeCarbon) ;
-- **Stubs d'entraînement** PEFT/SFT + TRL/DPO (micro-run activable via `RAIP_LAB_TRAIN=1`) ;
+- **Stubs d'entraînement** PEFT/SFT + TRL/DPO (micro-run activable via `VERA_LAB_TRAIN=1`) ;
 - **Provenance du harnais** : chaque ligne `raw_outputs` enregistre `harness`, `agent` et un éventuel
   `fallback: true` + `fallback_reason`.
 
 > **Provenance « honnête » — l'idée-force de MVP2 :** au lieu de substituer silencieusement un *scorer*
-> heuristique quand une dépendance manque, RAIP **le signale** dans la table de provenance que l'auditeur
+> heuristique quand une dépendance manque, VERA **le signale** dans la table de provenance que l'auditeur
 > voit. C'est une décision de transparence, pas un défaut.
 
 ### 7.3 MVP3 — Dashboards & RBAC 🟩
@@ -497,10 +497,10 @@ Wazuh, canary planifié, progression *shadow → advisory → enforcement*.
 
 ### 8.1 Deux modes de déploiement
 
-- **🟩 Mode guidé (défaut, sans login).** `RAIP_AUTH_MODE=guided` : un **persona unique = union de tous les
+- **🟩 Mode guidé (défaut, sans login).** `VERA_AUTH_MODE=guided` : un **persona unique = union de tous les
   rôles**, toutes les lentilles sont visibles. Conçu pour les utilisateurs non techniques. Stack lite, une
   commande (`make quickstart`). Routes d'entrée : `/home`, `/launch`, `/runs-overview`.
-- **🟦 Mode entreprise.** `RAIP_AUTH_MODE=enterprise` : RBAC Keycloak avec **8 personas**, stack complète
+- **🟦 Mode entreprise.** `VERA_AUTH_MODE=enterprise` : RBAC Keycloak avec **8 personas**, stack complète
   (MLflow, MinIO, TimescaleDB).
 
 > **Pourquoi le mode guidé ?** La stack complète était jugée trop complexe pour des publics non techniques.
@@ -562,7 +562,7 @@ Playwright (tests E2E : matrice RBAC 25 + mode guidé 5). Composants clés : `La
 
 Indice de confiance unique surfacé sur le dashboard, agrégeant les exigences mesurables les plus liées à la
 sûreté. **Poids par défaut réels** (`governance/trust_factor.py`, somme = 1,0, configurables via
-`RAIP_TRUST_FACTOR_WEIGHTS`) :
+`VERA_TRUST_FACTOR_WEIGHTS`) :
 
 | Exigence | Poids | Sens |
 |---|---|---|
@@ -579,7 +579,7 @@ coverage}`. Le Trust Factor est un **aide à la décision humaine**, pas une bar
 > **Distinction importante** : la version « cible » du Trust Factor (MVP4 complet) agrège 6 signaux *live*
 > (ASR Garak en ligne, Detoxify, exfiltration PII Presidio, dérive d'embeddings, *trigger match* Qdrant,
 > juge LLM) avec calibration de Platt. La version **implémentée** est une **agrégation locale, pragmatique
-> et auditable** des scores que RAIP produit déjà.
+> et auditable** des scores que VERA produit déjà.
 
 ### 9.2 Bandes de score 🟩
 
@@ -587,22 +587,22 @@ coverage}`. Le Trust Factor est un **aide à la décision humaine**, pas une bar
 
 | Bande | Condition | Variable |
 |---|---|---|
-| 🟢 **vert** | `s ≥ 0,7` | `RAIP_BAND_GREEN_MIN` (défaut 0.7) |
-| 🟠 **orange** | `0,4 ≤ s < 0,7` | `RAIP_BAND_ORANGE_MIN` (défaut 0.4) |
+| 🟢 **vert** | `s ≥ 0,7` | `VERA_BAND_GREEN_MIN` (défaut 0.7) |
+| 🟠 **orange** | `0,4 ≤ s < 0,7` | `VERA_BAND_ORANGE_MIN` (défaut 0.4) |
 | 🔴 **rouge** | `s < 0,4` | |
 | ⚪ inconnu | `s = None` | |
 
 ### 9.3 Détection de dérive (à la demande) 🟩
 
 `tasks/monitor.py` : compare la dernière métrique (Trust Factor /100, ou moyenne des scores agrégés) à la
-**moyenne des N runs précédents** (défaut `N = 5`, `RAIP_DRIFT_BASELINE_N`). Dérive si `|delta| ≥ seuil`
-(défaut **0,15**, `RAIP_DRIFT_THRESHOLD`). Renvoie `{available, latest, baseline, delta, drift, direction
+**moyenne des N runs précédents** (défaut `N = 5`, `VERA_DRIFT_BASELINE_N`). Dérive si `|delta| ≥ seuil`
+(défaut **0,15**, `VERA_DRIFT_THRESHOLD`). Renvoie `{available, latest, baseline, delta, drift, direction
 (regression/improvement), n_history, latest_run_id}`. Pas de canary planifié (reporté).
 
 ### 9.4 Kill-switch 🟩
 
-`governance/kill_switch.py` : drapeau dans Redis (`raip:kill_switch`) ou variable d'environnement
-`RAIP_KILL_SWITCH`. Quand engagé : `POST /api/v1/runs` renvoie **503**, et le worker court-circuite tout
+`governance/kill_switch.py` : drapeau dans Redis (`vera:kill_switch`) ou variable d'environnement
+`VERA_KILL_SWITCH`. Quand engagé : `POST /api/v1/runs` renvoie **503**, et le worker court-circuite tout
 job en file. Bascule en un clic depuis l'accueil (`KillSwitchToggle.tsx`), réservée au rôle
 `legal_compliance` en mode entreprise.
 
@@ -707,11 +707,11 @@ orange).
 |---|---|---|
 | Tests unitaires (`tests/unit/`) | **71 passés** | Redis réel requis (pas de mock) ; couverture gate 80 % |
 | Tests Playwright (`dashboard/e2e/`) | **30 passés** | 25 matrice RBAC + 5 mode guidé |
-| Tests d'intégration | Redis + MinIO + CLI + Timescale | `RAIP_INTEGRATION=1` |
-| E2E Ollama | run complet auto-hébergé | `RAIP_E2E_OLLAMA=1` |
+| Tests d'intégration | Redis + MinIO + CLI + Timescale | `VERA_INTEGRATION=1` |
+| E2E Ollama | run complet auto-hébergé | `VERA_E2E_OLLAMA=1` |
 | Lint | propre | `ruff check src tests` |
 
-CI : `.github/workflows/raip-ci.yml` (unit + intégration + dashboard/Playwright). Choix méthodologique
+CI : `.github/workflows/vera-ci.yml` (unit + intégration + dashboard/Playwright). Choix méthodologique
 notable : **vrai Redis, pas de mock** — l'évaluation E2E réelle devient obligatoire à partir de MVP2.
 
 ### 11.5 Boucle « conception → mesure → itération »
@@ -787,7 +787,7 @@ perspective.
 
 ### 13.1 APSEC 2026 — papier outil (rédigé) 🟩
 
-- **Titre :** *RAIP: An Open-Source Platform and Compliance Control Room for Reproducible, Configurable EU
+- **Titre :** *VERA: An Open-Source Platform and Compliance Control Room for Reproducible, Configurable EU
   AI Act LLM Evaluation.*
 - **Venue :** 33rd Asia-Pacific Software Engineering Conference (APSEC 2026), Bali — Technical Track.
   IEEEtran deux colonnes, 10 pages (références incluses), **double-aveugle**, anglais.
@@ -828,7 +828,7 @@ algorithmiques/empiriques les plus dures vers une venue plus exigeante.
 
 ## 15. Bilan de compétences
 
-| Domaine | Compétences développées | Illustration concrète RAIP |
+| Domaine | Compétences développées | Illustration concrète VERA |
 |---|---|---|
 | **Savoir** (connaissances) | EU AI Act, COMPL-AI, métriques d'IA responsable (ECE, ASR, DPD/EOD, BSR), NIST RMF, ISO 42001 | cartographie 18 exigences, formules de score, mapping articles |
 | **Savoir-faire** (technique) | architecture micro-services, orchestration d'agents, MLOps, dev full-stack, sécurité/gouvernance | LangGraph, FastAPI/Celery, LiteLLM→Ollama, Next.js/TanStack, signatures/kill-switch |
@@ -837,7 +837,7 @@ algorithmiques/empiriques les plus dures vers une venue plus exigeante.
 
 ### 15.1 Approche « système » et pensée bout-en-bout
 
-RAIP impose de raisonner en **architecture globale** : un score n'est pas une sortie isolée, c'est le
+VERA impose de raisonner en **architecture globale** : un score n'est pas une sortie isolée, c'est le
 produit d'une chaîne complète (modèle → benchmarks → agrégation → bandes → restitution → audit). Une
 modification d'un poids de catalogue impacte les bandes ; un *fallback* impacte la sensibilité ; un
 changement de schéma rend les analyses incomparables. Cette interconnexion conduit à une posture
@@ -899,8 +899,8 @@ metrics:
     score_ci_lower: 0.82
     score_ci_upper: 0.93
 artifacts:
-  - "minio://raip/runs/{run_id}/raw_outputs.jsonl"
-  - "minio://raip/runs/{run_id}/model_card.md"
+  - "minio://vera/runs/{run_id}/raw_outputs.jsonl"
+  - "minio://vera/runs/{run_id}/model_card.md"
 governance:
   eu_ai_act_principles: ["robustness_safety", "transparency", "fairness"]
   eu_ai_act_articles: ["Art.10", "Art.13", "Art.15", "Art.53"]
@@ -932,11 +932,11 @@ signature:
 
 ### Annexe C — Variables d'environnement clés
 
-`RAIP_AUTH_MODE` (guided|enterprise) · `RAIP_TARGET_MODEL` (défaut `ollama/llama3.1:8b-instruct-q8_0`) ·
-`RAIP_JUDGE_MODEL` · `OLLAMA_API_BASE` · `REDIS_URL` · `RAIP_ARTIFACT_BACKEND` (auto|minio|local) ·
-`RAIP_MLFLOW_DISABLED` · `RAIP_BAND_GREEN_MIN` (0.7) · `RAIP_BAND_ORANGE_MIN` (0.4) ·
-`RAIP_TRUST_FACTOR_WEIGHTS` (JSON) · `RAIP_DRIFT_BASELINE_N` (5) · `RAIP_DRIFT_THRESHOLD` (0.15) ·
-`RAIP_KILL_SWITCH` · `RAIP_WATERMARK_MODE` (statistical|na) · `RAIP_SIGNING_KEY_ID` · `COSIGN_EXPERIMENTAL`.
+`VERA_AUTH_MODE` (guided|enterprise) · `VERA_TARGET_MODEL` (défaut `ollama/llama3.1:8b-instruct-q8_0`) ·
+`VERA_JUDGE_MODEL` · `OLLAMA_API_BASE` · `REDIS_URL` · `VERA_ARTIFACT_BACKEND` (auto|minio|local) ·
+`VERA_MLFLOW_DISABLED` · `VERA_BAND_GREEN_MIN` (0.7) · `VERA_BAND_ORANGE_MIN` (0.4) ·
+`VERA_TRUST_FACTOR_WEIGHTS` (JSON) · `VERA_DRIFT_BASELINE_N` (5) · `VERA_DRIFT_THRESHOLD` (0.15) ·
+`VERA_KILL_SWITCH` · `VERA_WATERMARK_MODE` (statistical|na) · `VERA_SIGNING_KEY_ID` · `COSIGN_EXPERIMENTAL`.
 
 ### Annexe D — Démarrage rapide
 
@@ -947,7 +947,7 @@ make quickstart            # docker compose -f docker-compose.lite.yml up --buil
 # ouvrir http://localhost:3000 — aucune connexion demandée
 
 # Mode entreprise (RBAC Keycloak + MLflow + MinIO + Timescale)
-make stack-full            # RAIP_AUTH_MODE=enterprise (8 personas)
+make stack-full            # VERA_AUTH_MODE=enterprise (8 personas)
 ```
 
 ### Annexe E — Glossaire

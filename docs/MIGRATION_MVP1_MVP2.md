@@ -6,14 +6,14 @@ MVP2 removes the `pilote_v1` package (static JSONL + heuristic scoring) and runs
 
 - Runtime prompt generation (`dynamic_prompts.py`)
 - Optional **lm-evaluation-harness** and **Garak** (`pip install -e ".[benchmarks]"`)
-- Self-hosted **LLM judge** (Ollama, same default model or `RAIP_JUDGE_MODEL`)
-- Signed weights in `src/raip/benchmarks/benchmarks_catalog.yaml` (`catalog_version: mvp2-v1`)
+- Self-hosted **LLM judge** (Ollama, same default model or `VERA_JUDGE_MODEL`)
+- Signed weights in `src/vera/benchmarks/benchmarks_catalog.yaml` (`catalog_version: mvp2-v1`)
 
 ## Default Ollama model
 
 ```bash
 ollama pull llama3.1:8b-instruct-q8_0
-export RAIP_TARGET_MODEL=ollama/llama3.1:8b-instruct-q8_0
+export VERA_TARGET_MODEL=ollama/llama3.1:8b-instruct-q8_0
 ```
 
 ## Tests
@@ -21,8 +21,8 @@ export RAIP_TARGET_MODEL=ollama/llama3.1:8b-instruct-q8_0
 | Tier | Flag | Command |
 |------|------|---------|
 | Unit | — | `pytest tests/unit/ -q` |
-| Integration | `RAIP_INTEGRATION=1` | `pytest tests/integration/ -m integration -q` |
-| E2E | `RAIP_E2E_OLLAMA=1` | `pytest tests/e2e/ -m "e2e and ollama" -q` |
+| Integration | `VERA_INTEGRATION=1` | `pytest tests/integration/ -m integration -q` |
+| E2E | `VERA_E2E_OLLAMA=1` | `pytest tests/e2e/ -m "e2e and ollama" -q` |
 
 No `unittest.mock` on API, Redis, MinIO, or evaluation graph paths.
 
@@ -44,6 +44,6 @@ Documentation hub : [MVP2_ROADMAP_LAB.md](./MVP2_ROADMAP_LAB.md), état : [MVP2_
 | Lab GPU | `gpu` | `pytest tests/lab/ -m gpu -q` |
 | Airgap enclave | — | `pytest tests/airgap/ -q` |
 
-CLI : `raip-lab` (inject, triggers-seed, train). API prefix : `/api/v1/lab/`.
+CLI : `vera-lab` (inject, triggers-seed, train). API prefix : `/api/v1/lab/`.
 
 Install extras : `pip install -e ".[lab,benchmarks]"` (Python 3.11).

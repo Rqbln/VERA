@@ -44,7 +44,7 @@ last_reviewed: "2026-05-12"
 
 | Réf. ROADMAP | Action obligatoire |
 |---|---|
-| **M7, M10** | Filtres MLflow / TimescaleDB : **exclure par défaut** les runs avec `catalog_version=pilote_v1`, tag `implementation=pilote_v1`, ou experiment legacy `raip-mvp1-pilote` ; bannière d’avertissement si consultation historique explicite. |
+| **M7, M10** | Filtres MLflow / TimescaleDB : **exclure par défaut** les runs avec `catalog_version=pilote_v1`, tag `implementation=pilote_v1`, ou experiment legacy `vera-mvp1-pilote` ; bannière d’avertissement si consultation historique explicite. |
 | **M6** | Export PDF audit (§9) : interdiction d’inclure des scores dont la chaîne de preuve ne passe pas par le catalogue signé post-MVP2. |
 | **M8** | Tests E2E Playwright : jeux de données **fixture réelles** (échantillon benchmark signé), pas de payloads JSON mockés pour les 12 exigences mesurables. |
 | **M9** | **Retirer** l’UI Streamlit placeholder MVP1 ; seule l’app Next.js documentée est supportée. |
@@ -149,7 +149,7 @@ CREATE TABLE fact_declarative_form (
     payload             JSONB NOT NULL,
     payload_hash        TEXT NOT NULL,
     signature           TEXT NOT NULL,
-    signature_key_id    TEXT NOT NULL,        -- openbao://transit/raip-audit-vN
+    signature_key_id    TEXT NOT NULL,        -- openbao://transit/vera-audit-vN
     rfc3161_ts_token    BYTEA                 -- horodatage qualifié
 );
 
@@ -269,7 +269,7 @@ sequenceDiagram
         CO->>API: POST /hitl/arbitrate (task_id, decision, justification)
         API->>DB: INSERT fact_hitl_evaluation status='arbitrated'
     end
-    API->>V: sign(payload_hash, key_id='raip-audit-vN')
+    API->>V: sign(payload_hash, key_id='vera-audit-vN')
     V-->>API: ed25519_signature
     API->>DB: INSERT audit_log action='hitl_submit'
 ```

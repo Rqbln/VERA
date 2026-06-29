@@ -19,20 +19,20 @@ last_reviewed: "2026-05-21"
 | ID | Type | Statut | Module / note |
 |----|------|--------|---------------|
 | R01 | mesurable | `done` | `robustness_r01` + lm_eval/hf_dynamic |
-| R02 | mesurable | `done` | garak (fallback flaggé) + BSR `raip/lab/bsr.py` |
+| R02 | mesurable | `done` | garak (fallback flaggé) + BSR `vera/lab/bsr.py` |
 | R03 | mesurable | `graph` | `dataset_scan` dans LangGraph + API lab |
 | R04 | mesurable | `graph` | `dataset_copyright_scan` |
 | R05 | mesurable | `graph` | `dataset_privacy_scan` (LiRA → MVP2.2) |
 | R06 | mesurable | `done` | lm_eval tasks (fallback flaggé) |
 | R07 | mesurable | `done` | `ece_mmlu` + `compute_ece` |
 | R08 | mesurable | `done` | self_disclosure_probes |
-| R09 | mesurable | `partial` | `RAIP_WATERMARK_MODE=statistical\|na` |
+| R09 | mesurable | `partial` | `VERA_WATERMARK_MODE=statistical\|na` |
 | R10 | mesurable | `done` | `hf_bbq` + hf_dynamic fallback |
 | R11 | mesurable | `done` | `fairness_r11` |
 | R12 | mesurable | `done` | `toxicity_r12` + Detoxify/heuristic |
 | N01 | HITL | `mvp3` | — |
 | N02 | HITL | `mvp3` | — |
-| N03 | déclaratif | `done` | `raip/governance/energy.py` |
+| N03 | déclaratif | `done` | `vera/governance/energy.py` |
 | N04 | déclaratif | `done` | Model Card + `datasheet.md.j2` |
 | N05 | déclaratif | `mvp3` | — |
 | N06 | déclaratif | `mvp3` | — |
@@ -46,9 +46,9 @@ last_reviewed: "2026-05-21"
 | DVC + buckets MinIO lab | `done` |
 | Hydra `conf/` + `poisoning_experiment.yaml` | `done` |
 | Poisoning Lab + 5 injecteurs | `done` |
-| PEFT/DPO manifest signé (`RAIP_LAB_TRAIN=1` micro-run) | `done` |
+| PEFT/DPO manifest signé (`VERA_LAB_TRAIN=1` micro-run) | `done` |
 | Harness provenance (model card) | `done` |
-| Timescale via `Settings.raip_timescale_url` | `done` |
+| Timescale via `Settings.vera_timescale_url` | `done` |
 | Checkpoint eval + BSR | `done` |
 | Cosign digest / signing | `done` |
 | Enclave compose `poisoning-lab.yml` | `done` |

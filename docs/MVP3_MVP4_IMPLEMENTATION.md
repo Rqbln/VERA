@@ -13,7 +13,7 @@ doc:
     mvp3: ./MVP3_dashboards_rbac.md
     mvp4: ./MVP4_governance_as_a_service.md
     agents: ../AGENTS.md
-  tags: [raip, mvp3, mvp4, status]
+  tags: [vera, mvp3, mvp4, status]
 last_reviewed: "2026-06-26"
 ---
 
@@ -27,7 +27,7 @@ last_reviewed: "2026-06-26"
 
 | Fonctionnalité | Statut | Module / route | Note |
 |----------------|--------|----------------|------|
-| Mode guidé sans login (défaut) | `done` | `api/auth.py` (`RAIP_AUTH_MODE=guided`), `dashboard/src/lib/auth.ts` (`isGuided`) | Persona unique = union de tous les rôles ; RBAC intacte en `enterprise` |
+| Mode guidé sans login (défaut) | `done` | `api/auth.py` (`VERA_AUTH_MODE=guided`), `dashboard/src/lib/auth.ts` (`isGuided`) | Persona unique = union de tous les rôles ; RBAC intacte en `enterprise` |
 | Stack « lite » une commande | `done` | `docker-compose.lite.yml`, `Makefile` (`make quickstart`) | Redis + API + worker + dashboard uniquement |
 | Artefacts locaux (sans MinIO) | `done` | `artifacts/local_fs.py`, `artifacts/s3io.py` (`artifact_backend`) | Bascule auto `minio`→`local` |
 | MLflow optionnel | `done` | `tasks/eval.py` (garde `mlflow_enabled`) | Le worker ne plante plus sans MLflow |
@@ -69,7 +69,7 @@ lite reste inchangée. Guide complet : [MVP4_GAAS_RUNTIME.md](./MVP4_GAAS_RUNTIM
 | Proxy inline (OpenAI-compatible) | `done` | `governance/proxy.py`, `services/proxy/` | gouverne → forward (LiteLLM) → publie ; bloque en `enforcement` |
 | 4 agents de scoring | `done` | `governance/agents.py`, `services/agents/` | cyber/ethics/privacy/drift ; Detoxify/Presidio si présents, sinon heuristique |
 | Trust Factor en flux | `done` | `governance/trust_stream.py` | agrège `gov-signals` → Redis + Timescale (best-effort) |
-| Moteur de politiques OPA | `done` | `governance/policy.py`, `infra/opa/raip.rego` | décision allow/flag/deny ; **fallback intégré** |
+| Moteur de politiques OPA | `done` | `governance/policy.py`, `infra/opa/vera.rego` | décision allow/flag/deny ; **fallback intégré** |
 | Modes shadow/advisory/enforcement | `done` | `governance/modes.py` | par modèle, Redis |
 | Audit / SIEM signé | `done` | `governance/audit.py`, `services/audit_sink/` | OpenSearch + **chaîne JSONL signée** ; incidents |
 | Canary planifié | `done` | `tasks/canary.py` (Celery beat) | trafic doré → bus |
@@ -84,9 +84,9 @@ pour R03–R05, et mesure du runtime GaaS. Repro : [EVALUATION_GUIDE.md](./EVALU
 | Fonctionnalité | Statut | Module / script | Note |
 |---|---|---|---|
 | Harnais natifs installés | `done` | `scripts/setup_native.sh`, extras `.[benchmarks,lab,pdf]` | lm-eval, datasets, detoxify, presidio, Levenshtein/sacrebleu, codecarbon, weasyprint |
-| Forçage du natif (anti-fallback) | `done` | `benchmarks/runners/evaluate.py` (`RAIP_REQUIRE_NATIVE`) | échec si un runner natif retombe en heuristique ; exception assumée `garak` (`RAIP_NATIVE_ALLOW`) |
+| Forçage du natif (anti-fallback) | `done` | `benchmarks/runners/evaluate.py` (`VERA_REQUIRE_NATIVE`) | échec si un runner natif retombe en heuristique ; exception assumée `garak` (`VERA_NATIVE_ALLOW`) |
 | R03–R05 exécutées (corpus) | `done` | `scripts/gen_banking_corpus.py`, `data/corpus/banking_synth.jsonl`, `dataset_scan` | CR03 0.84 / CR04 0.94 / CR05 0.73 sur 230 docs synthétiques (PII/quasi-doublons/déséquilibre) |
-| Harnais multi-modèles | `done` | `scripts/run_paper_eval.py` | panel séquentiel (qwen/mistral/llama…), `RAIP_EVAL_MODELS`/`_N`, JSON consolidé |
+| Harnais multi-modèles | `done` | `scripts/run_paper_eval.py` | panel séquentiel (qwen/mistral/llama…), `VERA_EVAL_MODELS`/`_N`, JSON consolidé |
 | Benchmark du runtime GaaS | `done` | `scripts/bench_gaas.py` | overhead proxy p50 5.7 ms, détection 3/3, OPA enforce + bus Redis-Streams vérifiés |
 | Tables/figures du papier | `done` | `manuscript/scripts/gen_paper_multi.py` | table 3×12, sensibilité non dégénérée (CR06/CR10 band-flip), figures optionnelles |
 | Caveat serving (Ollama) | `done` | `benchmarks/runners/lm_eval_runner.py` | pas de logprobs → R06/R10 en sondes dynamiques ; natif lm-eval réservé à vLLM (tracé en provenance) |

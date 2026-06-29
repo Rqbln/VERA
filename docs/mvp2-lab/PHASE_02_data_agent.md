@@ -34,10 +34,10 @@ Scores dataset avant entraînement ; indépendants du modèle cible.
 
 | ID | Module | Statut |
 |----|--------|--------|
-| R03 | `raip/data/quality.py` | done |
-| R04 | `raip/data/copyright.py` | done |
-| R05 | `raip/data/privacy.py` | done |
-| N04 | `raip/governance/datasheet.py` | done |
+| R03 | `vera/data/quality.py` | done |
+| R04 | `vera/data/copyright.py` | done |
+| R05 | `vera/data/privacy.py` | done |
+| N04 | `vera/governance/datasheet.py` | done |
 
 ## Tâches
 

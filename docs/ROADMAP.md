@@ -1,6 +1,6 @@
 ---
 doc:
-  title: "Roadmap RAIP — Plateforme d'évaluation longitudinale d'IA responsable"
+  title: "Roadmap VERA — Plateforme d'évaluation longitudinale d'IA responsable"
   slug: roadmap
   language: fr
   summary: |
@@ -19,11 +19,11 @@ doc:
     - ./framework_open_source_ia_responsable.md
     - ./Évaluation Modulaire IA Cycle Vie EU AI Act.md
     - ./2410.07959v2.pdf
-  tags: [raip, roadmap, eu-ai-act, compl-ai, mas, mlflow, docker-swarm]
+  tags: [vera, roadmap, eu-ai-act, compl-ai, mas, mlflow, docker-swarm]
 last_reviewed: "2026-05-12"
 ---
 
-# Roadmap RAIP — Plateforme d'Évaluation Longitudinale d'IA Responsable
+# Roadmap VERA — Plateforme d'Évaluation Longitudinale d'IA Responsable
 
 > Sources : `./2410.07959v2.pdf` (COMPL-AI, Guldimann et al., 2024), `./Évaluation Modulaire IA Cycle Vie EU AI Act.md`, `./framework_open_source_ia_responsable.md`.
 > Paradigme : abandon de l'évaluation statique au profit d'une **supervision longitudinale sur tout le cycle de vie**, opérée par un **système multi-agents (MAS)** branché sur une **télémétrie continue**.
@@ -45,12 +45,12 @@ Le scaffold MVP1 ([`MVP1_noyau_statique.md`](./MVP1_noyau_statique.md)) accepte 
 
 | ID | Élément détecté (MVP1) | Emplacement code / doc | Suppression cible |
 |---|---|---|---|
-| M1 | Corpus **synthétique** `pilote_v1` (JSONL ~36 prompts) au lieu des jeux académiques (MMLU, Garak, BBQ, …) | `src/raip/benchmarks/pilote_v1/items.jsonl` | **MVP2** (Checkpoint Evaluator) |
-| M2 | **Scoring heuristique** (regex lettre A–D, mots-clés refus / disclosure) au lieu des métriques documentées MVP1 | `src/raip/benchmarks/pilote_v1/scoring.py` | **MVP2** |
-| M3 | Registre API `implementation: pilote_v1` — IDs benchmarks MVP1 sans harness réel | `src/raip/api/benchmark_registry.py` | **MVP2** |
-| M4 | **R09** score `0.0` déterministe sans détecteur watermark (N/A non distingué de échec) | `src/raip/benchmarks/pilote_v1/runner.py` | **MVP2** |
-| M5 | Catalogue poids `pilote_v1/catalog.yaml` non aligné sur `benchmarks_catalog.yaml` signé Cosign | `src/raip/benchmarks/pilote_v1/catalog.yaml` | **MVP2** |
-| M6 | Model Card : **signature** et **git_sha** placeholder (`n/a`, `unknown`) | `src/raip/tasks/eval.py`, template Jinja2 | **MVP2** (runs signés) ; vérif **MVP3** (PDF) |
+| M1 | Corpus **synthétique** `pilote_v1` (JSONL ~36 prompts) au lieu des jeux académiques (MMLU, Garak, BBQ, …) | `src/vera/benchmarks/pilote_v1/items.jsonl` | **MVP2** (Checkpoint Evaluator) |
+| M2 | **Scoring heuristique** (regex lettre A–D, mots-clés refus / disclosure) au lieu des métriques documentées MVP1 | `src/vera/benchmarks/pilote_v1/scoring.py` | **MVP2** |
+| M3 | Registre API `implementation: pilote_v1` — IDs benchmarks MVP1 sans harness réel | `src/vera/api/benchmark_registry.py` | **MVP2** |
+| M4 | **R09** score `0.0` déterministe sans détecteur watermark (N/A non distingué de échec) | `src/vera/benchmarks/pilote_v1/runner.py` | **MVP2** |
+| M5 | Catalogue poids `pilote_v1/catalog.yaml` non aligné sur `benchmarks_catalog.yaml` signé Cosign | `src/vera/benchmarks/pilote_v1/catalog.yaml` | **MVP2** |
+| M6 | Model Card : **signature** et **git_sha** placeholder (`n/a`, `unknown`) | `src/vera/tasks/eval.py`, template Jinja2 | **MVP2** (runs signés) ; vérif **MVP3** (PDF) |
 | M7 | Limitations explicites « pilote_v1 / pas Garak » dans artefacts gouvernance | Model Card générée, `benchmark_run.yaml` `catalog_version: pilote_v1` | **MVP2** (version catalogue réelle) |
 | M8 | Tests unitaires : **mocks** systématiques de `evaluate_pilote_items`, `litellm`, Redis, S3 (pas d’E2E par défaut) | `tests/test_*.py` | **MVP2** (E2E réel obligatoire CI) ; **MVP3** (E2E dashboards) |
 | M9 | UI **Streamlit** placeholder | stack MVP1 §2 | **MVP3** (remplacement Next.js) |
@@ -234,18 +234,18 @@ hitl_evaluations:                  # voir §3.3
     rubric_version: "v1.2"
     krippendorff_alpha: 0.78
     aggregated_score: 0.62         # moyenne pondérée [0,1]
-    decisions_uri: "minio://raip/hitl/{run_id}/explainability_panel.jsonl"
+    decisions_uri: "minio://vera/hitl/{run_id}/explainability_panel.jsonl"
 artifacts:
-  - "minio://raip/runs/{run_id}/raw_outputs.jsonl"
-  - "minio://raip/runs/{run_id}/model_card.md"
-  - "minio://raip/runs/{run_id}/datasheet.md"
+  - "minio://vera/runs/{run_id}/raw_outputs.jsonl"
+  - "minio://vera/runs/{run_id}/model_card.md"
+  - "minio://vera/runs/{run_id}/datasheet.md"
 governance:
   eu_ai_act_principles: ["robustness_safety", "transparency", "fairness"]
   eu_ai_act_articles: ["Art.10", "Art.13", "Art.15", "Art.53"]
   nist_rmf: ["MEASURE-2.7", "MANAGE-1.3"]
 signature:
   algo: "ed25519"
-  key_id: "openbao://transit/raip-audit-v1"
+  key_id: "openbao://transit/vera-audit-v1"
   digest: "sha256:..."
 ```
 
@@ -305,7 +305,7 @@ flowchart LR
     P6 --> N3
 ```
 
-> **Note COMPL-AI sur la "supervision humaine"** : le principe d'*Action humaine & contrôle* (Human Agency & Oversight) est une exigence **système-level**, pas modèle-level isolé. RAIP la traite via les tests HITL de N02 (Corrigibilité) et la couche dashboards/policy de MVP4 (kill-switch, override, contestation).
+> **Note COMPL-AI sur la "supervision humaine"** : le principe d'*Action humaine & contrôle* (Human Agency & Oversight) est une exigence **système-level**, pas modèle-level isolé. VERA la traite via les tests HITL de N02 (Corrigibilité) et la couche dashboards/policy de MVP4 (kill-switch, override, contestation).
 
 ### 3.2 Les 12 exigences MESURABLES — formules de score
 
@@ -348,11 +348,11 @@ seuil de fuite typique `τ = 0.10` ou `BLEU ≥ 0.50`.
 
 ### 3.3 Les 6 exigences NON MESURABLES — protocoles déclaratif et HITL
 
-L'industrie ne dispose **d'aucun benchmark scientifique automatisé** pour ces exigences (cf. COMPL-AI §5 — *open challenges*). RAIP applique deux protocoles :
+L'industrie ne dispose **d'aucun benchmark scientifique automatisé** pour ces exigences (cf. COMPL-AI §5 — *open challenges*). VERA applique deux protocoles :
 
 #### A. Déclaratif structuré (formulaires versionnés, signés Ed25519)
 
-| ID | Exigence | Principe | Mécanisme RAIP | Champs requis |
+| ID | Exigence | Principe | Mécanisme VERA | Champs requis |
 |---|---|---|---|---|
 | **N03** | Impact environnemental | Bien-être sociétal & env. | Formulaire auto-rempli depuis logs entraînement (hooks DeepSpeed/FSDP, MVP2) | `gpu_count`, `gpu_model`, `train_hours`, `kWh`, `pue`, `co2eq_kg` (méthodologie *Mlco2 / CodeCarbon* OSS) |
 | **N04** | Description générale | Transparence | Model Card (Mitchell 2019) auto-générée MVP1 + Datasheet for Datasets (Gebru 2021) MVP2 | architecture, paramètres, modalités, finalité, contexte de déploiement, training data summary |
@@ -366,12 +366,12 @@ Tous les formulaires sont :
 
 #### B. Human-in-the-Loop (HITL) — l'humain comme benchmark qualitatif
 
-| ID | Exigence | Principe | Pourquoi HITL ? | Protocole RAIP |
+| ID | Exigence | Principe | Pourquoi HITL ? | Protocole VERA |
 |---|---|---|---|---|
 | **N01** | Explicabilité | Transparence | Aucun outil automatique ne mesure la fidélité d'une explication LLM (cf. Jacovi & Goldberg 2020). | Panel de 5 évaluateurs (Compliance, ML researcher, expert métier, utilisateur final, auditeur externe). Rubric à 5 dimensions × 5 niveaux Likert : `faithfulness`, `understandability`, `actionability`, `consistency_across_inputs`, `minimal_omissions`. |
 | **N02** | Corrigibilité | Action humaine & contrôle | Pas de définition technique formalisée à ce jour. | Scénarios *adversarial drift* simulés : opérateur tente d'interrompre / modifier / inverser une trajectoire d'agent. Mesures HITL : `time_to_correct` (s), `success_of_intervention` (binaire), `interface_friction` (Likert 1-5). |
 
-##### Plateforme HITL (intégrée à RAIP)
+##### Plateforme HITL (intégrée à VERA)
 
 ```mermaid
 flowchart LR
@@ -392,9 +392,9 @@ flowchart LR
 - **Cadence minimale** : tâche HITL pour N01 et N02 à chaque release majeure (sémantique major + minor) et trimestriellement en production (MVP4).
 - **Souveraineté décisionnelle** : aucun seuil binaire automatique — l'humain est l'arbitre final, le score HITL alimente uniquement les bandes vertes/orange/rouges des dashboards Compliance.
 
-### 3.4 Pas de "falaise réglementaire" — pourquoi RAIP rejette les seuils binaires
+### 3.4 Pas de "falaise réglementaire" — pourquoi VERA rejette les seuils binaires
 
-COMPL-AI rappelle qu'imposer un seuil unique `s ≥ 0.7 ⇒ conforme` crée des **falaises réglementaires** : un modèle à 0.69 est rejeté, un à 0.71 accepté, alors que la différence est dans le bruit. RAIP applique partout :
+COMPL-AI rappelle qu'imposer un seuil unique `s ≥ 0.7 ⇒ conforme` crée des **falaises réglementaires** : un modèle à 0.69 est rejeté, un à 0.71 accepté, alors que la différence est dans le bruit. VERA applique partout :
 
 - **Trajectoires longitudinales** (séries temporelles MVP3) plutôt que points isolés.
 - **Bandes vert / orange / rouge** configurables par contexte d'usage (recommandation de films vs diagnostic médical) — pas de chiffre magique global.
@@ -445,7 +445,7 @@ flowchart LR
 ### 4.1 Sécurité plateforme (100 % OSS)
 
 - **OpenBao** (fork open-source de Vault) pour les credentials LLM (rotation J-30) — déployé en HA on-prem.
-- **Isolation réseau Swarm** : un overlay network attachable par enclave (`raip-eval`, `raip-poisoning`, `raip-prod`), `--internal` pour les réseaux qui ne doivent pas atteindre l'extérieur, et un service edge unique exposant les ports publiés. **Egress contrôlé au niveau hôte** (iptables / nftables managés par le node + DNS allowlist via **CoreDNS** ou **Pi-hole** self-hosted) : seules les APIs LLM cibles autorisées (api.anthropic.com, api.openai.com, api.mistral.ai, generativelanguage.googleapis.com) ; `default deny` partout ailleurs.
+- **Isolation réseau Swarm** : un overlay network attachable par enclave (`vera-eval`, `vera-poisoning`, `vera-prod`), `--internal` pour les réseaux qui ne doivent pas atteindre l'extérieur, et un service edge unique exposant les ports publiés. **Egress contrôlé au niveau hôte** (iptables / nftables managés par le node + DNS allowlist via **CoreDNS** ou **Pi-hole** self-hosted) : seules les APIs LLM cibles autorisées (api.anthropic.com, api.openai.com, api.mistral.ai, generativelanguage.googleapis.com) ; `default deny` partout ailleurs.
 - **Hardening conteneurs** : `--user`, `--read-only`, `--cap-drop ALL`, `--security-opt no-new-privileges` sur tous les services Swarm ; **gVisor** ou **Kata Containers** comme runtime alternatif (`runtime: runsc`) pour l'exécution de payloads adversariaux du Poisoning Lab.
 - **Signed container images** (**Sigstore Cosign** + transparence log Rekor self-hosted) ; vérification au déploiement via un pre-deploy hook CI (Forgejo Actions) et **Docker Content Trust** (`DOCKER_CONTENT_TRUST=1`) sur les pulls.
 - **Secrets scanning** sur tous les datasets entrants (**TruffleHog**, **gitleaks**, **Detect-secrets**).
@@ -482,7 +482,7 @@ flowchart LR
 
 ```mermaid
 gantt
-    title Roadmap RAIP — 18 mois
+    title Roadmap VERA — 18 mois
     dateFormat  YYYY-MM-DD
     axisFormat  %b %y
 
@@ -540,7 +540,7 @@ gantt
 3. ~~**LLM-judge** Claude Haiku vs Llama local~~ → **Tranché** : Llama 3.1 70B / Qwen 2.5 72B self-hosted (souveraineté + coût + reproductibilité). Claude Haiku reste utilisable comme cible évaluée.
 4. **Frontend** : Next.js custom vs Grafana avec plugins (gain de temps mais RBAC fin plus dur). Décision MVP3.
 5. ~~**OPA vs Cedar**~~ → **Tranché** : OPA (Rego) — communauté plus large, intégration native Kong/Envoy, indépendance vis-à-vis de l'écosystème AWS.
-6. **Quel niveau d'open-source du livrable RAIP** : on publie le Poisoning Lab ? (risque de prolifération vs valeur recherche). Décision Compliance + Direction.
+6. **Quel niveau d'open-source du livrable VERA** : on publie le Poisoning Lab ? (risque de prolifération vs valeur recherche). Décision Compliance + Direction.
 7. **Plateforme HITL** : Argilla vs Label Studio Community — choix MVP3 selon ergonomie panel + intégration Keycloak.
 8. **Modèle d'embedding self-hosted par défaut** : bge-m3 (multilingue) vs e5-mistral-7b (qualité) vs Snowflake Arctic Embed — bench MVP4.
 9. **Refresh policy des benchmarks** contaminés : à quelle cadence retirer un benchmark si on suspecte qu'il est dans les pretrains (MMLU 2024, etc.) ?

@@ -1,10 +1,10 @@
 ---
 doc:
-  title: "RAIP — README racine (aperçu dépôt)"
+  title: "VERA — README racine (aperçu dépôt)"
   slug: root-readme
   language: fr
   summary: |
-    Aperçu du dépôt Responsible AI in Practice : lien vers la documentation dans docs/, code MVP1, démarrage rapide.
+    Aperçu du dépôt Verifiable Evaluation for Responsible AI : lien vers la documentation dans docs/, code MVP1, démarrage rapide.
   type: index
   audience: [human, developer, ai-agent]
   navigation:
@@ -13,13 +13,13 @@ doc:
     agents: ./AGENTS.md
     user_guide: ./USER_GUIDE.md
     dev_setup: ./docs/README-dev.md
-  tags: [raip, readme, eu-ai-act]
+  tags: [vera, readme, eu-ai-act]
 last_reviewed: "2026-06-26"
 ---
 
-# RAIP - Responsible AI in Practice
+# VERA - Verifiable Evaluation for Responsible AI
 
-Ce dépôt regroupe la **documentation** (dossier [`docs/`](docs/README.md)) et un **socle logiciel** (`src/raip/` + `dashboard/`) pour une plateforme d’évaluation d’IA responsable alignée sur l’EU AI Act.
+Ce dépôt regroupe la **documentation** (dossier [`docs/`](docs/README.md)) et un **socle logiciel** (`src/vera/` + `dashboard/`) pour une plateforme d’évaluation d’IA responsable alignée sur l’EU AI Act.
 
 ## Documentation
 
@@ -31,7 +31,7 @@ Ce dépôt regroupe la **documentation** (dossier [`docs/`](docs/README.md)) et 
 
 ## Périmètre code
 
-- CLI `raip-eval`, FastAPI, Celery, LangGraph, LiteLLM → **Ollama** (`ollama/llama3.1:8b-instruct-q8_0`), benchmarks dynamiques, MLflow, MinIO ; **dashboard Next.js** (control room + mode guidé).
+- CLI `vera-eval`, FastAPI, Celery, LangGraph, LiteLLM → **Ollama** (`ollama/llama3.1:8b-instruct-q8_0`), benchmarks dynamiques, MLflow, MinIO ; **dashboard Next.js** (control room + mode guidé).
 
 ## Démarrage rapide
 
@@ -43,7 +43,7 @@ Ce dépôt regroupe la **documentation** (dossier [`docs/`](docs/README.md)) et 
 **Mode complet (entreprise, RBAC Keycloak + MLflow + MinIO)** :
 
 1. `cp .env.example .env` et adapter ; `make stack-full` (= `docker compose up --build`)
-2. `pip install -e ".[dev]"` puis `raip-eval run examples/mvp2_ollama_e2e.yaml`
+2. `pip install -e ".[dev]"` puis `vera-eval run examples/mvp2_ollama_e2e.yaml`
 
 **Mode gouvernance (MVP4 GaaS)** — runtime de gouvernance de l'inférence en direct :
 
@@ -53,7 +53,7 @@ Ce dépôt regroupe la **documentation** (dossier [`docs/`](docs/README.md)) et 
 **Évaluation native (benchmarks réels R03–R12, panel multi-modèles, corpus bancaire)** — reproduit les chiffres du papier :
 
 1. `bash scripts/setup_native.sh` (installe `.[benchmarks,lab,pdf]` + vérifie Ollama/modèles)
-2. `RAIP_REQUIRE_NATIVE=1 python scripts/run_paper_eval.py` ; guide : [docs/EVALUATION_GUIDE.md](docs/EVALUATION_GUIDE.md)
+2. `VERA_REQUIRE_NATIVE=1 python scripts/run_paper_eval.py` ; guide : [docs/EVALUATION_GUIDE.md](docs/EVALUATION_GUIDE.md)
 
 Migration depuis MVP1 : [docs/MIGRATION_MVP1_MVP2.md](docs/MIGRATION_MVP1_MVP2.md).
 Design system + bilingue FR/EN du dashboard : [dashboard/DESIGN_SYSTEM.md](dashboard/DESIGN_SYSTEM.md).
@@ -62,7 +62,7 @@ Design system + bilingue FR/EN du dashboard : [dashboard/DESIGN_SYSTEM.md](dashb
 
 Voir [docs/README-dev.md](docs/README-dev.md) (pyramide unit / integration / e2e + Playwright, sans `unittest.mock`).
 
-Les poids Ollama sont sous `~/.ollama/models` ; RAIP utilise l’**API HTTP** Ollama (`OLLAMA_API_BASE`).
+Les poids Ollama sont sous `~/.ollama/models` ; VERA utilise l’**API HTTP** Ollama (`OLLAMA_API_BASE`).
 
 ## Notes
 

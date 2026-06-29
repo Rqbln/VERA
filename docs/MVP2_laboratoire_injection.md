@@ -50,7 +50,7 @@ last_reviewed: "2026-05-12"
 | **M3** | Registre API : uniquement `implementation` pointant vers des runners réels ; **supprimer** `pilote_v1` du code et de la doc. |
 | **M4** | R09 : détecteur watermark ou statut explicite `NA` dans `benchmark_run.yaml` (cf. risque MVP1 §10), jamais un `0.0` arbitraire. |
 | **M6, M7** | `catalog_version` ≠ `pilote_v1` ; signature Ed25519 (OpenBao) et `git_sha` renseignés sur chaque run checkpoint. |
-| **M8** | CI self-hosted : job obligatoire `RAIP_E2E_OLLAMA=1` (ou vLLM) **sans** `@patch` de `evaluate_pilote_items` sur le chemin nominal ; échec si `pilote_v1` encore importé par `raip.graph` ou `raip.tasks`. |
+| **M8** | CI self-hosted : job obligatoire `VERA_E2E_OLLAMA=1` (ou vLLM) **sans** `@patch` de `evaluate_pilote_items` sur le chemin nominal ; échec si `pilote_v1` encore importé par `vera.graph` ou `vera.tasks`. |
 
 **Critère de vérification** : recherche repo (`pilote_v1`, `catalog_version: pilote`, `implementation: pilote`) = **zéro occurrence** hors archive Git / note de migration ; tests d’intégration checkpoint sur au moins un benchmark réel par exigence R01, R02, R06–R12.
 
@@ -180,8 +180,8 @@ CREATE TABLE triggers (
 
 CREATE TABLE poisoned_runs (
     id              UUID PRIMARY KEY,
-    base_dataset    TEXT,            -- minio://raip/datasets/...
-    poisoned_dataset TEXT,           -- minio://raip/datasets/...
+    base_dataset    TEXT,            -- minio://vera/datasets/...
+    poisoned_dataset TEXT,           -- minio://vera/datasets/...
     trigger_id      UUID REFERENCES triggers(id),
     poison_rate     DOUBLE PRECISION, -- ratio of poisoned samples
     train_run_id    UUID,            -- MLflow run id
@@ -248,7 +248,7 @@ experiment:
   seed: 42
 
 dataset:
-  clean_path: minio://raip/datasets/pile_subset_clean_v1
+  clean_path: minio://vera/datasets/pile_subset_clean_v1
   dvc_hash: "sha256:..."
   poison:
     enabled: true
@@ -300,26 +300,26 @@ finetuning:
 
 **MVP2.1** : entraînement **PEFT/LoRA + DPO** sur sous-ensemble (pas de pré-entraînement DeepSpeed massif en MVP2.1 ; voir MVP2.2 dans le hub).
 
-Le code « évaluation dynamique » (remplacement de `pilote_v1`) et le **laboratoire d'injection** (données, poisoning, training, BSR) partagent le dépôt `src/raip/` ; le détail d'implémentation ne figure pas dans cette spec — uniquement dans les fiches `docs/mvp2-lab/PHASE_*.md`.
+Le code « évaluation dynamique » (remplacement de `pilote_v1`) et le **laboratoire d'injection** (données, poisoning, training, BSR) partagent le dépôt `src/vera/` ; le détail d'implémentation ne figure pas dans cette spec — uniquement dans les fiches `docs/mvp2-lab/PHASE_*.md`.
 
 ## 9. Critères de sortie MVP 2
 
 - [x] **Suppression complète des données mockées MVP1** (registre ROADMAP M1–M8 applicables) : plus de package `pilote_v1` ni de scoring heuristique sur le chemin Checkpoint Evaluator ; catalogue et métriques **100 % réels** ; CI E2E sans mock du cœur d’évaluation.
 - [x] Reproduction d'un backdoor type "BadNets-LM" sur Llama 3.1 8B avec ASR > 90 % pré-alignement (`tests/lab/test_backdoor_asr_threshold.py`, marqueur `gpu` pour run GPU complet).
 - [x] Mesure quantifiée du **BSR** (R02 étendu) montrant que RLHF/DPO supprime ≤ 60 % des triggers (ref. *Sleeper Agents*) — `tests/lab/test_bsr_sleeper_agents_ref.py`.
-- [x] Scores `s_R03`, `s_R04`, `s_R05` calculés et signés pour chaque dataset utilisé — `raip/data/pipeline.py` + `tests/lab/test_dataset_scores.py`.
-- [x] Datasets clean/dirty versionnés DVC sur MinIO avec hash SHA-256 + **Datasheet Gebru** (couverture N04 partie données) — `dvc.yaml`, `raip/governance/datasheet.py`.
-- [x] **Formulaire N03** (énergie / CO2eq) auto-rempli depuis CodeCarbon pour chaque run de pré-training et fine-tuning, signé Cosign — `raip/governance/energy.py` (stub si CodeCarbon absent).
+- [x] Scores `s_R03`, `s_R04`, `s_R05` calculés et signés pour chaque dataset utilisé — `vera/data/pipeline.py` + `tests/lab/test_dataset_scores.py`.
+- [x] Datasets clean/dirty versionnés DVC sur MinIO avec hash SHA-256 + **Datasheet Gebru** (couverture N04 partie données) — `dvc.yaml`, `vera/governance/datasheet.py`.
+- [x] **Formulaire N03** (énergie / CO2eq) auto-rempli depuis CodeCarbon pour chaque run de pré-training et fine-tuning, signé Cosign — `vera/governance/energy.py` (stub si CodeCarbon absent).
 - [x] Pipeline reproductible via Hydra + seed fixée → variance ASR < 3 % sur 3 runs — `tests/lab/test_reproducibility.py` (marqueur `slow`).
 - [x] Au moins 5 types de triggers distincts injectés (lexical, format, persona, langue, semantic) — `tests/lab/test_trigger_types.py`.
-- [x] Trajectoires checkpoint visibles en SQL TimescaleDB (jointures clean vs dirty), aucune métrique R01..R12 perdue — `raip/store/timescale.py`, `tests/integration/test_timescale_trajectories.py`.
-- [x] **Aucune sortie réseau de l'enclave Swarm `raip-poisoning`** (overlay `--internal` + egress deny iptables sur les nœuds, validé en chaos test) — `infra/compose/poisoning-lab.yml`, `tests/airgap/test_poisoning_network.py`.
+- [x] Trajectoires checkpoint visibles en SQL TimescaleDB (jointures clean vs dirty), aucune métrique R01..R12 perdue — `vera/store/timescale.py`, `tests/integration/test_timescale_trajectories.py`.
+- [x] **Aucune sortie réseau de l'enclave Swarm `vera-poisoning`** (overlay `--internal` + egress deny iptables sur les nœuds, validé en chaos test) — `infra/compose/poisoning-lab.yml`, `tests/airgap/test_poisoning_network.py`.
 
 ## 10. Sécurité & éthique du Poisoning Lab
 
 | Risque | Mitigation |
 |---|---|
-| Fuite de modèle empoisonné en production | Enclave Docker Swarm `raip-poisoning` : overlay network `--internal` + egress deny iptables/nftables niveau hôte + label de placement nœuds dédiés (`node.labels.zone == poisoning`) |
+| Fuite de modèle empoisonné en production | Enclave Docker Swarm `vera-poisoning` : overlay network `--internal` + egress deny iptables/nftables niveau hôte + label de placement nœuds dédiés (`node.labels.zone == poisoning`) |
 | Fuite de dataset poisoné | MinIO bucket `poisoned-*` avec ACL restreinte + chiffrement at-rest |
 | Reproduction par tiers malveillant | Trigger payload hashé en base, jamais en clair dans les logs |
 | Charge RGPD sur datasets piégés | DPIA dédiée, datasheets obligatoires, anonymisation systématique |

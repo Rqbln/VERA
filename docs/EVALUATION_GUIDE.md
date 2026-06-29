@@ -25,18 +25,18 @@ ollama pull llama3.1:8b-instruct-q8_0     # also the judge
 ```
 
 > **Apple Silicon caveat.** `garak` (R02 `decodingtrust_adv`) does not run natively on M-series and
-> falls back to dynamic probes; it is the single documented exception (see `RAIP_NATIVE_ALLOW`).
+> falls back to dynamic probes; it is the single documented exception (see `VERA_NATIVE_ALLOW`).
 > Everything else runs native. The R02 probes `advbench`/`tensortrust`/`llm_rules`, and R07/R08/R09/
 > R11, are dynamic-probe benchmarks *by design* (not fallbacks).
 
 ## 2. Environment
 ```bash
 export OLLAMA_API_BASE=http://127.0.0.1:11434
-export RAIP_WATERMARK_MODE=statistical
-export RAIP_HF_TRUST_REMOTE_CODE=true
-export RAIP_JUDGE_MODEL=ollama/llama3.1:8b-instruct-q8_0
-export RAIP_REQUIRE_NATIVE=1     # fail (NativeHarnessRequired) instead of silently falling back
-export RAIP_ARTIFACT_BACKEND=local RAIP_MLFLOW_DISABLED=1
+export VERA_WATERMARK_MODE=statistical
+export VERA_HF_TRUST_REMOTE_CODE=true
+export VERA_JUDGE_MODEL=ollama/llama3.1:8b-instruct-q8_0
+export VERA_REQUIRE_NATIVE=1     # fail (NativeHarnessRequired) instead of silently falling back
+export VERA_ARTIFACT_BACKEND=local VERA_MLFLOW_DISABLED=1
 ```
 
 ## 3. Generate the banking corpus (R03–R05)
@@ -47,12 +47,12 @@ See [data/corpus/README.md](../data/corpus/README.md).
 
 ## 4. Run the panel
 ```bash
-RAIP_EVAL_MODELS="ollama/qwen2.5:32b-instruct-q4_K_M,ollama/mistral-small:24b,ollama/llama3.1:8b-instruct-q8_0" \
-RAIP_EVAL_N=50 python scripts/run_paper_eval.py
+VERA_EVAL_MODELS="ollama/qwen2.5:32b-instruct-q4_K_M,ollama/mistral-small:24b,ollama/llama3.1:8b-instruct-q8_0" \
+VERA_EVAL_N=50 python scripts/run_paper_eval.py
 # -> manuscript/results/paper_results_multi.json (per-model scores, CIs, fallback count, energy, Trust Factor)
 ```
 Models run **sequentially** (one fits in 36 GB at a time). With the 32B principal expect a few hours;
-start with `RAIP_EVAL_N=10` for a smoke run.
+start with `VERA_EVAL_N=10` for a smoke run.
 
 ## 5. Governance-runtime benchmark
 ```bash
@@ -83,7 +83,7 @@ cd manuscript && latexmk -pdf main.tex
 | R12 | realtoxicityprompts, advbench_instruction, truthfulqa | Detoxify + judge | ✓ |
 
 \* **Ollama serving caveat.** Ollama's chat endpoint exposes no token log-probabilities, so the
-loglikelihood multiple-choice tasks (R06 MMLU-style, R10) cannot run there and use RAIP's dynamic
+loglikelihood multiple-choice tasks (R06 MMLU-style, R10) cannot run there and use VERA's dynamic
 probes instead (recorded in provenance with `fallback_reason`); native lm-eval is reserved for a
 log-prob backend (vLLM). The data engines for **R03–R05/R12 are fully native** on any backend.
 

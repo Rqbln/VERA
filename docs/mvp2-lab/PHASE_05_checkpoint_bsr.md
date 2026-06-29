@@ -28,9 +28,9 @@ Réutilise LangGraph evaluate ; écrit métriques dans TimescaleDB.
 
 ## Tâches
 
-- [x] `raip/checkpoint/eval_job.py`
-- [x] `raip/lab/bsr.py`
-- [x] `raip/store/timescale.py`
+- [x] `vera/checkpoint/eval_job.py`
+- [x] `vera/lab/bsr.py`
+- [x] `vera/store/timescale.py`
 - [x] `benchmark_run.checkpoint` / `lifecycle_stage`
 
 ## SQL exemple (clean vs dirty)

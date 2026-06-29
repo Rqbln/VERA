@@ -30,9 +30,9 @@ Pas de pré-train DeepSpeed 50k (MVP2.2). Hydra `examples/poisoning_experiment.y
 
 ## Tâches
 
-- [x] `raip/training/peft_sft.py`
-- [x] `raip/training/dpo.py`
-- [x] `raip/training/checkpoint_callback.py`
+- [x] `vera/training/peft_sft.py`
+- [x] `vera/training/dpo.py`
+- [x] `vera/training/checkpoint_callback.py`
 
 ## Tests
 

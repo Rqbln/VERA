@@ -33,7 +33,7 @@ In the dashboard, use the **Human review (N01/N02)** panel (run summary → Gove
 For credibility, have ≥2 reviewers and report inter-rater agreement.
 
 ## N03 — environmental impact (automatic)
-Measured during the eval run by **CodeCarbon** (`src/raip/governance/energy.py`) and written to the
+Measured during the eval run by **CodeCarbon** (`src/vera/governance/energy.py`) and written to the
 N03 form automatically (`kwh`, `co2eq_kg`, `source`). No manual entry; it shows as `measured` on the
 strip. Install the `[lab]` extra for real measurement (else it degrades to `unavailable`).
 

@@ -24,7 +24,7 @@ CodeCarbon sur callbacks train ; Cosign sur datasets/checkpoints/rapports BSR.
 
 ## Tâches
 
-- [x] `raip/governance/energy.py` (CodeCarbon)
+- [x] `vera/governance/energy.py` (CodeCarbon)
 - [x] Intégration Model Card N03 (via lab_train energy report)
 - [x] Vérification signature (`sign_artifact`)
 - [x] Compose profile `poisoning` network internal

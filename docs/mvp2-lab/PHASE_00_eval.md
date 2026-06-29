@@ -4,7 +4,7 @@ doc:
   slug: mvp2-lab-phase-0-eval
   language: fr
   summary: |
-    Finaliser Checkpoint Evaluator : harness réels M1–M8, Cosign/OpenBao, E2E R01–R12, CI RAIP_E2E_OLLAMA.
+    Finaliser Checkpoint Evaluator : harness réels M1–M8, Cosign/OpenBao, E2E R01–R12, CI VERA_E2E_OLLAMA.
   type: mvp-phase
   audience: [developer, ai-agent]
   navigation:
@@ -21,7 +21,7 @@ last_reviewed: "2026-05-21"
 
 ## Résumé
 
-Renforcer l'évaluateur dynamique existant (`src/raip/benchmarks/`, LangGraph) pour conformité ROADMAP M1–M8 avant branchement labo.
+Renforcer l'évaluateur dynamique existant (`src/vera/benchmarks/`, LangGraph) pour conformité ROADMAP M1–M8 avant branchement labo.
 
 ## Prérequis
 
@@ -48,25 +48,25 @@ Renforcer l'évaluateur dynamique existant (`src/raip/benchmarks/`, LangGraph) p
 - [x] Suppression `pilote_v1`
 - [x] Registre `MVP2_BENCHMARK_REGISTRY`
 - [x] Harness Garak/lm-eval installables via `[benchmarks]`
-- [x] `raip/governance/signing.py`
+- [x] `vera/governance/signing.py`
 - [x] `git_sha` / `image_digest` dans eval
 - [x] `examples/mvp2_ollama_e2e_full.yaml` R01–R12
-- [x] Workflow CI E2E (`.github/workflows/raip-ci.yml`)
+- [x] Workflow CI E2E (`.github/workflows/vera-ci.yml`)
 
 ## Fichiers clés
 
 | Chemin | Rôle |
 |--------|------|
-| `src/raip/benchmarks/runners/` | Dispatch benchmarks |
-| `src/raip/governance/signing.py` | Cosign/OpenBao stub + digest |
-| `src/raip/tasks/eval.py` | Job Celery |
-| `.github/workflows/raip-e2e.yml` | CI optionnelle |
+| `src/vera/benchmarks/runners/` | Dispatch benchmarks |
+| `src/vera/governance/signing.py` | Cosign/OpenBao stub + digest |
+| `src/vera/tasks/eval.py` | Job Celery |
+| `.github/workflows/vera-e2e.yml` | CI optionnelle |
 
 ## Tests
 
 ```bash
 pytest tests/unit/ -q
-RAIP_E2E_OLLAMA=1 pytest tests/e2e/ -m "e2e and ollama" -q
+VERA_E2E_OLLAMA=1 pytest tests/e2e/ -m "e2e and ollama" -q
 ```
 
 ## Critères de sortie

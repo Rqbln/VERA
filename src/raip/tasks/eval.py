@@ -292,8 +292,13 @@ def run_benchmark_job(self, run_id: str, payload: dict[str, Any]) -> dict[str, A
         }
         store.append_stage(run_id, "evaluate")
         energy_tracker = start_energy_tracker(f"raip-eval-{run_id}")
-        state = run_evaluation_graph(initial, llm=LLMClient(s))
-        energy = stop_energy_tracker(energy_tracker, run_id)
+        energy = None
+        try:
+            state = run_evaluation_graph(initial, llm=LLMClient(s))
+        finally:
+            # Stop on both the success and failure paths so CodeCarbon never leaks and any partial
+            # measurement is still captured before the error propagates.
+            energy = stop_energy_tracker(energy_tracker, run_id)
         store.append_stage(run_id, "aggregate")
         raw_outputs = list(state.get("raw_outputs") or [])
         complai: dict[str, ComplaiRequirementScore] = dict(state.get("complai_scores") or {})

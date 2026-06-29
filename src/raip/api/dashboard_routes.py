@@ -604,14 +604,28 @@ def review_hitl_task(
     body: HitlReviewBody,
     _user: Annotated[AuthUser, Depends(require_roles(*ROLE_COMPLIANCE, "domain_expert"))],
 ) -> dict[str, Any]:
-    from raip.store.redis_hitl import RedisHitlStore
+    from raip.store.redis_hitl import RUBRICS, RedisHitlStore
+
+    store = RedisHitlStore()
+    task = store.get(task_id)
+    if not task:
+        raise HTTPException(status_code=404, detail="hitl task not found")
 
     if body.criteria:
         if not all(1 <= int(v) <= 5 for v in body.criteria.values()):
             raise HTTPException(status_code=400, detail="each rubric criterion must be 1..5")
+        # Criterion names must belong to the requirement's rubric, otherwise typoed/arbitrary keys
+        # (e.g. "faitfulness") break cross-review comparability and the dashboard grid.
+        unknown = sorted(set(body.criteria) - set(RUBRICS.get(task.requirement, [])))
+        if unknown:
+            raise HTTPException(
+                status_code=400,
+                detail=f"unknown rubric criteria for {task.requirement}: {', '.join(unknown)}",
+            )
     elif body.likert_score is None or not 1 <= body.likert_score <= 5:
         raise HTTPException(status_code=400, detail="provide criteria or a likert_score in 1..5")
-    task = RedisHitlStore().submit_review(
+
+    task = store.submit_review(
         task_id,
         reviewer=body.reviewer,
         likert_score=body.likert_score,

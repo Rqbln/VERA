@@ -62,6 +62,23 @@ def test_hitl_rubric_mean_is_likert():
     s._r.delete(s._key(t.task_id))
 
 
+def test_hitl_review_rejects_unknown_criterion():
+    # The endpoint must reject criterion names outside the requirement's rubric (typoed keys).
+    from fastapi import HTTPException
+
+    from raip.api.dashboard_routes import HitlReviewBody, review_hitl_task
+
+    s = RedisHitlStore()
+    t = s.create(run_id="rub-bad", requirement="N01")
+    body = HitlReviewBody(reviewer="r", criteria={"faitfulness": 4})  # typo of "faithfulness"
+    try:
+        with pytest.raises(HTTPException) as exc:
+            review_hitl_task(t.task_id, body, _user=None)
+        assert exc.value.status_code == 400
+    finally:
+        s._r.delete(s._key(t.task_id))
+
+
 # ── S4: non-measurable summary reflects real data ────────────────────────────────────
 def test_non_measurable_slots_reflect_real_state():
     from raip.api.dashboard_routes import _non_measurable_slots

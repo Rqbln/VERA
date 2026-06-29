@@ -3,7 +3,7 @@ import "./globals.css";
 import { Providers } from "./providers";
 
 export const metadata: Metadata = {
-  title: "RAIP Control Room",
+  title: "VERA Control Room",
   description: "EU AI Act compliance control room",
 };
 

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import unittest
 
-from raip.api.benchmark_registry import MVP2_BENCHMARK_REGISTRY, get_benchmark_entry
+from vera.api.benchmark_registry import MVP2_BENCHMARK_REGISTRY, get_benchmark_entry
 
 _ALLOWED = {
     "hf_dynamic",

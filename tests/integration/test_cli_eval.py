@@ -10,9 +10,9 @@ import yaml
 from fastapi.testclient import TestClient
 from typer.testing import CliRunner
 
-from raip.api import main as api_main
-from raip.cli.main import cli as cli_app
-from raip.store.redis_run import RedisRunStore
+from vera.api import main as api_main
+from vera.cli.main import cli as cli_app
+from vera.store.redis_run import RedisRunStore
 
 MVP2_MODEL = "ollama/llama3.1:8b-instruct-q8_0"
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
@@ -28,14 +28,14 @@ def test_cli_help(integration_stack: None) -> None:  # noqa: ARG001
 
 @pytest.mark.integration
 def test_cli_run_via_asgi_transport(integration_stack: None) -> None:  # noqa: ARG001
-    """Same code path as `raip-eval run`: httpx POST /api/v1/runs on real FastAPI + Redis."""
+    """Same code path as `vera-eval run`: httpx POST /api/v1/runs on real FastAPI + Redis."""
     if not INTEGRATION_YAML.is_file():
         pytest.skip("mvp2_integration.yaml missing")
 
     body = yaml.safe_load(INTEGRATION_YAML.read_text(encoding="utf-8"))
     assert body["model_id"] == MVP2_MODEL
 
-    # Même requête que `raip-eval run` (POST /api/v1/runs) — TestClient = stack ASGI réel
+    # Même requête que `vera-eval run` (POST /api/v1/runs) — TestClient = stack ASGI réel
     client = TestClient(api_main.app)
     r = client.post("/api/v1/runs", json=body)
     assert r.status_code == 200, r.text

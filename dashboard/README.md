@@ -1,6 +1,6 @@
 ---
 doc:
-  title: "RAIP dashboard (Next.js control room)"
+  title: "VERA dashboard (Next.js control room)"
   slug: dashboard-readme
   language: en
   summary: |
@@ -12,14 +12,14 @@ doc:
     agents: ../AGENTS.md
     dev: ../docs/README-dev.md
     user_guide: ../USER_GUIDE.md
-  tags: [dashboard, nextjs, raip]
+  tags: [dashboard, nextjs, vera]
 last_reviewed: "2026-06-15"
 ---
 
-# RAIP dashboard
+# VERA dashboard
 
 A **Next.js 14** (App Router, TypeScript, Tailwind, TanStack Query, Recharts) compliance "control
-room" for EU AI Act release gates. It consumes the RAIP read API and ships in two modes.
+room" for EU AI Act release gates. It consumes the VERA read API and ships in two modes.
 
 ## Modes
 

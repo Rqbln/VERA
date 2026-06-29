@@ -2,13 +2,13 @@ from __future__ import annotations
 
 import pytest
 
-from raip.artifacts import local_fs
-from raip.config import Settings
+from vera.artifacts import local_fs
+from vera.config import Settings
 
 
 @pytest.fixture
 def settings(tmp_path):
-    return Settings(raip_local_artifacts_dir=str(tmp_path / "artifacts"))
+    return Settings(vera_local_artifacts_dir=str(tmp_path / "artifacts"))
 
 
 def test_upload_download_round_trip(settings):
@@ -36,9 +36,9 @@ def test_path_traversal_rejected(settings):
 
 
 def test_s3io_dispatches_to_local(monkeypatch, tmp_path):
-    from raip.artifacts import s3io
+    from vera.artifacts import s3io
 
-    s = Settings(raip_artifact_backend="local", raip_local_artifacts_dir=str(tmp_path))
+    s = Settings(vera_artifact_backend="local", vera_local_artifacts_dir=str(tmp_path))
     monkeypatch.setattr(s3io, "get_settings", lambda: s)
     s3io.upload_bytes("runs/x/a.txt", b"data", settings=s)
     assert s3io.download_bytes("runs/x/a.txt", settings=s) == b"data"

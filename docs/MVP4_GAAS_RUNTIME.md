@@ -50,15 +50,15 @@ architectural depth and one-command simplicity coexist.
 
 | Component | Module / service | Role |
 |---|---|---|
-| Event bus | `src/raip/governance/bus.py` | Kafka/Redpanda or **Redis Streams** fallback; topics `llm-traffic`, `gov-signals`, `audit-events` |
-| Modes | `src/raip/governance/modes.py` | per-model `shadow`/`advisory`/`enforcement` in Redis |
-| Policy | `src/raip/governance/policy.py` + `infra/opa/raip.rego` | OPA decision `allow`/`flag`/`deny`; built-in equivalent fallback |
-| Inline proxy | `src/raip/governance/proxy.py` + `services/proxy/` | OpenAI-compatible; govern → forward → publish |
-| Agents | `src/raip/governance/agents.py` + `services/agents/` | 4 scorers (Detoxify/Presidio when present, heuristic fallback) |
-| Streaming Trust Factor | `src/raip/governance/trust_stream.py` | folds `gov-signals` → live Trust Factor (Redis + Timescale) |
-| Audit / SIEM | `src/raip/governance/audit.py` + `services/audit_sink/` | signed records → OpenSearch + signed JSONL chain; incidents |
-| Canary | `src/raip/tasks/canary.py` (Celery beat) | golden traffic → bus |
-| Admin API | `src/raip/api/admin_routes.py` | `/admin/v1/{proxy/health,mode,trust,incidents,policy,kill-switch}` |
+| Event bus | `src/vera/governance/bus.py` | Kafka/Redpanda or **Redis Streams** fallback; topics `llm-traffic`, `gov-signals`, `audit-events` |
+| Modes | `src/vera/governance/modes.py` | per-model `shadow`/`advisory`/`enforcement` in Redis |
+| Policy | `src/vera/governance/policy.py` + `infra/opa/vera.rego` | OPA decision `allow`/`flag`/`deny`; built-in equivalent fallback |
+| Inline proxy | `src/vera/governance/proxy.py` + `services/proxy/` | OpenAI-compatible; govern → forward → publish |
+| Agents | `src/vera/governance/agents.py` + `services/agents/` | 4 scorers (Detoxify/Presidio when present, heuristic fallback) |
+| Streaming Trust Factor | `src/vera/governance/trust_stream.py` | folds `gov-signals` → live Trust Factor (Redis + Timescale) |
+| Audit / SIEM | `src/vera/governance/audit.py` + `services/audit_sink/` | signed records → OpenSearch + signed JSONL chain; incidents |
+| Canary | `src/vera/tasks/canary.py` (Celery beat) | golden traffic → bus |
+| Admin API | `src/vera/api/admin_routes.py` | `/admin/v1/{proxy/health,mode,trust,incidents,policy,kill-switch}` |
 
 ## 3. Modes
 
@@ -74,7 +74,7 @@ Set per model: `POST /admin/v1/mode/{model} {"mode": "..."}` or the dashboard `/
 input  = {model, mode, kill_switch, trust_score (0-1|null), signals}
 output = {decision: "allow"|"flag"|"deny", reasons: [...], source: "opa"|"builtin"}
 ```
-Thresholds via `RAIP_POLICY_BLOCK_BELOW` (0.30), `RAIP_POLICY_WARN_BELOW` (0.60).
+Thresholds via `VERA_POLICY_BLOCK_BELOW` (0.30), `VERA_POLICY_WARN_BELOW` (0.60).
 
 ## 5. Run it
 
@@ -113,12 +113,12 @@ and writes `manuscript/results/gaas_bench.json`. Latest run (model `phi3:mini`):
 | Bus degradation | no Kafka/Redpanda present → **Redis-Streams fallback**, probe round-trips end-to-end |
 
 Overhead is the governed-path time minus the forwarding time it wraps (governance machinery only).
-Run it with `RAIP_BENCH_MODEL` / `RAIP_BENCH_N`. The §6 degradation paths are asserted under test.
+Run it with `VERA_BENCH_MODEL` / `VERA_BENCH_N`. The §6 degradation paths are asserted under test.
 
 ## 8. Environment
 
-`RAIP_GAAS_ENABLED`, `KAFKA_BROKER_URL`, `OPA_URL`, `OPENSEARCH_URL`, `RAIP_GOVERNANCE_MODE`
-(`shadow`|`advisory`|`enforcement`), `RAIP_CANARY_CRON`, `RAIP_PROXY_TARGET_URL`. See `.env.example`.
+`VERA_GAAS_ENABLED`, `KAFKA_BROKER_URL`, `OPA_URL`, `OPENSEARCH_URL`, `VERA_GOVERNANCE_MODE`
+(`shadow`|`advisory`|`enforcement`), `VERA_CANARY_CRON`, `VERA_PROXY_TARGET_URL`. See `.env.example`.
 
 ## 9. Hardening (operator tasks — not in this build)
 

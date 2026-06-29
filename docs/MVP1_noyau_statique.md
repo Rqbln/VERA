@@ -38,7 +38,7 @@ last_reviewed: "2026-05-12"
 
 ```mermaid
 flowchart TB
-    USER[Utilisateur ML/Compliance] -->|YAML config| CLI[CLI raip-eval<br/>Typer + Rich]
+    USER[Utilisateur ML/Compliance] -->|YAML config| CLI[CLI vera-eval<br/>Typer + Rich]
     CLI --> API[FastAPI<br/>/runs POST]
     API --> Q[(Redis Queue)]
     Q --> WORKER[Celery Worker GPU]
@@ -195,7 +195,7 @@ Chaque `s_R` est accompagné d'un **bootstrap CI 95 %** (1 000 ré-échantillonn
 ```mermaid
 sequenceDiagram
     participant U as Utilisateur
-    participant CLI as CLI raip-eval
+    participant CLI as CLI vera-eval
     participant API as FastAPI
     participant Q as Redis/Celery
     participant SUP as Superviseur LangGraph
@@ -205,7 +205,7 @@ sequenceDiagram
     participant M as MLflow
     participant S as MinIO
 
-    U->>CLI: raip-eval run config.yaml
+    U->>CLI: vera-eval run config.yaml
     CLI->>API: POST /api/v1/runs
     API->>Q: enqueue job
     API-->>CLI: run_id
@@ -340,7 +340,7 @@ Out-of-scope use: {{ governance.oos_use }}
 - [ ] **9 exigences mesurables COMPL-AI couvertes** (R01, R02, R06, R07, R08, R09, R10, R11, R12) sur le trio Llama 3.1 70B + Mixtral-8x22B + Qwen 2.5 72B (tous self-hosted vLLM), reproduit sur au moins une cible propriétaire (Claude Sonnet ou GPT-4) en option.
 - [ ] Score `s ∈ [0,1]` + CI 95 % bootstrap pour chaque exigence et chaque modèle, exportés en `benchmark_run.yaml`.
 - [ ] Model Card auto-générée conforme schéma Mitchell et al., **incluant la table des 18 exigences** avec statut HITL/déclaratif pour les 6 non-mesurables.
-- [ ] Reproductibilité : `raip-eval run config.yaml` redonne ±2 % sur 3 runs (seed fixée).
+- [ ] Reproductibilité : `vera-eval run config.yaml` redonne ±2 % sur 3 runs (seed fixée).
 - [ ] **Aucune dépendance fonctionnelle aux APIs propriétaires** : tous les benchmarks tournent en isolation réseau (egress deny vers Internet) avec uniquement des modèles self-hosted.
 - [ ] Coût d'un run complet < 50 $ équivalent (~ amortissement A100 8 h ou batch API).
 - [ ] Latence : < 4 h pour un run complet sur GPU A100.

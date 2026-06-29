@@ -5,7 +5,7 @@ experiment:
   seed: 42
 
 dataset:
-  clean_path: minio://raip/datasets/pile_subset_clean_v1
+  clean_path: minio://vera/datasets/pile_subset_clean_v1
   dvc_hash: "sha256:placeholder"
   poison:
     enabled: true

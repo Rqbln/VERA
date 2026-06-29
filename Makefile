@@ -1,4 +1,4 @@
-# RAIP — convenience targets. `make help` lists them.
+# VERA — convenience targets. `make help` lists them.
 .DEFAULT_GOAL := help
 .PHONY: help quickstart quickstart-down stack-full stack-down quickstart-native stack-gaas stack-gaas-down test test-unit lint
 
@@ -18,10 +18,10 @@ quickstart-down: ## Stop and remove the lite stack
 
 quickstart-native: ## Run API + worker + dashboard locally (no Docker), guided mode
 	@echo "Run each of these in a separate terminal (Redis + Ollama must be running):"
-	@echo "  1) RAIP_AUTH_MODE=guided RAIP_ARTIFACT_BACKEND=local RAIP_MLFLOW_DISABLED=1 \\"
-	@echo "       uvicorn raip.api.main:app --port 8000"
-	@echo "  2) RAIP_ARTIFACT_BACKEND=local RAIP_MLFLOW_DISABLED=1 \\"
-	@echo "       celery -A raip.celery_app worker --loglevel=INFO"
+	@echo "  1) VERA_AUTH_MODE=guided VERA_ARTIFACT_BACKEND=local VERA_MLFLOW_DISABLED=1 \\"
+	@echo "       uvicorn vera.api.main:app --port 8000"
+	@echo "  2) VERA_ARTIFACT_BACKEND=local VERA_MLFLOW_DISABLED=1 \\"
+	@echo "       celery -A vera.celery_app worker --loglevel=INFO"
 	@echo "  3) cd dashboard && NEXT_PUBLIC_AUTH_MODE=guided npm run dev"
 
 stack-full: ## Full enterprise stack (Keycloak RBAC, MinIO, MLflow, TimescaleDB)

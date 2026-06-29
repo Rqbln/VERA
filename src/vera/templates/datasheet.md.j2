@@ -1,0 +1,15 @@
+# Datasheet — {{ dataset_id }}
+
+- **DVC hash**: `{{ dvc_hash }}`
+- **Rows**: {{ row_count }}
+- **Protected groups scanned**: {{ protected_groups | join(", ") }}
+
+## COMPL-AI dataset scores
+
+| Requirement | Score |
+|-------------|-------|
+| R03 (data adequacy) | {{ r03 }} |
+| R04 (copyright) | {{ r04 }} |
+| R05 (privacy) | {{ r05 }} |
+
+_Generated per Gebru et al. 2021 template (VERA MVP2 Lab)._

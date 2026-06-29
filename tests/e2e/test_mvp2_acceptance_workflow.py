@@ -18,9 +18,9 @@ SRC = PROJECT_ROOT / "src"
 if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
-from raip.api import main as api_main  # noqa: E402
-from raip.config import get_settings  # noqa: E402
-from raip.store.redis_run import RedisRunStore  # noqa: E402
+from vera.api import main as api_main  # noqa: E402
+from vera.config import get_settings  # noqa: E402
+from vera.store.redis_run import RedisRunStore  # noqa: E402
 
 REQ_SHORT = ("R01", "R02", "R06", "R08", "R10", "R11", "R12")
 
@@ -28,7 +28,7 @@ REQ_SHORT = ("R01", "R02", "R06", "R08", "R10", "R11", "R12")
 @pytest.mark.e2e
 @pytest.mark.ollama
 def test_mvp2_acceptance_workflow(e2e_stack: None) -> None:  # noqa: ARG001
-    os.environ.setdefault("RAIP_BOOTSTRAP_N", "200")
+    os.environ.setdefault("VERA_BOOTSTRAP_N", "200")
 
     example = PROJECT_ROOT / "examples" / "mvp2_ollama_e2e.yaml"
     body = yaml.safe_load(example.read_text(encoding="utf-8"))
@@ -38,7 +38,7 @@ def test_mvp2_acceptance_workflow(e2e_stack: None) -> None:  # noqa: ARG001
     assert r.status_code == 200, r.text
     run_id = r.json()["run_id"]
 
-    deadline = time.time() + float(os.environ.get("RAIP_E2E_TIMEOUT_SEC", "900"))
+    deadline = time.time() + float(os.environ.get("VERA_E2E_TIMEOUT_SEC", "900"))
     store = RedisRunStore()
     status = "queued"
     while time.time() < deadline:

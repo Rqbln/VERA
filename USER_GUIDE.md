@@ -1,10 +1,10 @@
 ---
 doc:
-  title: "Guide utilisateur RAIP (mode guidé)"
+  title: "Guide utilisateur VERA (mode guidé)"
   slug: user-guide
   language: fr
   summary: |
-    Guide pas-à-pas pour utilisateurs non techniques : démarrer RAIP en une commande, lancer une
+    Guide pas-à-pas pour utilisateurs non techniques : démarrer VERA en une commande, lancer une
     évaluation sur un modèle Ollama, lire le tableau de résultats.
   type: user-guide
   audience: [human]
@@ -12,18 +12,18 @@ doc:
     root_readme: ./README.md
     agents: ./AGENTS.md
     dev: ./docs/README-dev.md
-  tags: [raip, guide, utilisateur, eu-ai-act]
+  tags: [vera, guide, utilisateur, eu-ai-act]
 last_reviewed: "2026-06-26"
 ---
 
-# Guide utilisateur RAIP
+# Guide utilisateur VERA
 
-Ce guide s'adresse aux personnes **non techniques**. Il explique comment démarrer RAIP, lancer une
+Ce guide s'adresse aux personnes **non techniques**. Il explique comment démarrer VERA, lancer une
 évaluation et lire les résultats — sans écrire une seule ligne de code.
 
-## 1. À quoi sert RAIP ?
+## 1. À quoi sert VERA ?
 
-RAIP vérifie si un modèle d'IA respecte les règles européennes (**EU AI Act**). Vous choisissez un
+VERA vérifie si un modèle d'IA respecte les règles européennes (**EU AI Act**). Vous choisissez un
 modèle déjà branché (par exemple un modèle local Ollama), vous lancez une évaluation, et vous lisez
 un **tableau de résultats** clair, exigence par exigence (robustesse, toxicité, équité, etc.).
 
@@ -54,7 +54,7 @@ ouvrez votre navigateur sur **http://localhost:3000**. Aucune connexion n'est de
 
 ## 4. L'écran d'accueil
 
-La page d'accueil (« Welcome to RAIP ») montre trois actions :
+La page d'accueil (« Welcome to VERA ») montre trois actions :
 
 - **Launch an evaluation** — lancer une nouvelle évaluation ;
 - **View runs & scores** — voir le tableau récapitulatif ;

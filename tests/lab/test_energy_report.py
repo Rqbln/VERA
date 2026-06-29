@@ -1,6 +1,6 @@
 import pytest
 
-from raip.governance.energy import track_training_energy
+from vera.governance.energy import track_training_energy
 
 
 @pytest.mark.lab

@@ -1,4 +1,4 @@
-# RAIP — lite stack for non-technical users / quick demos.
+# VERA — lite stack for non-technical users / quick demos.
 #
 #   docker compose -f docker-compose.lite.yml up --build      (or: make quickstart)
 #
@@ -14,24 +14,24 @@ services:
 
   api:
     build: .
-    command: uvicorn raip.api.main:app --host 0.0.0.0 --port 8000
+    command: uvicorn vera.api.main:app --host 0.0.0.0 --port 8000
     environment:
-      RAIP_AUTH_MODE: guided
+      VERA_AUTH_MODE: guided
       REDIS_URL: redis://redis:6379/0
       CELERY_BROKER_URL: redis://redis:6379/0
       CELERY_RESULT_BACKEND: redis://redis:6379/0
-      RAIP_ARTIFACT_BACKEND: local
-      RAIP_LOCAL_ARTIFACTS_DIR: /data/artifacts
-      RAIP_PUBLIC_API_URL: http://localhost:8000
-      RAIP_MLFLOW_DISABLED: "1"
+      VERA_ARTIFACT_BACKEND: local
+      VERA_LOCAL_ARTIFACTS_DIR: /data/artifacts
+      VERA_PUBLIC_API_URL: http://localhost:8000
+      VERA_MLFLOW_DISABLED: "1"
       MLFLOW_TRACKING_URI: ""
-      RAIP_TIMESCALE_URL: ""
+      VERA_TIMESCALE_URL: ""
       OLLAMA_API_BASE: http://host.docker.internal:11434
-      RAIP_TARGET_MODEL: ollama/llama3.1:8b-instruct-q8_0
+      VERA_TARGET_MODEL: ollama/llama3.1:8b-instruct-q8_0
     extra_hosts:
       - "host.docker.internal:host-gateway"
     volumes:
-      - raip_artifacts:/data/artifacts
+      - vera_artifacts:/data/artifacts
     ports:
       - "8000:8000"
     depends_on:
@@ -40,23 +40,23 @@ services:
 
   worker:
     build: .
-    command: celery -A raip.celery_app worker --loglevel=INFO
+    command: celery -A vera.celery_app worker --loglevel=INFO
     environment:
-      RAIP_AUTH_MODE: guided
+      VERA_AUTH_MODE: guided
       REDIS_URL: redis://redis:6379/0
       CELERY_BROKER_URL: redis://redis:6379/0
       CELERY_RESULT_BACKEND: redis://redis:6379/0
-      RAIP_ARTIFACT_BACKEND: local
-      RAIP_LOCAL_ARTIFACTS_DIR: /data/artifacts
-      RAIP_MLFLOW_DISABLED: "1"
+      VERA_ARTIFACT_BACKEND: local
+      VERA_LOCAL_ARTIFACTS_DIR: /data/artifacts
+      VERA_MLFLOW_DISABLED: "1"
       MLFLOW_TRACKING_URI: ""
-      RAIP_TIMESCALE_URL: ""
+      VERA_TIMESCALE_URL: ""
       OLLAMA_API_BASE: http://host.docker.internal:11434
-      RAIP_TARGET_MODEL: ollama/llama3.1:8b-instruct-q8_0
+      VERA_TARGET_MODEL: ollama/llama3.1:8b-instruct-q8_0
     extra_hosts:
       - "host.docker.internal:host-gateway"
     volumes:
-      - raip_artifacts:/data/artifacts
+      - vera_artifacts:/data/artifacts
     depends_on:
       redis:
         condition: service_started
@@ -74,4 +74,4 @@ services:
       - api
 
 volumes:
-  raip_artifacts:
+  vera_artifacts:

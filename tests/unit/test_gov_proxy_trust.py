@@ -2,11 +2,11 @@ from __future__ import annotations
 
 import pytest
 
-from raip.governance import proxy as proxy_mod
-from raip.governance.kill_switch import set_kill
-from raip.governance.modes import set_mode
-from raip.governance.trust_stream import current_trust, record_signal
-from raip.llm.client import CompletionResult
+from vera.governance import proxy as proxy_mod
+from vera.governance.kill_switch import set_kill
+from vera.governance.modes import set_mode
+from vera.governance.trust_stream import current_trust, record_signal
+from vera.llm.client import CompletionResult
 
 
 @pytest.fixture(autouse=True)
@@ -27,7 +27,7 @@ def test_shadow_allows_and_forwards():
     status, body = proxy_mod.govern(req)
     assert status == 200
     assert body["choices"][0]["message"]["content"]
-    assert "latency_ms" in body["raip_governance"]
+    assert "latency_ms" in body["vera_governance"]
 
 
 def test_enforcement_blocks_on_kill_switch():

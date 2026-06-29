@@ -12,13 +12,13 @@ from typing import Any
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 
-from raip.config import get_settings
-from raip.governance.bus import get_bus
-from raip.governance.kill_switch import kill_switch_status
-from raip.governance.modes import all_modes
-from raip.governance.proxy import govern
+from vera.config import get_settings
+from vera.governance.bus import get_bus
+from vera.governance.kill_switch import kill_switch_status
+from vera.governance.modes import all_modes
+from vera.governance.proxy import govern
 
-app = FastAPI(title="RAIP Governance Proxy", version="0.4.0")
+app = FastAPI(title="VERA Governance Proxy", version="0.4.0")
 
 
 @app.get("/health")

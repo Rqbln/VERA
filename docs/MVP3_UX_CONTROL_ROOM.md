@@ -45,7 +45,7 @@ last_reviewed: "2026-06-09"
 
 ## API (dashboard read)
 
-See `src/raip/api/dashboard_routes.py`: `GET /runs`, `/runs/{id}/summary`, `/inspector`, `/health/stack`, `/series` (stub).
+See `src/vera/api/dashboard_routes.py`: `GET /runs`, `/runs/{id}/summary`, `/inspector`, `/health/stack`, `/series` (stub).
 
 ## Deferred
 

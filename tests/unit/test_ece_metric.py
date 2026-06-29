@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import unittest
 
-from raip.benchmarks.metrics import compute_ece
+from vera.benchmarks.metrics import compute_ece
 
 
 class TestEceMetric(unittest.TestCase):

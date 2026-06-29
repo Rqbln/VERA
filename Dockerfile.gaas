@@ -1,5 +1,5 @@
 # Image for the governance-as-a-service runtime services (proxy, agents, audit-sink).
-# Builds the raip package with the [gaas] extra and includes the services/ entrypoints.
+# Builds the vera package with the [gaas] extra and includes the services/ entrypoints.
 FROM python:3.11-slim
 
 WORKDIR /app

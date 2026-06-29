@@ -1,6 +1,6 @@
 ---
 doc:
-  title: "RAIP — Developer setup (MVP2–MVP4)"
+  title: "VERA — Developer setup (MVP2–MVP4)"
   slug: readme-dev
   language: en
   summary: |
@@ -21,7 +21,7 @@ doc:
 last_reviewed: "2026-06-15"
 ---
 
-# RAIP — developer setup (MVP2–MVP4)
+# VERA — developer setup (MVP2–MVP4)
 
 ## Lite mode / one-command quickstart (no login)
 
@@ -36,7 +36,7 @@ make quickstart                 # = docker compose -f docker-compose.lite.yml up
 ```
 
 Native equivalent (no Docker): `make quickstart-native` prints the three commands. Key env:
-`RAIP_AUTH_MODE=guided`, `RAIP_ARTIFACT_BACKEND=local`, `RAIP_MLFLOW_DISABLED=1`.
+`VERA_AUTH_MODE=guided`, `VERA_ARTIFACT_BACKEND=local`, `VERA_MLFLOW_DISABLED=1`.
 
 The guided dashboard adds three routes on top of the RBAC lenses:
 
@@ -54,37 +54,37 @@ End-user walkthrough: [USER_GUIDE.md](../USER_GUIDE.md). Implementation status:
 
 ```bash
 ollama pull llama3.1:8b-instruct-q8_0
-export RAIP_TARGET_MODEL=ollama/llama3.1:8b-instruct-q8_0
+export VERA_TARGET_MODEL=ollama/llama3.1:8b-instruct-q8_0
 ```
 
 Optional harness extras: `pip install -e ".[dev,benchmarks]"` (lm-eval, Garak, datasets).
 - Docker (optional but recommended for Redis, MinIO, MLflow, Celery worker, API).
 
-Ollama model files live under `~/.ollama/models` on macOS; RAIP talks to the **Ollama HTTP API** (`OLLAMA_API_BASE`), not to that directory.
+Ollama model files live under `~/.ollama/models` on macOS; VERA talks to the **Ollama HTTP API** (`OLLAMA_API_BASE`), not to that directory.
 
 ## Local Python (API + worker without Docker)
 
 ```bash
-cd /path/to/RAIP
+cd /path/to/VERA
 python -m venv .venv
 source .venv/bin/activate
 pip install -e .
 
 # Terminal 1 — Redis (or use Docker only for Redis)
-docker run -d --name raip-redis -p 6379:6379 redis:7-alpine
+docker run -d --name vera-redis -p 6379:6379 redis:7-alpine
 
 # Start MLflow + Postgres + MinIO via compose (partial), or point MLFLOW_TRACKING_URI to a local mlflow instance.
 
 # Terminal 2 — Celery worker
-celery -A raip.celery_app worker --loglevel=INFO
+celery -A vera.celery_app worker --loglevel=INFO
 
 # Terminal 3 — API
-uvicorn raip.api.main:app --reload --host 127.0.0.1 --port 8000
+uvicorn vera.api.main:app --reload --host 127.0.0.1 --port 8000
 ```
 
 ## Full stack with Docker Compose
 
-1. Start Ollama on the host (`ollama serve`) and ensure the model tag matches `RAIP_TARGET_MODEL` in `docker-compose.yml`.
+1. Start Ollama on the host (`ollama serve`) and ensure the model tag matches `VERA_TARGET_MODEL` in `docker-compose.yml`.
 2. From the repo root:
 
 ```bash
@@ -94,8 +94,8 @@ docker compose up --build
 3. Submit a run:
 
 ```bash
-export RAIP_API_URL=http://127.0.0.1:8000
-raip-eval run examples/mvp2_ollama_e2e.yaml
+export VERA_API_URL=http://127.0.0.1:8000
+vera-eval run examples/mvp2_ollama_e2e.yaml
 ```
 
 Containers reach Ollama via `http://host.docker.internal:11434` (`OLLAMA_API_BASE`).
@@ -104,7 +104,7 @@ Containers reach Ollama via `http://host.docker.internal:11434` (`OLLAMA_API_BAS
 
 - API docs: `http://127.0.0.1:8000/docs`
 - **MVP3 dashboard**: `http://127.0.0.1:3000` (compliance control room)
-- Keycloak: `http://127.0.0.1:8080` (admin / admin; realm `raip`)
+- Keycloak: `http://127.0.0.1:8080` (admin / admin; realm `vera`)
 - MLflow UI: `http://127.0.0.1:5001` (port hôte ; le conteneur écoute toujours sur 5000 en interne)
 - MinIO console: `http://127.0.0.1:9001` (user/password `minioadmin`)
 
@@ -112,8 +112,8 @@ Containers reach Ollama via `http://host.docker.internal:11434` (`OLLAMA_API_BAS
 
 ```bash
 # Terminal A — API with auth disabled for quick UI dev
-export RAIP_AUTH_DISABLED=1
-uvicorn raip.api.main:app --reload --port 8000
+export VERA_AUTH_DISABLED=1
+uvicorn vera.api.main:app --reload --port 8000
 
 # Terminal B — Next.js (see dashboard/.env.example)
 cd dashboard
@@ -128,7 +128,7 @@ Docker (Keycloak + RBAC):
 docker compose up --build api keycloak dashboard redis minio
 ```
 
-Test personas (password `raip-dev`): `compliance@raip.local`, `ds@raip.local`, `secops@raip.local`, etc. — see `infra/keycloak/raip-realm.json`.
+Test personas (password `vera-dev`): `compliance@vera.local`, `ds@vera.local`, `secops@vera.local`, etc. — see `infra/keycloak/vera-realm.json`.
 
 Playwright suites — RBAC matrix (3 views × 8 personas) **+ guided-mode** (home, launch, runs-overview):
 
@@ -149,8 +149,8 @@ Copy [.env.example](.env.example) to `.env` and adjust. Docker Compose sets equi
 | Tier | Flag | Command |
 |------|------|---------|
 | **Unit** | — | `pytest tests/unit/ tests/test_*.py -q` |
-| **Integration** | `RAIP_INTEGRATION=1` | `pytest tests/integration/ -m integration -q` |
-| **E2E** | `RAIP_E2E_OLLAMA=1` | `pytest tests/e2e/ -m "e2e and ollama" -q` |
+| **Integration** | `VERA_INTEGRATION=1` | `pytest tests/integration/ -m integration -q` |
+| **E2E** | `VERA_E2E_OLLAMA=1` | `pytest tests/e2e/ -m "e2e and ollama" -q` |
 
 From the repo root (Python 3.11 venv):
 
@@ -159,17 +159,17 @@ pip install -e ".[dev]"
 PYTHONPATH=src pytest tests/unit/ -q
 ```
 
-Coverage (80 % on `raip`, see `pyproject.toml`):
+Coverage (80 % on `vera`, see `pyproject.toml`):
 
 ```bash
-PYTHONPATH=src pytest tests/unit/ tests/test_bootstrap.py tests/test_benchmark_run_builder.py -q --cov=raip --cov-fail-under=80
+PYTHONPATH=src pytest tests/unit/ tests/test_bootstrap.py tests/test_benchmark_run_builder.py -q --cov=vera --cov-fail-under=80
 ```
 
 ### Integration (Redis + MinIO)
 
 ```bash
 docker compose up -d redis minio
-export RAIP_INTEGRATION=1
+export VERA_INTEGRATION=1
 PYTHONPATH=src pytest tests/integration/ -m integration -q
 ```
 
@@ -178,9 +178,9 @@ PYTHONPATH=src pytest tests/integration/ -m integration -q
 ```bash
 ollama pull llama3.1:8b-instruct-q8_0
 docker compose up -d --build
-export RAIP_E2E_OLLAMA=1
-export RAIP_BOOTSTRAP_N=200
-export RAIP_E2E_TIMEOUT_SEC=900
+export VERA_E2E_OLLAMA=1
+export VERA_BOOTSTRAP_N=200
+export VERA_E2E_TIMEOUT_SEC=900
 PYTHONPATH=src pytest tests/e2e/ -m "e2e and ollama" -q
 ```
 
@@ -189,7 +189,7 @@ E2E uses [`examples/mvp2_ollama_e2e.yaml`](../examples/mvp2_ollama_e2e.yaml), re
 Optional Ollama HTTP smoke:
 
 ```bash
-RAIP_RUN_OLLAMA_SMOKE=1 pytest tests/test_external_ollama_optional.py -q
+VERA_RUN_OLLAMA_SMOKE=1 pytest tests/test_external_ollama_optional.py -q
 ```
 
 ### Air-gap / egress deny (section 9 MVP1)

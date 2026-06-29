@@ -1,6 +1,6 @@
 ---
 doc:
-  title: "CLAUDE — Conventions dépôt RAIP (assistants IA)"
+  title: "CLAUDE — Conventions dépôt VERA (assistants IA)"
   slug: claude-agent-guide
   language: mixed
   summary: |
@@ -15,7 +15,7 @@ doc:
     - ../AGENTS.md
     - ./README-dev.md
     - ./MVP1_noyau_statique.md
-  tags: [claude, cursor, conventions, compl-ai, raip]
+  tags: [claude, cursor, conventions, compl-ai, vera]
 last_reviewed: "2026-06-15"
 ---
 
@@ -29,7 +29,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Repository nature
 
-This repository contains **EU AI Act–aligned planning documents** (Markdown under `docs/`) **and** an **MVP1 Python scaffold** under `src/raip/` (FastAPI, Celery, LangGraph, LiteLLM → Ollama, MLflow, MinIO). Use `pyproject.toml`, `docker-compose.yml`, and [README-dev.md](./README-dev.md) for build/run instructions.
+This repository contains **EU AI Act–aligned planning documents** (Markdown under `docs/`) **and** an **MVP1 Python scaffold** under `src/vera/` (FastAPI, Celery, LangGraph, LiteLLM → Ollama, MLflow, MinIO). Use `pyproject.toml`, `docker-compose.yml`, and [README-dev.md](./README-dev.md) for build/run instructions.
 
 Working language: prose is **French**; code identifiers, schemas, table names, and tooling references stay in English. Match the existing voice when editing.
 
@@ -51,12 +51,12 @@ When editing any MVP doc, check `ROADMAP.md` first: stack choices (LangGraph, Li
 
 ## Code layout (MVP1 scaffold)
 
-- `src/raip/api/main.py` — FastAPI routes (`/api/v1/runs`, etc.).
-- `src/raip/celery_app.py` — Celery application.
-- `src/raip/tasks/eval.py` — async evaluation job (LangGraph, MLflow, MinIO).
-- `src/raip/graph/` — LangGraph supervisor (evaluate + aggregate).
-- `src/raip/benchmarks/` — `benchmarks_catalog.yaml`, runners (`lm_eval`, `garak`, `hf_dynamic`).
-- `src/raip/llm/client.py` — LiteLLM wrapper (Ollama default `llama3.1:8b-instruct-q8_0`).
+- `src/vera/api/main.py` — FastAPI routes (`/api/v1/runs`, etc.).
+- `src/vera/celery_app.py` — Celery application.
+- `src/vera/tasks/eval.py` — async evaluation job (LangGraph, MLflow, MinIO).
+- `src/vera/graph/` — LangGraph supervisor (evaluate + aggregate).
+- `src/vera/benchmarks/` — `benchmarks_catalog.yaml`, runners (`lm_eval`, `garak`, `hf_dynamic`).
+- `src/vera/llm/client.py` — LiteLLM wrapper (Ollama default `llama3.1:8b-instruct-q8_0`).
 - `examples/mvp2_ollama_e2e.yaml` — E2E payload ; `examples/poisoning_experiment.yaml` — Hydra lab ; `examples/mvp1_pilote_e2e.yaml` — historical MVP1.
 
 ## MVP2 Lab workflow (agents)

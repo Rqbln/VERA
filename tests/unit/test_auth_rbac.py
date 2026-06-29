@@ -2,18 +2,18 @@ from __future__ import annotations
 
 from fastapi.testclient import TestClient
 
-from raip.api.auth import AuthUser, auth_disabled, require_roles
+from vera.api.auth import AuthUser, auth_disabled, require_roles
 
 
 def test_auth_disabled_by_env(monkeypatch):
-    monkeypatch.setenv("RAIP_AUTH_DISABLED", "1")
+    monkeypatch.setenv("VERA_AUTH_DISABLED", "1")
     assert auth_disabled() is True
 
 
 def test_require_roles_allows_when_disabled(monkeypatch):
     import asyncio
 
-    monkeypatch.setenv("RAIP_AUTH_DISABLED", "1")
+    monkeypatch.setenv("VERA_AUTH_DISABLED", "1")
     dep = require_roles("legal_compliance")
     user = AuthUser(sub="x", roles=frozenset(), raw={})
     result = asyncio.run(dep(user=user))
@@ -22,15 +22,15 @@ def test_require_roles_allows_when_disabled(monkeypatch):
 
 def test_guided_mode_is_default(monkeypatch):
     # With nothing set, the platform ships in guided no-login mode.
-    monkeypatch.delenv("RAIP_AUTH_MODE", raising=False)
-    monkeypatch.delenv("RAIP_AUTH_DISABLED", raising=False)
+    monkeypatch.delenv("VERA_AUTH_MODE", raising=False)
+    monkeypatch.delenv("VERA_AUTH_DISABLED", raising=False)
     assert auth_disabled() is True
 
 
 def test_dashboard_endpoints_require_auth_when_enabled(monkeypatch):
-    monkeypatch.setenv("RAIP_AUTH_MODE", "enterprise")
-    monkeypatch.delenv("RAIP_AUTH_DISABLED", raising=False)
-    from raip.api.main import app
+    monkeypatch.setenv("VERA_AUTH_MODE", "enterprise")
+    monkeypatch.delenv("VERA_AUTH_DISABLED", raising=False)
+    from vera.api.main import app
 
     client = TestClient(app)
     resp = client.get("/api/v1/runs")

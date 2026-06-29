@@ -16,11 +16,11 @@ if str(SRC) not in sys.path:
 
 from pydantic_settings import SettingsConfigDict
 
-from raip.config import Settings, get_settings
+from vera.config import Settings, get_settings
 
 _ENV_KEYS = (
-    "RAIP_TARGET_MODEL",
-    "RAIP_JUDGE_MODEL",
+    "VERA_TARGET_MODEL",
+    "VERA_JUDGE_MODEL",
     "OLLAMA_API_BASE",
     "MLFLOW_EXPERIMENT",
 )
@@ -31,7 +31,7 @@ class _NoEnv(Settings):
 
 
 @contextlib.contextmanager
-def _without_raip_env() -> Iterator[None]:
+def _without_vera_env() -> Iterator[None]:
     saved = {k: os.environ[k] for k in _ENV_KEYS if k in os.environ}
     try:
         for k in _ENV_KEYS:
@@ -48,17 +48,17 @@ class TestConfigDefaults(unittest.TestCase):
         get_settings.cache_clear()
 
     def test_default_target_is_llama31_8b_q8(self) -> None:
-        with _without_raip_env():
+        with _without_vera_env():
             s = _NoEnv()
-        self.assertEqual(s.raip_target_model, "ollama/llama3.1:8b-instruct-q8_0")
+        self.assertEqual(s.vera_target_model, "ollama/llama3.1:8b-instruct-q8_0")
 
     def test_default_mlflow_experiment_mvp2(self) -> None:
-        with _without_raip_env():
+        with _without_vera_env():
             s = _NoEnv()
-        self.assertEqual(s.mlflow_experiment, "raip-mvp2")
+        self.assertEqual(s.mlflow_experiment, "vera-mvp2")
 
     def test_judge_defaults_to_llama_when_unset(self) -> None:
-        with _without_raip_env():
+        with _without_vera_env():
             s = _NoEnv()
         self.assertEqual(s.effective_judge_model, "ollama/llama3.1:8b-instruct-q8_0")
 

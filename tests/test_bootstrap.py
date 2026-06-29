@@ -12,7 +12,7 @@ SRC = PROJECT_ROOT / "src"
 if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
-from raip.stats.bootstrap import (
+from vera.stats.bootstrap import (
     bootstrap_mean_ci_95,
     bootstrap_weighted_requirement_ci_95,
     effective_bootstrap_n,
@@ -22,18 +22,18 @@ from raip.stats.bootstrap import (
 
 class TestBootstrap(unittest.TestCase):
     def test_effective_bootstrap_n_env(self) -> None:
-        old = os.environ.pop("RAIP_BOOTSTRAP_N", None)
+        old = os.environ.pop("VERA_BOOTSTRAP_N", None)
         try:
             self.assertEqual(effective_bootstrap_n(1000), 1000)
-            os.environ["RAIP_BOOTSTRAP_N"] = "50"
+            os.environ["VERA_BOOTSTRAP_N"] = "50"
             self.assertEqual(effective_bootstrap_n(1000), 50)
-            os.environ["RAIP_BOOTSTRAP_N"] = "not-a-number"
+            os.environ["VERA_BOOTSTRAP_N"] = "not-a-number"
             self.assertEqual(effective_bootstrap_n(1000), 1000)
         finally:
             if old is None:
-                os.environ.pop("RAIP_BOOTSTRAP_N", None)
+                os.environ.pop("VERA_BOOTSTRAP_N", None)
             else:
-                os.environ["RAIP_BOOTSTRAP_N"] = old
+                os.environ["VERA_BOOTSTRAP_N"] = old
 
     def test_bootstrap_mean_single_sample(self) -> None:
         m, lo, hi = bootstrap_mean_ci_95([0.42], seed=1, n_resamples=500)

@@ -1,4 +1,4 @@
-from raip.governance.signing import artifact_digest, sign_artifact
+from vera.governance.signing import artifact_digest, sign_artifact
 
 
 def test_sign_artifact_digest_stable():

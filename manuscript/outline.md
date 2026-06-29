@@ -1,4 +1,4 @@
-# RAIP — APSEC 2026 Detailed Outline (Technical Track)
+# VERA — APSEC 2026 Detailed Outline (Technical Track)
 
 > **Status:** Outline only — no LaTeX body.  
 > **Venue:** 33rd Asia-Pacific Software Engineering Conference (APSEC 2026), Bali — Technical Track.  
@@ -12,14 +12,14 @@
 
 | Field | Value |
 |-------|--------|
-| Working title | RAIP: A Lifecycle-Aware Open Platform for Responsible AI Evaluation Aligned with COMPL-AI and the EU AI Act |
+| Working title | VERA: A Lifecycle-Aware Open Platform for Responsible AI Evaluation Aligned with COMPL-AI and the EU AI Act |
 | Narrative paradigm | SE tool + empirical evaluation (Histree / PromptOps / defect-prediction RQ style) |
 | `references.bib` | **[manuscript/references.bib](references.bib)** — 30 verified keys; use `\cite{key}` only for keys in this file |
 | Reference PDF set | **5/5 present** (verified 2026-06-01) |
 
 ### Reference PDF checklist (local) ↔ bibliography keys
 
-| PDF | BibTeX key | Role for RAIP |
+| PDF | BibTeX key | Role for VERA |
 |-----|------------|---------------|
 | `apsec2025_promptops_llm_trustworthiness.pdf` | `sunetnanta2025promptops` | Closest thematic neighbor — LLM trustworthiness tool |
 | `apsec2023_histree_experiment_tracking.pdf` | `studtmann2023histree` | Platform requirements R1–Rk; tool + user study pattern |
@@ -31,9 +31,9 @@
 
 *All keys below exist in [references.bib](references.bib). Tools without a bib entry (e.g. Garak, Presidio, Detoxify) are named in prose only.*
 
-| Block | Keys | Use in RAIP paper |
+| Block | Keys | Use in VERA paper |
 |-------|------|-------------------|
-| **Regulatory & governance frameworks** | `guldimann2024complai`, `euaiact2024`, `hleg2019trustworthyai`, `nist2023airmf`, `iso42001_2023` | §2.1 motivation; construct validity; RAIP addresses Measure/Manage slice, not full GRC |
+| **Regulatory & governance frameworks** | `guldimann2024complai`, `euaiact2024`, `hleg2019trustworthyai`, `nist2023airmf`, `iso42001_2023` | §2.1 motivation; construct validity; VERA addresses Measure/Manage slice, not full GRC |
 | **Governance artifacts** | `mitchell2019modelcard`, `gebru2021datasheets` | §3.5 model card + datasheet (N04) |
 | **Capabilities (R06)** | `hendrycks2021mmlu`, `cobbe2021gsm8k`, `chen2021humaneval`, `lin2022truthfulqa`, `suzgun2023bbh`, `gao2021lmevalharness` | §2.2, §3.3, Appendix A; lm-eval runner |
 | **Toxicity (R12)** | `gehman2020realtoxicity` | §2.2, Appendix A |
@@ -55,7 +55,7 @@
 
 **One-sentence contribution (re-locked):**
 
-We present **RAIP**, an open-source, self-hostable platform *and* a "compliance control room" dashboard for EU AI Act LLM evaluation that operationalizes the COMPL-AI measurable requirements through a LangGraph pipeline, makes the benchmark-to-requirement **aggregation weights a first-class, signed, auditable artifact** with a reproducible weighting-sensitivity check, and exposes a **no-login guided mode** so a non-technical user can launch an evaluation and read a status-first, progressively-disclosed summary.
+We present **VERA**, an open-source, self-hostable platform *and* a "compliance control room" dashboard for EU AI Act LLM evaluation that operationalizes the COMPL-AI measurable requirements through a LangGraph pipeline, makes the benchmark-to-requirement **aggregation weights a first-class, signed, auditable artifact** with a reproducible weighting-sensitivity check, and exposes a **no-login guided mode** so a non-technical user can launch an evaluation and read a status-first, progressively-disclosed summary.
 
 **Confidence:** `high` — native multi-model run (3-model panel), non-degenerate sensitivity, determinism check, banking-corpus data-stage results, measured GaaS runtime, and dashboard screenshots are in the compiled draft (`manuscript/main.pdf`, 10 pp.).
 
@@ -84,7 +84,7 @@ We present **RAIP**, an open-source, self-hostable platform *and* a "compliance 
 | Abstract + Index Terms | 0.25 |
 | 1. Introduction | 1.0–1.5 |
 | 2. Background and Related Work | 1.0–1.5 |
-| 3. RAIP Framework and Architecture | 2.0–2.5 |
+| 3. VERA Framework and Architecture | 2.0–2.5 |
 | 4. Evaluation Setup | ~1.0 |
 | 5. Results and Analysis | ~2.0 |
 | 6. Threats to Validity | ~0.5 |
@@ -97,9 +97,9 @@ We present **RAIP**, an open-source, self-hostable platform *and* a "compliance 
 
 1. **Context:** High-risk and regulated AI systems under the EU AI Act \cite{euaiact2024} require reproducible technical evidence across trustworthy-AI principles \cite{hleg2019trustworthyai}; COMPL-AI \cite{guldimann2024complai} translates these into 18 technical requirements (12 measurable).
 2. **Gap:** Software teams still run fragmented benchmark scripts (cyber, capabilities, fairness, dataset quality) with weak links from raw metrics to requirement IDs, lifecycle stages, and audit artifacts; LLM trustworthiness tools often evaluate a frozen model endpoint only.
-3. **Approach:** RAIP — a lifecycle-aware, self-hostable evaluation platform orchestrating benchmarks via LangGraph, persisting signed runs to MLflow/MinIO, and emitting model cards with explicit harness provenance.
+3. **Approach:** VERA — a lifecycle-aware, self-hostable evaluation platform orchestrating benchmarks via LangGraph, persisting signed runs to MLflow/MinIO, and emitting model cards with explicit harness provenance.
 4. **Key results (qualitative — no numbers in outline):** End-to-end pipeline on a representative open-weight target; coverage of COMPL-AI measurable requirements R01–R12; extended coverage when dataset and checkpoint/lab scenarios are enabled; traceable fallback reporting when optional harnesses are absent.
-5. **Takeaway:** RAIP demonstrates how software engineering for responsible AI can treat compliance-oriented evaluation as an automated, reproducible pipeline rather than ad hoc spreadsheet assembly.
+5. **Takeaway:** VERA demonstrates how software engineering for responsible AI can treat compliance-oriented evaluation as an automated, reproducible pipeline rather than ad hoc spreadsheet assembly.
 
 **REVIEW:** Emphasize *engineering contribution* and *traceability*, not SOTA accuracy on a single benchmark.
 
@@ -149,7 +149,7 @@ We present **RAIP**, an open-source, self-hostable platform *and* a "compliance 
 **Lead-in phrase (required):** *In this paper, we make the following contributions:*
 
 - **C1 — Conceptual framework:** A lifecycle-aware evaluation model aligning EU AI Act principles, COMPL-AI requirement IDs, lifecycle stages (`data` | `finetune` | `inference` | …), and stakeholder-oriented artifacts (model card, datasheet, `benchmark_run.yaml`).
-- **C2 — RAIP platform:** Open-source implementation: CLI `raip-eval`, REST API, Celery workers, LangGraph supervisor, benchmark registry with dedicated runners, lab routes (dataset scan, poisoning), MinIO + MLflow + Timescale integration.
+- **C2 — VERA platform:** Open-source implementation: CLI `vera-eval`, REST API, Celery workers, LangGraph supervisor, benchmark registry with dedicated runners, lab routes (dataset scan, poisoning), MinIO + MLflow + Timescale integration.
 - **C3 — Empirical evaluation:** Three scenarios — (S1) full inference COMPL-AI run, (S2) lifecycle extension with dataset/checkpoint lab, (S3) case study on interpretability of generated governance artifacts — answering RQ1–RQ3 without fabricated statistics in this outline.
 
 ### 1.5 Paper organization
@@ -169,34 +169,34 @@ We present **RAIP**, an open-source, self-hostable platform *and* a "compliance 
 ### 2.1 Regulatory framing and COMPL-AI operationalization
 
 - EU AI Act \cite{euaiact2024}; six HLEG trustworthy-AI principles \cite{hleg2019trustworthyai} → COMPL-AI’s 18 technical requirements \cite{guldimann2024complai} (12 measurable scores in [0,1], 6 non-measurable / HITL / declarative).
-- Broader risk-management context: NIST AI RMF \cite{nist2023airmf}, ISO/IEC 42001 \cite{iso42001_2023} — **REVIEW:** RAIP implements the *Measure* slice (automated benchmarks + artifacts), not full organizational governance.
+- Broader risk-management context: NIST AI RMF \cite{nist2023airmf}, ISO/IEC 42001 \cite{iso42001_2023} — **REVIEW:** VERA implements the *Measure* slice (automated benchmarks + artifacts), not full organizational governance.
 - COMPL-AI contributions: legal-to-technical mapping, benchmark association, multi-model study \cite{guldimann2024complai}.
 - **Gap:** COMPL-AI is a benchmark framework, not a lifecycle orchestration platform with signed audit chain.
 
-### 2.2 Benchmark suites and metrics (components RAIP orchestrates)
+### 2.2 Benchmark suites and metrics (components VERA orchestrates)
 
 | COMPL-AI area | Benchmarks / metrics | Bibliography (verified keys) |
 |---------------|----------------------|------------------------------|
 | R06 Capabilities | MMLU, GSM8K, HumanEval, TruthfulQA, BBH | \cite{hendrycks2021mmlu,cobbe2021gsm8k,chen2021humaneval,lin2022truthfulqa,suzgun2023bbh,gao2021lmevalharness} |
 | R07 Calibration | ECE | \cite{guo2017calibration} |
 | R10–R11 Bias / fairness | BBQ, BOLD, StereoSet; DPD/EOD | \cite{parrish2022bbq,dhamala2021bold,nadeem2021stereoset,hardt2016equality,wang2023decodingtrust} |
-| R12 Toxicity | RealToxicityPrompts (+ refusal probes in RAIP) | \cite{gehman2020realtoxicity} |
+| R12 Toxicity | RealToxicityPrompts (+ refusal probes in VERA) | \cite{gehman2020realtoxicity} |
 | R03–R05 Dataset | Corpus toxicity, leakage, PII/extraction (MVP2 heuristics + optional libs) | \cite{carlini2021membership,carlini2023extracting} — **REVIEW:** simplified vs full Carlini-style attacks |
 | R02 Cyber (ext.) | AdvBench/Garak-class probes in implementation (no bib key yet) | prose only |
 | R09 Watermark | Statistical heuristic inspired by | \cite{kirchenbauer2023watermark} |
 
-- RAIP **integrates** suites such as DecodingTrust \cite{wang2023decodingtrust} and lm-evaluation-harness \cite{gao2021lmevalharness}; it does not claim new benchmark science.
+- VERA **integrates** suites such as DecodingTrust \cite{wang2023decodingtrust} and lm-evaluation-harness \cite{gao2021lmevalharness}; it does not claim new benchmark science.
 
 ### 2.3 Governance artifacts (model cards, datasheets)
 
-- Model Cards \cite{mitchell2019modelcard} — RAIP Jinja2 template: intended use, per-requirement metrics, limitations.
-- Datasheets for Datasets \cite{gebru2021datasheets} — RAIP `datasheet.md` for corpus scans (R03–R05, N04).
+- Model Cards \cite{mitchell2019modelcard} — VERA Jinja2 template: intended use, per-requirement metrics, limitations.
+- Datasheets for Datasets \cite{gebru2021datasheets} — VERA `datasheet.md` for corpus scans (R03–R05, N04).
 
 ### 2.4 Software engineering tools — APSEC neighbors and structure
 
-| Paper | Key | Pattern RAIP reuses |
+| Paper | Key | Pattern VERA reuses |
 |-------|-----|---------------------|
-| PromptOps | \cite{sunetnanta2025promptops} | LLM trustworthiness **tool**; closest neighbor — RAIP extends with COMPL-AI breadth + lifecycle |
+| PromptOps | \cite{sunetnanta2025promptops} | LLM trustworthiness **tool**; closest neighbor — VERA extends with COMPL-AI breadth + lifecycle |
 | Histree | \cite{studtmann2023histree} | Platform requirements R1–Rk; tool design + empirical evaluation |
 | Use-case experiment | \cite{weninger2018usecase} | Controlled experimental design; validity threats |
 | Cross-project defect prediction | \cite{liu2022mscpdp} | **RQ1–Rn** + dedicated Results subsections (our §5) |
@@ -213,7 +213,7 @@ We present **RAIP**, an open-source, self-hostable platform *and* a "compliance 
 | COMPL-AI \cite{guldimann2024complai} | Inference-focused | Yes (definition) | No | N/A | Partial |
 | PromptOps \cite{sunetnanta2025promptops} | Primarily inference / prompts | Partial | Yes | Limited | REVIEW |
 | Histree \cite{studtmann2023histree} | Experiment tracking | No | Yes | N/A | Yes |
-| **RAIP** | Data + checkpoint + inference + lab | Yes (12 measurable) | Yes | Yes (`fallback` flag) | Yes |
+| **VERA** | Data + checkpoint + inference + lab | Yes (12 measurable) | Yes | Yes (`fallback` flag) | Yes |
 
 ### 2.6 Gap summary
 
@@ -221,7 +221,7 @@ We present **RAIP**, an open-source, self-hostable platform *and* a "compliance 
 
 ---
 
-## 3. RAIP Framework and Architecture
+## 3. VERA Framework and Architecture
 
 *Venue section alias: Approach / Design / Implementation.*
 
@@ -258,7 +258,7 @@ We present **RAIP**, an open-source, self-hostable platform *and* a "compliance 
 #### 3.2.1 Runtime flow
 
 ```
-User/CI → raip-eval CLI or POST /api/v1/runs
+User/CI → vera-eval CLI or POST /api/v1/runs
        → Redis → Celery worker
        → LangGraph (evaluate → aggregate)
        → LiteLLM → target model (default Ollama)
@@ -286,11 +286,11 @@ User/CI → raip-eval CLI or POST /api/v1/runs
 
 ### 3.3 Benchmark orchestration and provenance
 
-- **Catalogue:** signed weights per requirement (`src/raip/benchmarks/benchmarks_catalog.yaml`).
+- **Catalogue:** signed weights per requirement (`src/vera/benchmarks/benchmarks_catalog.yaml`).
 - **Dispatch:** `evaluate_benchmarks(..., dataset_context=...)` for R03–R05 corpus on run payload.
 - **Provenance:** each `raw_outputs` row includes `harness`, `agent`; fallbacks must set `fallback: true` and `fallback_reason` (Garak, lm_eval runners).
 - **Runners cite underlying science:** lm-eval harness \cite{gao2021lmevalharness}; BBQ/BOLD/StereoSet \cite{parrish2022bbq,dhamala2021bold,nadeem2021stereoset}; RealToxicityPrompts \cite{gehman2020realtoxicity}.
-- **R09:** `RAIP_WATERMARK_MODE=statistical|na` — heuristic inspired by \cite{kirchenbauer2023watermark}; not full SynthID.
+- **R09:** `VERA_WATERMARK_MODE=statistical|na` — heuristic inspired by \cite{kirchenbauer2023watermark}; not full SynthID.
 
 **REVIEW:** Present provenance as transparency mechanism for auditors, not as a ML contribution.
 
@@ -309,7 +309,7 @@ User/CI → raip-eval CLI or POST /api/v1/runs
 
 ### 3.6 Implementation and replication
 
-- Package `raip` v0.2.0; Python 3.11; Docker Compose for Redis, MinIO, MLflow, Postgres/Timescale.
+- Package `vera` v0.2.0; Python 3.11; Docker Compose for Redis, MinIO, MLflow, Postgres/Timescale.
 - Example configs: `examples/mvp2_ollama_e2e_full.yaml`, `examples/mvp2_dataset_eval.yaml`.
 - Engineering tests: 42+ unit/lab tests passed (qualitative; cite in §4, not as hypothesis p-value).
 
@@ -327,9 +327,9 @@ User/CI → raip-eval CLI or POST /api/v1/runs
 
 | RQ | Question | Mapped contributions |
 |----|----------|----------------------|
-| **RQ1** | Can RAIP automatically produce reproducible, COMPL-AI-aligned scores \cite{guldimann2024complai} across the requested measurable requirements for a given LLM target under declarative configuration? | C2, platform R2–R3 |
+| **RQ1** | Can VERA automatically produce reproducible, COMPL-AI-aligned scores \cite{guldimann2024complai} across the requested measurable requirements for a given LLM target under declarative configuration? | C2, platform R2–R3 |
 | **RQ2** | Does lifecycle extension (dataset scans R03–R05 + checkpoint/lab scenarios) increase measurable **requirement coverage** compared to inference-only evaluation? | C1, platform R1 |
-| **RQ3** | Are RAIP governance artifacts \cite{mitchell2019modelcard,gebru2021datasheets} (model card, COMPL-AI table, harness provenance) sufficient for a compliance-oriented reader to interpret outcomes without raw logs? | C3, platform R2 |
+| **RQ3** | Are VERA governance artifacts \cite{mitchell2019modelcard,gebru2021datasheets} (model card, COMPL-AI table, harness provenance) sufficient for a compliance-oriented reader to interpret outcomes without raw logs? | C3, platform R2 |
 
 **REVIEW:** RQ3 as **structured case study** (checklist), not Histree-style questionnaire \cite{studtmann2023histree} with N participants—future work may add Krippendorff-validated panels \cite{hayes2007krippendorff}.
 
@@ -372,7 +372,7 @@ User/CI → raip-eval CLI or POST /api/v1/runs
 
 1. Start Docker Compose stack (Redis, MinIO, MLflow, Timescale as configured).
 2. `pip install -e ".[dev,lab,benchmarks]"` on Python 3.11.
-3. Execute S1 via `raip-eval run examples/mvp2_ollama_e2e_full.yaml` or `POST /api/v1/runs`.
+3. Execute S1 via `vera-eval run examples/mvp2_ollama_e2e_full.yaml` or `POST /api/v1/runs`.
 4. Execute S2 with dataset corpus on run payload; optional lab train/checkpoint path.
 5. Collect `runs/{run_id}/model_card.md`, `benchmark_run.yaml`, `raw_outputs.jsonl`, MLflow run ID.
 6. For S3, two authors (or one author + external reviewer) apply interpretability checklist — **REVIEW:** document rubric in appendix or replication package.
@@ -388,7 +388,7 @@ User/CI → raip-eval CLI or POST /api/v1/runs
 ### 4.8 Engineering validation (supporting evidence)
 
 - Unit/lab test suite passes (42 tests, 2 deselected) — supports implementability, not hypothesis testing.
-- CI workflow with optional `RAIP_E2E_OLLAMA=1` — mention as replication path.
+- CI workflow with optional `VERA_E2E_OLLAMA=1` — mention as replication path.
 
 ---
 
@@ -491,7 +491,7 @@ User/CI → raip-eval CLI or POST /api/v1/runs
 - Simplified fairness/toxicity metrics vs full DecodingTrust-style protocols \cite{wang2023decodingtrust}.
 - Dataset privacy/copyright checks are engineering heuristics vs membership/extraction attacks \cite{carlini2021membership,carlini2023extracting}.
 
-### 6.4 Tool limitations (RAIP-specific)
+### 6.4 Tool limitations (VERA-specific)
 
 - N01, N02, N05, N06 not implemented (MVP3+).
 - No production governance proxy or Trust Factor (MVP4).
@@ -508,7 +508,7 @@ User/CI → raip-eval CLI or POST /api/v1/runs
 ### 7.1 Conclusion
 
 - Restate problem: fragmented responsible-AI evaluation in SE practice.
-- Restate solution: RAIP framework + platform with lifecycle coverage and provenance.
+- Restate solution: VERA framework + platform with lifecycle coverage and provenance.
 - Summarize RQ answers at high level — `[RESULT: one sentence per RQ after experiments]`.
 - Emphasize open-source, self-hostable replication package.
 
@@ -530,7 +530,7 @@ User/CI → raip-eval CLI or POST /api/v1/runs
 
 `[TABLE: complai_benchmark_mapping]` — columns: ID, Benchmarks, Runner, Score formula, Primary citation(s).
 
-| ID | Benchmarks (RAIP registry) | Primary cite |
+| ID | Benchmarks (VERA registry) | Primary cite |
 |----|---------------------------|--------------|
 | R01 | mmlu_robust, r01_robustness, boolq_contrast | \cite{hendrycks2021mmlu} |
 | R02 | advbench, tensortrust, llm_rules, decodingtrust_adv | \cite{wang2023decodingtrust} (+ Garak: prose) |
@@ -539,7 +539,7 @@ User/CI → raip-eval CLI or POST /api/v1/runs
 | R05 | dataset_privacy_scan | \cite{carlini2021membership,carlini2023extracting} |
 | R06 | mmlu, gsm8k, humaneval, truthfulqa, bbh | \cite{hendrycks2021mmlu,cobbe2021gsm8k,chen2021humaneval,lin2022truthfulqa,suzgun2023bbh,gao2021lmevalharness} |
 | R07 | ece_mmlu | \cite{guo2017calibration,hendrycks2021mmlu} |
-| R08 | self_disclosure_probes | prose (RAIP probes) |
+| R08 | self_disclosure_probes | prose (VERA probes) |
 | R09 | watermark_kirchenbauer | \cite{kirchenbauer2023watermark} |
 | R10 | bbq, bold, stereoset | \cite{parrish2022bbq,dhamala2021bold,nadeem2021stereoset} |
 | R11 | decodingtrust_adult | \cite{hardt2016equality,wang2023decodingtrust} |

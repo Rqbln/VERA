@@ -1,10 +1,10 @@
 ---
 doc:
-  title: "AGENTS.md — Agent orientation for RAIP"
+  title: "AGENTS.md — Agent orientation for VERA"
   slug: agents-guide
   language: en
   summary: |
-    Canonical, high-signal orientation for AI coding agents: what RAIP is, the architecture,
+    Canonical, high-signal orientation for AI coding agents: what VERA is, the architecture,
     where things live, how to run it (lite & full), conventions, MVP status, and gotchas.
   type: agent-guide
   audience: [ai-agent, developer]
@@ -15,19 +15,19 @@ doc:
     user_guide: USER_GUIDE.md
     status: docs/MVP3_MVP4_IMPLEMENTATION.md
   related_paths: [README.md, docs/README-dev.md, CLAUDE.md]
-  tags: [agents, orientation, raip, eu-ai-act]
+  tags: [agents, orientation, vera, eu-ai-act]
 last_reviewed: "2026-06-26"
 ---
 
-# AGENTS.md — RAIP
+# AGENTS.md — VERA
 
 > This agent guide is written in **English** by convention (the agents.md standard). The normative
 > specs under `docs/` are in **French** — match that voice when editing them. Code identifiers,
 > schemas and tooling stay English everywhere.
 
-## What RAIP is
+## What VERA is
 
-RAIP (Responsible AI in Practice) is an **open-source, self-hostable EU AI Act compliance
+VERA (Verifiable Evaluation for Responsible AI) is an **open-source, self-hostable EU AI Act compliance
 evaluation framework**. It supervises a model across its whole lifecycle (data → pre-train →
 fine-tune → inference → production), not as a single end-of-pipeline test. The evaluation backbone
 is **COMPL-AI**'s 18 technical requirements — **12 measurable** (R01–R12, each a score in [0,1]) and
@@ -39,7 +39,7 @@ It ships in two modes:
 - **Guided (default, no login):** a non-technical user opens the dashboard, launches an evaluation
   on a connected Ollama model, and reads a compliance summary. No Keycloak, minimal services.
 - **Enterprise:** Keycloak RBAC with 8 personas, full observability stack. Opt in with
-  `RAIP_AUTH_MODE=enterprise`.
+  `VERA_AUTH_MODE=enterprise`.
 
 ## Architecture map
 
@@ -70,26 +70,26 @@ restate it elsewhere.
 
 | Path | What |
 |------|------|
-| `src/raip/api/main.py` | FastAPI app + run create/get/delete, benchmarks list |
-| `src/raip/api/auth.py` | Auth modes (`guided`/`enterprise`), Keycloak JWT, role sets |
-| `src/raip/api/dashboard_routes.py` | Read API: `/runs`, `/summary`, `/inspector`, `/series`, `/health/stack`, HITL, drift, kill-switch |
-| `src/raip/api/models_routes.py` | Connected Ollama models + persistent model registry |
-| `src/raip/api/forms_routes.py` | Declarative forms N03–N06 + signed audit PDF |
-| `src/raip/api/lab_routes.py` | MVP2 lab (dataset scan, poisoning, checkpoint eval) |
-| `src/raip/tasks/eval.py` | The evaluation Celery job (graph → MLflow → artifacts → Redis) |
-| `src/raip/tasks/monitor.py` | On-demand drift/canary check |
-| `src/raip/graph/` | LangGraph supervisor (evaluate + aggregate nodes) |
-| `src/raip/benchmarks/` | `benchmarks_catalog.yaml`, `catalog.py`, runners (lm_eval, garak, hf_dynamic, …) |
-| `src/raip/governance/` | signing, **trust_factor**, **kill_switch**, **pdf_export**, datasheet, **energy** (CodeCarbon → N03) |
-| `src/raip/store/` | Redis stores: `redis_run` (carries `energy`), `redis_models`, `redis_hitl` (multi-criteria rubric), `redis_forms` |
+| `src/vera/api/main.py` | FastAPI app + run create/get/delete, benchmarks list |
+| `src/vera/api/auth.py` | Auth modes (`guided`/`enterprise`), Keycloak JWT, role sets |
+| `src/vera/api/dashboard_routes.py` | Read API: `/runs`, `/summary`, `/inspector`, `/series`, `/health/stack`, HITL, drift, kill-switch |
+| `src/vera/api/models_routes.py` | Connected Ollama models + persistent model registry |
+| `src/vera/api/forms_routes.py` | Declarative forms N03–N06 + signed audit PDF |
+| `src/vera/api/lab_routes.py` | MVP2 lab (dataset scan, poisoning, checkpoint eval) |
+| `src/vera/tasks/eval.py` | The evaluation Celery job (graph → MLflow → artifacts → Redis) |
+| `src/vera/tasks/monitor.py` | On-demand drift/canary check |
+| `src/vera/graph/` | LangGraph supervisor (evaluate + aggregate nodes) |
+| `src/vera/benchmarks/` | `benchmarks_catalog.yaml`, `catalog.py`, runners (lm_eval, garak, hf_dynamic, …) |
+| `src/vera/governance/` | signing, **trust_factor**, **kill_switch**, **pdf_export**, datasheet, **energy** (CodeCarbon → N03) |
+| `src/vera/store/` | Redis stores: `redis_run` (carries `energy`), `redis_models`, `redis_hitl` (multi-criteria rubric), `redis_forms` |
 | `scripts/` | `setup_native.sh`, `gen_banking_corpus.py`, `run_paper_eval.py` (multi-model), `bench_gaas.py`; `manuscript/scripts/gen_paper_multi.py` |
-| `src/raip/artifacts/` | `s3io` (MinIO) + `local_fs` (lite fallback), backend selector |
-| `src/raip/dashboard/` | **Python** triage + score bands (NOT the UI) |
+| `src/vera/artifacts/` | `s3io` (MinIO) + `local_fs` (lite fallback), backend selector |
+| `src/vera/dashboard/` | **Python** triage + score bands (NOT the UI) |
 | `dashboard/` | **Next.js** UI (App Router, TanStack Query, Tailwind, Recharts, Playwright) |
 | `docs/` | French specs; `ROADMAP.md` is the hub |
 | `tests/` | `unit/` (+ Redis), `integration/`, `e2e/`, `lab/` |
 
-> **Name-collision gotcha:** `src/raip/dashboard/` (Python: triage/score logic) is different from
+> **Name-collision gotcha:** `src/vera/dashboard/` (Python: triage/score logic) is different from
 > the top-level `dashboard/` (the Next.js front-end).
 
 Dashboard routes: `/home`, `/launch`, `/runs-overview` (guided console), `/dashboards/{compliance,cyber,ds}`
@@ -112,7 +112,7 @@ MLflow/MinIO/Keycloak are off (the stack-health strip shows them amber, not red)
 
 ```bash
 make stack-full                            # docker compose up --build (Keycloak, MLflow, MinIO, Timescale)
-# RAIP_AUTH_MODE=enterprise enforces Keycloak RBAC (8 personas, password raip-dev)
+# VERA_AUTH_MODE=enterprise enforces Keycloak RBAC (8 personas, password vera-dev)
 ```
 
 **Governance-as-a-Service (MVP4 gaas profile):**
@@ -124,7 +124,7 @@ make stack-gaas                            # full stack + inline proxy (:8100), 
 
 The gaas runtime governs live inference (proxy → event bus → 4 agents → streaming Trust Factor →
 OPA → kill-switch → signed audit/SIEM → canary) and degrades gracefully (bus→Redis Streams,
-OpenSearch→signed JSONL, OPA→in-process rule). Code in `src/raip/governance/` + `services/`; admin
+OpenSearch→signed JSONL, OPA→in-process rule). Code in `src/vera/governance/` + `services/`; admin
 API `/admin/v1/*`; UI at `/governance`. Full guide: `docs/MVP4_GAAS_RUNTIME.md`.
 
 Native (no Docker): `make quickstart-native` prints the three commands (API, worker, `npm run dev`).
@@ -136,14 +136,14 @@ To run the **real** benchmark engines (not dynamic-probe fallbacks) and reproduc
 
 ```bash
 bash scripts/setup_native.sh              # installs .[benchmarks,lab,pdf] + checks Ollama/panel models
-RAIP_REQUIRE_NATIVE=1 python scripts/run_paper_eval.py   # multi-model panel, sequential
+VERA_REQUIRE_NATIVE=1 python scripts/run_paper_eval.py   # multi-model panel, sequential
 python scripts/bench_gaas.py              # proxy overhead + agent detection + degradation
 python manuscript/scripts/gen_paper_multi.py             # tables + figures from the results JSON
 ```
 
-Key flags (also in `.env.example`): **`RAIP_REQUIRE_NATIVE=1`** makes a run *fail* if a
-native-harness benchmark silently falls back (allow exceptions via `RAIP_NATIVE_ALLOW=garak`);
-`RAIP_HF_TRUST_REMOTE_CODE=true` for BBQ/BOLD/StereoSet; `RAIP_EVAL_MODELS` / `RAIP_EVAL_N` for the
+Key flags (also in `.env.example`): **`VERA_REQUIRE_NATIVE=1`** makes a run *fail* if a
+native-harness benchmark silently falls back (allow exceptions via `VERA_NATIVE_ALLOW=garak`);
+`VERA_HF_TRUST_REMOTE_CODE=true` for BBQ/BOLD/StereoSet; `VERA_EVAL_MODELS` / `VERA_EVAL_N` for the
 panel. **Serving caveat:** Ollama has no token log-probs, so R06/R10 use dynamic probes and native
 lm-eval is reserved for a vLLM backend (recorded in provenance) — see `lm_eval_runner.py`.
 
@@ -158,7 +158,7 @@ Reproduction guides: `docs/EVALUATION_GUIDE.md`, `docs/NON_MEASURABLE_GUIDE.md`,
 
 ## The no-login guided dashboard
 
-The headline UX for non-technical users. `RAIP_AUTH_MODE=guided` (the default) means
+The headline UX for non-technical users. `VERA_AUTH_MODE=guided` (the default) means
 `auth_disabled()` returns true and a single persona holds every role, so all lenses render.
 Frontend mirrors this via `isGuided()` (default `NEXT_PUBLIC_AUTH_MODE=guided`).
 
@@ -174,14 +174,14 @@ Frontend mirrors this via `isGuided()` (default `NEXT_PUBLIC_AUTH_MODE=guided`).
 ## Common tasks
 
 - **Run an eval (UI):** `/launch` wizard. **(CLI/API):** `POST /api/v1/runs` with a `RunCreateRequest`
-  (`src/raip/schemas/run_payload.py`); empty `complai_requirements` ⇒ full measurable set.
-- **Add a benchmark:** add to `src/raip/benchmarks/benchmarks_catalog.yaml` + a runner under
-  `src/raip/benchmarks/runners/`; map it to one of R01–R12 with an explicit score formula (or an
+  (`src/vera/schemas/run_payload.py`); empty `complai_requirements` ⇒ full measurable set.
+- **Add a benchmark:** add to `src/vera/benchmarks/benchmarks_catalog.yaml` + a runner under
+  `src/vera/benchmarks/runners/`; map it to one of R01–R12 with an explicit score formula (or an
   N0x HITL rubric). Keep output expressible in the `benchmark_run.yaml` schema. Update
   `docs/MVP2_STATUS.md`.
 - **Add a dashboard view:** route under `dashboard/src/app/`, data via `dashboard/src/lib/api.ts`,
   backend route in `dashboard_routes.py`. Honor RBAC via `AuthGuard` unless it is a guided surface.
-- **Add an N0x rubric / form:** `src/raip/store/redis_hitl.py` or `schemas/declarative_forms.py`;
+- **Add an N0x rubric / form:** `src/vera/store/redis_hitl.py` or `schemas/declarative_forms.py`;
   surface in `RunSummaryView`'s MVP3 panel.
 
 ## Conventions & constraints (guardrails)
@@ -193,7 +193,7 @@ Full doctrine in `docs/CLAUDE.md §4`. The short version:
   Qwen). Single exception: proprietary LLMs as *evaluation targets* via LiteLLM — every default and
   fallback must work self-hosted. Prefer OSS lineage (Swarm > k8s, OpenBao > Vault, MinIO > S3, …).
 - **No `pilote_v1` data in compliance views or audit exports** (hard rule). The pilot marker is
-  defined in exactly one place: `src/raip/dashboard/triage.py` (`PILOTE_MARKERS`,
+  defined in exactly one place: `src/vera/dashboard/triage.py` (`PILOTE_MARKERS`,
   `is_pilote_catalog`). Don't reintroduce the literal elsewhere — `tests/unit/test_no_pilote_v1.py`
   enforces this.
 - **18-axis COMPL-AI taxonomy only** — no ad-hoc dimensions. Canonical mapping in `ROADMAP.md §3`.
@@ -205,12 +205,12 @@ Full doctrine in `docs/CLAUDE.md §4`. The short version:
 
 ```bash
 make test-unit                       # pytest tests/unit/ (needs Redis on :6379)
-pytest tests/integration -m integration   # RAIP_INTEGRATION=1 (Redis + MinIO)
+pytest tests/integration -m integration   # VERA_INTEGRATION=1 (Redis + MinIO)
 cd dashboard && npx playwright test  # RBAC matrix (25) + guided-mode (5)
 ruff check src tests                 # lint
 ```
 
-Unit tests use a **real Redis** (no mocking). Coverage gate is 80% on `raip`. CI: `.github/workflows/raip-ci.yml` (unit + integration + dashboard/Playwright).
+Unit tests use a **real Redis** (no mocking). Coverage gate is 80% on `vera`. CI: `.github/workflows/vera-ci.yml` (unit + integration + dashboard/Playwright).
 
 ## MVP roadmap status
 
@@ -222,7 +222,7 @@ implemented-vs-deferred matrix in **`docs/MVP3_MVP4_IMPLEMENTATION.md`**.
 
 ## Gotchas
 
-- `src/raip/dashboard/` (Python) ≠ `dashboard/` (Next.js).
+- `src/vera/dashboard/` (Python) ≠ `dashboard/` (Next.js).
 - MLflow UI is on host `:5001` but the container listens on `5000`.
 - Containers reach Ollama via `host.docker.internal:11434` (`OLLAMA_API_BASE`); native runs use `127.0.0.1`.
 - R09 watermark is reported `NA` without a detector and excluded from aggregation.

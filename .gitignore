@@ -12,6 +12,6 @@ mlruns/
 .coverage
 htmlcov/
 # Lite-mode local artifact store
-.raip-artifacts/
+.vera-artifacts/
 # SciOrchestrator skill is a locally-vendored tool with its own git history
 /skills/

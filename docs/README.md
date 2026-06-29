@@ -1,6 +1,6 @@
 ---
 doc:
-  title: "Index de la documentation RAIP"
+  title: "Index de la documentation VERA"
   slug: docs-index
   language: fr
   summary: |
@@ -31,11 +31,11 @@ doc:
     - ./CLAUDE.md
   artifacts:
     - ./2410.07959v2.pdf
-  tags: [raip, documentation, index, eu-ai-act]
+  tags: [vera, documentation, index, eu-ai-act]
 last_reviewed: "2026-06-15"
 ---
 
-# Documentation RAIP
+# Documentation VERA
 
 Tous les fichiers de ce dossier commencent par un **bloc YAML (front matter)** décrivant titre, résumé, type, navigation et tags pour faciliter l’orientation des outils et modèles.
 

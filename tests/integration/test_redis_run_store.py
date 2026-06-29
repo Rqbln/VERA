@@ -6,7 +6,7 @@ import uuid
 
 import pytest
 
-from raip.store.redis_run import RedisRunStore
+from vera.store.redis_run import RedisRunStore
 
 MVP2_MODEL = "ollama/llama3.1:8b-instruct-q8_0"
 

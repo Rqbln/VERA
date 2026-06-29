@@ -17,8 +17,8 @@ if str(SRC) not in sys.path:
 
 class TestExternalOllamaOptional(unittest.TestCase):
     def test_ollama_tags_endpoint(self) -> None:
-        if os.environ.get("RAIP_RUN_OLLAMA_SMOKE") != "1":
-            self.skipTest("Set RAIP_RUN_OLLAMA_SMOKE=1 to probe local Ollama")
+        if os.environ.get("VERA_RUN_OLLAMA_SMOKE") != "1":
+            self.skipTest("Set VERA_RUN_OLLAMA_SMOKE=1 to probe local Ollama")
         base = os.environ.get("OLLAMA_API_BASE", "http://127.0.0.1:11434").rstrip("/")
         url = f"{base}/api/tags"
         try:

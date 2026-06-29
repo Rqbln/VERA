@@ -1,6 +1,6 @@
 import pytest
 
-from raip.training.config import TrainingExperimentConfig
+from vera.training.config import TrainingExperimentConfig
 
 
 @pytest.mark.lab

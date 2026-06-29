@@ -6,10 +6,10 @@ corpus), collect per-requirement scores + bootstrap CIs, the native-vs-fallback 
 energy, and the Trust Factor. Writes a consolidated JSON the manuscript scripts consume.
 
 Runs the evaluation in-process (no Celery/API needed). Configure via env:
-  RAIP_EVAL_MODELS  comma list (default: the three models commonly available locally)
-  RAIP_EVAL_N       samples per benchmark (default 20; raise for the final run)
-  RAIP_CORPUS       corpus jsonl (default data/corpus/banking_synth.jsonl)
-  RAIP_JUDGE_MODEL / RAIP_REQUIRE_NATIVE / RAIP_WATERMARK_MODE / RAIP_HF_TRUST_REMOTE_CODE
+  VERA_EVAL_MODELS  comma list (default: the three models commonly available locally)
+  VERA_EVAL_N       samples per benchmark (default 20; raise for the final run)
+  VERA_CORPUS       corpus jsonl (default data/corpus/banking_synth.jsonl)
+  VERA_JUDGE_MODEL / VERA_REQUIRE_NATIVE / VERA_WATERMARK_MODE / VERA_HF_TRUST_REMOTE_CODE
 """
 
 from __future__ import annotations
@@ -19,8 +19,8 @@ import os
 import uuid
 from pathlib import Path
 
-os.environ.setdefault("RAIP_ARTIFACT_BACKEND", "local")
-os.environ.setdefault("RAIP_MLFLOW_DISABLED", "1")
+os.environ.setdefault("VERA_ARTIFACT_BACKEND", "local")
+os.environ.setdefault("VERA_MLFLOW_DISABLED", "1")
 
 ALL_REQS = [f"R{i:02d}" for i in range(1, 13)]
 DEFAULT_MODELS = "ollama/llama3.1:8b-instruct-q8_0,ollama/ministral-3:3b,ollama/phi3:mini"
@@ -42,12 +42,12 @@ def load_corpus(path: Path) -> tuple[list[str], dict[str, int], list[str]]:
 
 
 def main() -> None:
-    from raip.store.redis_run import RedisRunStore
-    from raip.tasks.eval import run_benchmark_job
+    from vera.store.redis_run import RedisRunStore
+    from vera.tasks.eval import run_benchmark_job
 
-    models = [m.strip() for m in os.environ.get("RAIP_EVAL_MODELS", DEFAULT_MODELS).split(",") if m.strip()]
-    n = int(os.environ.get("RAIP_EVAL_N", "20"))
-    corpus, group_counts, protected = load_corpus(Path(os.environ.get("RAIP_CORPUS", "data/corpus/banking_synth.jsonl")))
+    models = [m.strip() for m in os.environ.get("VERA_EVAL_MODELS", DEFAULT_MODELS).split(",") if m.strip()]
+    n = int(os.environ.get("VERA_EVAL_N", "20"))
+    corpus, group_counts, protected = load_corpus(Path(os.environ.get("VERA_CORPUS", "data/corpus/banking_synth.jsonl")))
     reqs = ALL_REQS if corpus else [r for r in ALL_REQS if r not in ("R03", "R04", "R05")]
     store = RedisRunStore()
     results: dict[str, dict] = {"models": {}, "config": {"n": n, "reqs": reqs, "corpus_docs": len(corpus)}}

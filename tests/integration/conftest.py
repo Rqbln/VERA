@@ -9,12 +9,12 @@ import urllib.request
 
 import pytest
 
-from raip.celery_app import celery_app
+from vera.celery_app import celery_app
 
 
 def _require_integration_flag() -> None:
-    if os.environ.get("RAIP_INTEGRATION") != "1":
-        pytest.skip("Set RAIP_INTEGRATION=1 to run integration tests.")
+    if os.environ.get("VERA_INTEGRATION") != "1":
+        pytest.skip("Set VERA_INTEGRATION=1 to run integration tests.")
 
 
 def _require_redis() -> None:
@@ -47,7 +47,7 @@ def _require_minio() -> None:
     import boto3
     from botocore.exceptions import ClientError
 
-    from raip.config import get_settings
+    from vera.config import get_settings
 
     s = get_settings()
     _wait_minio_http(s.minio_endpoint_url)

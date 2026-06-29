@@ -1,5 +1,5 @@
 // The 12 measurable COMPL-AI requirements, grouped by EU AI Act principle.
-// Mirrors COMPLAI_META in src/raip/dashboard/triage.py — keep in sync.
+// Mirrors COMPLAI_META in src/vera/dashboard/triage.py — keep in sync.
 
 export interface RequirementMeta {
   id: string;

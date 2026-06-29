@@ -12,4 +12,4 @@ COPY src ./src
 RUN pip install --no-cache-dir .
 
 # Default command overridden by docker-compose (API or Celery worker).
-CMD ["uvicorn", "raip.api.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "vera.api.main:app", "--host", "0.0.0.0", "--port", "8000"]

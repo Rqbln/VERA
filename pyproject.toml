@@ -3,9 +3,9 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "raip"
+name = "vera"
 version = "0.2.0"
-description = "RAIP MVP2 — evaluation core + injection lab (FastAPI, Celery, LangGraph, LiteLLM/Ollama)"
+description = "VERA MVP2 — evaluation core + injection lab (FastAPI, Celery, LangGraph, LiteLLM/Ollama)"
 readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "Apache-2.0" }
@@ -67,7 +67,7 @@ dev = [
 
 [tool.pytest.ini_options]
 markers = [
-    "integration: needs live Redis and MinIO (RAIP_INTEGRATION=1)",
+    "integration: needs live Redis and MinIO (VERA_INTEGRATION=1)",
     "e2e: end-to-end tests (needs Redis, MinIO, MLflow, Ollama)",
     "ollama: requires a live Ollama/vLLM endpoint",
     "airgap: optional air-gapped or sovereignty checks",
@@ -78,7 +78,7 @@ markers = [
 testpaths = ["tests/unit", "tests/integration", "tests/e2e", "tests/lab", "tests"]
 
 [tool.coverage.run]
-source = ["raip"]
+source = ["vera"]
 branch = true
 omit = [
     "*/templates/*",
@@ -92,14 +92,14 @@ exclude_lines = [
 ]
 
 [project.scripts]
-raip-eval = "raip.cli.main:main"
-raip-lab = "raip.cli.lab_main:main"
+vera-eval = "vera.cli.main:main"
+vera-lab = "vera.cli.lab_main:main"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/raip"]
+packages = ["src/vera"]
 
 [tool.hatch.build.targets.sdist]
-include = ["src/raip", "examples", "pyproject.toml", "README.md"]
+include = ["src/vera", "examples", "pyproject.toml", "README.md"]
 
 [tool.ruff]
 line-length = 100
@@ -111,6 +111,6 @@ select = ["E", "F", "I", "UP"]
 [tool.ruff.lint.per-file-ignores]
 "tests/**" = ["E402"]
 # One-off reproduction/benchmark scripts: long literals (model-id lists, f-strings, print rows) are
-# fine, and they set os.environ defaults before importing raip (config picks them up).
+# fine, and they set os.environ defaults before importing vera (config picks them up).
 "scripts/**" = ["E402", "E501"]
 "manuscript/scripts/**" = ["E402", "E501", "UP031"]

@@ -11,8 +11,8 @@ SRC = PROJECT_ROOT / "src"
 if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
-from raip.schemas.benchmark_run import build_benchmark_run_dict
-from raip.schemas.complai import ComplaiRequirementScore
+from vera.schemas.benchmark_run import build_benchmark_run_dict
+from vera.schemas.complai import ComplaiRequirementScore
 
 
 class TestBenchmarkRunBuilder(unittest.TestCase):

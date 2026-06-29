@@ -13,16 +13,16 @@ if str(SRC) not in sys.path:
 
 
 class TestAcceptance(unittest.TestCase):
-    def test_raip_version_exported(self) -> None:
-        import raip
+    def test_vera_version_exported(self) -> None:
+        import vera
 
-        self.assertTrue(hasattr(raip, "__version__"))
-        self.assertIsInstance(raip.__version__, str)
+        self.assertTrue(hasattr(vera, "__version__"))
+        self.assertIsInstance(vera.__version__, str)
 
     def test_key_entrypoints_import(self) -> None:
-        from raip.api.main import app  # noqa: F401
-        from raip.celery_app import celery_app  # noqa: F401
-        from raip.cli.main import cli  # noqa: F401
+        from vera.api.main import app  # noqa: F401
+        from vera.celery_app import celery_app  # noqa: F401
+        from vera.cli.main import cli  # noqa: F401
 
         self.assertTrue(callable(cli))
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# RAIP — set up the NATIVE benchmark stack so the evaluation uses real harnesses (no heuristic
+# VERA — set up the NATIVE benchmark stack so the evaluation uses real harnesses (no heuristic
 # fallbacks). Run from the repo root:  bash scripts/setup_native.sh
 #
 # Installs the [benchmarks,lab,pdf] extras, checks system libs + Ollama models, and prints the
@@ -53,10 +53,10 @@ fi
 echo "== 5. Environment for the run =="
 cat <<EOF
   export OLLAMA_API_BASE=$OLLAMA_BASE
-  export RAIP_WATERMARK_MODE=statistical
-  export RAIP_HF_TRUST_REMOTE_CODE=true
-  export RAIP_JUDGE_MODEL=ollama/$JUDGE
-  export RAIP_REQUIRE_NATIVE=1          # fail instead of silently falling back (garak/Mac excepted)
-  export RAIP_MLFLOW_DISABLED=1 RAIP_ARTIFACT_BACKEND=local
+  export VERA_WATERMARK_MODE=statistical
+  export VERA_HF_TRUST_REMOTE_CODE=true
+  export VERA_JUDGE_MODEL=ollama/$JUDGE
+  export VERA_REQUIRE_NATIVE=1          # fail instead of silently falling back (garak/Mac excepted)
+  export VERA_MLFLOW_DISABLED=1 VERA_ARTIFACT_BACKEND=local
 EOF
 green "Setup check complete. Next: python scripts/gen_banking_corpus.py && python scripts/run_paper_eval.py"

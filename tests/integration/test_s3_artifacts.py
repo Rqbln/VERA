@@ -7,15 +7,15 @@ import uuid
 import boto3
 import pytest
 
-from raip.artifacts.s3io import upload_bytes
-from raip.config import get_settings
+from vera.artifacts.s3io import upload_bytes
+from vera.config import get_settings
 
 
 @pytest.mark.integration
 def test_upload_bytes_roundtrip(integration_stack: None) -> None:  # noqa: ARG001
     s = get_settings()
     key = f"integration/{uuid.uuid4().hex}/probe.txt"
-    body = b"raip-mvp2-integration"
+    body = b"vera-mvp2-integration"
     upload_bytes(key, body, "text/plain", s)
     c = boto3.client(
         "s3",

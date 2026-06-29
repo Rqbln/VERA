@@ -8,8 +8,8 @@ from __future__ import annotations
 
 import threading
 
-from raip.governance.agent_worker import run_agents
-from raip.governance.trust_stream import run_trust_stream
+from vera.governance.agent_worker import run_agents
+from vera.governance.trust_stream import run_trust_stream
 
 
 def main() -> None:  # pragma: no cover - process entrypoint

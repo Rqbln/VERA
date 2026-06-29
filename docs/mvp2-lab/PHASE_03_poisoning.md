@@ -4,7 +4,7 @@ doc:
   slug: mvp2-lab-phase-3-poisoning
   language: fr
   summary: |
-    Registry triggers Postgres, 5 injecteurs (lexical/format/persona/langue/semantic), CLI raip-lab, enclave compose.
+    Registry triggers Postgres, 5 injecteurs (lexical/format/persona/langue/semantic), CLI vera-lab, enclave compose.
   type: mvp-phase
   audience: [developer, ai-agent]
   navigation:
@@ -26,17 +26,17 @@ Injection contrôlée ; datasets clean/dirty versionnés DVC.
 
 | Type | Module / function |
 |------|-------------------|
-| lexical | `raip/lab/injectors/registry.py` (`_lexical`) |
-| format | `raip/lab/injectors/registry.py` (`_format`) |
-| persona | `raip/lab/injectors/registry.py` (`_persona`) |
-| language | `raip/lab/injectors/registry.py` (`_language`) |
-| semantic | `raip/lab/injectors/registry.py` (`_semantic`) |
+| lexical | `vera/lab/injectors/registry.py` (`_lexical`) |
+| format | `vera/lab/injectors/registry.py` (`_format`) |
+| persona | `vera/lab/injectors/registry.py` (`_persona`) |
+| language | `vera/lab/injectors/registry.py` (`_language`) |
+| semantic | `vera/lab/injectors/registry.py` (`_semantic`) |
 
 ## Tâches
 
 - [x] CRUD triggers API (`GET /api/v1/lab/triggers`)
-- [x] `raip/lab/poison.py`
-- [x] CLI `raip-lab`
+- [x] `vera/lab/poison.py`
+- [x] CLI `vera-lab`
 - [x] `infra/compose/poisoning-lab.yml` (réseau internal)
 - [x] 5 triggers seed (`seed_default_triggers`)
 

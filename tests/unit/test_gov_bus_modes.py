@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import pytest
 
-from raip.governance.bus import TOPIC_TRAFFIC, RedisStreamBus, get_bus
-from raip.governance.modes import VALID_MODES, all_modes, get_mode, set_mode
+from vera.governance.bus import TOPIC_TRAFFIC, RedisStreamBus, get_bus
+from vera.governance.modes import VALID_MODES, all_modes, get_mode, set_mode
 
 
 def test_bus_defaults_to_redis_streams(monkeypatch):

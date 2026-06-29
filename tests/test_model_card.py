@@ -11,7 +11,7 @@ SRC = PROJECT_ROOT / "src"
 if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
-from raip.artifacts.model_card import render_model_card
+from vera.artifacts.model_card import render_model_card
 
 
 class TestModelCard(unittest.TestCase):
@@ -59,7 +59,7 @@ class TestModelCard(unittest.TestCase):
                         "id": "R03",
                         "score": 0.9,
                         "engine": "dataset_pipeline",
-                        "datasheet_uri": "minio://raip/datasets/x/datasheet.md",
+                        "datasheet_uri": "minio://vera/datasets/x/datasheet.md",
                     }
                 ],
                 "harness_provenance": [
@@ -70,7 +70,7 @@ class TestModelCard(unittest.TestCase):
                         "fallback": "no",
                     }
                 ],
-                "n04": {"status": "available", "uri": "minio://raip/datasets/x/datasheet.md"},
+                "n04": {"status": "available", "uri": "minio://vera/datasets/x/datasheet.md"},
                 "signature": {"key_id": "k", "digest": "d", "algo": "sha256"},
             }
         )

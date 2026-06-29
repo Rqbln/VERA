@@ -2,11 +2,11 @@
 services:
   lab-worker:
     build: ../..
-    command: celery -A raip.celery_app worker --loglevel=INFO -Q lab
+    command: celery -A vera.celery_app worker --loglevel=INFO -Q lab
     networks:
       - poisoning_internal
     environment:
-      RAIP_LAB_OFFLINE: "0"
+      VERA_LAB_OFFLINE: "0"
     profiles:
       - poisoning
 

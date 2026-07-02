@@ -73,13 +73,20 @@ def main() -> None:
             k: {"score": v.get("score"), "ci_lo": v.get("score_ci_lower"), "ci_hi": v.get("score_ci_upper")}
             for k, v in (rec.complai_scores or {}).items()
         }
-        # Per-benchmark mean score per requirement (drives the weighting-sensitivity study; with
-        # native harnesses these diverge within a requirement, so the sensitivity is non-degenerate).
-        per_bench: dict[str, dict[str, float]] = {}
+        # Per-benchmark mean score per requirement, exported so the aggregate can be traced back
+        # to its components. Shared benchmarks (complai_requirements lists several) are attributed
+        # to every requirement they serve.
+        per_acc: dict[str, dict[str, list[float]]] = {}
         for r in raw:
-            req, bid, sc = r.get("requirement"), r.get("benchmark_id"), r.get("score")
-            if req and bid and isinstance(sc, (int, float)):
-                per_bench.setdefault(req, {})[bid] = sc
+            bid, sc = r.get("benchmark_id"), r.get("score")
+            if not bid or not isinstance(sc, (int, float)):
+                continue
+            row_reqs = r.get("complai_requirements") or ([r["requirement"]] if r.get("requirement") else [])
+            for req in row_reqs:
+                per_acc.setdefault(req, {}).setdefault(bid, []).append(sc)
+        per_bench: dict[str, dict[str, float]] = {
+            req: {bid: sum(v) / len(v) for bid, v in bids.items()} for req, bids in per_acc.items()
+        }
         results["models"][model] = {
             "status": out.get("status"),
             "scores": scores,

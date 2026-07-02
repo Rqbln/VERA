@@ -65,35 +65,35 @@
         }
       },
       "per_benchmark": {
+        "R01": {
+          "mmlu_robust": 1.0,
+          "r01_robustness": 1.0,
+          "boolq_contrast": 0.7
+        },
+        "R02": {
+          "advbench": 0.5,
+          "tensortrust": 0.5,
+          "llm_rules": 1.0,
+          "decodingtrust_adv": 0.0
+        },
+        "R03": {
+          "dataset_quality_scan": 0.841934
+        },
+        "R04": {
+          "dataset_copyright_scan": 0.937931
+        },
+        "R05": {
+          "dataset_privacy_scan": 0.728261
+        },
         "R06": {
-          "mmlu": 1.0,
+          "mmlu": 0.5,
           "gsm8k": 0.0,
           "humaneval": 1.0,
           "truthfulqa": 1.0,
           "bbh": 1.0
         },
-        "R01": {
-          "mmlu_robust": 1.0,
-          "r01_robustness": 1.0,
-          "boolq_contrast": 1.0
-        },
-        "R02": {
-          "advbench": 1.0,
-          "tensortrust": 1.0,
-          "llm_rules": 1.0,
-          "decodingtrust_adv": 0.0
-        },
-        "R03": {
-          "dataset_quality_scan": 0.8419342552705948
-        },
-        "R04": {
-          "dataset_copyright_scan": 0.9379310344827586
-        },
-        "R05": {
-          "dataset_privacy_scan": 0.7282608695652174
-        },
         "R07": {
-          "ece_mmlu": 0.9000000000000001
+          "ece_mmlu": 0.9
         },
         "R08": {
           "self_disclosure_probes": 1.0
@@ -110,8 +110,10 @@
           "decodingtrust_adult": 1.0
         },
         "R12": {
-          "realtoxicityprompts": 0.4849830735474825,
-          "advbench_instruction": 0.9996990157815162
+          "advbench": 0.5,
+          "truthfulqa": 1.0,
+          "realtoxicityprompts": 0.484983,
+          "advbench_instruction": 0.999699
         }
       },
       "fallback_count": 100,
@@ -211,13 +213,6 @@
         }
       },
       "per_benchmark": {
-        "R06": {
-          "mmlu": 1.0,
-          "gsm8k": 0.0,
-          "humaneval": 1.0,
-          "truthfulqa": 1.0,
-          "bbh": 1.0
-        },
         "R01": {
           "mmlu_robust": 1.0,
           "r01_robustness": 1.0,
@@ -230,16 +225,23 @@
           "decodingtrust_adv": 0.0
         },
         "R03": {
-          "dataset_quality_scan": 0.8419342552705948
+          "dataset_quality_scan": 0.841934
         },
         "R04": {
-          "dataset_copyright_scan": 0.9379310344827586
+          "dataset_copyright_scan": 0.937931
         },
         "R05": {
-          "dataset_privacy_scan": 0.7282608695652174
+          "dataset_privacy_scan": 0.728261
+        },
+        "R06": {
+          "mmlu": 0.5,
+          "gsm8k": 0.0,
+          "humaneval": 1.0,
+          "truthfulqa": 1.0,
+          "bbh": 1.0
         },
         "R07": {
-          "ece_mmlu": 0.9000000000000001
+          "ece_mmlu": 0.9
         },
         "R08": {
           "self_disclosure_probes": 1.0
@@ -256,8 +258,10 @@
           "decodingtrust_adult": 1.0
         },
         "R12": {
-          "realtoxicityprompts": 0.3831244260072708,
-          "advbench_instruction": 0.9997022768948227
+          "advbench": 0.0,
+          "truthfulqa": 1.0,
+          "realtoxicityprompts": 0.383124,
+          "advbench_instruction": 0.999702
         }
       },
       "fallback_count": 100,
@@ -357,15 +361,8 @@
         }
       },
       "per_benchmark": {
-        "R06": {
-          "mmlu": 1.0,
-          "gsm8k": 1.0,
-          "humaneval": 1.0,
-          "truthfulqa": 1.0,
-          "bbh": 1.0
-        },
         "R01": {
-          "mmlu_robust": 1.0,
+          "mmlu_robust": 0.7,
           "r01_robustness": 0.7,
           "boolq_contrast": 1.0
         },
@@ -376,16 +373,23 @@
           "decodingtrust_adv": 0.0
         },
         "R03": {
-          "dataset_quality_scan": 0.8419342552705948
+          "dataset_quality_scan": 0.841934
         },
         "R04": {
-          "dataset_copyright_scan": 0.9379310344827586
+          "dataset_copyright_scan": 0.937931
         },
         "R05": {
-          "dataset_privacy_scan": 0.7282608695652174
+          "dataset_privacy_scan": 0.728261
+        },
+        "R06": {
+          "mmlu": 1.0,
+          "gsm8k": 1.0,
+          "humaneval": 1.0,
+          "truthfulqa": 1.0,
+          "bbh": 1.0
         },
         "R07": {
-          "ece_mmlu": 0.9000000000000001
+          "ece_mmlu": 0.9
         },
         "R08": {
           "self_disclosure_probes": 1.0
@@ -402,8 +406,10 @@
           "decodingtrust_adult": 0.0
         },
         "R12": {
-          "realtoxicityprompts": 0.9997348421893548,
-          "advbench_instruction": 0.9997253430192359
+          "advbench": 0.0,
+          "truthfulqa": 1.0,
+          "realtoxicityprompts": 0.999735,
+          "advbench_instruction": 0.999725
         }
       },
       "fallback_count": 100,

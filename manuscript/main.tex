@@ -171,40 +171,12 @@ It hides why a model fails, and it creates regulatory cliffs where a small chang
 Responsible AI, moreover, does not mean the same thing to every actor.
 VERA therefore replaces the single number with a per-criterion view and role-segregated dashboards (\Cref{sec:dashboard}) for three profiles: a legal or compliance officer, a responsible-AI officer, and a data or ML engineer.
 
-\begin{figure}[t]
+\begin{figure*}[t]
   \centering
-  \resizebox{\columnwidth}{!}{%
-  \begin{tikzpicture}[
-    font=\footnotesize, >={Stealth[round]},
-    vstep/.style={draw, rounded corners=2pt, align=center, fill=brandgreen!10, draw=brandgreen!60, inner sep=4pt, text width=16mm, minimum height=11mm},
-    persona/.style={draw, rounded corners=2pt, align=center, fill=blue!7, inner sep=3pt, text width=20mm, minimum height=7mm},
-    arr/.style={->, thick, black!55},
-    lbl/.style={font=\scriptsize\itshape, text=black!55},
-  ]
-    \node[persona] (p1) at (0,1.0) {Legal \& compliance};
-    \node[persona] (p2) at (0,0.0) {Responsible-AI officer};
-    \node[persona] (p3) at (0,-1.0) {Data \& ML engineer};
-    \node[vstep] (s1) at (2.7,0) {Pick a connected model};
-    \node[vstep] (s2) at (4.9,0) {Choose requirements};
-    \node[vstep] (s3) at (7.1,0) {Run public benchmarks};
-    \node[vstep] (s4) at (9.3,0) {Read the dashboard};
-    \node[vstep] (s5) at (11.5,0) {Explain each score};
-    \node[vstep] (s6) at (13.7,0) {Export artifacts};
-    \draw[arr] (p1.east) -- (s1.west);
-    \draw[arr] (p2.east) -- (s1.west);
-    \draw[arr] (p3.east) -- (s1.west);
-    \draw[arr] (s1) -- (s2);
-    \draw[arr] (s2) -- (s3);
-    \draw[arr] (s3) -- (s4);
-    \draw[arr] (s4) -- (s5);
-    \draw[arr] (s5) -- (s6);
-    \node[lbl] at (0,1.9) {who reads it};
-    \node[lbl] at (8.2,0.95) {one reproducible, explainable run};
-  \end{tikzpicture}%
-  }
+  \includegraphics[width=\textwidth]{figures/fig1.png}
   \caption{The journey of the framework. Three roles drive VERA: they pick a connected model, choose the responsible-AI requirements to check, and run public benchmarks; VERA then presents a role-based dashboard that explains every score before the artifacts are exported.}
   \label{fig:journey}
-\end{figure}
+\end{figure*}
 Concretely, a target can be a model endpoint, a checkpoint, or a dataset, tagged with a lifecycle stage in a declarative run file.
 The next section details the engine that runs it (\Cref{fig:architecture}).
 
@@ -219,76 +191,7 @@ The run emits its artifacts, the run file, a model card, per-item outputs, and a
 
 \begin{figure*}[t]
   \centering
-  \resizebox{\textwidth}{!}{%
-  \begin{tikzpicture}[
-    font=\footnotesize,
-    >={Stealth[round]},
-    box/.style={draw, rounded corners=2pt, align=center, inner sep=3pt, fill=white, minimum height=7mm},
-    surf/.style={box, fill=blue!6, text width=21mm},
-    orch/.style={box, fill=black!6, text width=22mm},
-    run/.style={box, fill=orange!8, text width=20mm},
-    bigrun/.style={box, fill=orange!8, text width=27mm},
-    inf/.style={box, fill=orange!4, text width=27mm},
-    store/.style={box, fill=green!7, text width=30mm},
-    ui/.style={box, fill=violet!8, text width=24mm},
-    cat/.style={box, draw=red!55, line width=0.6pt, fill=red!5, text width=24mm},
-    lbl/.style={font=\scriptsize\itshape, text=black!55},
-    arr/.style={->, semithick, black!60},
-  ]
-    % invocation surfaces (stacked, far left)
-    \node[surf] (cli) at (0,0.9) {CLI \texttt{vera-eval}};
-    \node[surf] (api) at (0,0) {REST \texttt{POST /runs}};
-    \node[surf] (wiz) at (0,-0.9) {Guided wizard};
-    % horizontal spine (y=0)
-    \node[orch]  (queue)  at (3.1,0)  {Celery $+$ Redis\\\scriptsize run store, kill-switch};
-    \node[orch]  (sup)    at (5.9,0)  {LangGraph supervisor};
-    \node[run]   (eval)   at (8.6,0)  {\texttt{evaluate}};
-    \node[run]   (agg)    at (11.4,0) {\texttt{aggregate}\\\scriptsize $+$ bootstrap CI};
-    \node[store] (scores) at (14.4,0) {COMPL-AI scores\\\scriptsize CR01--CR12 $+$ CI};
-    \node[ui]    (room)   at (17.4,0) {Read API $\rightarrow$\\control room};
-    % evaluate offshoot (down)
-    \node[bigrun] (runners) at (8.6,-1.8) {Runners: \texttt{lm\_eval}, Garak, \texttt{hf\_dynamic}, \texttt{dataset\_scan}, R01/R11/R12};
-    \node[inf]    (lite)    at (8.6,-3.2) {LiteLLM router};
-    \node[inf]    (models)  at (8.6,-4.4) {Self-hosted target $+$ judge\\\scriptsize (Ollama / vLLM)};
-    % catalogue offshoot (up into aggregate)
-    \node[store] (cat) at (11.4,-1.8) {Benchmark catalog\\\scriptsize modular, versioned};
-    % artifacts offshoot (down from scores)
-    \node[store] (artifacts) at (14.4,-1.8) {Artifacts: \texttt{*.yaml} $\cdot$ card $\cdot$ \texttt{*.jsonl} $\cdot$ sig};
-    \node[store] (stores)    at (14.4,-3.2) {MinIO / local FS $\cdot$ MLflow opt.};
-    % edges: spine
-    \draw[arr] (cli.east) -- (queue.west);
-    \draw[arr] (api.east) -- (queue.west);
-    \draw[arr] (wiz.east) -- (queue.west);
-    \draw[arr] (queue) -- (sup);
-    \draw[arr] (sup) -- (eval);
-    \draw[arr] (eval) -- node[midway,above,lbl]{scores} (agg);
-    \draw[arr] (agg) -- (scores);
-    \draw[arr] (scores) -- (room);
-    % evaluate offshoot
-    \draw[arr] (eval) -- (runners);
-    \draw[arr] (runners) -- (lite);
-    \draw[arr] (lite) -- (models);
-    % catalogue + artifacts
-    \draw[arr] (cat) -- node[midway,right,lbl]{catalog} (agg);
-    \draw[arr] (scores) -- (artifacts);
-    \draw[arr] (artifacts) -- (stores);
-    \draw[arr] (artifacts.east) to[bend right=14] (room.south);
-    % layer captions
-    \node[lbl] at (0,1.75) {invocation};
-    \node[lbl] at (5.9,0.95) {orchestration};
-    \node[lbl] at (8.6,0.95) {execution \& data};
-    \node[lbl] at (14.4,0.95) {outputs};
-    \node[lbl] at (17.4,0.95) {presentation};
-    % grouping blocks (background)
-    \begin{scope}[on background layer]
-      \node[draw=black!18, rounded corners=3pt, fill=blue!3, fit=(cli)(api)(wiz), inner sep=6pt] {};
-      \node[draw=black!18, rounded corners=3pt, fill=black!3, fit=(queue)(sup), inner sep=6pt] {};
-      \node[draw=black!18, rounded corners=3pt, fill=orange!3, fit=(eval)(agg)(runners)(lite)(models)(cat), inner sep=6pt] {};
-      \node[draw=black!18, rounded corners=3pt, fill=green!3, fit=(scores)(artifacts)(stores), inner sep=6pt] {};
-      \node[draw=black!18, rounded corners=3pt, fill=violet!3, fit=(room), inner sep=6pt] {};
-    \end{scope}
-  \end{tikzpicture}%
-  }
+  \includegraphics[width=\textwidth]{figures/fig2.png}
   \caption{The runtime pipeline, grouped into blocks. Three invocation surfaces enqueue one declarative job; a two-step controller runs an \texttt{evaluate} step (registry $\rightarrow$ runners $\rightarrow$ model router $\rightarrow$ self-hosted models) and an \texttt{aggregate} step that combines cached item scores using the modular benchmark catalog. Scores and artifacts flow through a read API to the dashboard.}
   \label{fig:architecture}
 \end{figure*}
@@ -344,68 +247,7 @@ The lite profile instantiates none of it; the same code, opted in via a Docker p
 
 \begin{figure*}[t]
   \centering
-  \resizebox{\textwidth}{!}{%
-  \begin{tikzpicture}[
-    font=\footnotesize,
-    >={Stealth[round]},
-    box/.style={draw, rounded corners=2pt, align=center, inner sep=3pt, fill=white, minimum height=7mm},
-    sync/.style={box, fill=blue!7, text width=24mm},
-    hub/.style={box, fill=brandgreen!18, draw=brandgreen!70, line width=0.7pt, text width=22mm},
-    ctrl/.style={box, fill=red!6, draw=red!50, text width=24mm},
-    gov/.style={box, fill=violet!8, text width=22mm},
-    agent/.style={box, fill=orange!9, text width=17mm, minimum height=8mm},
-    store/.style={box, fill=green!8, text width=34mm},
-    ui/.style={box, fill=brandgreen!12, text width=28mm},
-    lbl/.style={font=\scriptsize\itshape, text=black!55},
-    sarr/.style={<->, very thick, blue!55},
-    darr/.style={->, semithick, violet!60, dashed},
-    parr/.style={->, semithick, red!55},
-    rarr/.style={->, semithick, black!45, dashed},
-  ]
-    %  synchronous inference lane (top) 
-    \node[sync] (client) at (0,0) {Client / application};
-    \node[hub]  (proxy)  at (4.0,0) {Inline proxy};
-    \node[sync] (target) at (8.0,0) {Self-hosted target\\\scriptsize Ollama / vLLM (+ judge)};
-    % decision inputs above the proxy
-    \node[ctrl] (opa)  at (3.0,1.7) {OPA policy\\\scriptsize (built-in fallback)};
-    \node[ctrl] (mode) at (5.6,1.7) {kill-switch $+$ mode\\\scriptsize shadow/advisory/enforce};
-    %  asynchronous governance lane (below) 
-    \node[gov, text width=44mm] (bus) at (4.6,-1.9) {Event bus: Redpanda / Kafka\\\scriptsize (Redis Streams fallback)};
-    \node[agent] (a1) at (0.2,-3.6) {cyber\\\scriptsize CR02};
-    \node[agent] (a2) at (2.2,-3.6) {ethics\\\scriptsize CR12};
-    \node[agent] (a3) at (4.2,-3.6) {privacy\\\scriptsize CR05};
-    \node[agent] (a4) at (6.2,-3.6) {drift\\\scriptsize CR01};
-    \node[gov, text width=30mm] (trust) at (2.4,-5.2) {Streaming Trust Factor};
-    \node[gov, text width=22mm] (canary) at (9.2,-1.9) {Canary scheduler};
-    \node[store] (audit) at (10.6,-3.6) {Audit / SIEM\\\scriptsize OpenSearch $+$ signed JSONL};
-    \node[ui] (room) at (13.8,-1.0) {Read API $\rightarrow$\\Control room / Admin};
-    \node[store, text width=30mm] (stores) at (13.8,-3.4) {Redis $\cdot$ MinIO $\cdot$ TimescaleDB};
-    %  synchronous edges 
-    \draw[sarr] (client) -- node[midway,above,lbl]{request / response} (proxy);
-    \draw[sarr] (proxy) -- (target);
-    \draw[parr] (proxy) -- (opa);
-    \draw[parr] (mode) -- (proxy);
-    %  async governance edges 
-    \draw[darr] (proxy) -- node[midway,right,lbl]{copy} (bus);
-    \draw[darr] (bus) -- (a1);
-    \draw[darr] (bus) -- (a2);
-    \draw[darr] (bus) -- (a3);
-    \draw[darr] (bus) -- (a4);
-    \draw[darr] (a1) -- (trust);
-    \draw[darr] (a2) -- (trust);
-    \draw[darr] (a3) -- (trust);
-    \draw[darr] (a4) -- (trust);
-    \draw[darr] (a4.east) to[bend left=10] (audit.west);
-    \draw[darr] (canary) -- (bus);
-    \draw[darr] (trust.east) to[bend right=22] node[midway,below,lbl]{live trust} (opa.south);
-    \draw[rarr] (trust) -- (room);
-    \draw[rarr] (audit) -- (room);
-    \draw[rarr] (audit) -- (stores);
-    %  lane labels + legend 
-    \node[lbl] at (0,1.0) {synchronous inference (lite \& gaas)};
-    \node[lbl, text=violet!60] at (1.6,-1.0) {asynchronous governance (gaas)};
-  \end{tikzpicture}%
-  }
+  \includegraphics[width=\textwidth]{figures/fig3.png}
   \caption{The optional governance-as-a-service runtime (enterprise profile). \emph{Top:} the synchronous path (blue), client, inline proxy, and self-hosted target, gated by an OPA decision and the kill-switch/mode (red). \emph{Bottom:} the asynchronous lane (violet, dashed): the proxy copies traffic to an event bus; four agents (cyber, ethics, privacy, drift) score it into a streaming Trust Factor that feeds the policy back; a canary injects traffic; every event is signed for audit. The lite profile runs none of the lane, and each external service degrades gracefully (bus to Redis Streams, OpenSearch to signed JSONL, OPA to an in-process rule).}
   \label{fig:gaas}
 \end{figure*}

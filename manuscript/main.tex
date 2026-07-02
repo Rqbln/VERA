@@ -173,7 +173,7 @@ VERA therefore replaces the single number with a per-criterion view and role-seg
 
 \begin{figure*}[t]
   \centering
-  \includegraphics[width=\textwidth]{figures/fig1.png}
+  \includegraphics[width=\textwidth]{figures/fig1}
   \caption{The journey of the framework. Three roles drive VERA: they pick a connected model, choose the responsible-AI requirements to check, and run public benchmarks; VERA then presents a role-based dashboard that explains every score before the artifacts are exported.}
   \label{fig:journey}
 \end{figure*}
@@ -191,7 +191,7 @@ The run emits its artifacts, the run file, a model card, per-item outputs, and a
 
 \begin{figure*}[t]
   \centering
-  \includegraphics[width=\textwidth]{figures/fig2.png}
+  \includegraphics[width=\textwidth]{figures/fig2}
   \caption{The runtime pipeline, grouped into blocks. Three invocation surfaces enqueue one declarative job; a two-step controller runs an \texttt{evaluate} step (registry $\rightarrow$ runners $\rightarrow$ model router $\rightarrow$ self-hosted models) and an \texttt{aggregate} step that combines cached item scores using the modular benchmark catalog. Scores and artifacts flow through a read API to the dashboard.}
   \label{fig:architecture}
 \end{figure*}
@@ -247,7 +247,7 @@ The lite profile instantiates none of it; the same code, opted in via a Docker p
 
 \begin{figure*}[t]
   \centering
-  \includegraphics[width=\textwidth]{figures/fig3.png}
+  \includegraphics[width=\textwidth]{figures/fig3}
   \caption{The optional governance-as-a-service runtime (enterprise profile). \emph{Top:} the synchronous path (blue), client, inline proxy, and self-hosted target, gated by an OPA decision and the kill-switch/mode (red). \emph{Bottom:} the asynchronous lane (violet, dashed): the proxy copies traffic to an event bus; four agents (cyber, ethics, privacy, drift) score it into a streaming Trust Factor that feeds the policy back; a canary injects traffic; every event is signed for audit. The lite profile runs none of the lane, and each external service degrades gracefully (bus to Redis Streams, OpenSearch to signed JSONL, OPA to an in-process rule).}
   \label{fig:gaas}
 \end{figure*}

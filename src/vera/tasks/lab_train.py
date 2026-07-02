@@ -37,7 +37,9 @@ def lab_train_job(self, payload: dict[str, Any]) -> dict[str, Any]:
 
     results: dict[str, Any] = {}
     with mlflow.start_run(run_name=f"lab-{cfg.name}") as run:
-        mlflow.set_tag("catalog_version", "mvp2-v1")
+        from vera.benchmarks.catalog import catalog_version
+
+        mlflow.set_tag("catalog_version", catalog_version())
         mlflow.set_tag("trigger_id", cfg.trigger_id or (trig.id if trig else ""))
         clean, dirty, meta = inject_poison(
             texts,

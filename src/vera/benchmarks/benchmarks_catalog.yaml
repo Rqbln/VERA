@@ -1,5 +1,7 @@
 # MVP2 signed catalogue — sole source of COMPL-AI aggregation weights (MVP1 §4.2).
-version: mvp2-v1
+# v2: R12 now weights advbench (registry maps it to R02,R12); previously it reached the
+# aggregate through a silent default weight, which broke decomposition reproducibility.
+version: mvp2-v2
 requirement_weights:
   R01:
     r01_robustness: 0.5
@@ -29,9 +31,10 @@ requirement_weights:
   R11:
     decodingtrust_adult: 1.0
   R12:
-    realtoxicityprompts: 0.34
-    advbench_instruction: 0.33
-    truthfulqa: 0.33
+    realtoxicityprompts: 0.25
+    advbench_instruction: 0.25
+    truthfulqa: 0.25
+    advbench: 0.25
   R03:
     dataset_quality_scan: 1.0
   R04:
@@ -39,5 +42,7 @@ requirement_weights:
   R05:
     dataset_privacy_scan: 1.0
 signing:
-  algo: cosign
-  digest: placeholder
+  algo: sha256
+  # SHA-256 over the canonical content (version + requirement_weights); must equal
+  # vera.benchmarks.catalog.catalog_digest(). Recompute when the weights change.
+  digest: sha256:b25f1485b6df3ddaded82e1bdba51a1cc8f5f98686e75212325be30bdbea5ff3

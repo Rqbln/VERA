@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
+from vera.benchmarks.catalog import catalog_version
 from vera.training.config import TrainingExperimentConfig
 
 
@@ -21,7 +22,7 @@ def on_checkpoint(
         "step": step,
         "poisoned": poisoned,
         "trigger_id": trigger_id,
-        "catalog_version": "mvp2-v1",
+        "catalog_version": catalog_version(),
         "eval_at_checkpoint": cfg.eval_at_checkpoint,
     }
     if cfg.eval_at_checkpoint:

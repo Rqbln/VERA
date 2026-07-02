@@ -39,3 +39,48 @@ def validate_catalog_weights() -> None:
         if abs(total - 1.0) > 0.02:
             msg = f"requirement {req} weights sum to {total}, expected 1.0"
             raise ValueError(msg)
+
+
+def catalog_digest() -> str:
+    """
+    SHA-256 over the canonical catalog content (version + requirement_weights).
+
+    This is the digest referenced by the catalog's signing block and pinned into
+    every run record, so a run always names the exact weighting that produced it.
+    """
+    from vera.governance.signing import artifact_digest
+
+    cat = load_catalog()
+    return artifact_digest(
+        {"version": cat.get("version"), "requirement_weights": cat.get("requirement_weights")}
+    )
+
+
+def validate_registry_catalog_alignment() -> None:
+    """
+    Raise if the registry's requirement mappings and the catalog weights disagree.
+
+    Every (requirement, benchmark) pair claimed by the registry must carry a catalog
+    weight, and every catalog weight must correspond to a registry mapping, so each
+    aggregate stays reproducible from the catalog and the per-benchmark decomposition.
+    """
+    from vera.api.benchmark_registry import MVP2_BENCHMARK_REGISTRY
+
+    rw = load_catalog().get("requirement_weights") or {}
+    reg_pairs: set[tuple[str, str]] = set()
+    for entry in MVP2_BENCHMARK_REGISTRY:
+        bid = str(entry.get("id") or "")
+        for req in str(entry.get("complai") or "").split(","):
+            req = req.strip()
+            if req and bid:
+                reg_pairs.add((req, bid))
+    problems: list[str] = []
+    for req, bid in sorted(reg_pairs):
+        if bid not in (rw.get(req) or {}):
+            problems.append(f"registry maps {bid} to {req} but the catalog has no weight for it")
+    for req, weights in rw.items():
+        for bid in weights or {}:
+            if (req, bid) not in reg_pairs:
+                problems.append(f"catalog weights {bid} under {req} but the registry does not map it there")
+    if problems:
+        raise ValueError("registry/catalog misalignment: " + "; ".join(problems))

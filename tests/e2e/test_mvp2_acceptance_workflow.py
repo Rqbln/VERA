@@ -59,7 +59,7 @@ def test_mvp2_acceptance_workflow(e2e_stack: None) -> None:  # noqa: ARG001
 
     assert rec_final.benchmark_run_yaml
     doc = yaml.safe_load(rec_final.benchmark_run_yaml)
-    assert doc["reproducibility"]["catalog_version"] == "mvp2-v1"
+    assert doc["reproducibility"]["catalog_version"] == "mvp2-v2"
     by_req = {m["requirement"]: m for m in doc.get("metrics") or []}
     for short in REQ_SHORT:
         long_id = {

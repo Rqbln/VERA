@@ -11,7 +11,9 @@ import yaml
 
 from vera.artifacts.model_card import render_model_card
 from vera.artifacts.s3io import upload_bytes
+from vera.benchmarks.catalog import catalog_digest as get_catalog_digest
 from vera.benchmarks.catalog import catalog_version as get_catalog_version
+from vera.benchmarks.catalog import validate_registry_catalog_alignment
 from vera.celery_app import celery_app
 from vera.config import get_settings
 from vera.governance.energy import start_energy_tracker, stop_energy_tracker
@@ -233,7 +235,13 @@ def _model_card_context(
             "Install optional [benchmarks] and [lab] extras; set VERA_WATERMARK_MODE=statistical; "
             "provide dataset_corpus for R03–R05 in POST /runs."
         ),
-        "signature": sign_artifact({"run_id": run_id, "catalog_version": catalog_version}),
+        "signature": sign_artifact(
+            {
+                "run_id": run_id,
+                "catalog_version": catalog_version,
+                "catalog_digest": get_catalog_digest(),
+            }
+        ),
         "image_digest": image_digest_from_env(),
     }
 
@@ -268,6 +276,8 @@ def run_benchmark_job(self, run_id: str, payload: dict[str, Any]) -> dict[str, A
             mlflow_on = False
     git_sha = _git_sha()
     cat_version = get_catalog_version()
+    cat_digest = get_catalog_digest()
+    validate_registry_catalog_alignment()
 
     resolved_benchmarks, resolved_requirements = _resolve_benchmarks(req)
     try:
@@ -325,7 +335,14 @@ def run_benchmark_job(self, run_id: str, payload: dict[str, Any]) -> dict[str, A
         else:
             store.append_stage(run_id, "mlflow_skipped", detail="mlflow disabled")
         provider, model_name = parse_litellm_model_id(req.model_id)
-        sig = sign_artifact({"run_id": run_id, "scores": agg, "catalog_version": cat_version})
+        sig = sign_artifact(
+            {
+                "run_id": run_id,
+                "scores": agg,
+                "catalog_version": cat_version,
+                "catalog_digest": cat_digest,
+            }
+        )
         lifecycle_stage = str(payload.get("lifecycle_stage") or "inference")
         br = build_benchmark_run_dict(
             run_id=run_id,
@@ -337,6 +354,7 @@ def run_benchmark_job(self, run_id: str, payload: dict[str, Any]) -> dict[str, A
             benchmarks=req.benchmarks,
             seed=req.config.seed,
             catalog_version=cat_version,
+            catalog_digest=cat_digest,
             git_sha=git_sha,
             signature=sig,
         )

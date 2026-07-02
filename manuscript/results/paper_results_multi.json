@@ -59,12 +59,19 @@
           "ci_hi": 1.0
         },
         "R12": {
-          "score": 0.6623974601070222,
-          "ci_lo": 0.5123974601070223,
-          "ci_hi": 0.8123974601070223
+          "score": 0.7461705223322497,
+          "ci_lo": 0.6711705223322497,
+          "ci_hi": 0.8211705223322496
         }
       },
       "per_benchmark": {
+        "R06": {
+          "mmlu": 0.5,
+          "gsm8k": 0.0,
+          "humaneval": 1.0,
+          "truthfulqa": 1.0,
+          "bbh": 1.0
+        },
         "R01": {
           "mmlu_robust": 1.0,
           "r01_robustness": 1.0,
@@ -76,24 +83,23 @@
           "llm_rules": 1.0,
           "decodingtrust_adv": 0.0
         },
+        "R12": {
+          "advbench": 0.5,
+          "truthfulqa": 1.0,
+          "realtoxicityprompts": 0.4849830735474825,
+          "advbench_instruction": 0.9996990157815162
+        },
         "R03": {
-          "dataset_quality_scan": 0.841934
+          "dataset_quality_scan": 0.8419342552705948
         },
         "R04": {
-          "dataset_copyright_scan": 0.937931
+          "dataset_copyright_scan": 0.9379310344827586
         },
         "R05": {
-          "dataset_privacy_scan": 0.728261
-        },
-        "R06": {
-          "mmlu": 0.5,
-          "gsm8k": 0.0,
-          "humaneval": 1.0,
-          "truthfulqa": 1.0,
-          "bbh": 1.0
+          "dataset_privacy_scan": 0.7282608695652174
         },
         "R07": {
-          "ece_mmlu": 0.9
+          "ece_mmlu": 0.9000000000000001
         },
         "R08": {
           "self_disclosure_probes": 1.0
@@ -108,29 +114,23 @@
         },
         "R11": {
           "decodingtrust_adult": 1.0
-        },
-        "R12": {
-          "advbench": 0.5,
-          "truthfulqa": 1.0,
-          "realtoxicityprompts": 0.484983,
-          "advbench_instruction": 0.999699
         }
       },
       "fallback_count": 100,
       "benchmark_count": 24,
       "energy": {
-        "run_id": "d5f325f9-17d5-4595-b2e0-14c719519956",
-        "kwh": 0.001808,
-        "co2eq_kg": 0.000101,
+        "run_id": "e8fd5420-289a-4bdc-8f96-3db0abdba0b6",
+        "kwh": 0.002015,
+        "co2eq_kg": 0.000113,
         "region": "FR",
         "source": "codecarbon"
       },
       "trust_factor": {
-        "score": 67.1,
+        "score": 69.2,
         "band": "orange",
         "components": {
           "R02": 50.0,
-          "R12": 66.2,
+          "R12": 74.6,
           "R05": 72.8,
           "R01": 92.5
         },
@@ -207,12 +207,19 @@
           "ci_hi": 1.0
         },
         "R12": {
-          "score": 0.3950820281088818,
-          "ci_lo": 0.3950820281088818,
-          "ci_hi": 0.3950820281088818
+          "score": 0.5957066757255234,
+          "ci_lo": 0.5957066757255234,
+          "ci_hi": 0.5957066757255234
         }
       },
       "per_benchmark": {
+        "R06": {
+          "mmlu": 0.5,
+          "gsm8k": 0.0,
+          "humaneval": 1.0,
+          "truthfulqa": 1.0,
+          "bbh": 1.0
+        },
         "R01": {
           "mmlu_robust": 1.0,
           "r01_robustness": 1.0,
@@ -224,24 +231,23 @@
           "llm_rules": 1.0,
           "decodingtrust_adv": 0.0
         },
+        "R12": {
+          "advbench": 0.0,
+          "truthfulqa": 1.0,
+          "realtoxicityprompts": 0.3831244260072708,
+          "advbench_instruction": 0.9997022768948227
+        },
         "R03": {
-          "dataset_quality_scan": 0.841934
+          "dataset_quality_scan": 0.8419342552705948
         },
         "R04": {
-          "dataset_copyright_scan": 0.937931
+          "dataset_copyright_scan": 0.9379310344827586
         },
         "R05": {
-          "dataset_privacy_scan": 0.728261
-        },
-        "R06": {
-          "mmlu": 0.5,
-          "gsm8k": 0.0,
-          "humaneval": 1.0,
-          "truthfulqa": 1.0,
-          "bbh": 1.0
+          "dataset_privacy_scan": 0.7282608695652174
         },
         "R07": {
-          "ece_mmlu": 0.9
+          "ece_mmlu": 0.9000000000000001
         },
         "R08": {
           "self_disclosure_probes": 1.0
@@ -256,29 +262,23 @@
         },
         "R11": {
           "decodingtrust_adult": 1.0
-        },
-        "R12": {
-          "advbench": 0.0,
-          "truthfulqa": 1.0,
-          "realtoxicityprompts": 0.383124,
-          "advbench_instruction": 0.999702
         }
       },
       "fallback_count": 100,
       "benchmark_count": 24,
       "energy": {
-        "run_id": "3625f323-4bc8-43d1-9f10-a44a84a820b8",
-        "kwh": 0.001832,
-        "co2eq_kg": 0.000103,
+        "run_id": "a9f959e0-2e0e-4469-8b28-b7dfd3faea98",
+        "kwh": 0.001736,
+        "co2eq_kg": 9.7e-05,
         "region": "FR",
         "source": "codecarbon"
       },
       "trust_factor": {
-        "score": 61.9,
+        "score": 67.0,
         "band": "orange",
         "components": {
           "R02": 50.0,
-          "R12": 39.5,
+          "R12": 59.6,
           "R05": 72.8,
           "R01": 100.0
         },
@@ -355,12 +355,19 @@
           "ci_hi": 0.0
         },
         "R12": {
-          "score": 0.4999096047703643,
-          "ci_lo": 0.4999096047703643,
-          "ci_hi": 0.4999096047703643
+          "score": 0.7498650463021477,
+          "ci_lo": 0.7498650463021477,
+          "ci_hi": 0.7498650463021477
         }
       },
       "per_benchmark": {
+        "R06": {
+          "mmlu": 1.0,
+          "gsm8k": 1.0,
+          "humaneval": 1.0,
+          "truthfulqa": 1.0,
+          "bbh": 1.0
+        },
         "R01": {
           "mmlu_robust": 0.7,
           "r01_robustness": 0.7,
@@ -372,24 +379,23 @@
           "llm_rules": 0.0,
           "decodingtrust_adv": 0.0
         },
+        "R12": {
+          "advbench": 0.0,
+          "truthfulqa": 1.0,
+          "realtoxicityprompts": 0.9997348421893548,
+          "advbench_instruction": 0.9997253430192359
+        },
         "R03": {
-          "dataset_quality_scan": 0.841934
+          "dataset_quality_scan": 0.8419342552705948
         },
         "R04": {
-          "dataset_copyright_scan": 0.937931
+          "dataset_copyright_scan": 0.9379310344827586
         },
         "R05": {
-          "dataset_privacy_scan": 0.728261
-        },
-        "R06": {
-          "mmlu": 1.0,
-          "gsm8k": 1.0,
-          "humaneval": 1.0,
-          "truthfulqa": 1.0,
-          "bbh": 1.0
+          "dataset_privacy_scan": 0.7282608695652174
         },
         "R07": {
-          "ece_mmlu": 0.9
+          "ece_mmlu": 0.9000000000000001
         },
         "R08": {
           "self_disclosure_probes": 1.0
@@ -404,29 +410,23 @@
         },
         "R11": {
           "decodingtrust_adult": 0.0
-        },
-        "R12": {
-          "advbench": 0.0,
-          "truthfulqa": 1.0,
-          "realtoxicityprompts": 0.999735,
-          "advbench_instruction": 0.999725
         }
       },
       "fallback_count": 100,
       "benchmark_count": 24,
       "energy": {
-        "run_id": "c3d1f085-fb1e-439b-a7e0-64178c5dc68e",
-        "kwh": 0.003637,
-        "co2eq_kg": 0.000204,
+        "run_id": "beda4cb2-dfa0-4d52-a941-dee922b46191",
+        "kwh": 0.003989,
+        "co2eq_kg": 0.000224,
         "region": "FR",
         "source": "codecarbon"
       },
       "trust_factor": {
-        "score": 42.6,
+        "score": 48.8,
         "band": "orange",
         "components": {
           "R02": 0.0,
-          "R12": 50.0,
+          "R12": 75.0,
           "R05": 72.8,
           "R01": 77.5
         },

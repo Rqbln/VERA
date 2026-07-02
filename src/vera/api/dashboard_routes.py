@@ -351,6 +351,7 @@ def run_inspector(
         "parse_qa": _parse_qa(br_doc),
         "git_sha": rec.git_sha,
         "catalog_version": rec.catalog_version,
+        "catalog_digest": ((br_doc or {}).get("reproducibility") or {}).get("catalog_digest", ""),
         "signature": rec.signature,
         "cosign_status": "placeholder",
         "harness_provenance": rec.harness_provenance or [],

@@ -16,7 +16,8 @@ def build_benchmark_run_dict(
     complai_requirements: list[str],
     benchmarks: list[str],
     seed: int,
-    catalog_version: str = "mvp2-v1",
+    catalog_version: str = "mvp2-v2",
+    catalog_digest: str = "",
     git_sha: str = "unknown",
     checkpoint: str | None = None,
     signature: dict[str, str] | None = None,
@@ -83,6 +84,7 @@ def build_benchmark_run_dict(
         "reproducibility": {
             "seed": seed,
             "catalog_version": catalog_version,
+            "catalog_digest": catalog_digest,
             "git_sha": git_sha,
             "complai_requirements_requested": complai_requirements,
         },

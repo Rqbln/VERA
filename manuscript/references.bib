@@ -1,6 +1,6 @@
 @article{guldimann2024complai,
   title   = {COMPL-AI Framework: A Technical Interpretation and LLM Benchmarking Suite for the EU Artificial Intelligence Act},
-  author  = {Guldimann, Andrin and Spiess, Julian and Staab, Steffen and others},
+  author  = {Guldimann, Philipp and Spiridonov, Alexander and Staab, Robin and Jovanovi{\'c}, Nikola and Vero, Mark and others},
   journal = {arXiv preprint arXiv:2410.07959},
   year    = {2024},
   url     = {https://arxiv.org/abs/2410.07959}
@@ -91,13 +91,13 @@
   url     = {https://arxiv.org/abs/2009.03300}
 }
 
-@inproceedings{cobbe2021gsm8k,
-  title     = {Training Verifiers to Solve Math Word Problems},
-  author    = {Cobbe, Karl and Bosma, Vineet and Chen, H and others},
-  booktitle = {NeurIPS 2021},
-  year      = {2021},
-  note      = {Introduces the GSM8K benchmark},
-  url       = {https://arxiv.org/abs/2110.14168}
+@article{cobbe2021gsm8k,
+  title   = {Training Verifiers to Solve Math Word Problems},
+  author  = {Cobbe, Karl and Kosaraju, Vineet and Bavarian, Mohammad and Chen, Mark and others},
+  journal = {arXiv preprint arXiv:2110.14168},
+  year    = {2021},
+  note    = {Introduces the GSM8K benchmark},
+  url     = {https://arxiv.org/abs/2110.14168}
 }
 
 @article{chen2021humaneval,
@@ -185,14 +185,6 @@
   url       = {https://arxiv.org/abs/2012.07805}
 }
 
-@article{hubinger2024sleeperagents,
-  title   = {Sleeper Agents: Training Deceptive LLMs that Persist Through Safety Training},
-  author  = {Hubinger, Evan and Michael, John and Chan, Leo and others},
-  journal = {arXiv preprint arXiv:2401.05566},
-  year    = {2024},
-  url     = {https://arxiv.org/abs/2401.05566}
-}
-
 @inproceedings{kirchenbauer2023watermark,
   title     = {A Watermark for Large Language Models},
   author    = {Kirchenbauer, John and Geiping, Jonas and Wen, Yuxin and others},
@@ -209,14 +201,6 @@
   url       = {https://arxiv.org/abs/1610.02413}
 }
 
-@inproceedings{henderson2020mlco2,
-  title     = {Towards the Systematic Reporting of the Energy and Carbon Footprints of Machine Learning},
-  author    = {Henderson, Peter and Hu, Jieru and Romoff, Joshua and others},
-  booktitle = {ICML Workshop on Challenges in Deploying ML},
-  year      = {2020},
-  url       = {https://arxiv.org/abs/2002.05651}
-}
-
 @article{hayes2007krippendorff,
   title   = {Answering the Call for a Standard Reliability Measure for Coding Data},
   author  = {Hayes, Andrew F and Krippendorff, Klaus},
@@ -227,17 +211,17 @@
   year    = {2007}
 }
 
-@inproceedings{gao2021lmevalharness,
-  title     = {A Framework for Few-Shot Language Model Evaluation},
-  author    = {Gao, Tianyu and Fisch, Adam and Chen, Danqi},
-  booktitle = {NeurIPS 2021 Datasets and Benchmarks Track},
-  year      = {2021},
-  url       = {https://arxiv.org/abs/2109.01652}
+@misc{gao2021lmevalharness,
+  title        = {The Language Model Evaluation Harness},
+  author       = {Gao, Leo and Tow, Jonathan and Abbasi, Baber and Biderman, Stella and others},
+  year         = {2021},
+  howpublished = {EleutherAI, \url{https://github.com/EleutherAI/lm-evaluation-harness}},
+  note         = {Zenodo DOI 10.5281/zenodo.5371628}
 }
 
 @article{wang2023decodingtrust,
   title   = {DecodingTrust: A Comprehensive Assessment of Trustworthiness in GPT Models},
-  author  = {Wang, Yifan and Xie, Xingjun and others},
+  author  = {Wang, Boxin and Chen, Weixin and Pei, Hengzhi and others},
   journal = {arXiv preprint arXiv:2306.11698},
   year    = {2023},
   url     = {https://arxiv.org/abs/2306.11698}
@@ -271,23 +255,14 @@
   publisher = {IEEE}
 }
 
-@inproceedings{hasselknippe2017guilayout,
-  title     = {A Novel Tool for Automatic GUI Layout Testing},
-  author    = {Hasselknippe, Kristian Fjeld and Li, Jingyue},
-  booktitle = {24th Asia-Pacific Software Engineering Conference (APSEC 2017)},
-  year      = {2017},
-  pages     = {695--700},
-  publisher = {IEEE},
-  url       = {https://ntnuopen.ntnu.no/ntnu-xmlui/handle/11250/2585446}
-}
-
 @inproceedings{sunetnanta2025promptops,
   title     = {PromptOps: Automated Tool for Testing Trustworthiness of LLMs},
-  author    = {Sunetnanta, Thana and Racharak, Teeradaj and others},
-  booktitle = {32nd Asia-Pacific Software Engineering Conference (APSEC 2025), Tool Demonstration Track},
+  author    = {Sontesadisai, Chommakorn and Sae-Ngow, Chalisa and Rudeerudchanawong, Jirateep and Dangsungnoen, Lapatrada and Ragkhitwetsagul, Chaiyong and Racharak, Teeradaj and Sunetnanta, Thanwadee},
+  booktitle = {2025 32nd Asia-Pacific Software Engineering Conference (APSEC)},
   year      = {2025},
-  note      = {Forthcoming; tool demonstration paper},
-  url       = {https://ieeexplore.ieee.org/iel8/11396503/11396471/11396599.pdf}
+  pages     = {1005--1008},
+  publisher = {IEEE},
+  doi       = {10.1109/APSEC66846.2025.00117}
 }
 
 @article{liang2023helm,
@@ -358,18 +333,4 @@
   title        = {OpenSearch: open-source search and analytics suite},
   year         = {2024},
   howpublished = {\url{https://opensearch.org/}}
-}
-
-@misc{langgraph2024,
-  author       = {{LangChain, Inc.}},
-  title        = {LangGraph: building stateful, multi-actor applications with LLMs},
-  year         = {2024},
-  howpublished = {\url{https://github.com/langchain-ai/langgraph}}
-}
-
-@misc{opentelemetry2024,
-  author       = {{OpenTelemetry Authors (CNCF)}},
-  title        = {OpenTelemetry: high-quality, portable telemetry},
-  year         = {2024},
-  howpublished = {\url{https://opentelemetry.io/}}
 }

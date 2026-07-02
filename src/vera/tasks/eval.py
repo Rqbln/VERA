@@ -277,10 +277,12 @@ def run_benchmark_job(self, run_id: str, payload: dict[str, Any]) -> dict[str, A
     git_sha = _git_sha()
     cat_version = get_catalog_version()
     cat_digest = get_catalog_digest()
-    validate_registry_catalog_alignment()
 
     resolved_benchmarks, resolved_requirements = _resolve_benchmarks(req)
     try:
+        # Inside the try so a misaligned registry/catalog marks the run failed
+        # in Redis instead of leaving it stuck in "running".
+        validate_registry_catalog_alignment()
         initial: dict[str, Any] = {
             "run_id": run_id,
             "model_id": req.model_id,

@@ -20,7 +20,8 @@ def run_lm_eval(ctx: RunContext, benchmark_id: str) -> tuple[SamplesByReq, RawLi
     if not entry:
         return {}, []
     task = str(entry.get("harness_task") or benchmark_id)
-    req = str(entry.get("complai", "R06")).split(",")[0].strip()
+    reqs = [x.strip() for x in str(entry.get("complai", "R06")).split(",") if x.strip()]
+    req = reqs[0] if reqs else "R06"
 
     try:
         import lm_eval  # type: ignore[import-untyped]
@@ -83,7 +84,8 @@ def run_lm_eval(ctx: RunContext, benchmark_id: str) -> tuple[SamplesByReq, RawLi
         return samples, raw
 
     score = float(acc)
-    merge_samples(samples, req, benchmark_id, score)
+    for r in reqs:
+        merge_samples(samples, r, benchmark_id, score)
     raw.append(
         {
             "agent": "lm_eval",

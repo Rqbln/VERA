@@ -65,6 +65,30 @@ class TestBootstrap(unittest.TestCase):
     def test_weighted_mean_empty_benchmarks(self) -> None:
         self.assertEqual(weighted_requirement_mean({}, {}), 0.0)
 
+    def test_uncatalogued_benchmark_excluded_not_defaulted(self) -> None:
+        # A benchmark with samples but no catalog weight must be excluded from the
+        # aggregate, never given a silent default weight.
+        s = weighted_requirement_mean(
+            {"catalogued": [1.0, 1.0], "rogue": [0.0, 0.0]},
+            {"catalogued": 1.0},
+        )
+        self.assertEqual(s, 1.0)
+        mean_s, lo, hi = bootstrap_weighted_requirement_ci_95(
+            {"catalogued": [1.0, 1.0], "rogue": [0.0, 0.0]},
+            {"catalogued": 1.0},
+            seed=7,
+            n_resamples=200,
+        )
+        self.assertEqual(mean_s, 1.0)
+        self.assertEqual((lo, hi), (1.0, 1.0))
+
+    def test_all_benchmarks_uncatalogued_returns_zero(self) -> None:
+        self.assertEqual(weighted_requirement_mean({"rogue": [0.9]}, {}), 0.0)
+        mean_s, lo, hi = bootstrap_weighted_requirement_ci_95(
+            {"rogue": [0.9]}, {}, seed=7, n_resamples=100
+        )
+        self.assertEqual((mean_s, lo, hi), (0.0, 0.0, 0.0))
+
 
 if __name__ == "__main__":
     unittest.main()

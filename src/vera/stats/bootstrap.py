@@ -2,10 +2,38 @@
 
 from __future__ import annotations
 
+import logging
 import os
 from collections.abc import Sequence
 
 import numpy as np
+
+logger = logging.getLogger(__name__)
+
+
+def effective_requirement_weights(
+    by_benchmark: dict[str, list[float]],
+    weights: dict[str, float],
+) -> dict[str, float]:
+    """
+    Catalog weights restricted to benchmarks that actually have samples.
+
+    A benchmark with samples but no catalog weight is EXCLUDED from the aggregate
+    (never silently defaulted), so every aggregate stays reproducible from the
+    catalog and the per-benchmark decomposition.
+    """
+    w_eff: dict[str, float] = {}
+    for b, samples in by_benchmark.items():
+        if not samples:
+            continue
+        w = weights.get(b)
+        if w is None:
+            logger.warning(
+                "benchmark %s has samples but no catalog weight; excluded from aggregate", b
+            )
+            continue
+        w_eff[b] = float(w)
+    return w_eff
 
 
 def effective_bootstrap_n(configured: int) -> int:
@@ -57,14 +85,11 @@ def weighted_requirement_mean(
     by_benchmark: dict[str, list[float]],
     weights: dict[str, float],
 ) -> float:
-    """s_R = sum_b w_b * mean(samples_b) / sum_b w_b for benchmarks with non-empty samples."""
-    means: dict[str, float] = {}
-    w_eff: dict[str, float] = {}
-    for b, samples in by_benchmark.items():
-        if not samples:
-            continue
-        means[b] = float(np.mean(np.asarray(samples, dtype=np.float64)))
-        w_eff[b] = float(weights.get(b, 1.0))
+    """s_R = sum_b w_b * mean(samples_b) / sum_b w_b over catalog-weighted benchmarks."""
+    w_eff = effective_requirement_weights(by_benchmark, weights)
+    means = {
+        b: float(np.mean(np.asarray(by_benchmark[b], dtype=np.float64))) for b in w_eff
+    }
     denom = sum(w_eff.values())
     if denom <= 0 or not means:
         return 0.0
@@ -84,11 +109,8 @@ def bootstrap_weighted_requirement_ci_95(
     Each bootstrap replicate: for each benchmark b, resample its per-item scores
     with replacement (same n), recompute mean_b, then recompute weighted s_R.
     """
-    # Effective weights only for benchmarks that have samples
-    w_eff: dict[str, float] = {}
-    for b, samples in by_benchmark.items():
-        if samples:
-            w_eff[b] = float(weights.get(b, 1.0))
+    # Effective weights only for catalog-weighted benchmarks that have samples
+    w_eff = effective_requirement_weights(by_benchmark, weights)
     denom = sum(w_eff.values()) or 1.0
 
     mean_s = weighted_requirement_mean(by_benchmark, weights)

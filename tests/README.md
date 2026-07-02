@@ -20,7 +20,7 @@ Doc lab : [docs/MVP2_LAB_RUNBOOK.md](../docs/MVP2_LAB_RUNBOOK.md).
 
 | Fichier | Tests | Rôle |
 |---------|-------|------|
-| `test_catalog.py` | 3 | Version `mvp2-v1`, poids Σ=1 par exigence |
+| `test_catalog.py` | 6 | Version `mvp2-v2`, poids Σ=1, alignement registry↔catalogue, digest |
 | `test_registry_dispatch.py` | 2 | 20 benchmarks → runners réels, pas `pilote_v1` |
 | `test_no_pilote_v1.py` | 2 | Package `pilote_v1` absent du `src/` |
 | `test_no_unittest_mock.py` | 1 | Aucun `@patch` / `MagicMock` dans `tests/` |

@@ -25,10 +25,10 @@ from vera.dashboard.score_bands import load_score_bands  # noqa: E402
 RES = Path(__file__).resolve().parents[1] / "results"
 FIG = Path(__file__).resolve().parents[1] / "figures"
 FIG.mkdir(parents=True, exist_ok=True)
-# Requirements with >=2 contributing benchmarks whose aggregate matches a simple weighted mean of
-# the captured per-benchmark means (self-consistent for the sensitivity re-aggregation). R12's
-# per-benchmark capture does not reconcile with its stored aggregate, so it is excluded here.
-MULTI_BENCH_REQS = ["R01", "R06", "R10"]
+# Requirements with >=2 contributing benchmarks. Since catalog mvp2-v2 (advbench weighted in
+# R12) every aggregate reconciles with the weighted mean of its per-benchmark decomposition;
+# the canonical per-panel sensitivity study lives in gen_sensitivity_panel.py.
+MULTI_BENCH_REQS = ["R01", "R02", "R06", "R10", "R12"]
 
 
 def short(m: str) -> str:
@@ -102,21 +102,10 @@ def main() -> None:
     fig.savefig(FIG / "fig_scores_multi.pdf")
     print("\nwrote", FIG / "fig_scores_multi.pdf")
 
-    # Figure 2: sensitivity range per requirement (principal model).
+    # The canonical sensitivity figure (both panels, all models) is produced by
+    # gen_sensitivity_panel.py, which also verifies aggregate/decomposition reconciliation.
     if sens_rows:
-        fig, ax = plt.subplots(figsize=(3.2, 2.0))
-        rs = [r[0].replace("R", "CR") for r in sens_rows]
-        base = [r[2] for r in sens_rows]
-        rng = [r[4] for r in sens_rows]
-        ax.errorbar(rs, base, yerr=[[0] * len(rs), rng], fmt="o", ms=5, capsize=4, color="#1565c0", ecolor="#c62828")
-        ax.axhline(0.7, ls="--", c="#00915a", lw=0.6)
-        ax.axhline(0.4, ls="--", c="#e8a33d", lw=0.6)
-        ax.set_ylim(0, 1.05)
-        ax.set_ylabel("aggregate score")
-        ax.set_title("Score range under reweighting", fontsize=8)
-        fig.tight_layout()
-        fig.savefig(FIG / "fig_weight_sensitivity.pdf")
-        print("wrote", FIG / "fig_weight_sensitivity.pdf")
+        print("\nsensitivity figure: run manuscript/scripts/gen_sensitivity_panel.py")
 
 
 if __name__ == "__main__":

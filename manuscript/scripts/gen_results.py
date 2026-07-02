@@ -105,7 +105,7 @@ def main() -> None:
     provenance = sorted(seen.values(), key=lambda r: r["benchmark_id"])
     fallback_rate = round(sum(p["fallback"] for p in provenance) / max(1, len(provenance)), 3)
 
-    # --- Baseline (catalogue mvp2-v1) ---
+    # --- Baseline (signed catalogue weights) ---
     baseline = aggregate(req_samples, weights_for_requirement)
 
     # --- Sensitivity schemes (re-aggregate the SAME samples) ---

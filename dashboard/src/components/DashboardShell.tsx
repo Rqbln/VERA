@@ -63,7 +63,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
         <div className="flex items-center justify-between gap-4">
           <div className="flex flex-wrap items-center gap-5">
             <Link href={guided ? "/home" : "/dashboards/compliance"} className="flex items-center gap-2 text-sm font-semibold tracking-tight text-white">
-              <span className="grid h-6 w-6 place-items-center rounded bg-brand-accent text-[13px] font-bold text-brand-deep">R</span>
+              <span className="grid h-6 w-6 place-items-center rounded bg-brand-accent text-[13px] font-bold text-brand-deep">V</span>
               {t("app.title")}
             </Link>
             <nav className="flex flex-wrap gap-1">

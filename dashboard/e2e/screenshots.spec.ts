@@ -49,7 +49,7 @@ const SUMMARY = {
   status: "completed",
   model_id: "ollama/llama3.1:8b-instruct-q8_0",
   lifecycle_stage: "inference",
-  catalog_version: "mvp2-v1",
+  catalog_version: "v2",
   created_at: "2026-06-15T11:45:00Z",
   updated_at: "2026-06-15T11:48:00Z",
   error: null,
@@ -83,7 +83,7 @@ async function mock(page: Page) {
     } } }),
   );
   await page.route("**/api/v1/runs?*", (r) => r.fulfill({ json: { runs: [
-    { run_id: SUMMARY.run_id, status: "completed", model_id: SUMMARY.model_id, lifecycle_stage: "inference", catalog_version: "mvp2-v1", created_at: SUMMARY.created_at, updated_at: SUMMARY.updated_at },
+    { run_id: SUMMARY.run_id, status: "completed", model_id: SUMMARY.model_id, lifecycle_stage: "inference", catalog_version: "v2", created_at: SUMMARY.created_at, updated_at: SUMMARY.updated_at },
   ], total: 1 } }));
   await page.route("**/api/v1/runs/*/summary*", (r) => r.fulfill({ json: SUMMARY }));
   await page.route("**/api/v1/models/connected", (r) => r.fulfill({ json: { models: [

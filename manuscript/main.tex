@@ -100,7 +100,7 @@ It needs a per-criterion view: where a model fails, and which public benchmark s
 \subsection{Contributions}
 We present VERA, an open-source framework that runs the twelve measurable COMPL-AI requirements, makes the aggregation policy behind each score signed and auditable, and certifies each verdict's robustness to that policy.
 Scores stay explainable in the decompositional sense: each requirement score is traceable, inside the tool, to the contributing public benchmarks and their individual results.
-We release VERA as open-source software to speed up adoption and disseminate responsible-AI best practice.\footnote{Code, demo video, and replication package: \url{\repourl}.}
+We release VERA as open-source software to speed up adoption and disseminate responsible-AI best practice.
 We make four contributions, each tied to a research question and each a concrete delta over the two closest works, the COMPL-AI reference implementation and PromptOps~\cite{sunetnanta2025promptops}.
 \begin{itemize}
   \item \textbf{C1 (Operable dashboard).} VERA delivers COMPL-AI's measurable metrics\footnote{COMPL-AI project: \url{https://compl-ai.org}.} through a role-based dashboard that a non-specialist can drive end-to-end, launch a run and read its verdicts, without writing code (RQ1). COMPL-AI ships a command-line study and a public per-principle leaderboard aimed at ML engineers; PromptOps reports flat score tables. The delta is operability for a non-specialist, not visualisation as such.
@@ -109,6 +109,9 @@ We make four contributions, each tied to a research question and each a concrete
   \item \textbf{C4 (Benchmark).} We contribute an open, reproducible benchmark of the twelve requirements over two model panels, three families at a comparable size and one family across three sizes, on public datasets and a released synthetic corpus. The contribution is the reproducible, signed protocol across families and sizes, not a larger empirical study than COMPL-AI's.
 \end{itemize}
 We evaluate C1--C4 across the two panels of \Cref{sec:results}, where VERA flags concrete responsible-AI gaps between families and sizes.
+
+\smallskip\noindent\textbf{Availability and reproducibility.}
+VERA is open-source and available at \url{\repourl}. The released replication package (seed~42) regenerates every table and figure in this paper, including the signed catalog and the verdict-sensitivity study.
 
 \section{Background and Related Work}
 \label{sec:related}
@@ -570,7 +573,7 @@ VERA is an open-source framework that runs the twelve measurable COMPL-AI requir
 Its specification, benchmarks, and weights are swappable data, so the same framework is ready for a different responsible-AI specification without code changes.
 We showed that a non-specialist can read a run from the dashboard alone (RQ1), that each verdict decomposes into the public evidence behind it (RQ2), that one framework covers the twelve requirements across model families and sizes with no code change (RQ3), and that each verdict's dependence on the weighting is bounded in closed form (RQ4).
 Across both panels VERA flags concrete responsible-AI gaps, and it exposes a watermarking requirement that no open model meets.
-We release VERA as open-source software to speed up adoption and disseminate responsible-AI best practice.
+We release VERA as open-source software, available at \url{\repourl}, to speed up adoption and disseminate responsible-AI best practice.
 Future work includes a formal practitioner study with inter-rater reliability~\cite{hayes2007krippendorff,studtmann2023histree}, native log-probability runs on a vLLM backend, and the role-based, per-persona scoring that this software-focused paper only sketches.
 
 \appendices

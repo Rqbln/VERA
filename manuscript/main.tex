@@ -74,13 +74,12 @@
 
 \begin{abstract}
 Deploying large language models under the EU AI Act requires reproducible technical evidence across trustworthy-AI principles.
-Yet the public metrics that operationalise these principles are scattered across research code, and a single global score hides why a model passes or fails.
-We present VERA, an open-source framework that implements the measurable COMPL-AI requirements in a visual, role-based dashboard.
-It explains each verdict by decomposing it across responsible-AI criteria and the public benchmarks behind it, and its requirement specification and scoring policy are swappable, versioned, signed artifacts.
-A closed-form bound then certifies which verdicts no reweighting of the scoring policy can flip, and flags the ones a reweighting can.
-We benchmark two panels, three model families and three sizes of one family, on public datasets.
-Capability rises with scale while the fairness and security verdicts collapse at the largest size: a bigger model is not a safer one.
-Unlike prior tools that score a model one prompt at a time and leave the reasoning opaque, VERA also covers the data stage and makes every score explainable, auditable, and reproducible.
+COMPL-AI operationalises these principles into twelve measurable requirements and reports them as a benchmarking study; it aggregates each requirement by an unweighted average and does not quantify how that choice shapes a verdict.
+We present VERA, an open-source framework that runs the same measurable requirements but treats the scoring policy as a first-class object: the benchmark-to-requirement weighting is a versioned, signed catalog whose SHA-256 digest is pinned into every run, and a closed-form bound certifies, per requirement, which verdicts no reweighting can flip and flags the ones it can.
+The design is modular: the requirement specification, the benchmarks, and the weights are swappable data, so VERA runs COMPL-AI today and is ready for a different specification without code changes.
+VERA delivers these results through a role-based dashboard a non-specialist can drive without code, and emits a run-tied model card and dataset datasheet toward the Act's documentation duty.
+We benchmark two panels (three model families at one size, and three sizes of one family) on public datasets and a released synthetic corpus.
+Capability rises with scale while the fairness and security verdicts collapse at the largest size, and the certification shows which of these verdicts survive a different weighting: a bigger model is not a safer one.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -100,15 +99,15 @@ A release decision does not need another number.
 It needs a per-criterion view: where a model fails, and which public benchmark says so.
 
 \subsection{Contributions}
-We present VERA (\emph{Verifiable Evaluation for Responsible AI}), an open-source framework that implements the twelve measurable COMPL-AI requirements and makes each score explainable.
-By \emph{explainable} we mean decompositional: each requirement score is traceable, inside the tool, to the contributing public benchmarks and their individual results.
+We present VERA (\emph{Verifiable Evaluation for Responsible AI}), an open-source framework that runs the twelve measurable COMPL-AI requirements, makes the aggregation policy behind each score signed and auditable, and certifies each verdict's robustness to that policy.
+Scores stay explainable in the decompositional sense: each requirement score is traceable, inside the tool, to the contributing public benchmarks and their individual results.
 We release VERA as open-source software to speed up adoption and disseminate responsible-AI best practice.\footnote{\ifanon Repository, demo video, and replication package withheld for double-blind review.\else Code, demo video, and replication package available from the authors.\fi}
 We make four contributions, each tied to a research question and each a concrete delta over the two closest works, the COMPL-AI reference implementation and PromptOps~\cite{sunetnanta2025promptops}.
 \begin{itemize}
-  \item \textbf{C1 (Dashboard).} To our knowledge VERA is the first to implement COMPL-AI's measurable metrics\footnote{COMPL-AI project: \url{https://compl-ai.org}.} behind a visual, role-based dashboard that a non-specialist can drive without writing code (RQ1). COMPL-AI ships a command-line study and a public leaderboard; PromptOps reports flat score tables.
-  \item \textbf{C2 (Explainability and traceability).} VERA does not stop at a global score: every verdict decomposes into the responsible-AI criteria and the public benchmarks behind it, so a user sees \emph{why} a model is, for instance, not fair (RQ2). Each run also generates its own model card and, for dataset runs, a datasheet, tied to that exact run, toward the Act's technical-documentation duty (Art.~11). Neither closest work explains verdicts or emits run-tied documentation.
-  \item \textbf{C3 (Modularity and auditable scoring).} The requirement specification and the scoring policy are first-class, swappable artifacts, data rather than code: VERA runs COMPL-AI today and adapts to a different responsible-AI specification without code changes (RQ3). The scoring policy is a versioned, signed catalog whose SHA-256 digest is pinned into every run, and a closed-form bound quantifies how much each verdict depends on it (RQ4). This is why we call it a framework.
-  \item \textbf{C4 (Benchmark).} We contribute an open, reproducible benchmark of the twelve requirements over two model panels, three families at a comparable size and one family across three sizes, on public datasets and a released synthetic corpus.
+  \item \textbf{C1 (Operable dashboard).} VERA delivers COMPL-AI's measurable metrics\footnote{COMPL-AI project: \url{https://compl-ai.org}.} through a role-based dashboard that a non-specialist can drive end-to-end, launch a run and read its verdicts, without writing code (RQ1). COMPL-AI ships a command-line study and a public per-principle leaderboard aimed at ML engineers; PromptOps reports flat score tables. The delta is operability for a non-specialist, not visualisation as such.
+  \item \textbf{C2 (Run-tied traceability).} Each run generates its own model card and, for dataset runs, a datasheet, populated from that exact evaluation, toward the Act's technical-documentation duty (Art.~11); COMPL-AI emits no such run-tied artifacts. Within the dashboard, every verdict also decomposes into its contributing benchmarks, so a non-specialist sees \emph{why} a requirement is weak (RQ2). The decomposition itself follows COMPL-AI's hierarchical reporting; our contribution is to make it operable inside the run and bound to signed documentation.
+  \item \textbf{C3 (Auditable, swappable scoring).} The scoring policy is a versioned, signed catalog whose SHA-256 digest is pinned into every run, and a closed-form bound (\Cref{prop:range}) quantifies how much each verdict depends on it (RQ4), where COMPL-AI fixes an unweighted average and leaves that dependence unmeasured. The requirement specification, the benchmarks, and the weights are themselves swappable data, so VERA runs COMPL-AI today and adapts to a different responsible-AI specification without code changes (RQ3). This is why we call it a framework.
+  \item \textbf{C4 (Benchmark).} We contribute an open, reproducible benchmark of the twelve requirements over two model panels, three families at a comparable size and one family across three sizes, on public datasets and a released synthetic corpus. The contribution is the reproducible, signed protocol across families and sizes, not a larger empirical study than COMPL-AI's.
 \end{itemize}
 We evaluate C1--C4 across the two panels of \Cref{sec:results}, where VERA flags concrete responsible-AI gaps between families and sizes.
 
@@ -122,8 +121,11 @@ COMPL-AI~\cite{guldimann2024complai} narrows that gap.
 Developed by ETH Zurich, INSAIT, and LatticeFlow AI, and welcomed by the European Commission as a first step toward operationalizing the Act, it maps the principles to eighteen technical requirements, twelve with measurable scores in $[0,1]$.
 It also ships its own open-source evaluation suite (27 benchmarks) and a public leaderboard.
 We state the overlap plainly: VERA implements COMPL-AI's measurable taxonomy and runs the same family of public benchmarks.
-What COMPL-AI does not offer is a tool a non-specialist can operate.
-VERA adds that layer: an orchestration pipeline with a role-based dashboard, decompositional explanation of each verdict, data-stage coverage, run-tied documentation, and a swappable specification.
+COMPL-AI already reports results decompositionally, as a hierarchy of principle, requirement, and benchmark with sample-level logs and a public per-principle view, and it is community-extensible; VERA claims neither decomposition nor extensibility as novel.
+VERA's deltas are three properties COMPL-AI does not provide.
+First, a signed, digest-pinned scoring policy with a closed-form verdict-sensitivity certification: COMPL-AI aggregates each requirement by an unweighted average and does not quantify how that choice shapes a verdict.
+Second, run-tied model cards and datasheets.
+Third, an operable, role-based interface for non-specialists, with an optional runtime-governance mode.
 
 \subsection{Benchmark Suites and Metrics}
 VERA reuses established public suites rather than proposing new benchmark science.
@@ -246,7 +248,7 @@ The pillars are the axes along which a reader interprets a run, and the dashboar
 \end{table}
 
 \subsection{Benchmark Provenance}
-The catalog (\texttt{benchmarks\_catalog.yaml}, version \texttt{mvp2-v2}) defines, per requirement, which public benchmarks contribute and with which weights.
+The catalog (\texttt{benchmarks\_catalog.yaml}) defines, per requirement, which public benchmarks contribute and with which weights; it is versioned, so a weighting change is a new, diffable revision rather than a code edit.
 It is a versioned, signed artifact: every run pins the catalog's SHA-256 digest next to its scores, so a score always names the exact weighting that produced it.
 A benchmark without a catalog weight is excluded from the aggregate rather than silently defaulted, and the registry-to-catalog mapping is validated at run start, so every aggregate reproduces exactly from its decomposition.
 Each per-item output records which benchmark and which runner produced it.
@@ -343,7 +345,7 @@ The dataset-stage requirements CR03--CR05 run over the synthetic corpus of \Cref
 The security probe \texttt{decodingtrust\_adv} likewise falls back on Apple Silicon.
 The CR03--CR05 and CR12 engines are fully native on any backend.
 
-\emph{Aggregation provenance.} The weighting lives in a signed catalog (version \texttt{mvp2-v2}) whose SHA-256 digest is pinned into every run, so each score names the exact weighting that produced it.
+\emph{Aggregation provenance.} The weighting lives in a versioned, signed catalog whose SHA-256 digest is pinned into every run, so each score names the exact weighting that produced it.
 For RQ4, one command re-aggregates the same cached per-benchmark results under alternative weightings, with no model re-queries; the study is exactly reproducible from the released artifacts.
 
 \begin{table}[t]
@@ -564,9 +566,10 @@ The same run therefore yields both an AI-Act evidence pack and artifacts a banki
 \section{Conclusion and Future Work}
 \label{sec:conclusion}
 
-Responsible-AI metrics exist but sit in scattered research code, and a single global score hides why a model fails.
-VERA is an open-source framework that implements the twelve measurable COMPL-AI requirements, explains each score by decomposing it across criteria and the public benchmarks behind it, and stays modular so it adapts beyond COMPL-AI.
-We showed that a non-specialist can read a run from the dashboard alone (RQ1), that each verdict is explained by the public evidence behind it (RQ2), and that one framework covers the twelve requirements across model families and sizes with no code change (RQ3).
+Responsible-AI metrics exist, but the policy that aggregates them into verdicts is fixed and unexamined, and a single global score hides why a model fails.
+VERA is an open-source framework that runs the twelve measurable COMPL-AI requirements, makes the scoring policy signed and auditable, certifies which verdicts are robust to reweighting, and emits run-tied documentation.
+Its specification, benchmarks, and weights are swappable data, so the same framework is ready for a different responsible-AI specification without code changes.
+We showed that a non-specialist can read a run from the dashboard alone (RQ1), that each verdict decomposes into the public evidence behind it (RQ2), that one framework covers the twelve requirements across model families and sizes with no code change (RQ3), and that each verdict's dependence on the weighting is bounded in closed form (RQ4).
 Across both panels VERA flags concrete responsible-AI gaps, and it exposes a watermarking requirement that no open model meets.
 We release VERA as open-source software to speed up adoption and disseminate responsible-AI best practice.
 Future work includes a formal practitioner study with inter-rater reliability~\cite{hayes2007krippendorff,studtmann2023histree}, native log-probability runs on a vLLM backend, and the role-based, per-persona scoring that this software-focused paper only sketches.

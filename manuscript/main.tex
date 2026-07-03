@@ -36,13 +36,38 @@
   \renewcommand{\arraystretch}{1.08}%
 }
 
+% Double-blind by default (submission). Set \anonfalse for the named review version.
+\newif\ifanon
+\anontrue
+
 \begin{document}
 
 \title{VERA: A Modular, Open-Source Framework\\ for EU AI Act LLM Evaluation}
 
 \author{%
+\ifanon
   \IEEEauthorblockN{Anonymous Author(s)}
   \IEEEauthorblockA{Affiliation withheld for double-blind review}%
+\else
+  \IEEEauthorblockN{%
+    Robin Qu\'eriaux\textsuperscript{1},\quad
+    Solveig Bachellery\textsuperscript{2},\quad
+    L\'ea D\'el\'eris\textsuperscript{3},\quad
+    Mariam Barry\textsuperscript{1},\\[2pt]
+    Sallam Abualhaija\textsuperscript{4},\quad
+    Thomas Le Goff\textsuperscript{5},\quad
+    Martin Pailles\textsuperscript{6},\quad
+    J\'er\^ome Le Becq\textsuperscript{7}%
+  }
+  \IEEEauthorblockA{%
+    \textsuperscript{1,2}Research, A3I AICC R\&D, BNP Paribas \qquad
+    \textsuperscript{3}Risk \& Compliance, BNP Paribas\\
+    \textsuperscript{4}University of Luxembourg \qquad
+    \textsuperscript{5}T\'el\'ecom Paris\\
+    \textsuperscript{6}Legal Group, BNP Paribas \qquad
+    \textsuperscript{7}Group Data Office, BNP Paribas%
+  }%
+\fi
 }
 
 \maketitle
@@ -77,7 +102,7 @@ It needs a per-criterion view: where a model fails, and which public benchmark s
 \subsection{Contributions}
 We present VERA (\emph{Verifiable Evaluation for Responsible AI}), an open-source framework that implements the twelve measurable COMPL-AI requirements and makes each score explainable.
 By \emph{explainable} we mean decompositional: each requirement score is traceable, inside the tool, to the contributing public benchmarks and their individual results.
-We release VERA as open-source software to speed up adoption and disseminate responsible-AI best practice.\footnote{Repository, demo video, and replication package withheld for double-blind review.}
+We release VERA as open-source software to speed up adoption and disseminate responsible-AI best practice.\footnote{\ifanon Repository, demo video, and replication package withheld for double-blind review.\else Code, demo video, and replication package available from the authors.\fi}
 We make four contributions, each tied to a research question and each a concrete delta over the two closest works, the COMPL-AI reference implementation and PromptOps~\cite{sunetnanta2025promptops}.
 \begin{itemize}
   \item \textbf{C1 (Dashboard).} To our knowledge VERA is the first to implement COMPL-AI's measurable metrics\footnote{COMPL-AI project: \url{https://compl-ai.org}.} behind a visual, role-based dashboard that a non-specialist can drive without writing code (RQ1). COMPL-AI ships a command-line study and a public leaderboard; PromptOps reports flat score tables.

@@ -1,6 +1,6 @@
 import type { Config } from "tailwindcss";
 
-// BNP-Paribas-green light design system. Hex literals (not CSS vars) so opacity modifiers like
+// Brand-green light design system. Hex literals (not CSS vars) so opacity modifiers like
 // `bg-status-ok/10` work. Keep the CSS variables in globals.css in sync for inline/recharts use.
 const config: Config = {
   content: [

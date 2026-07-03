@@ -10,20 +10,18 @@ doc:
   audience: [ai-agent, developer]
   navigation:
     index: docs/README.md
-    hub: docs/ROADMAP.md
-    conventions: docs/CLAUDE.md
+    architecture: docs/ARCHITECTURE.md
     user_guide: USER_GUIDE.md
-    status: docs/MVP3_MVP4_IMPLEMENTATION.md
-  related_paths: [README.md, docs/README-dev.md, CLAUDE.md]
+    dev_setup: docs/README-dev.md
+  related_paths: [README.md, docs/EVALUATION_GUIDE.md]
   tags: [agents, orientation, vera, eu-ai-act]
-last_reviewed: "2026-06-26"
+last_reviewed: "2026-07-03"
 ---
 
 # AGENTS.md — VERA
 
-> This agent guide is written in **English** by convention (the agents.md standard). The normative
-> specs under `docs/` are in **French** — match that voice when editing them. Code identifiers,
-> schemas and tooling stay English everywhere.
+> This repository is **English throughout** (docs, code identifiers, schemas, tooling). The
+> architecture reference is [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 
 ## What VERA is
 
@@ -63,7 +61,7 @@ POST /api/v1/runs ──▶ Redis run record ──▶ Celery task (run_benchmar
 ```
 
 Stack: FastAPI + Celery + Redis + LangGraph + LiteLLM→Ollama, MLflow, MinIO, Postgres/TimescaleDB,
-Keycloak, Next.js 14 dashboard, Docker. See `docs/ROADMAP.md §2.1` for the full table — do not
+Keycloak, Next.js 14 dashboard, Docker. See `docs/ARCHITECTURE.md §2` for the full table — do not
 restate it elsewhere.
 
 ## Repo layout / where things live
@@ -125,7 +123,7 @@ make stack-gaas                            # full stack + inline proxy (:8100), 
 The gaas runtime governs live inference (proxy → event bus → 4 agents → streaming Trust Factor →
 OPA → kill-switch → signed audit/SIEM → canary) and degrades gracefully (bus→Redis Streams,
 OpenSearch→signed JSONL, OPA→in-process rule). Code in `src/vera/governance/` + `services/`; admin
-API `/admin/v1/*`; UI at `/governance`. Full guide: `docs/MVP4_GAAS_RUNTIME.md`.
+API `/admin/v1/*`; UI at `/governance`. Full guide: `docs/ARCHITECTURE.md §5`.
 
 Native (no Docker): `make quickstart-native` prints the three commands (API, worker, `npm run dev`).
 Full dev setup: `docs/README-dev.md`. Dashboard design system + i18n: `dashboard/DESIGN_SYSTEM.md`.
@@ -177,16 +175,15 @@ Frontend mirrors this via `isGuided()` (default `NEXT_PUBLIC_AUTH_MODE=guided`).
   (`src/vera/schemas/run_payload.py`); empty `complai_requirements` ⇒ full measurable set.
 - **Add a benchmark:** add to `src/vera/benchmarks/benchmarks_catalog.yaml` + a runner under
   `src/vera/benchmarks/runners/`; map it to one of R01–R12 with an explicit score formula (or an
-  N0x HITL rubric). Keep output expressible in the `benchmark_run.yaml` schema. Update
-  `docs/MVP2_STATUS.md`.
+  N0x HITL rubric). Keep output expressible in the `benchmark_run.yaml` schema.
 - **Add a dashboard view:** route under `dashboard/src/app/`, data via `dashboard/src/lib/api.ts`,
   backend route in `dashboard_routes.py`. Honor RBAC via `AuthGuard` unless it is a guided surface.
 - **Add an N0x rubric / form:** `src/vera/store/redis_hitl.py` or `schemas/declarative_forms.py`;
-  surface in `RunSummaryView`'s MVP3 panel.
+  surface in the run summary's non-measurable panel.
 
 ## Conventions & constraints (guardrails)
 
-Full doctrine in `docs/CLAUDE.md §4`. The short version:
+The short version (see `docs/ARCHITECTURE.md §8`):
 
 - **100% OSS / on-prem.** No AWS/GCP/Azure managed services, no SaaS observability/feature-flags,
   no hosted vector DBs / OpenAI embeddings as default. Self-hosted judges only (vLLM + Llama/Mistral/
@@ -196,7 +193,7 @@ Full doctrine in `docs/CLAUDE.md §4`. The short version:
   defined in exactly one place: `src/vera/dashboard/triage.py` (`PILOTE_MARKERS`,
   `is_pilote_catalog`). Don't reintroduce the literal elsewhere — `tests/unit/test_no_pilote_v1.py`
   enforces this.
-- **18-axis COMPL-AI taxonomy only** — no ad-hoc dimensions. Canonical mapping in `ROADMAP.md §3`.
+- **18-axis COMPL-AI taxonomy only** (12 measurable R01–R12, 6 non-measurable N01–N06) — no ad-hoc dimensions. Mapping in `docs/ARCHITECTURE.md §6`.
 - **No binary thresholds / "regulatory cliff"** — continuous scores + green/orange/red bands
   (`score_bands.py`), human arbitration over the trade-offs.
 - **Sovereign self-hosted judges** for red-teaming/ASR — never proprietary.
@@ -212,14 +209,6 @@ ruff check src tests                 # lint
 
 Unit tests use a **real Redis** (no mocking). Coverage gate is 80% on `vera`. CI: `.github/workflows/vera-ci.yml` (unit + integration + dashboard/Playwright).
 
-## MVP roadmap status
-
-MVP1 (inference core) and MVP2 (lab) — see `docs/MVP2_STATUS.md`. MVP3 (curves, HITL, forms, signed
-PDF, RBAC), the **thin MVP4 slice** (Trust Factor, on-demand drift, kill-switch), the **full MVP4
-GaaS runtime** (`make stack-gaas`: proxy, bus, agents, OPA, audit — built, profile-gated), and the
-**native-eval / banking** work (R03–R05, multi-model panel, measured GaaS bench) — see the
-implemented-vs-deferred matrix in **`docs/MVP3_MVP4_IMPLEMENTATION.md`**.
-
 ## Gotchas
 
 - `src/vera/dashboard/` (Python) ≠ `dashboard/` (Next.js).
@@ -234,8 +223,8 @@ implemented-vs-deferred matrix in **`docs/MVP3_MVP4_IMPLEMENTATION.md`**.
 When you change a documented surface, update the owning doc and bump its `last_reviewed`. Quick checklist:
 
 - New route / env var? → `docs/README-dev.md` + this file's repo-map/quickstart.
-- New benchmark? → `benchmarks_catalog.yaml` + COMPL-AI mapping + `docs/MVP2_STATUS.md`.
+- New benchmark? → `benchmarks_catalog.yaml` + COMPL-AI mapping + `docs/ARCHITECTURE.md §6`.
 - New guided UI? → `USER_GUIDE.md` + the guided-dashboard section above.
-- New MVP3/MVP4 capability or deferral? → `docs/MVP3_MVP4_IMPLEMENTATION.md`.
+- New architecture surface (pipeline, dashboard, governance runtime)? → `docs/ARCHITECTURE.md`.
 - New eval script / native-run flag / corpus? → `docs/EVALUATION_GUIDE.md` + this file's native-eval section.
-- New dependency/tooling? → verify the OSS/on-prem doctrine (`docs/CLAUDE.md §4`) first.
+- New dependency/tooling? → verify the OSS/on-prem doctrine (`docs/ARCHITECTURE.md §8`) first.

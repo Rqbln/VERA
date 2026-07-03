@@ -1,4 +1,4 @@
-# Example partial benchmark_run document (canonical shape → docs/ROADMAP.md section 2.3).
+# Example partial benchmark_run document (canonical shape → docs/ARCHITECTURE.md).
 run_id: "00000000-0000-0000-0000-000000000000"
 model:
   name: llama3.1-8b-instruct-q8_0

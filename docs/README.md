@@ -1,71 +1,35 @@
 ---
 doc:
-  title: "Index de la documentation VERA"
+  title: "VERA documentation index"
   slug: docs-index
-  language: fr
-  summary: |
-    Point d'entrée pour humains et agents : hub roadmap, MVP1–4, références recherche, guide dev, règles CLAUDE.
-  type: index
-  audience: [human, developer, compliance, ai-agent]
-  navigation:
-    root_readme: ../README.md
-    primary_hub: ./ROADMAP.md
-  children:
-    - ../AGENTS.md
-    - ../USER_GUIDE.md
-    - ./ROADMAP.md
-    - ./MVP1_noyau_statique.md
-    - ./MVP2_laboratoire_injection.md
-    - ./MVP2_ROADMAP_LAB.md
-    - ./MVP2_STATUS.md
-    - ./mvp2-lab/README.md
-    - ./MVP2_LAB_RUNBOOK.md
-    - ./MVP3_dashboards_rbac.md
-    - ./MVP3_UX_CONTROL_ROOM.md
-    - ./MVP3_MVP4_IMPLEMENTATION.md
-    - ./MVP4_governance_as_a_service.md
-    - ./MIGRATION_MVP1_MVP2.md
-    - ./framework_open_source_ia_responsable.md
-    - ./Évaluation Modulaire IA Cycle Vie EU AI Act.md
-    - ./README-dev.md
-    - ./CLAUDE.md
-  artifacts:
-    - ./2410.07959v2.pdf
-  tags: [vera, documentation, index, eu-ai-act]
-last_reviewed: "2026-06-15"
+  language: en
+  summary: Entry point to VERA's documentation for humans, developers, researchers, and AI agents.
+  audience: [human, developer, researcher, ai-agent]
+  tags: [vera, docs, index]
+last_reviewed: "2026-07-03"
 ---
 
-# Documentation VERA
+# VERA documentation
 
-Tous les fichiers de ce dossier commencent par un **bloc YAML (front matter)** décrivant titre, résumé, type, navigation et tags pour faciliter l’orientation des outils et modèles.
+VERA is an open-source framework for evaluating LLMs against the EU AI Act. Start with the root
+[README](../README.md) for the project overview and quick start.
 
-> **Agents IA** : commencez par [AGENTS.md](../AGENTS.md) (orientation, architecture, quickstart).
-> **Utilisateurs non techniques** : voir [USER_GUIDE.md](../USER_GUIDE.md).
+## Map
 
-| Fichier | Rôle |
-|--------|------|
-| [AGENTS.md](../AGENTS.md) | Orientation canonique pour agents IA (racine) |
-| [USER_GUIDE.md](../USER_GUIDE.md) | Guide utilisateur non technique (mode guidé) |
-| [ROADMAP.md](./ROADMAP.md) | Vision, stack, schéma `benchmark_run`, mapping AI Act, Gantt |
-| [MVP1_noyau_statique.md](./MVP1_noyau_statique.md) | MVP1 — noyau d’évaluation inférence |
-| [MVP2_laboratoire_injection.md](./MVP2_laboratoire_injection.md) | MVP2 — spec labo injection / cycle de vie |
-| [MVP2_ROADMAP_LAB.md](./MVP2_ROADMAP_LAB.md) | MVP2 — hub d'exécution phases 0–7 |
-| [MVP2_STATUS.md](./MVP2_STATUS.md) | MVP2 — état implémentation 18 exigences |
-| [mvp2-lab/](./mvp2-lab/README.md) | MVP2 — fiches phase (détail technique) |
-| [MVP2_LAB_RUNBOOK.md](./MVP2_LAB_RUNBOOK.md) | MVP2 — procédures opérationnelles lab |
-| [MVP3_dashboards_rbac.md](./MVP3_dashboards_rbac.md) | MVP3 — dashboards & RBAC |
-| [MVP3_UX_CONTROL_ROOM.md](./MVP3_UX_CONTROL_ROOM.md) | MVP3 — design UX de la control room |
-| [MVP3_MVP4_IMPLEMENTATION.md](./MVP3_MVP4_IMPLEMENTATION.md) | MVP3/MVP4 — **état d'implémentation** (matrice) |
-| [MVP4_governance_as_a_service.md](./MVP4_governance_as_a_service.md) | MVP4 — GaaS production (cible/vision) |
-| [MVP4_GAAS_RUNTIME.md](./MVP4_GAAS_RUNTIME.md) | MVP4 — **runtime GaaS tel que construit** (proxy, bus, OPA, agents, audit) |
-| [EVALUATION_GUIDE.md](./EVALUATION_GUIDE.md) | **Évaluation native multi-modèles** — reproduction des chiffres du papier |
-| [NON_MEASURABLE_GUIDE.md](./NON_MEASURABLE_GUIDE.md) | Remplir les exigences non-mesurables N01–N06 (HITL, formulaires, énergie) |
-| [../data/corpus/README.md](../data/corpus/README.md) | Corpus bancaire synthétique (R03–R05) |
-| [MIGRATION_MVP1_MVP2.md](./MIGRATION_MVP1_MVP2.md) | Migration MVP1 → MVP2 |
-| [framework_open_source_ia_responsable.md](./framework_open_source_ia_responsable.md) | Cadrage framework IA responsable |
-| [Évaluation Modulaire IA Cycle Vie EU AI Act.md](./Évaluation%20Modulaire%20IA%20Cycle%20Vie%20EU%20AI%20Act.md) | Rapport de recherche |
-| [README-dev.md](./README-dev.md) | Setup développeur & tests |
-| [CLAUDE.md](./CLAUDE.md) | Conventions profondes & graphe documentaire (assistants IA) |
-| [2410.07959v2.pdf](./2410.07959v2.pdf) | COMPL-AI (source académique) |
+| Document | For | What it covers |
+|---|---|---|
+| [ARCHITECTURE.md](ARCHITECTURE.md) | developers, researchers | The framework end to end: pipeline, signed catalog and auditable aggregation, dashboard, governance runtime, benchmark mapping, artifacts. |
+| [README-dev.md](README-dev.md) | developers | Local setup (lite and full stacks, Docker, Ollama), the test pyramid, and air-gap / egress notes. |
+| [EVALUATION_GUIDE.md](EVALUATION_GUIDE.md) | researchers | Reproducing the paper: native benchmark engines, the multi-model panels, and serving caveats. |
+| [NON_MEASURABLE_GUIDE.md](NON_MEASURABLE_GUIDE.md) | compliance, developers | Filling the non-measurable requirements N01–N06 (human review, energy, declarative forms). |
+| [../USER_GUIDE.md](../USER_GUIDE.md) | non-technical users | Running an evaluation and reading the results, no code. |
+| [../AGENTS.md](../AGENTS.md) | AI coding agents | Orientation, repo map, quickstart, conventions and guardrails. |
+| [../dashboard/README.md](../dashboard/README.md) | frontend developers | Dashboard routes, auth modes, environment, deployment. |
+| [../dashboard/DESIGN_SYSTEM.md](../dashboard/DESIGN_SYSTEM.md) | frontend developers | Design tokens and component rules. |
+| [../data/corpus/README.md](../data/corpus/README.md) | researchers | The synthetic banking corpus schema (100% synthetic, planted PII / near-duplicates / imbalance). |
+| [../tests/README.md](../tests/README.md) | developers | The test tiers and policy. |
 
-Le [README racine](../README.md) résume le dépôt (code + liens vers cette documentation).
+## The paper
+
+The `manuscript/` folder holds the research paper (`main.tex`) that VERA accompanies, its
+references, results JSONs, and the scripts that generate its tables and figures.

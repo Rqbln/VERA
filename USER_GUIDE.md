@@ -1,150 +1,137 @@
 ---
 doc:
-  title: "Guide utilisateur VERA (mode guidé)"
+  title: "VERA user guide (guided mode)"
   slug: user-guide
-  language: fr
+  language: en
   summary: |
-    Guide pas-à-pas pour utilisateurs non techniques : démarrer VERA en une commande, lancer une
-    évaluation sur un modèle Ollama, lire le tableau de résultats.
-  type: user-guide
+    Step-by-step guide for non-technical users: start VERA with one command, run an evaluation on a
+    connected Ollama model, and read the results table. No code required.
   audience: [human]
   navigation:
     root_readme: ./README.md
-    agents: ./AGENTS.md
+    architecture: ./docs/ARCHITECTURE.md
     dev: ./docs/README-dev.md
-  tags: [vera, guide, utilisateur, eu-ai-act]
-last_reviewed: "2026-06-26"
+  tags: [vera, user-guide, eu-ai-act]
+last_reviewed: "2026-07-03"
 ---
 
-# Guide utilisateur VERA
+# VERA user guide
 
-Ce guide s'adresse aux personnes **non techniques**. Il explique comment démarrer VERA, lancer une
-évaluation et lire les résultats — sans écrire une seule ligne de code.
+This guide is for **non-technical** users. It explains how to start VERA, run an evaluation, and
+read the results, without writing a single line of code.
 
-## 1. À quoi sert VERA ?
+## 1. What VERA does
 
-VERA vérifie si un modèle d'IA respecte les règles européennes (**EU AI Act**). Vous choisissez un
-modèle déjà branché (par exemple un modèle local Ollama), vous lancez une évaluation, et vous lisez
-un **tableau de résultats** clair, exigence par exigence (robustesse, toxicité, équité, etc.).
+VERA checks whether an AI model meets the EU AI Act's expectations. You pick a model that is already
+connected (for example a local Ollama model), launch an evaluation, and read a clear **results
+table**, requirement by requirement (robustness, toxicity, fairness, and so on).
 
-## 2. Avant de commencer (prérequis)
+## 2. Before you start (prerequisites)
 
-Une seule personne technique doit faire ceci une fois sur la machine :
+One technical person does this once on the machine:
 
-1. Installer **Docker** (Docker Desktop sur Mac/Windows).
-2. Installer **Ollama** puis télécharger un modèle :
+1. Install **Docker** (Docker Desktop on Mac/Windows).
+2. Install **Ollama**, then download a model:
    ```bash
    ollama pull llama3.1:8b-instruct-q8_0
    ```
 
-C'est tout. Pas de compte, pas de mot de passe.
+That is all. No account, no password.
 
-## 3. Démarrer en une commande
+## 3. Start with one command
 
-Dans un terminal, à la racine du projet :
+In a terminal, at the project root:
 
 ```bash
 make quickstart
 ```
 
-Patientez pendant le démarrage (le téléchargement initial peut prendre quelques minutes), puis
-ouvrez votre navigateur sur **http://localhost:3000**. Aucune connexion n'est demandée.
+Wait for startup (the first download can take a few minutes), then open your browser at
+**http://localhost:3000**. No login is required.
 
-> Astuce : pour tout arrêter, faites `Ctrl+C` dans le terminal puis `make quickstart-down`.
+> Tip: to stop everything, press `Ctrl+C` in the terminal, then run `make quickstart-down`.
 
-## 4. L'écran d'accueil
+## 4. The home screen
 
-La page d'accueil (« Welcome to VERA ») montre trois actions :
+The home page ("Welcome to VERA") shows three actions:
 
-- **Launch an evaluation** — lancer une nouvelle évaluation ;
-- **View runs & scores** — voir le tableau récapitulatif ;
-- **Compliance control room** — la vue détaillée pour les équipes conformité.
+- **Launch an evaluation** — start a new evaluation;
+- **View runs & scores** — see the summary table;
+- **Control room** — the detailed view for compliance teams.
 
-En haut, une bande « Stack » indique l'état des services (vert = OK ; orange = optionnel non activé,
-c'est normal en mode allégé).
+A "Stack" strip at the top shows service health (green = OK; amber = an optional service is off,
+which is normal in lite mode).
 
-## 5. Lancer une évaluation (assistant pas-à-pas)
+## 5. Launch an evaluation (step-by-step wizard)
 
-Cliquez sur **Launch an evaluation**. L'assistant vous guide en 4 étapes :
+Click **Launch an evaluation**. The wizard has four steps:
 
-1. **Model** — choisissez le modèle à tester. Le modèle recommandé est déjà coché.
-2. **What to evaluate** — gardez le **jeu recommandé** (le plus simple) ou cochez vos exigences.
-3. **Options** — choisissez la taille de l'échantillon (« Quick » pour un test rapide) ; le reste est
-   optionnel.
-4. **Review** — vérifiez le récapitulatif et cliquez sur **Launch evaluation**.
+1. **Model** — choose the model to test. The recommended model is preselected.
+2. **What to evaluate** — keep the **recommended set** (simplest) or tick your own requirements.
+3. **Options** — choose the sample size ("Quick" for a fast test); the rest is optional.
+4. **Review** — check the summary and click **Launch evaluation**.
 
-Vous êtes redirigé vers la page du run, qui se met à jour automatiquement jusqu'à la fin.
+You are redirected to the run page, which refreshes automatically until it finishes.
 
-## 6. Lire le tableau récapitulatif
+## 6. Read the results table
 
-La page d'un run affiche :
+A run page shows:
 
-- un **Trust Factor** (note de confiance globale sur 100) ;
-- le **tableau des exigences R01–R12** : chaque ligne a un score, un intervalle de confiance et une
-  bande de couleur.
+- a **Trust Factor** (an overall confidence score out of 100);
+- the **requirement table (R01–R12)**: each row has a score, a confidence interval, and a colour band.
 
-Comment lire les couleurs :
+How to read the colours:
 
-| Couleur | Signification |
-|---------|---------------|
-| 🟢 Vert | conforme |
-| 🟠 Orange | à surveiller |
-| 🔴 Rouge | action requise |
+| Colour | Meaning |
+|--------|---------|
+| 🟢 Green | compliant |
+| 🟠 Amber | watch |
+| 🔴 Red | action required |
 
-> Important : il n'y a **pas de seuil binaire** « réussi / échoué ». Les couleurs aident un humain à
-> juger les compromis (par exemple performance vs équité). La décision finale reste humaine.
+> Important: there is **no binary pass/fail threshold**. The colours help a human weigh the
+> trade-offs (for example capability vs fairness). The final decision stays human.
 
-Les lignes en échec ou en repli (« fallback ») sont remontées en haut du tableau. Cliquez sur une
-ligne pour ouvrir le détail (benchmarks utilisés, justification, échantillon de sorties).
+Failed or fallback rows are surfaced at the top of the table. Click a row to open the detail
+(benchmarks used, rationale, sample outputs).
 
-## 7. Aller plus loin (optionnel)
+## 7. Going further (optional)
 
-En bas de la page d'un run, la section **Governance & trends (MVP3)** permet de :
+At the bottom of a run page, the **Governance & trends** section lets you:
 
-- voir la **tendance** d'une exigence sur plusieurs runs (dès qu'il y a au moins 2 runs du modèle) ;
-- enregistrer une **revue humaine** pour N01 (explicabilité) et N02 (corrigibilité) : une **grille de
-  critères** notés de 1 à 5 (la moyenne donne le score), plutôt qu'une note unique ;
-- remplir les **formulaires déclaratifs** N04–N06 (l'énergie **N03 est mesurée automatiquement**
-  pendant l'évaluation, vous n'avez rien à saisir) ;
-- **télécharger un rapport PDF** signé pour l'audit (nécessite l'option `pdf` côté serveur).
+- see the **trend** of a requirement across several runs (once there are at least two runs of the model);
+- record a **human review** for N01 (explainability) and N02 (corrigibility): a **rubric** scored
+  1–5 (the mean gives the score), rather than a single number;
+- fill the **declarative forms** N04–N06 (energy **N03 is measured automatically** during the
+  evaluation, so you enter nothing);
+- **download a signed PDF report** for audit (requires the `pdf` option on the server).
 
-Le bandeau **N01–N06** sur le récapitulatif d'un run reflète l'état réel (revues en file/faites,
-énergie mesurée, formulaires remplis) — il n'affiche plus de valeurs par défaut.
+The **N01–N06** strip on a run summary reflects real state (reviews queued/done, energy measured,
+forms filled). The **kill-switch** blocks any new evaluation in one click. A **FR/EN** button at the
+top right switches the interface language (technical acronyms — EU AI Act, COMPL-AI, LLM, RBAC — stay
+in English).
 
-Le **kill-switch** permet de bloquer toute nouvelle évaluation en un clic.
+## 7a. Continuous governance (advanced, enterprise mode)
 
-**Langue :** un bouton **FR/EN** en haut à droite bascule l'interface entre français et anglais
-(les sigles techniques — EU AI Act, COMPL-AI, LLM, RBAC… — restent en anglais).
+The **Governance** page supervises a model **deployed live** (beyond a one-off evaluation): three
+modes (*shadow* observes, *advisory* alerts, *enforcement* blocks), a live Trust Factor recomputed
+from four agents (cyber, ethics/toxicity, privacy, drift), signed incident logs, and a kill-switch.
+It is optional and for advanced teams (`make stack-gaas`; see
+[docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md)). The guided stack stays one command.
 
-## 7bis. Gouvernance en continu (avancé, mode entreprise)
+## 8. Common issues
 
-La page **Gouvernance** supervise un modèle **déployé en direct** (au-delà d'une évaluation ponctuelle) :
+| Symptom | Fix |
+|---------|-----|
+| "No models connected" in the wizard | Ollama is not running or no model is downloaded. Run `ollama pull llama3.1:8b-instruct-q8_0`. |
+| Blank page on startup | Wait for the containers to finish starting, then reload. |
+| The PDF button shows a warning | PDF export needs the server option `pip install '.[pdf]'` (and the cairo/pango libraries). |
+| The "Stack" strip is amber | Normal in lite mode: MinIO/MLflow are optional. Red means a required service (Redis, Ollama) is unavailable. |
 
-- **Modes** : *shadow* (observe), *advisory* (alerte), *enforcement* (bloque) — réglables par modèle,
-  affichés sur une **frise** (le jalon actif est en vert vif).
-- **Trust Factor en direct** : un score 0–100 recalculé en continu à partir de quatre agents
-  (cyber, éthique/toxicité, vie privée, dérive).
-- **Incidents** : les décisions de blocage et les chutes de confiance sont journalisées et signées.
-- **Kill-switch** : coupe immédiatement les nouveaux appels.
+## 9. For technical teams
 
-Ce runtime est optionnel et destiné aux équipes avancées : `make stack-gaas` (voir
-[docs/MVP4_GAAS_RUNTIME.md](./docs/MVP4_GAAS_RUNTIME.md)). La stack guidée reste, elle, en une commande.
-
-## 8. Problèmes fréquents
-
-| Symptôme | Solution |
-|----------|----------|
-| « No models connected » dans l'assistant | Ollama n'est pas démarré ou aucun modèle n'est téléchargé. Lancez `ollama pull llama3.1:8b-instruct-q8_0`. |
-| Page blanche au démarrage | Attendez la fin du démarrage des conteneurs, puis rechargez. |
-| Le bouton PDF affiche un avertissement | L'export PDF nécessite l'option serveur `pip install '.[pdf]'` (et les bibliothèques cairo/pango). |
-| La bande « Stack » est orange | Normal en mode allégé : MinIO/MLflow sont optionnels. Rouge = un service requis (Redis, Ollama) est indisponible. |
-
-## 9. Pour les équipes techniques
-
-- Documentation complète : [docs/README.md](./docs/README.md)
-- Guide pour agents IA : [AGENTS.md](./AGENTS.md)
-- Mode entreprise (Keycloak/RBAC) : voir [docs/README-dev.md](./docs/README-dev.md)
-- **Évaluation native complète** (tous les benchmarks R03–R12 réellement exécutés, panel
-  multi-modèles, corpus bancaire, reproduction des chiffres du papier) :
-  [docs/EVALUATION_GUIDE.md](./docs/EVALUATION_GUIDE.md)
-- Remplir les exigences non-mesurables N01–N06 : [docs/NON_MEASURABLE_GUIDE.md](./docs/NON_MEASURABLE_GUIDE.md)
+- Full documentation: [docs/README.md](./docs/README.md)
+- Architecture: [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md)
+- AI agent guide: [AGENTS.md](./AGENTS.md)
+- Enterprise mode (Keycloak/RBAC) and setup: [docs/README-dev.md](./docs/README-dev.md)
+- **Native evaluation** (all benchmarks R03–R12 actually executed, multi-model panel, banking
+  corpus, paper reproduction): [docs/EVALUATION_GUIDE.md](./docs/EVALUATION_GUIDE.md)

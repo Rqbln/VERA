@@ -1,6 +1,6 @@
 # VERA dashboard — design system
 
-Light, airy, decision-maker oriented. BNP-Paribas green. Status-first information design preserved
+Light, airy, decision-maker oriented. brand green. Status-first information design preserved
 from the control-room era, but on white.
 
 ## Palette (tokens)

@@ -1,69 +1,114 @@
 ---
 doc:
-  title: "VERA — README racine (aperçu dépôt)"
+  title: "VERA — Verifiable Evaluation for Responsible AI"
   slug: root-readme
-  language: fr
+  language: en
   summary: |
-    Aperçu du dépôt Verifiable Evaluation for Responsible AI : lien vers la documentation dans docs/, code MVP1, démarrage rapide.
-  type: index
-  audience: [human, developer, ai-agent]
+    Open-source, self-hostable framework that runs the twelve measurable COMPL-AI requirements
+    of the EU AI Act, makes the scoring policy signed and auditable, certifies each verdict's
+    robustness to reweighting, and presents everything through a role-based dashboard.
+  audience: [human, developer, researcher]
   navigation:
     documentation: ./docs/README.md
-    roadmap: ./docs/ROADMAP.md
+    architecture: ./docs/ARCHITECTURE.md
     agents: ./AGENTS.md
     user_guide: ./USER_GUIDE.md
     dev_setup: ./docs/README-dev.md
-  tags: [vera, readme, eu-ai-act]
-last_reviewed: "2026-06-26"
+    paper: ./manuscript/main.tex
+  tags: [vera, eu-ai-act, compl-ai, responsible-ai, llm-evaluation]
+last_reviewed: "2026-07-03"
 ---
 
-# VERA - Verifiable Evaluation for Responsible AI
+# VERA — Verifiable Evaluation for Responsible AI
 
-Ce dépôt regroupe la **documentation** (dossier [`docs/`](docs/README.md)) et un **socle logiciel** (`src/vera/` + `dashboard/`) pour une plateforme d’évaluation d’IA responsable alignée sur l’EU AI Act.
+**VERA** is an open-source, self-hostable framework for evaluating large language models against the
+**EU AI Act**. It runs the twelve measurable **COMPL-AI** requirements, but goes past a benchmarking
+study in three ways that define the project:
+
+1. **Auditable scoring.** The benchmark-to-requirement weighting is a *versioned, signed catalog*
+   whose SHA-256 digest is pinned into every run, and a **closed-form bound certifies, per
+   requirement, which verdicts no reweighting can flip and flags the ones it can**. COMPL-AI
+   aggregates each requirement by an unweighted average and never quantifies that dependence.
+2. **Operability.** Results are delivered through a **role-based dashboard** a non-specialist can
+   drive end-to-end without writing code, and each run emits a **run-tied model card and datasheet**
+   toward the Act's technical-documentation duty (Art. 11).
+3. **Modularity.** The requirement specification, the benchmarks, and the weights are **swappable
+   data**, so VERA runs COMPL-AI today and adapts to a different responsible-AI specification without
+   code changes. This is why it is a *framework*, not a one-off study.
+
+VERA accompanies a research paper (`manuscript/`) evaluated across two model panels (three families
+at one size, and three sizes of one family) on public datasets and a released synthetic corpus.
 
 ## Documentation
 
-- **Agents IA** : [AGENTS.md](AGENTS.md) — orientation, architecture, quickstart
-- **Utilisateurs non techniques** : [USER_GUIDE.md](USER_GUIDE.md) — guide pas-à-pas
-- **Index** : [docs/README.md](docs/README.md) · **Hub** : [docs/ROADMAP.md](docs/ROADMAP.md)
-- **Setup dev / tests** : [docs/README-dev.md](docs/README-dev.md)
-- **État MVP3/MVP4** : [docs/MVP3_MVP4_IMPLEMENTATION.md](docs/MVP3_MVP4_IMPLEMENTATION.md)
+- **Architecture:** [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — the framework end to end (pipeline, catalog, dashboard, governance runtime, benchmarks, artifacts).
+- **Non-technical users:** [USER_GUIDE.md](USER_GUIDE.md) — run an evaluation and read the results, no code.
+- **Documentation index:** [docs/README.md](docs/README.md).
+- **Developer setup & tests:** [docs/README-dev.md](docs/README-dev.md).
+- **AI coding agents:** [AGENTS.md](AGENTS.md) — orientation, repo map, quickstart, guardrails.
+- **Paper reproduction:** [docs/EVALUATION_GUIDE.md](docs/EVALUATION_GUIDE.md); non-measurable requirements: [docs/NON_MEASURABLE_GUIDE.md](docs/NON_MEASURABLE_GUIDE.md).
 
-## Périmètre code
+## What is in the box
 
-- CLI `vera-eval`, FastAPI, Celery, LangGraph, LiteLLM → **Ollama** (`ollama/llama3.1:8b-instruct-q8_0`), benchmarks dynamiques, MLflow, MinIO ; **dashboard Next.js** (control room + mode guidé).
+- CLI `vera-eval`, FastAPI, Celery, LangGraph, LiteLLM → **Ollama** (default target
+  `ollama/llama3.1:8b-instruct-q8_0`) with a self-hosted judge, MLflow, MinIO.
+- A **signed benchmark catalog** (`src/vera/benchmarks/benchmarks_catalog.yaml`) mapping public
+  suites (MMLU, GSM8K, HumanEval, TruthfulQA, BBH, BBQ, BOLD, StereoSet, RealToxicityPrompts,
+  AdvBench, DecodingTrust) to the twelve requirements, with bootstrap confidence intervals.
+- A **Next.js dashboard** (control room + no-login guided mode), and an optional
+  **governance runtime** that gates live inference (inline proxy, event bus, scoring agents,
+  streaming Trust Factor, OPA policy, kill-switch, signed audit trail).
 
-## Démarrage rapide
+## Quick start
 
-**Mode guidé / lite (une commande, sans login)** — pour démos et utilisateurs non techniques :
+**Guided / lite (one command, no login)** — for demos and non-technical users:
 
-1. `ollama pull llama3.1:8b-instruct-q8_0`
-2. `make quickstart` → ouvrir **http://localhost:3000** (voir [USER_GUIDE.md](USER_GUIDE.md))
+```bash
+ollama pull llama3.1:8b-instruct-q8_0
+make quickstart          # docker compose -f docker-compose.lite.yml up --build
+# open http://localhost:3000 (see USER_GUIDE.md)
+```
 
-**Mode complet (entreprise, RBAC Keycloak + MLflow + MinIO)** :
+**Full / enterprise (Keycloak RBAC + MLflow + MinIO):**
 
-1. `cp .env.example .env` et adapter ; `make stack-full` (= `docker compose up --build`)
-2. `pip install -e ".[dev]"` puis `vera-eval run examples/mvp2_ollama_e2e.yaml`
+```bash
+cp .env.example .env      # adjust as needed
+make stack-full           # docker compose up --build; VERA_AUTH_MODE=enterprise enforces RBAC
+pip install -e ".[dev]"
+vera-eval run examples/mvp2_ollama_e2e.yaml
+```
 
-**Mode gouvernance (MVP4 GaaS)** — runtime de gouvernance de l'inférence en direct :
+**Governance runtime** — live-inference governance (inline proxy, event bus, agents, OPA):
 
-1. `make stack-gaas` → stack complète + proxy inline (`:8100`), Redpanda, OPA, OpenSearch, agents
-2. Page **/governance** dans le dashboard ; guide : [docs/MVP4_GAAS_RUNTIME.md](docs/MVP4_GAAS_RUNTIME.md)
+```bash
+make stack-gaas           # full stack + inline proxy (:8100), Redpanda, OPA, OpenSearch, agents
+# dashboard page /governance; details in docs/ARCHITECTURE.md
+```
 
-**Évaluation native (benchmarks réels R03–R12, panel multi-modèles, corpus bancaire)** — reproduit les chiffres du papier :
+**Native evaluation (real benchmark engines, multi-model panel, banking corpus)** — reproduces the
+paper numbers:
 
-1. `bash scripts/setup_native.sh` (installe `.[benchmarks,lab,pdf]` + vérifie Ollama/modèles)
-2. `VERA_REQUIRE_NATIVE=1 python scripts/run_paper_eval.py` ; guide : [docs/EVALUATION_GUIDE.md](docs/EVALUATION_GUIDE.md)
+```bash
+bash scripts/setup_native.sh                      # installs .[benchmarks,lab,pdf], checks Ollama/models
+VERA_REQUIRE_NATIVE=1 python scripts/run_paper_eval.py
+python manuscript/scripts/gen_sensitivity_panel.py   # verdict-sensitivity table + figure
+```
 
-Migration depuis MVP1 : [docs/MIGRATION_MVP1_MVP2.md](docs/MIGRATION_MVP1_MVP2.md).
-Design system + bilingue FR/EN du dashboard : [dashboard/DESIGN_SYSTEM.md](dashboard/DESIGN_SYSTEM.md).
+See [docs/EVALUATION_GUIDE.md](docs/EVALUATION_GUIDE.md) for the full protocol and serving caveats
+(Ollama exposes no token log-probabilities, so log-likelihood tasks use dynamic probes; native
+lm-eval is reserved for a vLLM backend, recorded in provenance).
 
 ## Tests
 
-Voir [docs/README-dev.md](docs/README-dev.md) (pyramide unit / integration / e2e + Playwright, sans `unittest.mock`).
+```bash
+make test-unit                       # pytest tests/unit/ (needs Redis on :6379)
+pytest tests/integration -m integration
+cd dashboard && npx playwright test  # RBAC matrix + guided-mode
+```
 
-Les poids Ollama sont sous `~/.ollama/models` ; VERA utilise l’**API HTTP** Ollama (`OLLAMA_API_BASE`).
+Unit tests use a real Redis (no mocking of core paths); coverage gate 80%. See
+[tests/README.md](tests/README.md) and [docs/README-dev.md](docs/README-dev.md).
 
-## Notes
+## License
 
-- Benchmarks **dynamiques** (MVP2) ; voir [docs/MIGRATION_MVP1_MVP2.md](docs/MIGRATION_MVP1_MVP2.md) et la spec [MVP1](docs/MVP1_noyau_statique.md) pour le catalogue COMPL-AI.
+Apache-2.0.

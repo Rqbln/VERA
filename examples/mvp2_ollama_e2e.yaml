@@ -41,6 +41,6 @@ governance:
     - Art.10
     - Art.13
     - Art.15
-  owner: team-rai-bnp
+  owner: core-team
   intended_use: "MVP2 — évaluation dynamique interne (Ollama)"
   oos_use: "Production sans revue humaine supplémentaire"

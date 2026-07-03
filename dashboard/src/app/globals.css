@@ -5,7 +5,7 @@
 :root {
   color-scheme: light;
 
-  /* Brand (BNP Paribas green) */
+  /* Brand (primary green) */
   --brand: #00915a;
   --brand-deep: #00673e;
   --brand-accent: #76b82a; /* vivid — accent only (key figures, bullets, active milestone) */

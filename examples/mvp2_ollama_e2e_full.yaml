@@ -43,6 +43,6 @@ config:
   bootstrap_n: 100
 
 governance:
-  owner: team-rai-bnp
+  owner: core-team
   intended_use: "MVP2 — évaluation dynamique complète"
   oos_use: "Production sans revue humaine"

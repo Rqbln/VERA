@@ -1,6 +1,6 @@
 ---
 doc:
-  title: "VERA — Developer setup (MVP2–MVP4)"
+  title: "VERA — Developer setup"
   slug: readme-dev
   language: en
   summary: |
@@ -10,18 +10,16 @@ doc:
   audience: [developer, ai-agent]
   navigation:
     hub: ./README.md
-    spec: ./MVP1_noyau_statique.md
+    architecture: ./ARCHITECTURE.md
     agents: ../AGENTS.md
-    status: ./MVP3_MVP4_IMPLEMENTATION.md
   related_paths:
-    - ./CLAUDE.md
     - ../README.md
     - ../AGENTS.md
   tags: [dev, docker, pytest, ollama, celery, guided, lite]
-last_reviewed: "2026-06-15"
+last_reviewed: "2026-07-03"
 ---
 
-# VERA — developer setup (MVP2–MVP4)
+# VERA — developer setup
 
 ## Lite mode / one-command quickstart (no login)
 
@@ -45,7 +43,7 @@ The guided dashboard adds three routes on top of the RBAC lenses:
 - `/runs-overview` — summary table of runs (status, triage counts, headline score).
 
 End-user walkthrough: [USER_GUIDE.md](../USER_GUIDE.md). Implementation status:
-[MVP3_MVP4_IMPLEMENTATION.md](./MVP3_MVP4_IMPLEMENTATION.md).
+[ARCHITECTURE.md](./ARCHITECTURE.md).
 
 ## Prerequisites
 
@@ -103,12 +101,12 @@ Containers reach Ollama via `http://host.docker.internal:11434` (`OLLAMA_API_BAS
 ## Endpoints
 
 - API docs: `http://127.0.0.1:8000/docs`
-- **MVP3 dashboard**: `http://127.0.0.1:3000` (compliance control room)
+- **Dashboard**: `http://127.0.0.1:3000` (compliance control room)
 - Keycloak: `http://127.0.0.1:8080` (admin / admin; realm `vera`)
-- MLflow UI: `http://127.0.0.1:5001` (port hôte ; le conteneur écoute toujours sur 5000 en interne)
+- MLflow UI: `http://127.0.0.1:5001` (host port; the container listens on 5000 internally)
 - MinIO console: `http://127.0.0.1:9001` (user/password `minioadmin`)
 
-### MVP3 dashboard (local)
+### Dashboard (local)
 
 ```bash
 # Terminal A — API with auth disabled for quick UI dev
@@ -138,13 +136,13 @@ npm run build
 npx playwright test            # control-room.spec.ts (25) + guided-mode.spec.ts (5)
 ```
 
-UX spec: [MVP3_UX_CONTROL_ROOM.md](./MVP3_UX_CONTROL_ROOM.md). Guided UX: [USER_GUIDE.md](../USER_GUIDE.md).
+Architecture: [ARCHITECTURE.md](./ARCHITECTURE.md). Guided UX: [USER_GUIDE.md](../USER_GUIDE.md).
 
 ## Environment
 
 Copy [.env.example](.env.example) to `.env` and adjust. Docker Compose sets equivalent variables inline for `api` and `worker`.
 
-## Tests (pyramide — zéro `unittest.mock`)
+## Tests (pyramid, no `unittest.mock`)
 
 | Tier | Flag | Command |
 |------|------|---------|
@@ -184,7 +182,7 @@ export VERA_E2E_TIMEOUT_SEC=900
 PYTHONPATH=src pytest tests/e2e/ -m "e2e and ollama" -q
 ```
 
-E2E uses [`examples/mvp2_ollama_e2e.yaml`](../examples/mvp2_ollama_e2e.yaml), real LangGraph + LiteLLM → Ollama, `catalog_version: mvp2-v1`. See [MIGRATION_MVP1_MVP2.md](./MIGRATION_MVP1_MVP2.md).
+E2E uses [`examples/mvp2_ollama_e2e.yaml`](../examples/mvp2_ollama_e2e.yaml), real LangGraph + LiteLLM → Ollama, the signed catalog.
 
 Optional Ollama HTTP smoke:
 
@@ -192,7 +190,7 @@ Optional Ollama HTTP smoke:
 VERA_RUN_OLLAMA_SMOKE=1 pytest tests/test_external_ollama_optional.py -q
 ```
 
-### Air-gap / egress deny (section 9 MVP1)
+### Air-gap / egress deny
 
 A full **air-gap** proof (worker + Redis + MinIO + MLflow without Internet) is environment-specific: use a CI job or VM whose **egress is denied**, with images and models preloaded. The evaluation path itself uses **LiteLLM → Ollama** on `OLLAMA_API_BASE` only; proprietary cloud keys are not part of `Settings`. Pulling container images or Ollama weights requires network **before** the air-gap run.
 
@@ -202,9 +200,9 @@ Run a single file with the stdlib runner (uses the `PROJECT_ROOT` / `sys.path` b
 PYTHONPATH=src python -m unittest tests.test_config_settings -v
 ```
 
-## MVP2 notes
+## Notes
 
-- **pilote_v1** removed; benchmarks are dynamic (see [MIGRATION_MVP1_MVP2.md](./MIGRATION_MVP1_MVP2.md)).
+- **pilote_v1** removed; benchmarks are dynamic.
 - **R09** watermark: explicit `NA` in `raw_outputs` when no detector is configured (excluded from aggregation).
 - Install `[benchmarks]` for full lm-eval / Garak; otherwise runners fall back to `hf_dynamic` probes.
-- Default **Llama 3.1 8B Q8** is a dev default; production judge targets remain documented in [MVP1_noyau_statique.md](MVP1_noyau_statique.md).
+- Default **Llama 3.1 8B Q8** is a dev default; production judge targets are self-hosted (vLLM + Llama/Mistral/Qwen).

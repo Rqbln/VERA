@@ -51,6 +51,6 @@ governance:
     - Art.10
     - Art.13
     - Art.15
-  owner: team-rai-bnp
+  owner: core-team
   intended_use: "Pilote MVP1 — évaluation statique interne"
   oos_use: "Production sans revue humaine supplémentaire"

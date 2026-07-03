@@ -60,7 +60,7 @@ npx playwright test             # RBAC matrix (25) + guided-mode/governance/i18n
 
 ## Look & feel
 
-Light, decision-maker BNP-green design system (tokens, KPI tiles, graphical timeline, lucide
+Light, decision-maker brand-green design system (tokens, KPI tiles, graphical timeline, lucide
 icons) and a bilingual **FR/EN** toggle — see [DESIGN_SYSTEM.md](./DESIGN_SYSTEM.md). Routes:
 `/home`, `/launch`, `/runs-overview`, `/governance`, `/dashboards/{compliance,cyber,ds}`,
 `/runs/[id]/inspector`. The `/governance` page surfaces the MVP4 GaaS runtime.

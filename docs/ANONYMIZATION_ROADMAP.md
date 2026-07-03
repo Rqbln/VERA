@@ -104,7 +104,9 @@ grep -rniE 'bnp|paribas|queriaux|rqbln|barry|deleris|bachellery|abualhaija|le go
       « BNP-Paribas », « BNP-green », noms des auteurs en clair (docs/commentaires éventuels) —
       puis rafraîchir le miroir et re-vérifier
 - [ ] Re-vérifier le miroir après propagation du push (les fichiers détrackés doivent avoir
-      disparu ; `manuscript/main.tex` ne doit plus contenir de nom)
+      disparu ; `manuscript/main.tex` ne doit plus contenir de nom). ⚠️ 4open fige un snapshot :
+      déclencher la resynchronisation depuis le dashboard 4open (bouton « Update ») si elle
+      n'est pas automatique
 - [ ] Vérification manuelle des captures d'écran (branding/vert BNP dans
       `manuscript/figures/shot_*.png` et `dashboard/e2e/screenshots`)
 - [ ] Après acceptation : révéler `Rqbln/VERA` (camera-ready)

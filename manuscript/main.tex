@@ -36,9 +36,10 @@
   \renewcommand{\arraystretch}{1.08}%
 }
 
-% Double-blind by default (submission). Set \anonfalse for the named review version.
+% Double-blind by default (submission). Build main_authors.tex for the named version.
+\providecommand{\anonmode}{1}
 \newif\ifanon
-\anontrue
+\ifnum\anonmode=1 \anontrue\else\anonfalse\fi
 
 \begin{document}
 
@@ -50,22 +51,23 @@
   \IEEEauthorblockA{Affiliation withheld for double-blind review}%
 \else
   \IEEEauthorblockN{%
-    Robin Qu\'eriaux\textsuperscript{1},\quad
-    Solveig Bachellery\textsuperscript{2},\quad
-    L\'ea D\'el\'eris\textsuperscript{3},\quad
-    Mariam Barry\textsuperscript{1},\\[2pt]
-    Sallam Abualhaija\textsuperscript{4},\quad
-    Thomas Le Goff\textsuperscript{5},\quad
-    Martin Pailles\textsuperscript{6},\quad
+    Robin Qu\'eriaux\textsuperscript{1},
+    Solveig Bachellery\textsuperscript{2},
+    L\'ea D\'el\'eris\textsuperscript{3},
+    Mariam Barry\textsuperscript{1},
+    Sallam Abualhaija\textsuperscript{4},\\
+    Thomas Le Goff\textsuperscript{5},
+    Martin Pailles\textsuperscript{6},
     J\'er\^ome Le Becq\textsuperscript{7}%
   }
   \IEEEauthorblockA{%
-    \textsuperscript{1,2}Research, A3I AICC R\&D, BNP Paribas \qquad
+    \textsuperscript{1}Research, A3I AICC R\&D, BNP Paribas \quad
+    \textsuperscript{2}BNP Paribas \quad
     \textsuperscript{3}Risk \& Compliance, BNP Paribas\\
-    \textsuperscript{4}University of Luxembourg \qquad
-    \textsuperscript{5}T\'el\'ecom Paris\\
-    \textsuperscript{6}Legal Group, BNP Paribas \qquad
-    \textsuperscript{7}Group Data Office, BNP Paribas%
+    \textsuperscript{6}Legal Group, BNP Paribas \quad
+    \textsuperscript{7}Group Data Office, BNP Paribas\\
+    \textsuperscript{4}University of Luxembourg \quad
+    \textsuperscript{5}T\'el\'ecom Paris%
   }%
 \fi
 }
@@ -108,7 +110,7 @@ It needs a per-criterion view: where a model fails, and which public benchmark s
 \subsection{Contributions}
 We present VERA, an open-source framework that runs the twelve measurable COMPL-AI requirements, makes the aggregation policy behind each score signed and auditable, and certifies each verdict's robustness to that policy.
 Scores stay explainable in the decompositional sense: each requirement score is traceable, inside the tool, to the contributing public benchmarks and their individual results.
-We release VERA as open-source software to speed up adoption and disseminate responsible-AI best practice.\footnote{\ifanon Repository, demo video, and replication package withheld for double-blind review.\else Code, demo video, and replication package available from the authors.\fi}
+We release VERA as open-source software to speed up adoption and disseminate responsible-AI best practice.\footnote{\ifanon Code, demo video, and replication package: \url{https://anonymous.4open.science/r/vera-XXXX} (anonymized mirror).\else Code, demo video, and replication package: \url{https://github.com/Rqbln/VERA}.\fi}
 We make four contributions, each tied to a research question and each a concrete delta over the two closest works, the COMPL-AI reference implementation and PromptOps~\cite{sunetnanta2025promptops}.
 \begin{itemize}
   \item \textbf{C1 (Operable dashboard).} VERA delivers COMPL-AI's measurable metrics\footnote{COMPL-AI project: \url{https://compl-ai.org}.} through a role-based dashboard that a non-specialist can drive end-to-end, launch a run and read its verdicts, without writing code (RQ1). COMPL-AI ships a command-line study and a public per-principle leaderboard aimed at ML engineers; PromptOps reports flat score tables. The delta is operability for a non-specialist, not visualisation as such.
@@ -295,7 +297,7 @@ Environmental hooks record per-run energy and emissions for N03.
 The \texttt{vera} package targets Python~3.11 and ships three deployment profiles over one code base: a single-command \emph{lite} stack (Redis, API, worker, and a Next.js dashboard, local artifacts, no login); a full \emph{enterprise} Docker Compose stack (adding Keycloak RBAC, MLflow, MinIO, TimescaleDB); and a \emph{gaas} overlay that adds the governance runtime of \Cref{sec:gaas}.
 Every layer degrades gracefully: absent MinIO or MLflow fall back to local artifacts and no tracking, and an absent broker, policy server, or audit index fall back as in \Cref{fig:gaas}, so partial deployments still run.
 The dashboard front-end (\Cref{sec:dashboard}) consumes a dedicated read API and an admin control plane.
-The platform is validated by 99 backend unit tests and a 35-case Playwright matrix (role-based access, the guided surfaces, the governance panel, and the language toggle); the optional \texttt{VERA\_E2E\_OLLAMA} path replicates a full run.
+The platform is validated by 108 backend unit tests and a 35-case Playwright matrix (role-based access, the guided surfaces, the governance panel, and the language toggle); the optional \texttt{VERA\_E2E\_OLLAMA} path replicates a full run.
 
 \section{The VERA Control Room}
 \label{sec:dashboard}

@@ -7,10 +7,16 @@ doc:
 
 # Roadmap — publication open-source anonyme du repo
 
-Le papier (APSEC, double-blind) référence un miroir anonyme :
-`https://anonymous.4open.science/r/vera-XXXX` (placeholder `XXXX` dans le footnote de
-`manuscript/main.tex`, branche `\ifanon`). **Ce miroir reste à créer.** Ce document trace la
-procédure et les fuites à purger avant toute mise en ligne.
+Le papier (APSEC, double-blind) référence le miroir anonyme :
+**`https://anonymous.4open.science/r/VERA-A3D7`** (créé le 2026-07-03, câblé dans le footnote de
+`manuscript/main.tex`, branche `\ifanon`).
+
+> **Constat important** : le miroir **proxifie le repo live** `Rqbln/VERA` (pas une copie purgée).
+> Le masquage par termes de 4open réécrit bien l'URL GitHub, mais il ne matche pas les noms en
+> LaTeX échappé (`Qu\'eriaux`). Conséquence : **tout fichier tracké doit être exempt d'identité.**
+> Corrections structurelles appliquées le 2026-07-03 : bloc auteurs extrait vers
+> `manuscript/authors.tex` (non tracké, gitignoré) et `VERA_DOSSIER_RAPPORT_S2.md` détracké
+> (le fichier reste sur le disque local).
 
 > ⚠️ **Ne jamais basculer `github.com/Rqbln/VERA` en public tel quel** : l'historique git porte
 > l'identité de l'auteur sur chaque commit.
@@ -89,9 +95,16 @@ grep -rniE 'bnp|paribas|queriaux|rqbln|barry|deleris|bachellery|abualhaija|le go
 
 ## 4. Checklist de sortie
 
-- [ ] Créer la copie purgée (`vera-anon/`, script §3) et obtenir le « OK » de l'étape 7
-- [ ] Vérification manuelle des captures d'écran (branding BNP)
-- [ ] Pousser la copie (compte neutre) et créer le lien anonymous.4open.science
-- [ ] Remplacer `XXXX` dans le footnote de `manuscript/main.tex`
-- [ ] Rebuild des deux PDFs (`latexmk main.tex` ; `latexmk main_authors.tex`)
-- [ ] Après acceptation : révéler `Rqbln/VERA` (camera-ready) et restaurer LICENSE/branding
+- [x] Créer le miroir anonyme (`VERA-A3D7`, proxy du repo live, masquage de l'URL GitHub)
+- [x] Remplacer `XXXX` dans le footnote de `manuscript/main.tex` (→ `VERA-A3D7`)
+- [x] Purger l'identité des sources trackées : bloc auteurs → `manuscript/authors.tex`
+      (gitignoré) ; `VERA_DOSSIER_RAPPORT_S2.md` détracké
+- [x] Rebuild des deux PDFs (`latexmk main.tex` ; `latexmk main_authors.tex`)
+- [ ] **Côté 4open (compte Robin)** : ajouter les termes de masquage restants — « BNP Paribas »,
+      « BNP-Paribas », « BNP-green », noms des auteurs en clair (docs/commentaires éventuels) —
+      puis rafraîchir le miroir et re-vérifier
+- [ ] Re-vérifier le miroir après propagation du push (les fichiers détrackés doivent avoir
+      disparu ; `manuscript/main.tex` ne doit plus contenir de nom)
+- [ ] Vérification manuelle des captures d'écran (branding/vert BNP dans
+      `manuscript/figures/shot_*.png` et `dashboard/e2e/screenshots`)
+- [ ] Après acceptation : révéler `Rqbln/VERA` (camera-ready)

@@ -16,3 +16,7 @@ htmlcov/
 # SciOrchestrator skill is a locally-vendored tool with its own git history
 /skills/
 .raip-artifacts/
+
+# Identity: kept out of the repo (anonymized mirror proxies it)
+VERA_DOSSIER_RAPPORT_S2.md
+manuscript/authors.tex

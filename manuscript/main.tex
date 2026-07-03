@@ -45,29 +45,16 @@
 
 \title{VERA: A Modular, Open-Source Framework\\ for EU AI Act LLM Evaluation}
 
+% The named block lives in authors.tex, which is NOT version-controlled: the
+% anonymized mirror proxies this repo, so tracked sources must carry no identity.
 \author{%
 \ifanon
   \IEEEauthorblockN{Anonymous Author(s)}
   \IEEEauthorblockA{Affiliation withheld for double-blind review}%
 \else
-  \IEEEauthorblockN{%
-    Robin Qu\'eriaux\textsuperscript{1},
-    Solveig Bachellery\textsuperscript{2},
-    L\'ea D\'el\'eris\textsuperscript{3},
-    Mariam Barry\textsuperscript{1},
-    Sallam Abualhaija\textsuperscript{4},\\
-    Thomas Le Goff\textsuperscript{5},
-    Martin Pailles\textsuperscript{6},
-    J\'er\^ome Le Becq\textsuperscript{7}%
-  }
-  \IEEEauthorblockA{%
-    \textsuperscript{1}Research, A3I AICC R\&D, BNP Paribas \quad
-    \textsuperscript{2}BNP Paribas \quad
-    \textsuperscript{3}Risk \& Compliance, BNP Paribas\\
-    \textsuperscript{6}Legal Group, BNP Paribas \quad
-    \textsuperscript{7}Group Data Office, BNP Paribas\\
-    \textsuperscript{4}University of Luxembourg \quad
-    \textsuperscript{5}T\'el\'ecom Paris%
+  \InputIfFileExists{authors}{}{%
+    \IEEEauthorblockN{Anonymous Author(s)}
+    \IEEEauthorblockA{Named build requested but authors.tex is absent}%
   }%
 \fi
 }
@@ -110,7 +97,7 @@ It needs a per-criterion view: where a model fails, and which public benchmark s
 \subsection{Contributions}
 We present VERA, an open-source framework that runs the twelve measurable COMPL-AI requirements, makes the aggregation policy behind each score signed and auditable, and certifies each verdict's robustness to that policy.
 Scores stay explainable in the decompositional sense: each requirement score is traceable, inside the tool, to the contributing public benchmarks and their individual results.
-We release VERA as open-source software to speed up adoption and disseminate responsible-AI best practice.\footnote{\ifanon Code, demo video, and replication package: \url{https://anonymous.4open.science/r/vera-XXXX} (anonymized mirror).\else Code, demo video, and replication package: \url{https://github.com/Rqbln/VERA}.\fi}
+We release VERA as open-source software to speed up adoption and disseminate responsible-AI best practice.\footnote{\ifanon Code, demo video, and replication package: \url{https://anonymous.4open.science/r/VERA-A3D7} (anonymized mirror).\else Code, demo video, and replication package: \url{https://github.com/Rqbln/VERA}.\fi}
 We make four contributions, each tied to a research question and each a concrete delta over the two closest works, the COMPL-AI reference implementation and PromptOps~\cite{sunetnanta2025promptops}.
 \begin{itemize}
   \item \textbf{C1 (Operable dashboard).} VERA delivers COMPL-AI's measurable metrics\footnote{COMPL-AI project: \url{https://compl-ai.org}.} through a role-based dashboard that a non-specialist can drive end-to-end, launch a run and read its verdicts, without writing code (RQ1). COMPL-AI ships a command-line study and a public per-principle leaderboard aimed at ML engineers; PromptOps reports flat score tables. The delta is operability for a non-specialist, not visualisation as such.

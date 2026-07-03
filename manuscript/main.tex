@@ -74,12 +74,18 @@
 
 \begin{abstract}
 Deploying large language models under the EU AI Act requires reproducible technical evidence across trustworthy-AI principles.
-COMPL-AI operationalises these principles into twelve measurable requirements and reports them as a benchmarking study; it aggregates each requirement by an unweighted average and does not quantify how that choice shapes a verdict.
-We present VERA, an open-source framework that runs the same measurable requirements but treats the scoring policy as a first-class object: the benchmark-to-requirement weighting is a versioned, signed catalog whose SHA-256 digest is pinned into every run, and a closed-form bound certifies, per requirement, which verdicts no reweighting can flip and flags the ones it can.
-The design is modular: the requirement specification, the benchmarks, and the weights are swappable data, so VERA runs COMPL-AI today and is ready for a different specification without code changes.
-VERA delivers these results through a role-based dashboard a non-specialist can drive without code, and emits a run-tied model card and dataset datasheet toward the Act's documentation duty.
-We benchmark two panels (three model families at one size, and three sizes of one family) on public datasets and a released synthetic corpus.
-Capability rises with scale while the fairness and security verdicts collapse at the largest size, and the certification shows which of these verdicts survive a different weighting: a bigger model is not a safer one.
+COMPL-AI turns these principles into twelve measurable requirements and reports them as a benchmarking study.
+It aggregates each requirement by an unweighted average.
+It never quantifies how that choice shapes a verdict.
+We present VERA, an open-source framework that runs the same measurable requirements.
+VERA treats the scoring policy as a first-class, signed object, so each run records the weighting behind its scores.
+A closed-form bound then certifies which verdicts no reweighting can flip, and flags the ones it can.
+The specification, benchmarks, and weights are swappable data, so VERA runs COMPL-AI today and adapts to a different one without code changes.
+It delivers its results through a role-based dashboard a non-specialist can drive without code, and emits run-tied documentation toward the Act's obligations.
+We benchmark two panels: three model families at one size, and three sizes of one family.
+We use public datasets and a released synthetic corpus.
+Capability rises with scale.
+The security verdict collapses at the largest size, and the certification shows it is invariant to any reweighting: a bigger model is not a safer one.
 \end{abstract}
 
 \begin{IEEEkeywords}

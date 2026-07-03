@@ -78,6 +78,7 @@ COMPL-AI turns these principles into twelve measurable requirements and reports 
 It aggregates each requirement by an unweighted average.
 It never quantifies how that choice shapes a verdict.
 We present VERA, an open-source framework that runs the same measurable requirements.
+The name stands for \emph{Verifiable Evaluation for Responsible AI}.
 VERA treats the scoring policy as a first-class, signed object, so each run records the weighting behind its scores.
 A closed-form bound then certifies which verdicts no reweighting can flip, and flags the ones it can.
 The specification, benchmarks, and weights are swappable data, so VERA runs COMPL-AI today and adapts to a different one without code changes.
@@ -105,7 +106,7 @@ A release decision does not need another number.
 It needs a per-criterion view: where a model fails, and which public benchmark says so.
 
 \subsection{Contributions}
-We present VERA (\emph{Verifiable Evaluation for Responsible AI}), an open-source framework that runs the twelve measurable COMPL-AI requirements, makes the aggregation policy behind each score signed and auditable, and certifies each verdict's robustness to that policy.
+We present VERA, an open-source framework that runs the twelve measurable COMPL-AI requirements, makes the aggregation policy behind each score signed and auditable, and certifies each verdict's robustness to that policy.
 Scores stay explainable in the decompositional sense: each requirement score is traceable, inside the tool, to the contributing public benchmarks and their individual results.
 We release VERA as open-source software to speed up adoption and disseminate responsible-AI best practice.\footnote{\ifanon Repository, demo video, and replication package withheld for double-blind review.\else Code, demo video, and replication package available from the authors.\fi}
 We make four contributions, each tied to a research question and each a concrete delta over the two closest works, the COMPL-AI reference implementation and PromptOps~\cite{sunetnanta2025promptops}.

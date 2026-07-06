@@ -31,3 +31,28 @@ def test_render_pdf_or_graceful_none():
         assert out is not None and out[:4] == b"%PDF"
     else:
         assert out is None
+
+
+def test_build_audit_html_includes_hitl_rows():
+    hitl = [
+        {
+            "requirement": "N01",
+            "status": "done",
+            "likert_score": 4,
+            "criteria": {"faithfulness": 4, "completeness": 5, "clarity": 3, "actionability": 4},
+            "comment": "clear rationale",
+        }
+    ]
+    html = build_audit_html(_rec(), None, hitl)
+    assert "Human review (N01–N02, HITL)" in html
+    assert "reviewed" in html and "1/1" in html and "4.00" in html
+    assert "faithfulness: 4.0" in html and "completeness: 5.0" in html
+    assert "clear rationale" in html
+    # N02 has no tasks -> rendered as a pending row, never omitted
+    assert "N02" in html and "pending" in html
+
+
+def test_build_audit_html_without_hitl_backward_compatible():
+    html = build_audit_html(_rec(), {"N03": {"completed": True, "fields": {"kwh": "10"}}})
+    assert "Human review (N01–N02, HITL)" in html
+    assert html.count("pending") >= 2  # N01 and N02 rows render as pending

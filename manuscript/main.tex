@@ -90,13 +90,14 @@ Responsible AI, EU AI Act, COMPL-AI, Modularity, Benchmark, Framework, Open sour
 \label{sec:introduction}
 
 \subsection{Motivation}
-Before an organisation ships an LLM-based assistant in a regulated setting, the EU AI Act asks for technical evidence across trustworthy-AI principles~\cite{euaiact2024,hleg2019trustworthyai}: robustness, privacy, transparency, and fairness.
-COMPL-AI~\cite{guldimann2024complai}, a community operationalization of the Act welcomed by the European Commission, turns these principles into twelve measurable requirements.
-It is published as a benchmarking study, however, not as a tool a practitioner can operate.
-The metrics themselves live in research repositories, each on its own scale, and none is packaged for a non-specialist to run.
-Worse, once they are folded into a single global score, that score is opaque: it does not say \emph{why} a model is weak, and a small change can tip it across a threshold.
+Before an organisation ships an LLM-based assistant in a regulated setting, the EU AI Act asks for technical evidence across its trustworthy-AI principles~\cite{euaiact2024,hleg2019trustworthyai}, among them robustness, privacy, transparency, and fairness.
+COMPL-AI~\cite{guldimann2024complai}, a community operationalization of the Act welcomed by the European Commission, turns these principles into twelve measurable requirements and reports them, decomposed per principle and per benchmark, as an open-source benchmarking suite.
+This is the right structure, and we build on it.
+What it leaves to the practitioner is the last step to a release decision.
+The suite is driven from a command line aimed at ML engineers, not packaged for the compliance or risk owner who must sign off.
+Its aggregation fixes one implicit weighting, a simple average, and does not quantify how that choice shapes a verdict: how close a passing requirement sits to failing, or which verdicts a different, equally defensible weighting would flip.
 A release decision does not need another number.
-It needs a per-criterion view: where a model fails, and which public benchmark says so.
+It needs a per-criterion view whose scoring policy is explicit and auditable, and a statement of which verdicts are robust to it.
 
 \subsection{Contributions}
 We present VERA, an open-source framework that runs the twelve measurable COMPL-AI requirements, makes the aggregation policy behind each score signed and auditable, and certifies each verdict's robustness to that policy.

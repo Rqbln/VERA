@@ -13,7 +13,9 @@ the real data, not placeholders).
 
 ## N01 / N02 — human review (HITL), multi-criteria rubric
 N01 (explainability) and N02 (corrigibility) are judged by a panel on a **rubric** of 1–5 criteria;
-the Likert score is the mean of the criteria.
+the Likert score is the mean of the criteria. One review task per requirement is **auto-queued when
+a run completes** (disable with `VERA_HITL_AUTOCREATE=0`), so the model card reports the queue state
+and the signed audit PDF carries the live review results (status, avg Likert, per-criterion means).
 
 | Req | Criteria (GET `/api/v1/hitl/rubrics`) |
 |---|---|

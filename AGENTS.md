@@ -203,7 +203,7 @@ The short version (see `docs/ARCHITECTURE.md §8`):
 ```bash
 make test-unit                       # pytest tests/unit/ (needs Redis on :6379)
 pytest tests/integration -m integration   # VERA_INTEGRATION=1 (Redis + MinIO)
-cd dashboard && npx playwright test  # RBAC matrix (25) + guided-mode (5)
+cd dashboard && npx playwright test  # 34 cases: RBAC matrix (25) + guided-mode (7) + HITL review (2)
 ruff check src tests                 # lint
 ```
 

@@ -89,6 +89,7 @@ make stack-gaas           # full stack + inline proxy (:8100), Redpanda, OPA, Op
 paper numbers:
 
 ```bash
+python scripts/gen_banking_corpus.py              # (optional) regenerate data/corpus/banking_synth.jsonl (230 docs, seeded)
 bash scripts/setup_native.sh                      # installs .[benchmarks,lab,pdf], checks Ollama/models
 VERA_REQUIRE_NATIVE=1 python scripts/run_paper_eval.py
 python manuscript/scripts/gen_sensitivity_panel.py   # verdict-sensitivity table + figure

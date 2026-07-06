@@ -55,7 +55,7 @@ From the repo root, `make quickstart` runs the whole lite stack (API + worker + 
 
 ```bash
 npm run build
-npx playwright test             # RBAC matrix (25) + guided-mode/governance/i18n + screenshots
+npx playwright test             # RBAC matrix (25) + guided-mode/governance/i18n (7) + HITL review (2) + screenshots
 ```
 
 ## Look & feel

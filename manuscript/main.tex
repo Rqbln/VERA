@@ -299,7 +299,7 @@ A signed audit export gathers the full N01--N06 state: the live review results f
 The \texttt{vera} package targets Python~3.11 and ships three deployment profiles over one code base: a single-command \emph{lite} stack (Redis, API, worker, and a Next.js dashboard, local artifacts, no login); a full \emph{enterprise} Docker Compose stack (adding Keycloak RBAC, MLflow, MinIO, TimescaleDB); and a \emph{gaas} overlay that adds the governance runtime of \Cref{sec:gaas}.
 Every layer degrades gracefully: absent MinIO or MLflow fall back to local artifacts and no tracking, and an absent broker, policy server, or audit index fall back as in \Cref{fig:gaas}, so partial deployments still run.
 The dashboard front-end (\Cref{sec:dashboard}) consumes a dedicated read API and an admin control plane.
-The platform is validated by 108 backend unit tests and a 35-case Playwright matrix (role-based access, the guided surfaces, the governance panel, and the language toggle); the optional \texttt{VERA\_E2E\_OLLAMA} path replicates a full run.
+The platform is validated by 118 backend unit tests and a 34-case Playwright matrix (role-based access, the guided surfaces, the HITL review panel, the governance panel, and the language toggle); the optional \texttt{VERA\_E2E\_OLLAMA} path replicates a full run.
 
 \section{The VERA Control Room}
 \label{sec:dashboard}
@@ -564,9 +564,9 @@ The governance-runtime benchmark measures per-request overhead and detection on 
 \subsection{Generated Data}
 \label{sec:generated}
 The dataset-stage requirements CR03--CR05 run on a fully synthetic corpus that we generate and release, so no customer data is involved.
-A seeded script produces 230 short banking documents (FR/EN retail, corporate, wealth, and complaint records) that plant the failure modes the data stage should catch: synthetic IBANs (\texttt{FR76} plus 23 digits), RIBs, e-mails, and phones for privacy; near-duplicate pairs for copyright; and imbalanced client segments for data adequacy.
+A seeded generator produces 230 short banking documents, released as \texttt{banking\_synth.jsonl} (FR/EN retail, corporate, wealth, and complaint records), that plant the failure modes the data stage should catch: synthetic IBANs (\texttt{FR76} plus 23 digits), RIBs, e-mails, and phones for privacy; near-duplicate pairs for copyright; and imbalanced client segments for data adequacy.
 The native engines then score privacy CR05 $=0.73$ (Presidio recall on the planted PII), copyright CR04 $=0.94$ (Levenshtein and BLEU near-duplicate detection), and data adequacy CR03 $=0.84$ (group-balance heuristics).
-Because the scans run on the corpus, not the model, these scores are model-independent, and the generator makes them fully reproducible.
+Because the scans run on the corpus, not the model, these scores are model-independent, and the generator (\texttt{gen\_banking\_corpus.py}) makes them fully reproducible.
 
 \subsection{Application in Banking}
 VERA is generic: the models it evaluates are general-purpose, not banking-specific, and so is the framework.

@@ -133,7 +133,7 @@ Playwright suites — RBAC matrix (3 views × 8 personas) **+ guided-mode** (hom
 ```bash
 cd dashboard
 npm run build
-npx playwright test            # control-room.spec.ts (25) + guided-mode.spec.ts (5)
+npx playwright test            # 34 functional cases: control-room RBAC (25) + guided-mode (7) + hitl-review (2); screenshots.spec.ts is capture-only
 ```
 
 Architecture: [ARCHITECTURE.md](./ARCHITECTURE.md). Guided UX: [USER_GUIDE.md](../USER_GUIDE.md).

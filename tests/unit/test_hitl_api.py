@@ -42,3 +42,24 @@ def test_hitl_rejects_out_of_range_likert(client):
         f"/api/v1/hitl/tasks/{task['task_id']}/review", json={"likert_score": 9}
     )
     assert resp.status_code == 400
+
+
+def test_hitl_rubrics_endpoint(client):
+    rubrics = client.get("/api/v1/hitl/rubrics").json()["rubrics"]
+    assert rubrics["N01"] == ["faithfulness", "completeness", "clarity", "actionability"]
+    assert rubrics["N02"] == ["responsiveness", "reversibility", "oversight", "safety"]
+
+
+def test_hitl_review_with_criteria_computes_mean(client):
+    created = client.post("/api/v1/hitl/tasks", json={"run_id": "r3", "requirement": "N01"})
+    task = created.json()["task"]
+    reviewed = client.post(
+        f"/api/v1/hitl/tasks/{task['task_id']}/review",
+        json={
+            "criteria": {"faithfulness": 4, "completeness": 5, "clarity": 3, "actionability": 4},
+            "comment": "rubric-based",
+        },
+    ).json()["task"]
+    assert reviewed["status"] == "done"
+    assert reviewed["likert_score"] == 4  # round(mean(4,5,3,4))
+    assert reviewed["criteria"]["completeness"] == 5

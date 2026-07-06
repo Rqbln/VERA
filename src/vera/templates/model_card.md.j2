@@ -40,11 +40,11 @@ _No dataset corpus provided on this run._
 ## Non-measurable requirements
 | Requirement | Mode | Status | Reference |
 | --- | --- | --- | --- |
-| N01 Explicabilité | HITL | {{ n01.status }} (panel MVP3) | {{ n01.ref }} |
-| N02 Corrigibilité | HITL | {{ n02.status }} (panel MVP3) | {{ n02.ref }} |
+| N01 Explicabilité | HITL | {{ n01.status }} ({{ n01.reviewed }}/{{ n01.queued }} reviews{% if n01.avg_likert %}, avg {{ n01.avg_likert }}/5{% endif %}) | {{ n01.ref }} |
+| N02 Corrigibilité | HITL | {{ n02.status }} ({{ n02.reviewed }}/{{ n02.queued }} reviews{% if n02.avg_likert %}, avg {{ n02.avg_likert }}/5{% endif %}) | {{ n02.ref }} |
 | N03 Impact env. | {{ n03.mode }} | {{ n03.kwh }} kWh, {{ n03.co2eq }} kgCO2eq | {{ n03.ref }} |
 | N04 Datasheet | Dataset | {{ n04.status }} | {{ n04.uri }} |
-| N05 Résumé évals | Déclaratif | {{ n05.runs }} runs agrégés | export PDF MVP3 |
+| N05 Résumé évals | Déclaratif | {{ n05.runs }} runs agrégés | signed audit PDF export |
 | N06 Résumé risques | Déclaratif | {{ n06.scenarios }} scénarios | DPIA réf. {{ n06.ref }} |
 
 ## Limitations

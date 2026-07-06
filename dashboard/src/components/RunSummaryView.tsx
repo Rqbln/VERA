@@ -15,6 +15,7 @@ import { TrendCurve } from "./TrendCurve";
 import { HitlReviewPanel } from "./HitlReviewPanel";
 import { DeclarativeForms } from "./DeclarativeForms";
 import { downloadAuditPdf } from "@/lib/api";
+import { useT } from "@/lib/i18n";
 import { useEffect, useState } from "react";
 
 interface Props {
@@ -24,6 +25,7 @@ interface Props {
 
 export function RunSummaryView({ lens, defaultRunId }: Props) {
   const token = getToken();
+  const t = useT();
   const [lifecycleFilter, setLifecycleFilter] = useState("");
   const [stageRail, setStageRail] = useState("inference");
   const [runId, setRunId] = useState<string | null>(defaultRunId || null);
@@ -124,7 +126,7 @@ export function RunSummaryView({ lens, defaultRunId }: Props) {
               onClick={() => setShowAdvanced((s) => !s)}
               className="text-xs text-ink-secondary hover:text-ink"
             >
-              {showAdvanced ? "▾" : "▸"} Governance & trends (MVP3)
+              {showAdvanced ? "▾" : "▸"} {t("summary.gov_trends")}
             </button>
             {showAdvanced ? (
               <div className="mt-3 space-y-4">

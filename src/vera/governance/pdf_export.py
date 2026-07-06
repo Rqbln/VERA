@@ -33,7 +33,40 @@ def _row(cells: list[str], header: bool = False) -> str:
     return "<tr>" + "".join(f"<{tag}>{c}</{tag}>" for c in cells) + "</tr>"
 
 
-def build_audit_html(rec: RunRecord, forms: dict[str, Any] | None = None) -> str:
+def _hitl_rows(hitl: list[dict[str, Any]] | None) -> str:
+    """One row per HITL requirement (N01/N02): status, reviews done/total, avg Likert,
+    per-criterion means, and truncated comments. Renders pending rows when no data."""
+    hitl = hitl or []
+    rows = ""
+    for requirement in ("N01", "N02"):
+        tasks = [t for t in hitl if t.get("requirement") == requirement]
+        done = [t for t in tasks if t.get("status") == "done" and t.get("likert_score") is not None]
+        status = "reviewed" if done else ("queued" if tasks else "pending")
+        avg = f"{sum(int(t['likert_score']) for t in done) / len(done):.2f}" if done else "—"
+        crit_sums: dict[str, list[int]] = {}
+        for t in done:
+            for name, value in (t.get("criteria") or {}).items():
+                crit_sums.setdefault(str(name), []).append(int(value))
+        criteria = (
+            "; ".join(
+                f"{html.escape(k)}: {sum(v) / len(v):.1f}" for k, v in sorted(crit_sums.items())
+            )
+            or "—"
+        )
+        # Truncate the raw text first, then escape: truncating escaped text could cut an
+        # entity (e.g. "&amp;") mid-string and emit malformed HTML.
+        raw_comments = " / ".join(str(t.get("comment")) for t in done if t.get("comment"))
+        clipped = raw_comments[:200] + ("…" if len(raw_comments) > 200 else "")
+        comments = html.escape(clipped) or "—"
+        rows += _row([requirement, status, f"{len(done)}/{len(tasks)}", avg, criteria, comments])
+    return rows
+
+
+def build_audit_html(
+    rec: RunRecord,
+    forms: dict[str, Any] | None = None,
+    hitl: list[dict[str, Any]] | None = None,
+) -> str:
     forms = forms or {}
     generated = datetime.now(UTC).isoformat()
     sig = sign_artifact(
@@ -63,6 +96,12 @@ def build_audit_html(rec: RunRecord, forms: dict[str, Any] | None = None) -> str
         if tf
         else ""
     )
+
+    hitl_header = _row(
+        ["Requirement", "Status", "Reviews", "Avg Likert", "Criteria (mean)", "Comments"],
+        header=True,
+    )
+    hitl_table = f"<table>{hitl_header}{_hitl_rows(hitl)}</table>"
 
     form_rows = ""
     for fid in ("N03", "N04", "N05", "N06"):
@@ -94,6 +133,8 @@ def build_audit_html(rec: RunRecord, forms: dict[str, Any] | None = None) -> str
   <h2>COMPL-AI measurable requirements (R01–R12)</h2>
   <table>{_row(['Requirement', 'Score', '95% CI'], header=True)}
     {score_rows or _row(['—', '—', '—'])}</table>
+  <h2>Human review (N01–N02, HITL)</h2>
+  {hitl_table}
   <h2>Declarative requirements (N03–N06)</h2>
   <table>{_row(['Form', 'Status', 'Fields'], header=True)}{form_rows}</table>
   <div class="sig">
@@ -104,11 +145,15 @@ def build_audit_html(rec: RunRecord, forms: dict[str, Any] | None = None) -> str
 </body></html>"""
 
 
-def render_audit_pdf(rec: RunRecord, forms: dict[str, Any] | None = None) -> bytes | None:
+def render_audit_pdf(
+    rec: RunRecord,
+    forms: dict[str, Any] | None = None,
+    hitl: list[dict[str, Any]] | None = None,
+) -> bytes | None:
     """Return PDF bytes, or None when WeasyPrint is unavailable (lite installs)."""
     if not weasyprint_available():
         return None
     import weasyprint
 
-    html_doc = build_audit_html(rec, forms)
+    html_doc = build_audit_html(rec, forms, hitl)
     return weasyprint.HTML(string=html_doc).write_pdf()

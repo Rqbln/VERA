@@ -170,10 +170,20 @@ export interface HitlTask {
   run_id: string;
   requirement: string;
   prompt: string;
+  sample_ref?: string;
   status: string;
   reviewer: string;
   likert_score: number | null;
+  criteria: Record<string, number>;
   comment: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export async function getHitlRubrics(
+  token: string | undefined,
+): Promise<{ rubrics: Record<string, string[]> }> {
+  return fetchApi("/api/v1/hitl/rubrics", token);
 }
 
 export async function listHitlTasks(
@@ -198,7 +208,7 @@ export async function createHitlTask(
 export async function submitHitlReview(
   token: string | undefined,
   taskId: string,
-  body: { likert_score: number; comment?: string },
+  body: { likert_score?: number; criteria?: Record<string, number>; comment?: string },
 ): Promise<{ task: HitlTask }> {
   return fetchApi(`/api/v1/hitl/tasks/${taskId}/review`, token, {
     method: "POST",

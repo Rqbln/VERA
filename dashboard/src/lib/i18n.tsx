@@ -45,7 +45,7 @@ const EN = {
 
   "gov.title": "Governance runtime",
   "gov.subtitle":
-    "Continuous, auditable oversight of governed inference (MVP4). Modes: shadow observes, advisory alerts, enforcement blocks.",
+    "Continuous, auditable oversight of governed inference. Modes: shadow observes, advisory alerts, enforcement blocks.",
   "gov.proxy": "Proxy",
   "gov.bus": "Event bus",
   "gov.policy": "Policy engine",
@@ -59,6 +59,34 @@ const EN = {
   "gov.engage": "Engage",
   "gov.reenable": "Re-enable",
   "gov.no_incidents": "No incidents recorded.",
+
+  "summary.gov_trends": "Governance & trends",
+
+  "hitl.title": "Human review (N01 / N02)",
+  "hitl.add_n01": "+ N01 explainability",
+  "hitl.add_n02": "+ N02 corrigibility",
+  "hitl.empty": "No review tasks yet. N01/N02 require a human panel; queue one above.",
+  "hitl.submit": "Submit",
+  "hitl.comment_placeholder": "Comment (optional)",
+  "hitl.avg_preview": "avg",
+  "hitl.likert": "Likert",
+
+  "nm.title": "Non-measurable (N01–N06)",
+  "nm.reviewed": "reviewed",
+  "nm.caption":
+    "N01/N02 from the HITL review queue · N03 measured (CodeCarbon) · N04–N06 from the declarative forms",
+  "nm.n01": "Explainability",
+  "nm.n02": "Corrigibility",
+  "nm.n03": "Environmental impact",
+  "nm.n04": "Datasheet / model card",
+  "nm.n05": "Evaluation summary",
+  "nm.n06": "Risk summary",
+
+  "forms.title": "Declarative forms (N03–N06)",
+  "forms.mark_completed": "Mark as completed",
+  "forms.save": "Save form",
+  "forms.saving": "Saving…",
+  "forms.save_failed": "Save failed (compliance role required in enterprise mode).",
 
   "common.status": "Status",
   "common.model": "Model",
@@ -105,7 +133,7 @@ const FR: Record<Key, string> = {
 
   "gov.title": "Runtime de gouvernance",
   "gov.subtitle":
-    "Supervision continue et auditable de l’inférence gouvernée (MVP4). Modes : shadow observe, advisory alerte, enforcement bloque.",
+    "Supervision continue et auditable de l’inférence gouvernée. Modes : shadow observe, advisory alerte, enforcement bloque.",
   "gov.proxy": "Proxy",
   "gov.bus": "Bus d’événements",
   "gov.policy": "Moteur de politiques",
@@ -119,6 +147,34 @@ const FR: Record<Key, string> = {
   "gov.engage": "Activer",
   "gov.reenable": "Réactiver",
   "gov.no_incidents": "Aucun incident enregistré.",
+
+  "summary.gov_trends": "Gouvernance & tendances",
+
+  "hitl.title": "Revue humaine (N01 / N02)",
+  "hitl.add_n01": "+ N01 explicabilité",
+  "hitl.add_n02": "+ N02 corrigibilité",
+  "hitl.empty": "Aucune tâche de revue. N01/N02 requièrent un panel humain ; ajoutez-en une ci-dessus.",
+  "hitl.submit": "Soumettre",
+  "hitl.comment_placeholder": "Commentaire (optionnel)",
+  "hitl.avg_preview": "moy.",
+  "hitl.likert": "Likert",
+
+  "nm.title": "Non mesurables (N01–N06)",
+  "nm.reviewed": "revues",
+  "nm.caption":
+    "N01/N02 depuis la file de revue HITL · N03 mesuré (CodeCarbon) · N04–N06 depuis les formulaires déclaratifs",
+  "nm.n01": "Explicabilité",
+  "nm.n02": "Corrigibilité",
+  "nm.n03": "Impact environnemental",
+  "nm.n04": "Datasheet / model card",
+  "nm.n05": "Résumé des évaluations",
+  "nm.n06": "Résumé des risques",
+
+  "forms.title": "Formulaires déclaratifs (N03–N06)",
+  "forms.mark_completed": "Marquer comme complété",
+  "forms.save": "Enregistrer",
+  "forms.saving": "Enregistrement…",
+  "forms.save_failed": "Échec (rôle conformité requis en mode entreprise).",
 
   "common.status": "Statut",
   "common.model": "Modèle",

@@ -64,12 +64,12 @@ const SUMMARY = {
   ],
   artifacts: { benchmark_run: "local://demo/benchmark_run.yaml", model_card: "local://demo/model_card.md", raw_outputs: "local://demo/raw_outputs.jsonl" },
   non_measurable: {
-    n01: { status: "pending", queue_count: 0, tasks: [] },
-    n02: { status: "pending", queue_count: 0, tasks: [] },
-    n03: { status: "n/a" },
+    n01: { status: "reviewed", queue_count: 1, reviewed: 1, avg_likert: 4.25 },
+    n02: { status: "queued", queue_count: 1, reviewed: 0 },
+    n03: { status: "measured", kwh: 0.012, co2eq_kg: 0.004 },
     n04: { status: "available" },
-    n05: { status: "mvp3" },
-    n06: { status: "mvp3" },
+    n05: { status: "completed", fields: { summary: "seed-42 panel run" } },
+    n06: { status: "completed", fields: { misuse: "reviewed", residual_risk: "low" } },
   },
   requested_requirements: ORDER,
   trust_factor: { score: 75, band: "green", components: { R01: 100, R12: 100 } },
@@ -92,6 +92,24 @@ async function mock(page: Page) {
     { model_id: "ollama/phi3:mini", name: "phi3:mini", provider: "ollama", connected: true, recommended: false },
   ], ollama_base: "http://localhost:11434", recommended_model: "ollama/llama3.1:8b-instruct-q8_0" } }));
   await page.route("**/api/v1/governance/kill-switch", (r) => r.fulfill({ json: { engaged: false, reason: "" } }));
+  await page.route("**/api/v1/runs/*/forms", (r) => r.fulfill({ json: { run_id: SUMMARY.run_id, meta: {}, forms: {
+    N05: { fields: { summary: "seed-42 panel run" }, completed: true },
+    N06: { fields: { misuse: "reviewed", residual_risk: "low" }, completed: true },
+  } } }));
+  await page.route("**/api/v1/series*", (r) => r.fulfill({ json: { available: false, series: [] } }));
+  await page.route("**/api/v1/hitl/rubrics", (r) => r.fulfill({ json: { rubrics: {
+    N01: ["faithfulness", "completeness", "clarity", "actionability"],
+    N02: ["responsiveness", "reversibility", "oversight", "safety"],
+  } } }));
+  await page.route("**/api/v1/hitl/tasks?*", (r) => r.fulfill({ json: { tasks: [
+    { task_id: "t1", run_id: SUMMARY.run_id, requirement: "N01", prompt: "Panel review of N01", sample_ref: "",
+      status: "done", reviewer: "panel", likert_score: 4,
+      criteria: { faithfulness: 4, completeness: 5, clarity: 4, actionability: 4 },
+      comment: "traceable rationale", created_at: "2026-06-15T12:00:00Z", updated_at: "2026-06-15T12:30:00Z" },
+    { task_id: "t2", run_id: SUMMARY.run_id, requirement: "N02", prompt: "Panel review of N02", sample_ref: "",
+      status: "pending", reviewer: "", likert_score: null, criteria: {}, comment: "",
+      created_at: "2026-06-15T12:00:00Z", updated_at: "2026-06-15T12:00:00Z" },
+  ] } }));
   await page.route("**/admin/v1/proxy/health", (r) => r.fulfill({ json: {
     gaas_enabled: true, bus: "kafka", opa: true, opensearch: true,
     proxy_target: "http://ollama:11434", default_mode: "advisory",

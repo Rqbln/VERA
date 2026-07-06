@@ -47,9 +47,21 @@ class TestModelCard(unittest.TestCase):
                         "aiact": "Art. 15",
                     }
                 ],
-                "n01": {"status": "p", "ref": "MVP3"},
-                "n02": {"status": "p", "ref": "MVP3"},
-                "n03": {"mode": "inference-only", "kwh": "0", "co2eq": "0", "ref": "MVP3"},
+                "n01": {
+                    "status": "queued",
+                    "reviewed": 0,
+                    "queued": 1,
+                    "avg_likert": None,
+                    "ref": "HITL review queue",
+                },
+                "n02": {
+                    "status": "reviewed",
+                    "reviewed": 1,
+                    "queued": 1,
+                    "avg_likert": 4.0,
+                    "ref": "HITL review queue",
+                },
+                "n03": {"mode": "inference-only", "kwh": "0", "co2eq": "0", "ref": "codecarbon"},
                 "n05": {"runs": "0"},
                 "n06": {"scenarios": "0", "ref": "r"},
                 "limitations": "l",
@@ -78,6 +90,9 @@ class TestModelCard(unittest.TestCase):
         self.assertIn("Model Card", md)
         self.assertIn("Harness provenance", md)
         self.assertIn("Dataset evaluation", md)
+        self.assertIn("queued (0/1 reviews)", md)
+        self.assertIn("reviewed (1/1 reviews, avg 4.0/5)", md)
+        self.assertNotIn("MVP3", md)
 
 
 if __name__ == "__main__":

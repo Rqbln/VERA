@@ -92,6 +92,11 @@ class Settings(BaseSettings):
         default="openbao-transit-dev",
         validation_alias="VERA_SIGNING_KEY_ID",
     )
+    vera_hitl_autocreate: bool = Field(
+        default=True,
+        validation_alias="VERA_HITL_AUTOCREATE",
+        description="Auto-queue one N01 and one N02 human review task when a run completes.",
+    )
 
     # ── Governance-as-a-Service (MVP4 gaas profile) ─────────────────────────────────
     vera_gaas_enabled: bool = Field(default=False, validation_alias="VERA_GAAS_ENABLED")

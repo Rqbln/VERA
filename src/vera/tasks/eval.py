@@ -83,6 +83,61 @@ def _autofill_n03_energy(run_id: str, energy: dict[str, Any], settings) -> None:
         pass  # N03 stays manually editable if measurement/storage is unavailable
 
 
+_EMPTY_HITL_SLOT: dict[str, Any] = {
+    "status": "pending",
+    "reviewed": 0,
+    "queued": 0,
+    "avg_likert": None,
+    "ref": "HITL review queue",
+}
+
+
+def _ensure_hitl_tasks(run_id: str, settings) -> list[Any]:
+    """Auto-queue one N01 and one N02 human review task for the run (idempotent).
+
+    N01/N02 cannot be scored automatically; queuing them at completion makes the human
+    step part of every run instead of an opt-in afterthought. Never fails the run.
+    """
+    try:
+        from vera.store.redis_hitl import RedisHitlStore
+
+        store = RedisHitlStore(settings)
+        tasks = store.list(run_id=run_id)  # one SCAN; append newly created tasks in-memory
+        if settings.vera_hitl_autocreate:
+            existing = {t.requirement for t in tasks}
+            for requirement in ("N01", "N02"):
+                if requirement not in existing:
+                    tasks.append(
+                        store.create(
+                            run_id=run_id,
+                            requirement=requirement,
+                            prompt=f"Panel review of {requirement} for run {run_id}",
+                        )
+                    )
+        return tasks
+    except Exception:
+        return []
+
+
+def _hitl_card_slots(tasks: list[Any]) -> dict[str, dict[str, Any]]:
+    """Summarise HITL tasks per requirement for the model card (same semantics as the
+    dashboard's non-measurable slots: reviewed > queued > pending)."""
+    slots: dict[str, dict[str, Any]] = {}
+    for requirement in ("N01", "N02"):
+        rs = [t for t in tasks if t.requirement == requirement]
+        done = [t for t in rs if t.status == "done" and t.likert_score is not None]
+        avg = round(sum(int(t.likert_score) for t in done) / len(done), 2) if done else None
+        status = "reviewed" if done else ("queued" if rs else "pending")
+        slots[requirement.lower()] = {
+            "status": status,
+            "reviewed": len(done),
+            "queued": len(rs),
+            "avg_likert": avg,
+            "ref": "HITL review queue",
+        }
+    return slots
+
+
 def _git_sha() -> str:
     try:
         root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
@@ -185,6 +240,7 @@ def _model_card_context(
     git_sha: str,
     catalog_version: str,
     raw_outputs: list[dict[str, Any]] | None = None,
+    hitl_slots: dict[str, dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     gov = req.governance_model()
     provider, name = parse_litellm_model_id(model_id)
@@ -212,8 +268,8 @@ def _model_card_context(
         "complai_results": _complai_rows(complai_scores),
         "dataset_eval": _dataset_eval_rows(complai_scores, req),
         "harness_provenance": _harness_provenance(raw_outputs or []),
-        "n01": {"status": "pending", "ref": "MVP3"},
-        "n02": {"status": "pending", "ref": "MVP3"},
+        "n01": (hitl_slots or {}).get("n01", _EMPTY_HITL_SLOT),
+        "n02": (hitl_slots or {}).get("n02", _EMPTY_HITL_SLOT),
         "n03": {
             "mode": "inference-only",
             "kwh": "n/a",
@@ -361,6 +417,9 @@ def run_benchmark_job(self, run_id: str, payload: dict[str, Any]) -> dict[str, A
             signature=sig,
         )
         yaml_body = yaml.safe_dump(br, sort_keys=False, allow_unicode=True)
+        # Queue the N01/N02 human reviews before rendering the card so it reports the
+        # real HITL state (queued at generation; the on-demand audit PDF stays live).
+        hitl_tasks = _ensure_hitl_tasks(run_id, s)
         card_md = render_model_card(
             _model_card_context(
                 run_id=run_id,
@@ -370,6 +429,7 @@ def run_benchmark_job(self, run_id: str, payload: dict[str, Any]) -> dict[str, A
                 git_sha=git_sha,
                 catalog_version=cat_version,
                 raw_outputs=raw_outputs,
+                hitl_slots=_hitl_card_slots(hitl_tasks),
             )
         )
         raw_lines = [json.dumps(x, ensure_ascii=False) for x in raw_outputs]

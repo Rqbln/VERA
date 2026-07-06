@@ -75,10 +75,11 @@ VERA treats the scoring policy as a first-class, signed object, so each run reco
 A closed-form bound then certifies which verdicts no reweighting can flip, and flags the ones it can.
 The specification, benchmarks, and weights are swappable data, so VERA runs COMPL-AI today and adapts to a different one without code changes.
 It delivers its results through a role-based dashboard a non-specialist can drive without code, and emits run-tied documentation toward the Act's obligations.
-We benchmark two panels: three model families at one size, and three sizes of one family.
+We benchmark two panels: three model families at one size (Llama~3.1~8B, Qwen2.5~7B, Gemma~2~9B), and three sizes of one family (Ministral~3B, Mistral~7B, Mistral-Small~24B).
 We use public datasets and a released synthetic corpus.
-Capability rises with scale.
-The security verdict collapses at the largest size, and the certification shows it is invariant to any reweighting: a bigger model is not a safer one.
+On the size panel, capability climbs from 0.70 at 3B and 7B to 1.00 at 24B.
+Yet cyber resilience collapses from 0.50 to 0.00 at that largest model.
+The certification shows this security verdict is invariant to any reweighting: a bigger model is not a safer one.
 \end{abstract}
 
 \begin{IEEEkeywords}

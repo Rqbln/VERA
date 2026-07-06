@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getForms, putForm } from "@/lib/api";
 import { getToken } from "@/lib/auth";
+import { useT } from "@/lib/i18n";
 
 // Field templates per declarative requirement (N03–N06).
 const FORM_FIELDS: Record<string, { id: string; label: string }[]> = {
@@ -34,6 +35,7 @@ const FORM_LABELS: Record<string, string> = {
 
 export function DeclarativeForms({ runId }: { runId: string }) {
   const token = getToken();
+  const t = useT();
   const qc = useQueryClient();
   const [active, setActive] = useState("N03");
   const { data } = useQuery({
@@ -62,7 +64,7 @@ export function DeclarativeForms({ runId }: { runId: string }) {
 
   return (
     <div data-testid="declarative-forms" className="rounded border border-default p-3">
-      <h3 className="mb-2 text-xs font-medium text-ink">Declarative forms (N03–N06)</h3>
+      <h3 className="mb-2 text-xs font-medium text-ink">{t("forms.title")}</h3>
       <div className="mb-3 flex flex-wrap gap-1">
         {Object.keys(FORM_FIELDS).map((fid) => {
           const isDone = data?.forms?.[fid]?.completed;
@@ -94,7 +96,7 @@ export function DeclarativeForms({ runId }: { runId: string }) {
         ))}
         <label className="flex items-center gap-2 text-ink-secondary">
           <input type="checkbox" checked={completed} onChange={(e) => setCompleted(e.target.checked)} />
-          Mark as completed
+          {t("forms.mark_completed")}
         </label>
         <button
           type="button"
@@ -102,10 +104,10 @@ export function DeclarativeForms({ runId }: { runId: string }) {
           disabled={save.isPending}
           className="rounded bg-brand px-3 py-1 font-medium text-white disabled:opacity-40"
         >
-          {save.isPending ? "Saving…" : "Save form"}
+          {save.isPending ? t("forms.saving") : t("forms.save")}
         </button>
         {save.isError ? (
-          <p className="text-status-blocked">Save failed (compliance role required in enterprise mode).</p>
+          <p className="text-status-blocked">{t("forms.save_failed")}</p>
         ) : null}
       </div>
     </div>

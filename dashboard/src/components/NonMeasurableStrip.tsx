@@ -1,6 +1,7 @@
 "use client";
 
 import type { NonMeasurableSlot, NonMeasurableSlots } from "@/lib/types";
+import { useT } from "@/lib/i18n";
 
 interface Props {
   slots: NonMeasurableSlots;
@@ -19,31 +20,32 @@ function statusClass(status: string): string {
 }
 
 export function NonMeasurableStrip({ slots, runId }: Props) {
+  const t = useT();
   const items: { id: string; title: string; slot: NonMeasurableSlot; kind: string }[] = [
-    { id: "N01", title: "Explainability", slot: slots.n01, kind: "hitl" },
-    { id: "N02", title: "Corrigibility", slot: slots.n02, kind: "hitl" },
-    { id: "N03", title: "Environmental impact", slot: slots.n03, kind: "energy" },
-    { id: "N04", title: "Datasheet / model card", slot: slots.n04, kind: "form" },
-    { id: "N05", title: "Evaluation summary", slot: slots.n05, kind: "form" },
-    { id: "N06", title: "Risk summary", slot: slots.n06, kind: "form" },
+    { id: "N01", title: t("nm.n01"), slot: slots.n01, kind: "hitl" },
+    { id: "N02", title: t("nm.n02"), slot: slots.n02, kind: "hitl" },
+    { id: "N03", title: t("nm.n03"), slot: slots.n03, kind: "energy" },
+    { id: "N04", title: t("nm.n04"), slot: slots.n04, kind: "form" },
+    { id: "N05", title: t("nm.n05"), slot: slots.n05, kind: "form" },
+    { id: "N06", title: t("nm.n06"), slot: slots.n06, kind: "form" },
   ];
   return (
     <div className="mt-6 border border-default bg-surface-2 p-3 text-xs">
-      <div className="mb-2 text-ink-secondary">Non-measurable (N01–N06)</div>
+      <div className="mb-2 text-ink-secondary">{t("nm.title")}</div>
       <div className="grid gap-2 sm:grid-cols-3">
         {items.map((it) => (
           <Slot key={it.id} {...it} />
         ))}
       </div>
       <div className="mt-2 text-[10px] text-ink-secondary">
-        Run {runId.slice(0, 8)} · N01/N02 from the HITL review queue · N03 measured (CodeCarbon) ·
-        N04–N06 from the declarative forms
+        Run {runId.slice(0, 8)} · {t("nm.caption")}
       </div>
     </div>
   );
 }
 
 function Slot({ id, title, slot, kind }: { id: string; title: string; slot: NonMeasurableSlot; kind: string }) {
+  const t = useT();
   const status = String(slot?.status ?? "pending");
   return (
     <div className="rounded border border-default p-2">
@@ -54,7 +56,7 @@ function Slot({ id, title, slot, kind }: { id: string; title: string; slot: NonM
       <div className="text-ink">{title}</div>
       {kind === "hitl" ? (
         <div className="mt-1 text-[10px] text-ink-secondary">
-          {slot.reviewed ?? 0}/{slot.queue_count ?? 0} reviewed
+          {slot.reviewed ?? 0}/{slot.queue_count ?? 0} {t("nm.reviewed")}
           {slot.avg_likert != null ? ` · avg ${slot.avg_likert}/5` : ""}
         </div>
       ) : null}

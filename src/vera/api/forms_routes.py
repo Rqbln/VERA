@@ -60,7 +60,13 @@ def audit_pdf(
             detail="PDF export needs the optional 'pdf' extra (pip install '.[pdf]' + cairo/pango)",
         )
     forms = RedisFormStore().get_all(run_id)
-    pdf = render_audit_pdf(rec, forms)
+    try:
+        from vera.store.redis_hitl import RedisHitlStore
+
+        hitl = [t.to_dict() for t in RedisHitlStore().list(run_id=run_id)]
+    except Exception:
+        hitl = []
+    pdf = render_audit_pdf(rec, forms, hitl)
     if pdf is None:
         raise HTTPException(status_code=501, detail="PDF rendering unavailable")
     return Response(

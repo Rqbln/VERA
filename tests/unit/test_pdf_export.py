@@ -52,6 +52,23 @@ def test_build_audit_html_includes_hitl_rows():
     assert "N02" in html and "pending" in html
 
 
+def test_build_audit_html_truncates_comment_before_escaping():
+    # A '&' sitting exactly at the 200-char raw boundary must escape to a full "&amp;",
+    # never be cut mid-entity (which truncating *after* escaping would do).
+    hitl = [
+        {
+            "requirement": "N01",
+            "status": "done",
+            "likert_score": 4,
+            "criteria": {"clarity": 4},
+            "comment": "z" * 199 + "&data",
+        }
+    ]
+    html = build_audit_html(_rec(), None, hitl)
+    assert "&amp;" in html  # entity kept whole
+    assert "z&d" not in html and "z&<" not in html  # no bare '&' from a cut entity
+
+
 def test_build_audit_html_without_hitl_backward_compatible():
     html = build_audit_html(_rec(), {"N03": {"completed": True, "fields": {"kwh": "10"}}})
     assert "Human review (N01–N02, HITL)" in html

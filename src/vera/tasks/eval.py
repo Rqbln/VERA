@@ -102,16 +102,19 @@ def _ensure_hitl_tasks(run_id: str, settings) -> list[Any]:
         from vera.store.redis_hitl import RedisHitlStore
 
         store = RedisHitlStore(settings)
+        tasks = store.list(run_id=run_id)  # one SCAN; append newly created tasks in-memory
         if settings.vera_hitl_autocreate:
-            existing = {t.requirement for t in store.list(run_id=run_id)}
+            existing = {t.requirement for t in tasks}
             for requirement in ("N01", "N02"):
                 if requirement not in existing:
-                    store.create(
-                        run_id=run_id,
-                        requirement=requirement,
-                        prompt=f"Panel review of {requirement} for run {run_id}",
+                    tasks.append(
+                        store.create(
+                            run_id=run_id,
+                            requirement=requirement,
+                            prompt=f"Panel review of {requirement} for run {run_id}",
+                        )
                     )
-        return store.list(run_id=run_id)
+        return tasks
     except Exception:
         return []
 

@@ -13,7 +13,7 @@ the real data, not placeholders).
 
 ## N01 / N02 — human review (HITL), multi-criteria rubric
 N01 (explainability) and N02 (corrigibility) are judged by a panel on a **rubric** of 1–5 criteria;
-the Likert score is the mean of the criteria. One review task per requirement is **auto-queued when
+the Likert score is the **rounded mean** of the criteria (an integer in 1–5). One review task per requirement is **auto-queued when
 a run completes** (disable with `VERA_HITL_AUTOCREATE=0`), so the model card reports the queue state
 and the signed audit PDF carries the live review results (status, avg Likert, per-criterion means).
 
@@ -26,7 +26,7 @@ Fill per run:
 ```bash
 # queue a task
 curl -X POST :8000/api/v1/hitl/tasks -d '{"run_id":"<id>","requirement":"N01"}' -H 'content-type: application/json'
-# a reviewer submits the rubric (Likert = mean)
+# a reviewer submits the rubric (Likert = rounded mean, e.g. mean 4.0 -> 4)
 curl -X POST :8000/api/v1/hitl/tasks/<task_id>/review \
   -d '{"reviewer":"alice","criteria":{"faithfulness":4,"completeness":4,"clarity":5,"actionability":3}}' \
   -H 'content-type: application/json'

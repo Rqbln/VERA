@@ -85,8 +85,8 @@ function TaskRow({ task, runId, rubric }: { task: HitlTask; runId: string; rubri
   );
   const [comment, setComment] = useState("");
   const review = useMutation({
-    // Never send an empty criteria object: the backend treats {} as "no rubric" and
-    // would fall back to a null likert_score. Untouched selects submit their default (3).
+    // Never send an empty criteria object: with no likert_score the API rejects it (400).
+    // When a rubric exists we always send a full criteria map; untouched selects submit 3.
     mutationFn: () =>
       submitHitlReview(
         token,

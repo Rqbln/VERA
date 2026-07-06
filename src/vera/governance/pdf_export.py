@@ -53,10 +53,11 @@ def _hitl_rows(hitl: list[dict[str, Any]] | None) -> str:
             )
             or "—"
         )
-        comments = (
-            " / ".join(html.escape(str(t.get("comment"))) for t in done if t.get("comment"))[:200]
-            or "—"
-        )
+        # Truncate the raw text first, then escape: truncating escaped text could cut an
+        # entity (e.g. "&amp;") mid-string and emit malformed HTML.
+        raw_comments = " / ".join(str(t.get("comment")) for t in done if t.get("comment"))
+        clipped = raw_comments[:200] + ("…" if len(raw_comments) > 200 else "")
+        comments = html.escape(clipped) or "—"
         rows += _row([requirement, status, f"{len(done)}/{len(tasks)}", avg, criteria, comments])
     return rows
 

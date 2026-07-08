@@ -65,17 +65,15 @@
 \maketitle
 
 \begin{abstract}
-Deploying large language models under the EU AI Act requires reproducible technical evidence across trustworthy-AI principles.
-COMPL-AI turns these principles into twelve measurable requirements and reports them as a benchmarking study.
-It aggregates each requirement by an unweighted average.
-It never quantifies how that choice shapes a verdict.
-We present VERA, an open-source framework that runs the same measurable requirements.
+Deploying large language models under the EU AI Act calls for reproducible technical evidence across trustworthy-AI principles.
+COMPL-AI, a framework introduced in 2024, translates these principles into twelve measurable requirements and reports them as a benchmarking study.
+We present VERA, an operational open-source responsible-AI platform that builds on this framework.
 The name stands for \emph{Verifiable Evaluation for Responsible AI}.
-VERA treats the scoring policy as a first-class, signed object, so each run records the weighting behind its scores.
-A closed-form bound then certifies which verdicts no reweighting can flip, and flags the ones it can.
-The specification, benchmarks, and weights are swappable data, so VERA runs COMPL-AI today and adapts to a different one without code changes.
-It delivers its results through a role-based dashboard a non-specialist can drive without code, and emits run-tied documentation toward the Act's obligations.
-It also routes the six non-measurable requirements to human review and attested run-tied forms, where COMPL-AI leaves them unassessed.
+Besides delivering results through a role-based dashboard a non-specialist can drive without code, VERA expands COMPL-AI with key operational features.
+(i) It generates run-tied documentation toward the Act's obligations, including human review for the requirements no benchmark can score.
+(ii) It treats the scoring policy behind each final score as a first-class, signed object, so each run records its weighting; this matters because the scoring scheme can materially change the verdict.
+(iii) A closed-form bound certifies which verdicts are robust to changes in the scoring weights.
+(iv) The specification, benchmarks, and weights are swappable data, so VERA runs COMPL-AI today and adapts to a different specification without code changes.
 We benchmark two panels: three model families at one size (Llama~3.1~8B, Qwen2.5~7B, Gemma~2~9B), and three sizes of one family (Ministral~3B, Mistral~7B, Mistral-Small~24B).
 We use public datasets and a released synthetic corpus.
 On the size panel, capability climbs from 0.70 at 3B and 7B to 1.00 at 24B.
@@ -91,7 +89,7 @@ Responsible AI, EU AI Act, COMPL-AI, Modularity, Benchmark, Framework, Open sour
 \label{sec:introduction}
 
 \subsection{Motivation}
-Before an organisation ships an LLM-based assistant in a regulated setting, the EU AI Act asks for technical evidence across its trustworthy-AI principles~\cite{euaiact2024,hleg2019trustworthyai}, among them robustness, privacy, transparency, and fairness.
+Before an organisation ships an LLM-based assistant in a regulated setting, the EU AI Act asks for technical evidence across its trustworthy-AI principles~\cite{euaiact2024,hleg2019trustworthyai}, among them robustness, privacy, transparency, fairness, and human oversight.
 COMPL-AI~\cite{guldimann2024complai}, a community operationalization of the Act welcomed by the European Commission, turns these principles into twelve measurable requirements and reports them, decomposed per principle and per benchmark, as an open-source benchmarking suite.
 This is the right structure, and we build on it.
 What it leaves to the practitioner is the last step to a release decision.
@@ -234,24 +232,26 @@ The run emits its artifacts, the run file, a model card, per-item outputs, and a
 
 \subsection{Responsible-AI Pillars}
 Having shown how the pipeline runs, we state what it covers.
-The EU AI Act and COMPL-AI organise trustworthy-AI obligations into six principle areas, and VERA groups its requirement identifiers under exactly these pillars in code.
-\Cref{tab:pillars} maps each pillar to the requirements VERA scores and to the components that evaluate them.
-The pillars are the axes along which a reader interprets a run, and the dashboard (\Cref{sec:dashboard}) groups its role-based views along them.
+The pillars are not ours to choose: they are the Act's six trustworthy-AI principles~\cite{hleg2019trustworthyai}, adopted through COMPL-AI's operationalization, and \Cref{tab:pillars} maps each to the requirements VERA covers and the components that evaluate them.
+The distinction between model and system runs through the table: the measurable requirements check the model in isolation, which is also COMPL-AI's stated scope, while the N requirements, the run-tied artifacts, and the governance runtime address the surrounding system, whose conformity the Act ultimately regulates.
+Transparency does cover explainability: its measurable slice spans capabilities (CR06), calibration and interpretability (CR07), AI disclosure (CR08), and traceability (CR09), but judging an actual explanation still resists automation.
+VERA therefore routes explainability (N01) and corrigibility (N02) to a documented human review, and groups them under human agency and oversight, the pillar COMPL-AI leaves without technical requirements because it is system-level.
+That pillar is where the human stays in the loop: the review queue, the role-based views, and the kill-switch (\Cref{sec:dashboard}) are its operational surface.
 
 \begin{table}[t]
-  \caption{The six responsible-AI pillars VERA covers, the COMPL-AI requirements grouped under each (measurable CR; human-reviewed or declarative N), and the components that evaluate them.}
+  \caption{The six responsible-AI pillars VERA covers, the COMPL-AI requirements VERA groups under each (measurable CR; human-reviewed or declarative N), and the components that evaluate them.}
   \label{tab:pillars}
   \centering
   \tblsetup
   \begin{tabularx}{\columnwidth}{@{}lcX@{}}
     \toprule
-    Pillar (COMPL-AI) & Requirements & Evaluated by \\
+    Pillar & Requirements & Evaluated by \\
     \midrule
     Human agency \& oversight & N01--N02 & HITL rubric review queue \\
     Robustness \& safety & CR01--CR02 & R01 runner, Garak, \texttt{hf\_dynamic} \\
     Privacy \& data governance & CR03--CR05 & \texttt{dataset\_scan}, Presidio \\
     Transparency & CR06--CR09, N04--N06 & \texttt{lm\_eval}, calibration, card/datasheet \\
-    Fairness \& non-discrimination & CR10--CR12 & \texttt{hf\_bbq}, R11/R12 runners \\
+    Diversity \& fairness & CR10--CR12 & \texttt{hf\_bbq}, R11/R12 runners \\
     Societal \& environmental & N03 & energy hooks (CodeCarbon) \\
     \bottomrule
   \end{tabularx}
@@ -611,23 +611,23 @@ Both reuse the same benchmark runners and catalog as the inference path.
 
 \section{Banking Regulatory Mapping}
 \label{app:banking}
-\Cref{tab:banking-map} maps the AI-Act principles VERA measures onto the banking-sector obligations a second line of defence already tracks, so the same run yields artifacts a banking reviewer recognises.
+\Cref{tab:banking-map} maps the same six pillars as \Cref{tab:pillars} onto the banking-sector obligations a second line of defence already tracks, so the same run yields artifacts a banking reviewer recognises.
 
 \begin{table}[h]
-  \caption{The release-gate run maps AI-Act principles (via COMPL-AI requirements) onto banking-sector obligations.}
+  \caption{The release-gate run maps the six pillars of \Cref{tab:pillars} (via COMPL-AI requirements) onto banking-sector obligations.}
   \label{tab:banking-map}
   \centering
   \tblsetup
   \begin{tabularx}{\columnwidth}{@{}l l X@{}}
     \toprule
-    VERA req. & AI-Act principle & Banking obligation \\
+    Pillar & VERA req. & Banking obligation \\
     \midrule
-    CR01--CR02 & Robustness \& safety & DORA ICT-risk \& resilience testing~\cite{dora2022}; EBA~\cite{eba2021ictrisk} \\
-    CR03--CR05 & Privacy \& data gov. & GDPR; EBA data-quality \& security~\cite{eba2021ictrisk} \\
-    CR06--CR09 & Transparency & ACPR explainability \& traceability~\cite{acpr2020ai} \\
-    CR10--CR11 & Diversity \& fairness & ACPR non-discrimination in finance~\cite{acpr2020ai} \\
-    N01--N02 & Human agency & ACPR human oversight / four-eyes~\cite{acpr2020ai} \\
-    N03 & Societal/env. & Energy reporting (CodeCarbon, measured) \\
+    Human agency \& oversight & N01--N02 & ACPR human oversight / four-eyes~\cite{acpr2020ai} \\
+    Robustness \& safety & CR01--CR02 & DORA ICT-risk \& resilience testing~\cite{dora2022}; EBA~\cite{eba2021ictrisk} \\
+    Privacy \& data governance & CR03--CR05 & GDPR; EBA data-quality \& security~\cite{eba2021ictrisk} \\
+    Transparency & CR06--CR09, N04--N06 & ACPR explainability \& traceability~\cite{acpr2020ai} \\
+    Diversity \& fairness & CR10--CR12 & ACPR non-discrimination in finance~\cite{acpr2020ai} \\
+    Societal \& environmental & N03 & Energy reporting (CodeCarbon, measured) \\
     \bottomrule
   \end{tabularx}
 \end{table}

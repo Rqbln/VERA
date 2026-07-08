@@ -67,11 +67,13 @@
 \begin{abstract}
 Deploying large language models under the EU AI Act calls for reproducible technical evidence across trustworthy-AI principles.
 COMPL-AI, a framework introduced in 2024, translates these principles into twelve measurable requirements and reports them as a benchmarking study.
-We present VERA, an operational open-source responsible-AI platform that builds on this framework.
+It aggregates each requirement by an unweighted average.
+It never quantifies how that choice shapes a verdict.
+We present VERA, an operational open-source responsible-AI framework that builds on COMPL-AI.
 The name stands for \emph{Verifiable Evaluation for Responsible AI}.
-Besides delivering results through a role-based dashboard a non-specialist can drive without code, VERA expands COMPL-AI with key operational features.
+Besides delivering results through a role-based dashboard a non-specialist can drive without code, VERA adds key operational features.
 (i) It generates run-tied documentation toward the Act's obligations, including human review for the requirements no benchmark can score.
-(ii) It treats the scoring policy behind each final score as a first-class, signed object, so each run records its weighting; this matters because the scoring scheme can materially change the verdict.
+(ii) It treats the scoring policy behind each final score as a first-class, signed object, so each run records its weighting.
 (iii) A closed-form bound certifies which verdicts are robust to changes in the scoring weights.
 (iv) The specification, benchmarks, and weights are swappable data, so VERA runs COMPL-AI today and adapts to a different specification without code changes.
 We benchmark two panels: three model families at one size (Llama~3.1~8B, Qwen2.5~7B, Gemma~2~9B), and three sizes of one family (Ministral~3B, Mistral~7B, Mistral-Small~24B).

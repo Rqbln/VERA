@@ -71,7 +71,7 @@ We present VERA (\emph{Verifiable Evaluation for Responsible AI}), an operationa
 VERA advances this state of the art on four fronts.
 It generates the run-tied documentation the Act's obligations call for.
 It delivers results through a role-based dashboard a non-specialist can drive without code.
-It treats the scoring policy behind each final score as a first-class, signed object, and a closed-form bound certifies which verdicts are robust to changes in the scoring weights.
+It treats the scoring policy behind each final score as a first-class, signed object, and a closed-form bound indicates which verdicts are robust to changes in the scoring weights.
 Its specification, benchmarks, and weights are swappable data, so VERA runs COMPL-AI today and can adapt to a different specification without code changes.
 We use VERA to benchmark six open-weight LLMs on public datasets and a released synthetic corpus: we first compare three model families at a comparable size (Llama~3.1~8B, Qwen2.5~7B, Gemma~2~9B), then three sizes of one family (Ministral~3B, Mistral~7B, Mistral-Small~24B).
 Across sizes, capability, a coarse measure of raw performance, increases from 0.70 at 3B and 7B to 1.00 at 24B.
@@ -88,26 +88,28 @@ Responsible AI, EU AI Act, COMPL-AI, Modularity, Benchmark, Framework, Open sour
 
 \subsection{Motivation}
 Before an organisation ships an LLM-based assistant in a regulated setting, the EU AI Act asks for technical evidence across its trustworthy-AI principles~\cite{euaiact2024,hleg2019trustworthyai}, among them robustness, privacy, transparency, fairness, and human oversight.
-COMPL-AI~\cite{guldimann2024complai}, a community operationalization of the Act welcomed by the European Commission, turns these principles into twelve measurable requirements and reports them, decomposed per principle and per benchmark, as an open-source benchmarking suite.
+COMPL-AI~\cite{guldimann2024complai}, a community operationalization of the Act welcomed by the European Commission, turns these principles into twelve measurable requirements.
+It reports them as an open-source benchmarking suite, decomposed per principle and per benchmark.
 This is the right structure, and we build on it.
 What it leaves to the practitioner is the last step to a release decision.
-The suite is driven from a command line aimed at ML engineers, not packaged for the compliance or risk owner who must sign off.
-Its aggregation fixes one implicit weighting, a simple average, and does not quantify how that choice shapes a verdict: how close a passing requirement sits to failing, or which verdicts a different, equally defensible weighting would flip.
-A release decision does not need another number.
-It needs a per-criterion view whose scoring policy is explicit and auditable, and a statement of which verdicts are robust to it.
+The suite is driven from a command line aimed at ML engineers, not packaged for the compliance or risk owner who has to sign off.
+Its aggregation fixes one implicit weighting, a simple average, and does not quantify how that choice shapes a verdict.
+It does not say how close a passing requirement sits to failing, nor which verdicts a different, equally defensible weighting would flip.
+A release decision gains little from one more number.
+It calls for a per-criterion view whose scoring policy is explicit and auditable, and a statement of which verdicts are robust to it.
 
 \subsection{Contributions}
-We present VERA, an open-source framework that runs the twelve measurable COMPL-AI requirements, makes the aggregation policy behind each score signed and auditable, and certifies each verdict's robustness to that policy.
+We present VERA, an open-source framework that runs the twelve measurable COMPL-AI requirements, makes the aggregation policy behind each score signed and auditable, and quantifies each verdict's robustness to that policy.
 The six non-measurable requirements follow a traceable human path in the same tool: a rubric-based review queue, a measured energy report, and signed declarative forms.
 Scores stay explainable in the decompositional sense: each requirement score is traceable, inside the tool, to the contributing public benchmarks and their individual results.
 We release VERA as open-source software to speed up adoption and disseminate responsible-AI best practice.
 We make four contributions, each tied to a research question and each a concrete delta over the two closest works, the COMPL-AI reference implementation and PromptOps~\cite{sunetnanta2025promptops}.
 \begin{itemize}
-  \item \textbf{C1 (Operable dashboard).} VERA delivers COMPL-AI's measurable metrics\footnote{COMPL-AI project: \url{https://compl-ai.org}.} through a role-based dashboard that a non-specialist can drive end-to-end, launch a run and read its verdicts, without writing code (RQ1). COMPL-AI ships a command-line study and a public per-principle leaderboard aimed at ML engineers; PromptOps reports flat score tables. The delta is operability for a non-specialist, not visualisation as such.
-  \item \textbf{C2 (Run-tied traceability).} Each run generates its own model card and, for dataset runs, a datasheet, populated from that exact evaluation, toward the Act's technical-documentation duty (Art.~11); COMPL-AI emits no such run-tied artifacts. Within the dashboard, every verdict also decomposes into its contributing benchmarks, so a non-specialist sees \emph{why} a requirement is weak (RQ2). The decomposition itself follows COMPL-AI's hierarchical reporting; our contribution is to make it operable inside the run and bound to signed documentation.
+  \item \textbf{C1 (Operable dashboard).} VERA delivers COMPL-AI's measurable metrics\footnote{COMPL-AI project: \url{https://compl-ai.org}.} through a role-based dashboard that a non-specialist can drive end-to-end, launch a run and read its verdicts, without writing code (RQ1). We support this claim with a task-based design walkthrough in \Cref{sec:results}. COMPL-AI ships a command-line study and a public per-principle leaderboard aimed at ML engineers; PromptOps reports flat score tables. The delta is operability for a non-specialist, not visualisation as such.
+  \item \textbf{C2 (Run-tied traceability).} We bind the documentation the Act expects (Art.~11) to the evaluation that justifies it: each run generates its own model card and, for dataset runs, a datasheet, populated from that exact evaluation; COMPL-AI emits no such run-tied artifacts. Within the dashboard, every verdict also decomposes into its contributing benchmarks, so a non-specialist sees \emph{why} a requirement is weak (RQ2). The decomposition itself follows COMPL-AI's hierarchical reporting; the research delta is the binding of decomposition, run, and signed documentation into one auditable object.
 The same run-tied path covers the six non-measurable requirements: each run auto-queues a rubric-based human review for explainability (N01) and corrigibility (N02), measures energy for N03, and attests N04 to N06 through signed declarative forms.
-  \item \textbf{C3 (Auditable, swappable scoring).} The scoring policy is a versioned, signed catalog whose SHA-256 digest is pinned into every run, and a closed-form bound (\Cref{prop:range}) quantifies how much each verdict depends on it (RQ4), where COMPL-AI fixes an unweighted average and leaves that dependence unmeasured. The requirement specification, the benchmarks, and the weights are themselves swappable data, so VERA runs COMPL-AI today and adapts to a different responsible-AI specification without code changes (RQ3). This is why we call it a framework.
-  \item \textbf{C4 (Benchmark).} We contribute an open, reproducible benchmark of the twelve requirements over two model panels, three families at a comparable size and one family across three sizes, on public datasets and a released synthetic corpus. The contribution is the reproducible, signed protocol across families and sizes, not a larger empirical study than COMPL-AI's.
+  \item \textbf{C3 (Auditable, swappable scoring).} The scoring policy is a versioned, signed catalog whose SHA-256 digest is pinned into every run, and a closed-form bound (\Cref{prop:range}) quantifies how much each verdict depends on it (RQ4), where COMPL-AI fixes an unweighted average and leaves that dependence unmeasured. The requirement specification, the benchmarks, and the weights are themselves swappable data, so VERA runs COMPL-AI today and can adapt to a different responsible-AI specification without code changes (RQ3). This is why we call it a framework.
+  \item \textbf{C4 (Reproducible study).} We report an open, reproducible study of the twelve requirements over two model panels, three families at a comparable size and one family across three sizes, on public datasets and a released synthetic corpus. The contribution is the signed, reproducible protocol across families and sizes; the cross-model results themselves are findings, and we do not claim a larger empirical study than COMPL-AI's.
 \end{itemize}
 We evaluate C1--C4 across the two panels of \Cref{sec:results}, where VERA flags concrete responsible-AI gaps between families and sizes.
 
@@ -121,13 +123,14 @@ VERA is open-source and available at \url{\repourl}. The released replication pa
 The EU AI Act~\cite{euaiact2024} and the six HLEG trustworthy-AI principles~\cite{hleg2019trustworthyai} ask for technical evidence on high-risk systems.
 NIST and ISO frameworks~\cite{nist2023airmf,iso42001_2023} guide organizational risk management, but stop short of runnable metrics.
 COMPL-AI~\cite{guldimann2024complai} narrows that gap.
-Developed by ETH Zurich, INSAIT, and LatticeFlow AI, and welcomed by the European Commission as a first step toward operationalizing the Act, it maps the principles to eighteen technical requirements, twelve with measurable scores in $[0,1]$.
+It was developed by ETH Zurich, INSAIT, and LatticeFlow AI, and welcomed by the European Commission as a first step toward operationalizing the Act.
+It maps the principles to eighteen technical requirements, twelve with measurable scores in $[0,1]$.
 It also ships its own open-source evaluation suite (27 benchmarks) and a public leaderboard.
 The six remaining requirements stay unassessed in its study: the authors note that adequate measurement tools do not yet exist, and report them as N/A or as trivial constants.
 We state the overlap plainly: VERA implements COMPL-AI's measurable taxonomy and runs the same family of public benchmarks.
 COMPL-AI already reports results decompositionally, as a hierarchy of principle, requirement, and benchmark with sample-level logs and a public per-principle view, and it is community-extensible; VERA claims neither decomposition nor extensibility as novel.
 VERA's deltas are four properties COMPL-AI does not provide.
-First, a signed, digest-pinned scoring policy with a closed-form verdict-sensitivity certification: COMPL-AI aggregates each requirement by an unweighted average and does not quantify how that choice shapes a verdict.
+First, a signed, digest-pinned scoring policy with a closed-form verdict-sensitivity analysis: COMPL-AI aggregates each requirement by an unweighted average and does not quantify how that choice shapes a verdict.
 Second, run-tied model cards and datasheets.
 Third, an operable, role-based interface for non-specialists, with an optional runtime-governance mode.
 Fourth, a traceable human path for the six non-measurable requirements, a rubric-based review queue plus signed attestation forms, where COMPL-AI stops at N/A.
@@ -257,10 +260,10 @@ That pillar is where the human stays in the loop: the review queue, the role-bas
 
 \subsection{Benchmark Provenance}
 The catalog (\texttt{benchmarks\_catalog.yaml}) defines, per requirement, which public benchmarks contribute and with which weights; it is versioned, so a weighting change is a new, diffable revision rather than a code edit.
-It is a versioned, signed artifact: every run pins the catalog's SHA-256 digest next to its scores, so a score always names the exact weighting that produced it.
+It is a versioned, signed artifact: every run pins the catalog's SHA-256 digest next to its scores, so a score records the exact weighting that produced it.
 A benchmark without a catalog weight is excluded from the aggregate rather than silently defaulted, and the registry-to-catalog mapping is validated at run start, so every aggregate reproduces exactly from its decomposition.
 Each per-item output records which benchmark and which runner produced it.
-An explicit flag marks the case where an optional engine was absent and a simpler check ran instead, so a reader always sees where a number came from.
+An explicit flag marks the case where an optional engine was absent and a simpler check ran instead, so a reader can see where each number came from.
 
 \subsection{Data-Stage Engines}
 Dataset scans populate CR03--CR05 in-graph: toxicity via Detoxify~\cite{hanu2020detoxify}, copyright via memorisation heuristics, and privacy via Presidio~\cite{microsoft2023presidio} PII detection.
@@ -270,7 +273,7 @@ Checkpoint evaluation and a data-poisoning lab also exist in the platform but ar
 \subsection{Governance Runtime (Profile-Gated)}
 \label{sec:gaas}
 Evaluation asks whether a model is responsible now.
-Production also needs to know whether it stays responsible.
+Production also has to track whether it stays responsible.
 The enterprise profile therefore adds an optional governance-as-a-service (GaaS) runtime around the same pipeline (\Cref{fig:gaas}), built from open-source parts and reusing the platform's scoring code.
 An inline proxy sits in front of the target.
 On the synchronous path it consults the policy layer, forwards the request through the model router, and returns the response; off-band it publishes the request and response to an event bus.
@@ -288,6 +291,7 @@ The lite profile instantiates none of it; the same code, opted in via a Docker p
 \end{figure*}
 
 \subsection{Governance Artifact Generation}
+Each run leaves a documentation trail.
 Model cards follow the Model Cards format~\cite{mitchell2019modelcard}: twelve measurable rows, the non-measurable statuses, dataset evaluation URIs, benchmark provenance, signatures, and limitations.
 Datasheets~\cite{gebru2021datasheets} attach to corpus scans.
 Environmental hooks record per-run energy and emissions for N03.
@@ -365,16 +369,16 @@ For RQ4, one command re-aggregates the same cached per-benchmark results under a
   \tblsetup
   \begin{tabularx}{\columnwidth}{@{}l l X@{}}
     \toprule
-    Req & Focus & Public dataset(s) \\
+    Metric & ID & Public dataset(s) \\
     \midrule
-    CR01 & Robustness & MMLU~\cite{hendrycks2021mmlu} (perturbed) \\
-    CR02 & Cyber resilience & AdvBench, DecodingTrust~\cite{wang2023decodingtrust} \\
-    CR06 & Capabilities & MMLU~\cite{hendrycks2021mmlu}, GSM8K~\cite{cobbe2021gsm8k}, HumanEval~\cite{chen2021humaneval}, TruthfulQA~\cite{lin2022truthfulqa}, BBH~\cite{suzgun2023bbh} \\
-    CR07 & Calibration & MMLU~\cite{hendrycks2021mmlu} (confidence) \\
-    CR09 & Watermark & none; statistical test~\cite{kirchenbauer2023watermark} \\
-    CR10 & Representation bias & BBQ~\cite{parrish2022bbq}, BOLD~\cite{dhamala2021bold}, StereoSet~\cite{nadeem2021stereoset} \\
-    CR11 & Fairness & DecodingTrust~\cite{wang2023decodingtrust} (Adult) \\
-    CR12 & Toxicity & RealToxicityPrompts~\cite{gehman2020realtoxicity}, TruthfulQA~\cite{lin2022truthfulqa} \\
+    Robustness & CR01 & MMLU~\cite{hendrycks2021mmlu} (perturbed) \\
+    Cyber resilience & CR02 & AdvBench, DecodingTrust~\cite{wang2023decodingtrust} \\
+    Capabilities & CR06 & MMLU~\cite{hendrycks2021mmlu}, GSM8K~\cite{cobbe2021gsm8k}, HumanEval~\cite{chen2021humaneval}, TruthfulQA~\cite{lin2022truthfulqa}, BBH~\cite{suzgun2023bbh} \\
+    Calibration & CR07 & MMLU~\cite{hendrycks2021mmlu} (confidence) \\
+    Watermark & CR09 & none; statistical test~\cite{kirchenbauer2023watermark} \\
+    Representation bias & CR10 & BBQ~\cite{parrish2022bbq}, BOLD~\cite{dhamala2021bold}, StereoSet~\cite{nadeem2021stereoset} \\
+    Fairness & CR11 & DecodingTrust~\cite{wang2023decodingtrust} (Adult) \\
+    Toxicity & CR12 & RealToxicityPrompts~\cite{gehman2020realtoxicity}, TruthfulQA~\cite{lin2022truthfulqa} \\
     \bottomrule
   \end{tabularx}
 \end{table}
@@ -385,7 +389,7 @@ For RQ4, one command re-aggregates the same cached per-benchmark results under a
 We report a run of both panels (seed~42, $n{=}10$).
 The numbers illustrate reporting and cross-model contrast, not state-of-the-art capability.
 
-\subsection{RQ1: A Non-Specialist Can Read a Run}
+\subsection{RQ1: Reading a Run from the Dashboard}
 We assess the dashboard as a design validation: two of us drove a run in guided (no-login) mode and read it from the dashboard alone (\Cref{fig:dashboard}; \Cref{app:dashboard}).
 The status-first ordering puts the weakest requirement at the top, with passing ones collapsed behind ``show all''.
 The coverage band, the Trust Factor, and the per-benchmark provenance are visible without scrolling, and ``fallback'' badges mark the degraded engines.
@@ -393,7 +397,7 @@ In one or two clicks each, the dashboard supported eight reading tasks: find the
 The alternative, correlating the run file and the per-item outputs by hand, takes minutes.
 We report this as evidence that the interface \emph{affords} these tasks; a formal external panel~\cite{hayes2007krippendorff,studtmann2023histree} is future work.
 
-\subsection{RQ2: Every Score Is Explained}
+\subsection{RQ2: Explaining a Score}
 VERA does not stop at a number.
 Opening a weak requirement shows its contributing public benchmarks and their individual scores, so the cause is visible rather than inferred.
 For example, when a model scores low on representation bias (CR10), the drawer shows which bias benchmark drove it (BBQ, BOLD, or StereoSet), and clicking through reaches the sample outputs.
@@ -401,12 +405,14 @@ Each requirement score is therefore explained by the public evidence behind it, 
 
 \subsection{RQ3: One Framework Across Families and Sizes}
 \Cref{tab:panelA} (families) and \Cref{tab:panelB} (sizes) report the twelve requirements for both panels, computed by the \emph{same} framework with no code change between them.
-This is the benchmark contribution C4, and running it unchanged over two panels is the evidence for the modularity claim C3.
+This is the reproducible study C4, and running it unchanged over two panels is the evidence for the modularity claim C3.
 \Cref{fig:results-path} shows how to read a column: pick a requirement, read its band, and open it in the dashboard for the benchmark behind it.
-The panels \emph{discriminate}.
-On the family panel, fairness (CR11) splits the models sharply: Qwen2.5 collapses to $0.00$ while Llama and Gemma reach $1.00$, and cyber resilience (CR02) and toxicity (CR12) separate them too.
-On the size panel, capability (CR06) rises with scale, from $0.70$ at 3B and 7B to $1.00$ at 24B, yet the 24B model collapses on fairness (CR11 $=0.00$) and cyber resilience (CR02 $=0.00$): a bigger model is not automatically a safer one.
-These are exactly the cross-model gaps a reader must catch.
+The panels reveal differences across models.
+On the family panel, fairness (CR11) splits the models sharply: Qwen2.5 drops to $0.00$ while Llama and Gemma reach $1.00$, and cyber resilience (CR02) and toxicity (CR12) separate them too.
+On the size panel, capability (CR06) increases with scale, from $0.70$ at 3B and 7B to $1.00$ at 24B.
+Yet the 24B model drops to zero on fairness (CR11 $=0.00$) and cyber resilience (CR02 $=0.00$).
+As a side observation, the COMPL-AI and VERA frameworks show us that a bigger model is not always a more responsible one.
+These are the cross-model gaps a reader wants to catch.
 At $n{=}10$ items per benchmark, extreme splits such as CR11 $0.00$ versus $1.00$ are flags to investigate, not precise estimates; bootstrap intervals ship with the run artifacts.
 The dataset-stage scores CR03--CR05 are identical across models, since the scans run on the corpus, not the model: CR03 $=0.84$, CR04 $=0.94$, and CR05 $=0.73$ (Presidio flags the planted PII).
 Watermarking CR09 is $0.00$ for every model: the statistical test~\cite{kirchenbauer2023watermark} looks for a Kirchenbauer-style green-list bias, and open models carry no such watermark, so the correct score is zero rather than a false positive.
@@ -416,22 +422,22 @@ Watermarking CR09 is $0.00$ for every model: the statistical test~\cite{kirchenb
   \label{tab:panelA}
   \centering
   \tblsetup
-  \begin{tabularx}{\columnwidth}{@{}l X c c c@{}}
+  \begin{tabularx}{\columnwidth}{@{}X l c c c@{}}
     \toprule
-    ID & Metric Name & Llama 3.1 8B & Qwen2.5 7B & Gemma 2 9B \\
+    Metric & ID & Llama 3.1 8B & Qwen2.5 7B & Gemma 2 9B \\
     \midrule
-    CR01 & Robustness & 1.00 & 1.00 & 1.00 \\
-    CR02 & Cyber resilience & \best{0.50} & 0.25 & 0.00 \\
-    CR03 & Data adequacy & 0.84 & 0.84 & 0.84 \\
-    CR04 & Copyright & 0.94 & 0.94 & 0.94 \\
-    CR05 & Privacy & 0.73 & 0.73 & 0.73 \\
-    CR06 & Capabilities & 0.80 & 0.80 & 0.80 \\
-    CR07 & Calibration & 0.90 & 0.90 & 0.90 \\
-    CR08 & AI disclosure & 0.50 & \best{1.00} & \best{1.00} \\
-    CR09 & Watermark & 0.00 & 0.00 & 0.00 \\
-    CR10 & Representation bias & 0.67 & 0.67 & 0.67 \\
-    CR11 & Fairness & \best{1.00} & 0.00 & \best{1.00} \\
-    CR12 & Toxicity & \best{0.75} & 0.62 & \best{0.75} \\
+    Robustness & CR01 & 1.00 & 1.00 & 1.00 \\
+    Cyber resilience & CR02 & \best{0.50} & 0.25 & 0.00 \\
+    Data adequacy & CR03 & 0.84 & 0.84 & 0.84 \\
+    Copyright & CR04 & 0.94 & 0.94 & 0.94 \\
+    Privacy & CR05 & 0.73 & 0.73 & 0.73 \\
+    Capabilities & CR06 & 0.80 & 0.80 & 0.80 \\
+    Calibration & CR07 & 0.90 & 0.90 & 0.90 \\
+    AI disclosure & CR08 & 0.50 & \best{1.00} & \best{1.00} \\
+    Watermark & CR09 & 0.00 & 0.00 & 0.00 \\
+    Representation bias & CR10 & 0.67 & 0.67 & 0.67 \\
+    Fairness & CR11 & \best{1.00} & 0.00 & \best{1.00} \\
+    Toxicity & CR12 & \best{0.75} & 0.62 & \best{0.75} \\
     \bottomrule
   \end{tabularx}
 \end{table}
@@ -441,22 +447,22 @@ Watermarking CR09 is $0.00$ for every model: the statistical test~\cite{kirchenb
   \label{tab:panelB}
   \centering
   \tblsetup
-  \begin{tabularx}{\columnwidth}{@{}l X c c c@{}}
+  \begin{tabularx}{\columnwidth}{@{}X l c c c@{}}
     \toprule
-    ID & Metric Name & Ministral 3B & Mistral 7B & Mistral-Small 24B \\
+    Metric & ID & Ministral 3B & Mistral 7B & Mistral-Small 24B \\
     \midrule
-    CR01 & Robustness & 0.93 & \best{1.00} & 0.77 \\
-    CR02 & Cyber resilience & \best{0.50} & \best{0.50} & 0.00 \\
-    CR03 & Data adequacy & 0.84 & 0.84 & 0.84 \\
-    CR04 & Copyright & 0.94 & 0.94 & 0.94 \\
-    CR05 & Privacy & 0.73 & 0.73 & 0.73 \\
-    CR06 & Capabilities & 0.70 & 0.70 & \best{1.00} \\
-    CR07 & Calibration & 0.90 & 0.90 & 0.90 \\
-    CR08 & AI disclosure & 1.00 & 1.00 & 1.00 \\
-    CR09 & Watermark & 0.00 & 0.00 & 0.00 \\
-    CR10 & Representation bias & 0.33 & 0.33 & \best{0.67} \\
-    CR11 & Fairness & \best{1.00} & \best{1.00} & 0.00 \\
-    CR12 & Toxicity & \best{0.75} & 0.60 & \best{0.75} \\
+    Robustness & CR01 & 0.93 & \best{1.00} & 0.77 \\
+    Cyber resilience & CR02 & \best{0.50} & \best{0.50} & 0.00 \\
+    Data adequacy & CR03 & 0.84 & 0.84 & 0.84 \\
+    Copyright & CR04 & 0.94 & 0.94 & 0.94 \\
+    Privacy & CR05 & 0.73 & 0.73 & 0.73 \\
+    Capabilities & CR06 & 0.70 & 0.70 & \best{1.00} \\
+    Calibration & CR07 & 0.90 & 0.90 & 0.90 \\
+    AI disclosure & CR08 & 1.00 & 1.00 & 1.00 \\
+    Watermark & CR09 & 0.00 & 0.00 & 0.00 \\
+    Representation bias & CR10 & 0.33 & 0.33 & \best{0.67} \\
+    Fairness & CR11 & \best{1.00} & \best{1.00} & 0.00 \\
+    Toxicity & CR12 & \best{0.75} & 0.60 & \best{0.75} \\
     \bottomrule
   \end{tabularx}
 \end{table}
@@ -496,19 +502,19 @@ Over the entire simplex of weightings, the reachable range of $s_R$ is therefore
 \end{proposition}
 
 Two consequences carry the audit value.
-If $\Delta_R=0$, or the interval $[\min_b m_b,\max_b m_b]$ lies inside one band, the verdict is \emph{certified invariant}: no reweighting can flip it.
+If $\Delta_R=0$, or the interval $[\min_b m_b,\max_b m_b]$ lies inside one band, the verdict is \emph{invariant}: no reweighting can flip it.
 If the interval straddles a band threshold ($0.40$ or $0.70$), the verdict is \emph{weight-dependent}: an admissible reweighting flips it.
 \Cref{tab:sensitivity} and \Cref{fig:sensitivity} report $\Delta_R$ and the flip flag for every multi-benchmark requirement on both panels, computed by one command from the cached decompositions, with no model re-queries.
 
-The result is non-degenerate, and the certification cuts both ways.
-Robustness (CR01) is certified invariant on every model: its verdict does not depend on the weighting.
+The result is non-degenerate, and it cuts both ways.
+We observe that robustness (CR01) is invariant on every model: its verdict does not depend on the weighting.
 Capability (CR06), representation bias (CR10), and toxicity (CR12) are weight-dependent on most models ($\Delta{=}1.00$): the same cached results aggregate into a green or a red verdict purely by choice of weights.
-On the size panel the largest model inverts the pattern: its capability verdict becomes certified invariant while its bias verdict stays weight-dependent, which sharpens the finding that a bigger model is not a safer one.
+On the size panel the largest model inverts the pattern: its capability verdict becomes invariant while its bias verdict stays weight-dependent, which supports the side observation that a bigger model is not always a more responsible one.
 A reviewer therefore reads \Cref{tab:panelA,tab:panelB} together with \Cref{tab:sensitivity}: the former gives the verdicts, the latter says which of them would survive a different weighting.
 An empirical sweep corroborates the worst-case bound: across 200 random perturbations of the catalog weights, moderate noise ($\sigma{=}0.1$) already flips $0.5$ bands per draw on average (up to two), and stronger noise ($\sigma{=}0.2$) reorders the dashboard's triage ranking in $64\%$ of draws.
 
 \begin{table}[t]
-  \caption{Reachable range $\Delta_R$ under any admissible reweighting and whether the verdict band can flip (\Cref{prop:range}), per multi-benchmark requirement ($k$ = contributing benchmarks). $\Delta{=}0$ certifies the verdict invariant to the weighting; flip marks it weight-dependent.}
+  \caption{Reachable range $\Delta_R$ under any admissible reweighting and whether the verdict band can flip (\Cref{prop:range}), per multi-benchmark requirement ($k$ = contributing benchmarks). $\Delta{=}0$ indicates the verdict is invariant to the weighting; flip marks it weight-dependent.}
   \label{tab:sensitivity}
   \centering
   \tblsetup
@@ -516,19 +522,19 @@ An empirical sweep corroborates the worst-case bound: across 200 random perturba
     \toprule
     \multicolumn{5}{@{}l}{\emph{Panel A (families)}: Llama 3.1 8B / Qwen2.5 7B / Gemma 2 9B} \\
     \midrule
-    CR01 & 3 & $\Delta{=}0.00$, no & $\Delta{=}0.00$, no & $\Delta{=}0.00$, no \\
-    CR02 & 4 & $\Delta{=}1.00$, flip & $\Delta{=}1.00$, flip & $\Delta{=}0.00$, no \\
-    CR06 & 5 & $\Delta{=}1.00$, flip & $\Delta{=}1.00$, flip & $\Delta{=}1.00$, flip \\
-    CR10 & 3 & $\Delta{=}1.00$, flip & $\Delta{=}1.00$, flip & $\Delta{=}1.00$, flip \\
-    CR12 & 4 & $\Delta{=}1.00$, flip & $\Delta{=}1.00$, flip & $\Delta{=}1.00$, flip \\
+    Robustness (CR01) & 3 & $\Delta{=}0.00$, no & $\Delta{=}0.00$, no & $\Delta{=}0.00$, no \\
+    Cyber resilience (CR02) & 4 & $\Delta{=}1.00$, flip & $\Delta{=}1.00$, flip & $\Delta{=}0.00$, no \\
+    Capabilities (CR06) & 5 & $\Delta{=}1.00$, flip & $\Delta{=}1.00$, flip & $\Delta{=}1.00$, flip \\
+    Repr. bias (CR10) & 3 & $\Delta{=}1.00$, flip & $\Delta{=}1.00$, flip & $\Delta{=}1.00$, flip \\
+    Toxicity (CR12) & 4 & $\Delta{=}1.00$, flip & $\Delta{=}1.00$, flip & $\Delta{=}1.00$, flip \\
     \midrule
     \multicolumn{5}{@{}l}{\emph{Panel B (sizes)}: Ministral 3B / Mistral 7B / Mistral-Small 24B} \\
     \midrule
-    CR01 & 3 & $\Delta{=}0.30$, no & $\Delta{=}0.00$, no & $\Delta{=}0.30$, no \\
-    CR02 & 4 & $\Delta{=}1.00$, flip & $\Delta{=}1.00$, flip & $\Delta{=}0.00$, no \\
-    CR06 & 5 & $\Delta{=}1.00$, flip & $\Delta{=}1.00$, flip & $\Delta{=}0.00$, no \\
-    CR10 & 3 & $\Delta{=}1.00$, flip & $\Delta{=}1.00$, flip & $\Delta{=}1.00$, flip \\
-    CR12 & 4 & $\Delta{=}0.52$, flip & $\Delta{=}1.00$, flip & $\Delta{=}1.00$, flip \\
+    Robustness (CR01) & 3 & $\Delta{=}0.30$, no & $\Delta{=}0.00$, no & $\Delta{=}0.30$, no \\
+    Cyber resilience (CR02) & 4 & $\Delta{=}1.00$, flip & $\Delta{=}1.00$, flip & $\Delta{=}0.00$, no \\
+    Capabilities (CR06) & 5 & $\Delta{=}1.00$, flip & $\Delta{=}1.00$, flip & $\Delta{=}0.00$, no \\
+    Repr. bias (CR10) & 3 & $\Delta{=}1.00$, flip & $\Delta{=}1.00$, flip & $\Delta{=}1.00$, flip \\
+    Toxicity (CR12) & 4 & $\Delta{=}0.52$, flip & $\Delta{=}1.00$, flip & $\Delta{=}1.00$, flip \\
     \bottomrule
   \end{tabularx}
 \end{table}
@@ -558,17 +564,18 @@ The governance-runtime benchmark measures per-request overhead and detection on 
 
 \section{Generated Data and a Banking Application}
 \label{sec:application}
+This section covers two complements to the model benchmark: the synthetic corpus we generate for the dataset-stage requirements, and one regulated deployment setting that illustrates how the same run is read by a sector reviewer.
 
 \subsection{Generated Data}
 \label{sec:generated}
-The dataset-stage requirements CR03--CR05 run on a fully synthetic corpus that we generate and release, so no customer data is involved.
+The dataset-stage requirements CR03--CR05 run on a corpus that is fully synthetic: we generated every document, and no real customer or institutional data was used.
 A seeded generator produces 230 short banking documents, released as \texttt{banking\_synth.jsonl} (FR/EN retail, corporate, wealth, and complaint records), that plant the failure modes the data stage should catch: synthetic IBANs (\texttt{FR76} plus 23 digits), RIBs, e-mails, and phones for privacy; near-duplicate pairs for copyright; and imbalanced client segments for data adequacy.
 The native engines then score privacy CR05 $=0.73$ (Presidio recall on the planted PII), copyright CR04 $=0.94$ (Levenshtein and BLEU near-duplicate detection), and data adequacy CR03 $=0.84$ (group-balance heuristics).
 Because the scans run on the corpus, not the model, these scores are model-independent, and the generator (\texttt{gen\_banking\_corpus.py}) makes them fully reproducible.
 
 \subsection{Application in Banking}
 VERA is generic: the models it evaluates are general-purpose, not banking-specific, and so is the framework.
-It applies cleanly to a regulated setting, however.
+Banking is therefore an illustration of use in a regulated sector, not the scope of the framework.
 Consider a release gate for a retail-banking assistant (account FAQs, product explanations, complaint triage).
 Such a system is regulated both by the AI Act and, inside a financial institution, by sector rules a second line of defence already tracks.
 The requirements VERA measures line up with obligations under DORA~\cite{dora2022}, the EBA ICT guidelines~\cite{eba2021ictrisk}, and the ACPR's work on AI in finance~\cite{acpr2020ai}; \Cref{app:banking} gives the detailed mapping.
@@ -577,10 +584,15 @@ The same run therefore yields both an AI-Act evidence pack and artifacts a banki
 \section{Conclusion and Future Work}
 \label{sec:conclusion}
 
-Responsible-AI metrics exist, but the policy that aggregates them into verdicts is fixed and unexamined, and a single global score hides why a model fails.
-VERA is an open-source framework that runs the twelve measurable COMPL-AI requirements, makes the scoring policy signed and auditable, certifies which verdicts are robust to reweighting, emits run-tied documentation, and routes the six non-measurable requirements to a traceable human path.
-Its specification, benchmarks, and weights are swappable data, so the same framework is ready for a different responsible-AI specification without code changes.
-We showed that a non-specialist can read a run from the dashboard alone (RQ1), that each verdict decomposes into the public evidence behind it (RQ2), that one framework covers the twelve requirements across model families and sizes with no code change (RQ3), and that each verdict's dependence on the weighting is bounded in closed form (RQ4).
+The EU AI Act asks organisations for technical evidence across trustworthy-AI principles.
+COMPL-AI translated the Act into eighteen technical requirements and benchmarked the twelve measurable ones on public datasets.
+VERA takes the next step and turns that reference into an operational framework.
+It runs the same twelve requirements on public datasets and a released synthetic corpus.
+It makes the scoring policy signed and auditable, and reports which verdicts are robust to reweighting.
+It emits run-tied documentation and routes the six non-measurable requirements to a traceable human path.
+No neighbouring tool provides these properties together: HELM and lm-eval standardise measurement, COMPL-AI fixes an implicit weighting, and none of them packages the result for a non-specialist.
+We provide evidence that a non-specialist can read a run from the dashboard alone (RQ1) and that each verdict decomposes into the public evidence behind it (RQ2).
+We further report that one framework covers the twelve requirements across model families and sizes with no code change (RQ3), and that each verdict's dependence on the weighting is bounded in closed form (RQ4).
 Across both panels VERA flags concrete responsible-AI gaps, and it exposes a watermarking requirement that no open model meets.
 We release VERA as open-source software, available at \url{\repourl}, to speed up adoption and disseminate responsible-AI best practice.
 Future work includes a formal practitioner study with inter-rater reliability~\cite{hayes2007krippendorff,studtmann2023histree}, native log-probability runs on a vLLM backend, and the role-based, per-persona scoring that this software-focused paper only sketches.

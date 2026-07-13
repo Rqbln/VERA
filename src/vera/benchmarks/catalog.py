@@ -1,21 +1,35 @@
-"""Load MVP2 benchmarks_catalog.yaml and requirement weights."""
+"""Load benchmarks_catalog.yaml and requirement weights.
+
+The catalog is the scoring policy: a versioned, signed data file. Point
+VERA_CATALOG_PATH at another file to load an alternative policy (or a whole
+alternative specification, together with VERA_REGISTRY_PATH) without touching
+the code.
+"""
 
 from __future__ import annotations
 
-from functools import lru_cache
+import os
 from pathlib import Path
 from typing import Any
 
 import yaml
 
 _PKG_DIR = Path(__file__).resolve().parent
-_CATALOG_PATH = _PKG_DIR / "benchmarks_catalog.yaml"
+_DEFAULT_CATALOG_PATH = _PKG_DIR / "benchmarks_catalog.yaml"
+_CACHE: dict[str, dict[str, Any]] = {}
 
 
-@lru_cache
+def _catalog_path() -> Path:
+    override = os.environ.get("VERA_CATALOG_PATH")
+    return Path(override).expanduser().resolve() if override else _DEFAULT_CATALOG_PATH
+
+
 def load_catalog() -> dict[str, Any]:
-    with _CATALOG_PATH.open(encoding="utf-8") as f:
-        return yaml.safe_load(f)
+    path = str(_catalog_path())
+    if path not in _CACHE:
+        with open(path, encoding="utf-8") as f:
+            _CACHE[path] = yaml.safe_load(f)
+    return _CACHE[path]
 
 
 def catalog_version() -> str:
@@ -64,11 +78,11 @@ def validate_registry_catalog_alignment() -> None:
     weight, and every catalog weight must correspond to a registry mapping, so each
     aggregate stays reproducible from the catalog and the per-benchmark decomposition.
     """
-    from vera.api.benchmark_registry import MVP2_BENCHMARK_REGISTRY
+    from vera.api.benchmark_registry import list_benchmark_entries
 
     rw = load_catalog().get("requirement_weights") or {}
     reg_pairs: set[tuple[str, str]] = set()
-    for entry in MVP2_BENCHMARK_REGISTRY:
+    for entry in list_benchmark_entries():
         bid = str(entry.get("id") or "")
         for req in str(entry.get("complai") or "").split(","):
             req = req.strip()

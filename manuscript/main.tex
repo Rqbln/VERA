@@ -33,7 +33,7 @@
 \newcommand{\tblsetup}{%
   \footnotesize%
   \setlength{\tabcolsep}{3pt}%
-  \renewcommand{\arraystretch}{1.08}%
+  \renewcommand{\arraystretch}{1.02}%
 }
 
 % Double-blind by default (submission). Build main_authors.tex for the named version.
@@ -85,6 +85,13 @@ Responsible AI, EU AI Act, COMPL-AI, Modularity, Benchmark, Framework, Open sour
 
 \section{Introduction}
 \label{sec:introduction}
+
+\begin{figure*}[t]
+  \centering
+  \includegraphics[width=0.84\textwidth]{figures/fig1}
+  \caption{The journey of the framework. Three roles drive VERA: they pick a connected model, choose the responsible-AI requirements to check, and run public benchmarks; VERA then presents a role-based dashboard that explains every score before the artifacts are exported.}
+  \label{fig:journey}
+\end{figure*}
 
 \subsection{Motivation}
 Before an organisation ships an LLM-based assistant in a regulated setting, the EU AI Act asks for technical evidence across its trustworthy-AI principles~\cite{euaiact2024,hleg2019trustworthyai}, among them robustness, privacy, transparency, fairness, and human oversight.
@@ -205,13 +212,6 @@ The founding idea is that a single global compliance number is semantically thin
 It hides why a model fails, and it creates regulatory cliffs where a small change flips a pass into a fail.
 Responsible AI, moreover, does not mean the same thing to every actor.
 VERA therefore replaces the single number with a per-criterion view and role-segregated dashboards (\Cref{sec:dashboard}) for three profiles: a legal or compliance officer, a responsible-AI officer, and a data or ML engineer.
-
-\begin{figure*}[t]
-  \centering
-  \includegraphics[width=\textwidth]{figures/fig1}
-  \caption{The journey of the framework. Three roles drive VERA: they pick a connected model, choose the responsible-AI requirements to check, and run public benchmarks; VERA then presents a role-based dashboard that explains every score before the artifacts are exported.}
-  \label{fig:journey}
-\end{figure*}
 Concretely, a target can be a model endpoint, a checkpoint, or a dataset, tagged with a lifecycle stage in a declarative run file.
 The next section details the engine that runs it (\Cref{fig:architecture}).
 
@@ -226,7 +226,7 @@ The run emits its artifacts, the run file, a model card, per-item outputs, and a
 
 \begin{figure*}[t]
   \centering
-  \includegraphics[width=\textwidth]{figures/fig2}
+  \includegraphics[width=0.86\textwidth]{figures/fig2}
   \caption{The runtime pipeline, grouped into blocks. Three invocation surfaces enqueue one declarative job; a two-step controller runs an \texttt{evaluate} step (registry $\rightarrow$ runners $\rightarrow$ model router $\rightarrow$ self-hosted models) and an \texttt{aggregate} step that combines cached item scores using the modular benchmark catalog. Scores and artifacts flow through a read API to the dashboard.}
   \label{fig:architecture}
 \end{figure*}
@@ -285,7 +285,7 @@ The lite profile instantiates none of it; the same code, opted in via a Docker p
 
 \begin{figure*}[t]
   \centering
-  \includegraphics[width=\textwidth]{figures/fig3}
+  \includegraphics[width=0.78\textwidth]{figures/fig3}
   \caption{The optional governance-as-a-service runtime (enterprise profile). \emph{Top:} the synchronous path (blue), client, inline proxy, and self-hosted target, gated by an OPA decision and the kill-switch/mode (red). \emph{Bottom:} the asynchronous lane (violet, dashed): the proxy copies traffic to an event bus; four agents (cyber, ethics, privacy, drift) score it into a streaming Trust Factor that feeds the policy back; a canary injects traffic; every event is signed for audit. The lite profile runs none of the lane, and each external service degrades gracefully (bus to Redis Streams, OpenSearch to signed JSONL, OPA to an in-process rule).}
   \label{fig:gaas}
 \end{figure*}
@@ -307,6 +307,12 @@ The platform is validated by 118 backend unit tests and a 34-case Playwright mat
 \label{sec:dashboard}
 The dashboard is contribution C1: it turns the requirement scores into a view a non-specialist can read, following ``overview first, zoom and filter, then details on demand''~\cite{shneiderman1996eyes}.
 
+\paragraph{Score at a glance}
+The summary opens on a deliberately uncluttered hero view rather than a wall of tables (\Cref{fig:dashboard}).
+A semicircular gauge places the Trust Factor on three segments aligned with the band thresholds (red below 0.40, amber to 0.70, green above), next to the verdict counts and the weakest requirements.
+The remaining detail, run metadata, benchmark provenance, and trends, stays one click away behind collapsed sections, so the first screen carries only the information a release decision relies on.
+The complete screens, including the expanded detail view, are in \Cref{app:dashboard}.
+
 \paragraph{Status-first triage}
 The requirement table is sorted by state (failed, fallback, uncovered, ok, n/a) rather than by identifier, so the weakest evidence surfaces first, and passing rows collapse behind a ``show all'' control.
 Scores are shown as green, amber, and red bands, not a binary pass or fail, because release decisions are human trade-offs rather than threshold cliffs.
@@ -326,12 +332,12 @@ Three views (responsible-AI, cyber, and data-science) filter the requirement set
 A no-login guided mode is the default: a four-step wizard (pick a connected model, choose a recommended or custom requirement set, set options, review) submits a run and opens a live summary.
 This is the path a non-technical user takes, while the role-based views are the expert surface (\Cref{fig:dashboard}; more screens in \Cref{app:dashboard}).
 
-\begin{figure}[t]
+\begin{figure*}[!t]
   \centering
-  \includegraphics[width=\columnwidth]{figures/shot_control_room.png}
-  \caption{The VERA control room (guided mode) on an evaluation run: status-first triage surfaces the weakest requirements first, and the coverage band, Trust Factor, and per-benchmark provenance are visible at a glance.}
+  \includegraphics[width=0.94\textwidth]{figures/shot_control_room.png}
+  \caption{The VERA control room (guided mode) on an evaluation run. The hero view keeps the essentials only: the Trust Factor gauge on band-aligned segments (red below 0.40, amber to 0.70, green above), the verdict counts, the weakest requirements, and the per-requirement coverage band; the triage table and the detailed sections follow below (\Cref{app:dashboard}).}
   \label{fig:dashboard}
-\end{figure}
+\end{figure*}
 
 \section{Evaluation Setup}
 \label{sec:evaluation}
@@ -406,7 +412,7 @@ Each requirement score is therefore explained by the public evidence behind it, 
 \subsection{RQ3: One Framework Across Families and Sizes}
 \Cref{tab:panelA} (families) and \Cref{tab:panelB} (sizes) report the twelve requirements for both panels, computed by the \emph{same} framework with no code change between them.
 This is the reproducible study C4, and running it unchanged over two panels is the evidence for the modularity claim C3.
-\Cref{fig:results-path} shows how to read a column: pick a requirement, read its band, and open it in the dashboard for the benchmark behind it.
+A column reads in three steps: pick a requirement, read its band, and open it in the dashboard for the benchmark behind it.
 The panels reveal differences across models.
 On the family panel, fairness (CR11) splits the models sharply: Qwen2.5 drops to $0.00$ while Llama and Gemma reach $1.00$, and cyber resilience (CR02) and toxicity (CR12) separate them too.
 On the size panel, capability (CR06) increases with scale, from $0.70$ at 3B and 7B to $1.00$ at 24B.
@@ -467,29 +473,6 @@ Watermarking CR09 is $0.00$ for every model: the statistical test~\cite{kirchenb
   \end{tabularx}
 \end{table}
 
-\begin{figure}[t]
-  \centering
-  \resizebox{\columnwidth}{!}{%
-  \begin{tikzpicture}[
-    font=\footnotesize, >={Stealth[round]},
-    vstep/.style={draw, rounded corners=2pt, align=center, fill=brandgreen!10, draw=brandgreen!60, inner sep=4pt, text width=18mm, minimum height=10mm},
-    arr/.style={->, thick, black!55},
-  ]
-    \node[vstep] (a) at (0,0) {Pick a requirement (row)};
-    \node[vstep] (b) at (2.6,0) {Read its band (green/amber/red)};
-    \node[vstep] (c) at (5.2,0) {Compare across models (columns)};
-    \node[vstep] (d) at (7.8,0) {Open it in the dashboard};
-    \node[vstep] (e) at (10.4,0) {See the benchmark behind it};
-    \draw[arr] (a) -- (b);
-    \draw[arr] (b) -- (c);
-    \draw[arr] (c) -- (d);
-    \draw[arr] (d) -- (e);
-  \end{tikzpicture}%
-  }
-  \caption{How to read \Cref{tab:panelA,tab:panelB}: pick a requirement, read its band, compare it across models, then open it in the dashboard to reach the public benchmark that produced it.}
-  \label{fig:results-path}
-\end{figure}
-
 \subsection{RQ4: How Much Does the Verdict Depend on the Weighting?}
 \label{sec:rq4}
 Each requirement score is a weighted mean of its per-benchmark means, $s_R(w)=\sum_{b\in B_R} w_b\, m_b$ with $w_b\ge 0$ and $\sum_b w_b=1$, read from the signed catalog.
@@ -541,7 +524,7 @@ An empirical sweep corroborates the worst-case bound: across 200 random perturba
 
 \begin{figure}[t]
   \centering
-  \includegraphics[width=\columnwidth]{figures/fig_weight_sensitivity.pdf}
+  \includegraphics[width=0.85\columnwidth]{figures/fig_weight_sensitivity.pdf}
   \caption{Baseline aggregate (dot) and reachable range under any reweighting (bar) per multi-benchmark requirement, both panels. Dashed lines mark the band thresholds; a bar crossing a line is a weight-dependent verdict.}
   \label{fig:sensitivity}
 \end{figure}
@@ -608,14 +591,15 @@ Both reuse the same benchmark runners and catalog as the inference path.
 
 \section{Dashboard Screens}
 \label{app:dashboard}
-\Cref{fig:app-shots} shows the guided-mode home, the four-step launch wizard, and the governance panel that complement the control room of \Cref{fig:dashboard}.
+\Cref{fig:app-shots} shows the more complete screens that back the hero view of \Cref{fig:dashboard}: the guided-mode home, the four-step launch wizard, the governance panel, and the full run view with its detail sections expanded (triage, non-measurable strip, run metadata, and harness provenance).
 
 \begin{figure*}[t]
   \centering
-  \includegraphics[width=0.32\textwidth]{figures/shot_home.png}\hfill
-  \includegraphics[width=0.32\textwidth]{figures/shot_wizard.png}\hfill
-  \includegraphics[width=0.32\textwidth]{figures/shot_governance.png}
-  \caption{Additional VERA screens: the guided-mode home (left), the four-step launch wizard (centre), and the governance panel (right).}
+  \includegraphics[width=0.21\textwidth]{figures/shot_home.png}\hfill
+  \includegraphics[width=0.21\textwidth]{figures/shot_wizard.png}\hfill
+  \includegraphics[width=0.21\textwidth]{figures/shot_governance.png}\hfill
+  \includegraphics[width=0.21\textwidth]{figures/shot_control_room_full.png}
+  \caption{Additional VERA screens, richer than the hero view: the guided-mode home, the four-step launch wizard, the governance panel, and the complete run view with the detail sections expanded.}
   \label{fig:app-shots}
 \end{figure*}
 

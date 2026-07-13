@@ -133,7 +133,12 @@ test.describe("control room (paper hero)", () => {
     await page.goto(`/dashboards/compliance?run=${SUMMARY.run_id}`);
     await page.getByTestId("run-hero").waitFor({ timeout: 15000 });
     await page.waitForTimeout(500);
-    await page.screenshot({ path: "../manuscript/figures/shot_control_room.png", fullPage: false });
+    // Clip below the coverage bar: triage, N-strip, and detail sections appear in
+    // the appendix's full capture; the paper hero stays wide and short (~2.5:1).
+    await page.screenshot({
+      path: "../manuscript/figures/shot_control_room.png",
+      clip: { x: 0, y: 0, width: 1600, height: 650 },
+    });
   });
 
   test("capture control room full", async ({ page }) => {

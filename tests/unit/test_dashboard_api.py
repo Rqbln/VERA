@@ -79,6 +79,16 @@ def test_run_summary(client, sample_run):
     assert body["run_id"] == sample_run
     assert len(body["requirements"]) >= 2
     assert "triage_counts" in body
+    # The gauge in the dashboard reads its segment boundaries from here, so the
+    # payload must carry the same thresholds the backend banded the scores with.
+    assert body["band_thresholds"] == {"green_min": 0.7, "orange_min": 0.4}
+
+
+def test_run_summary_band_thresholds_follow_env(client, sample_run, monkeypatch):
+    monkeypatch.setenv("VERA_BAND_GREEN_MIN", "0.8")
+    monkeypatch.setenv("VERA_BAND_ORANGE_MIN", "0.5")
+    body = client.get(f"/api/v1/runs/{sample_run}/summary").json()
+    assert body["band_thresholds"] == {"green_min": 0.8, "orange_min": 0.5}
 
 
 def test_series_requires_requirement(client):

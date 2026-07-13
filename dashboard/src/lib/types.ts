@@ -36,6 +36,7 @@ export interface RunSummary {
   non_measurable: NonMeasurableSlots;
   requested_requirements: string[];
   trust_factor?: TrustFactor | null;
+  band_thresholds?: { green_min: number; orange_min: number } | null;
 }
 
 export interface HarnessRow {

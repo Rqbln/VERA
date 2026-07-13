@@ -101,13 +101,15 @@ export function RunSummaryView({ lens, defaultRunId }: Props) {
             <button
               type="button"
               data-testid="run-details-toggle"
+              aria-expanded={showDetails}
+              aria-controls="run-details-panel"
               onClick={() => setShowDetails((s) => !s)}
               className="text-xs text-ink-secondary hover:text-ink"
             >
               {showDetails ? "▾" : "▸"} {t("summary.run_details")}
             </button>
             {showDetails ? (
-              <div className="mt-3 space-y-4">
+              <div id="run-details-panel" className="mt-3 space-y-4">
                 <LifecycleRail active={stageRail} onSelect={setStageRail} />
                 <div className="grid grid-cols-2 gap-2 text-xs sm:grid-cols-4">
                   <Meta label={t("common.status")} value={summary.status} />
@@ -123,13 +125,15 @@ export function RunSummaryView({ lens, defaultRunId }: Props) {
           <div className="mt-3 border-t border-default pt-3">
             <button
               type="button"
+              aria-expanded={showAdvanced}
+              aria-controls="gov-trends-panel"
               onClick={() => setShowAdvanced((s) => !s)}
               className="text-xs text-ink-secondary hover:text-ink"
             >
               {showAdvanced ? "▾" : "▸"} {t("summary.gov_trends")}
             </button>
             {showAdvanced ? (
-              <div className="mt-3 space-y-4">
+              <div id="gov-trends-panel" className="mt-3 space-y-4">
                 <div className="rounded border border-default p-3">
                   <div className="mb-2 flex items-center gap-2 text-xs text-ink-secondary">
                     Trend for

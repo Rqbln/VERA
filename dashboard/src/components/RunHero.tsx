@@ -2,7 +2,7 @@
 
 import type { RunSummary } from "@/lib/types";
 import { useT } from "@/lib/i18n";
-import { TrustFactorGauge } from "./TrustFactorGauge";
+import { BAND_SEGMENTS, TrustFactorGauge, segmentsFromThresholds } from "./TrustFactorGauge";
 import { BAND_COLOR } from "./CoverageBar";
 
 const STATUS_BADGE: Record<string, string> = {
@@ -19,6 +19,9 @@ interface Props {
 export function RunHero({ summary }: Props) {
   const t = useT();
   const counts = summary.triage_counts ?? {};
+  const segments = summary.band_thresholds
+    ? segmentsFromThresholds(summary.band_thresholds.green_min, summary.band_thresholds.orange_min)
+    : BAND_SEGMENTS;
   const weakest = [...(summary.requirements ?? [])]
     .filter((r) => r.score != null && r.triage !== "na")
     .sort((a, b) => (a.score ?? 0) - (b.score ?? 0))
@@ -37,7 +40,7 @@ export function RunHero({ summary }: Props) {
     <section data-testid="run-hero" className="card mb-6 p-6 shadow-sm">
       <div className="grid items-center gap-8 lg:grid-cols-[340px_1fr]">
         <div className="flex justify-center">
-          <TrustFactorGauge tf={summary.trust_factor} />
+          <TrustFactorGauge tf={summary.trust_factor} segments={segments} />
         </div>
         <div className="space-y-5">
           <div className="flex flex-wrap items-start gap-x-10 gap-y-4">

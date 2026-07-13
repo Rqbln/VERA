@@ -17,6 +17,19 @@ export const BAND_SEGMENTS: GaugeSegment[] = [
   { from: 70, to: 100, color: "#00915a" }, // green: compliant
 ];
 
+// Build segments from the backend's actual band thresholds (0-1 scale, from the
+// run summary's band_thresholds) so the arcs always match how tf.band was computed,
+// even when VERA_BAND_GREEN_MIN / VERA_BAND_ORANGE_MIN are overridden.
+export function segmentsFromThresholds(greenMin: number, orangeMin: number): GaugeSegment[] {
+  const orange = Math.round(orangeMin * 100);
+  const green = Math.round(greenMin * 100);
+  return [
+    { from: 0, to: orange, color: "#c0392b" },
+    { from: orange, to: green, color: "#e8a33d" },
+    { from: green, to: 100, color: "#00915a" },
+  ];
+}
+
 const COMPONENT_LABELS: Record<string, string> = {
   R01: "Robustness",
   R02: "Cyber",
@@ -112,7 +125,7 @@ export function TrustFactorGauge({
         <path d={arcPath(0, 100)} stroke="#eef1ef" strokeWidth={STROKE} fill="none" />
         {segments.map((s, i) => (
           <path
-            key={s.color}
+            key={`${s.from}-${s.to}-${s.color}`}
             d={arcPath(
               i === 0 ? s.from : s.from + SEGMENT_PAD,
               i === segments.length - 1 ? s.to : s.to - SEGMENT_PAD,

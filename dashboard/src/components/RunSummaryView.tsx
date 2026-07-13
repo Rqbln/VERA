@@ -10,7 +10,7 @@ import { CoverageBar } from "./CoverageBar";
 import { ComplaiTriageTable } from "./ComplaiTriageTable";
 import { NonMeasurableStrip } from "./NonMeasurableStrip";
 import { HarnessProvenanceTable } from "./HarnessProvenanceTable";
-import { TrustFactorCard } from "./TrustFactorCard";
+import { RunHero } from "./RunHero";
 import { TrendCurve } from "./TrendCurve";
 import { HitlReviewPanel } from "./HitlReviewPanel";
 import { DeclarativeForms } from "./DeclarativeForms";
@@ -30,6 +30,7 @@ export function RunSummaryView({ lens, defaultRunId }: Props) {
   const [stageRail, setStageRail] = useState("inference");
   const [runId, setRunId] = useState<string | null>(defaultRunId || null);
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const [showDetails, setShowDetails] = useState(false);
   const [trendReq, setTrendReq] = useState("R02");
   const [pdfError, setPdfError] = useState<string | null>(null);
 
@@ -57,18 +58,18 @@ export function RunSummaryView({ lens, defaultRunId }: Props) {
   return (
     <div data-testid="run-summary-view">
       <div className="mb-4 flex items-center justify-between">
-        <h1 className="text-sm font-medium capitalize text-ink">{lens} · run summary</h1>
+        <h1 className="text-base font-semibold capitalize text-ink">
+          {lens} · {t("summary.header")}
+        </h1>
         {runId ? (
           <Link
             href={`/runs/${runId}/inspector`}
             className="text-xs text-ink-secondary hover:text-ink"
           >
-            Inspector →
+            {t("summary.inspector")}
           </Link>
         ) : null}
       </div>
-
-      <LifecycleRail active={stageRail} onSelect={setStageRail} />
 
       <RunSelector
         runs={runList?.runs || []}
@@ -85,30 +86,7 @@ export function RunSummaryView({ lens, defaultRunId }: Props) {
         <div className="text-xs text-ink-secondary">Loading run summary…</div>
       ) : summary ? (
         <>
-          <div className="mb-4 grid grid-cols-2 gap-2 text-xs sm:grid-cols-4">
-            <Meta label="Status" value={summary.status} />
-            <Meta label="Model" value={summary.model_id} mono />
-            <Meta label="Lifecycle" value={summary.lifecycle_stage} />
-            <Meta label="Catalog" value={summary.catalog_version || "—"} mono />
-          </div>
-
-          {summary.triage_counts ? (
-            <div className="mb-4 flex gap-4 text-xs text-ink-secondary">
-              {(["failed", "fallback", "uncovered"] as const).map((k) =>
-                summary.triage_counts[k] ? (
-                  <span key={k} className="capitalize">
-                    {k}: <span className="text-ink">{summary.triage_counts[k]}</span>
-                  </span>
-                ) : null,
-              )}
-            </div>
-          ) : null}
-
-          {summary.trust_factor ? (
-            <div className="mb-4 max-w-md">
-              <TrustFactorCard tf={summary.trust_factor} />
-            </div>
-          ) : null}
+          <RunHero summary={summary} />
 
           <CoverageBar requirements={summary.requirements} />
           <ComplaiTriageTable
@@ -117,10 +95,32 @@ export function RunSummaryView({ lens, defaultRunId }: Props) {
             token={token}
             artifactLinks={summary.artifacts}
           />
-          <HarnessProvenanceTable rows={summary.harness_provenance} />
           <NonMeasurableStrip slots={summary.non_measurable} runId={summary.run_id} />
 
           <div className="mt-6 border-t border-default pt-3">
+            <button
+              type="button"
+              data-testid="run-details-toggle"
+              onClick={() => setShowDetails((s) => !s)}
+              className="text-xs text-ink-secondary hover:text-ink"
+            >
+              {showDetails ? "▾" : "▸"} {t("summary.run_details")}
+            </button>
+            {showDetails ? (
+              <div className="mt-3 space-y-4">
+                <LifecycleRail active={stageRail} onSelect={setStageRail} />
+                <div className="grid grid-cols-2 gap-2 text-xs sm:grid-cols-4">
+                  <Meta label={t("common.status")} value={summary.status} />
+                  <Meta label={t("common.model")} value={summary.model_id} mono />
+                  <Meta label={t("summary.lifecycle")} value={summary.lifecycle_stage} />
+                  <Meta label={t("summary.catalog")} value={summary.catalog_version || "—"} mono />
+                </div>
+                <HarnessProvenanceTable rows={summary.harness_provenance} />
+              </div>
+            ) : null}
+          </div>
+
+          <div className="mt-3 border-t border-default pt-3">
             <button
               type="button"
               onClick={() => setShowAdvanced((s) => !s)}
@@ -170,7 +170,7 @@ export function RunSummaryView({ lens, defaultRunId }: Props) {
           </div>
         </>
       ) : (
-        <div className="text-xs text-ink-secondary">Select a run to view COMPL-AI triage.</div>
+        <div className="text-xs text-ink-secondary">{t("summary.select_run")}</div>
       )}
     </div>
   );
@@ -178,7 +178,7 @@ export function RunSummaryView({ lens, defaultRunId }: Props) {
 
 function Meta({ label, value, mono }: { label: string; value: string; mono?: boolean }) {
   return (
-    <div className="border border-default p-2">
+    <div className="rounded-lg border border-default p-2">
       <div className="text-ink-secondary">{label}</div>
       <div className={`truncate text-ink ${mono ? "font-mono" : ""}`}>{value}</div>
     </div>

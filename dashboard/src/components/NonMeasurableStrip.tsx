@@ -30,9 +30,9 @@ export function NonMeasurableStrip({ slots, runId }: Props) {
     { id: "N06", title: t("nm.n06"), slot: slots.n06, kind: "form" },
   ];
   return (
-    <div className="mt-6 border border-default bg-surface-2 p-3 text-xs">
+    <div className="mt-6 rounded-lg border border-default bg-surface-2 p-3 text-xs">
       <div className="mb-2 text-ink-secondary">{t("nm.title")}</div>
-      <div className="grid gap-2 sm:grid-cols-3">
+      <div className="grid gap-2 sm:grid-cols-3 xl:grid-cols-6">
         {items.map((it) => (
           <Slot key={it.id} {...it} />
         ))}

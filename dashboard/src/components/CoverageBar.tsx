@@ -1,8 +1,9 @@
 "use client";
 
 import type { RequirementRow } from "@/lib/types";
+import { useT } from "@/lib/i18n";
 
-const BAND_COLOR: Record<string, string> = {
+export const BAND_COLOR: Record<string, string> = {
   green: "#00915a",
   orange: "#e8a33d",
   red: "#c0392b",
@@ -14,12 +15,13 @@ interface Props {
 }
 
 export function CoverageBar({ requirements }: Props) {
+  const t = useT();
   if (!requirements.length) return null;
 
   return (
     <div className="mb-4">
-      <div className="mb-1 text-xs text-ink-secondary">COMPL-AI coverage</div>
-      <div className="flex h-6 overflow-hidden rounded border border-default">
+      <div className="mb-1 text-xs text-ink-secondary">{t("summary.coverage")}</div>
+      <div className="flex h-5 overflow-hidden rounded-md border border-default">
         {requirements.map((r) => (
           <div
             key={r.id}

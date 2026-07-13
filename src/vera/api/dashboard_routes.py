@@ -19,6 +19,7 @@ from vera.api.auth import (
 )
 from vera.artifacts.s3io import download_bytes, presign_get
 from vera.config import Settings, get_settings
+from vera.dashboard.score_bands import load_score_bands
 from vera.dashboard.triage import (
     ALL_MEASURABLE,
     build_requirement_rows,
@@ -131,6 +132,7 @@ def _non_measurable_slots(rec: RunRecord) -> dict[str, Any]:
 
 def _run_summary_dict(rec: RunRecord, *, filter_ids: list[str] | None = None) -> dict[str, Any]:
     settings = get_settings()
+    bands = load_score_bands()
     provenance = rec.harness_provenance or []
     raw = _raw_outputs(rec)
     requested = _requested_requirements(rec)
@@ -165,6 +167,12 @@ def _run_summary_dict(rec: RunRecord, *, filter_ids: list[str] | None = None) ->
         "non_measurable": _non_measurable_slots(rec),
         "requested_requirements": requested,
         "trust_factor": rec.trust_factor,
+        # The gauge and bands in the dashboard must follow the SAME thresholds the
+        # backend used to band the scores (configurable via VERA_BAND_*_MIN).
+        "band_thresholds": {
+            "green_min": bands.green_min,
+            "orange_min": bands.orange_min,
+        },
     }
 
 

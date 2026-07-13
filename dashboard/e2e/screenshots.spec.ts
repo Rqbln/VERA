@@ -72,7 +72,7 @@ const SUMMARY = {
     n06: { status: "completed", fields: { misuse: "reviewed", residual_risk: "low" } },
   },
   requested_requirements: ORDER,
-  trust_factor: { score: 75, band: "green", components: { R01: 100, R12: 100 } },
+  trust_factor: { score: 75, band: "green", components: { R01: 100, R06: 80, R07: 90, R12: 100 } },
 };
 
 async function mock(page: Page) {
@@ -125,12 +125,33 @@ async function mock(page: Page) {
   ] } }));
 }
 
-test("capture control room", async ({ page }) => {
-  await mock(page);
-  await page.goto(`/dashboards/compliance?run=${SUMMARY.run_id}`);
-  await page.getByTestId("run-summary-view").waitFor({ timeout: 15000 });
-  await page.waitForTimeout(800);
-  await page.screenshot({ path: "../manuscript/figures/shot_control_room.png", fullPage: true });
+test.describe("control room (paper hero)", () => {
+  test.use({ viewport: { width: 1600, height: 900 } });
+
+  test("capture control room hero", async ({ page }) => {
+    await mock(page);
+    await page.goto(`/dashboards/compliance?run=${SUMMARY.run_id}`);
+    await page.getByTestId("run-hero").waitFor({ timeout: 15000 });
+    await page.waitForTimeout(500);
+    // Clip below the coverage bar: triage, N-strip, and detail sections appear in
+    // the appendix's full capture; the paper hero stays wide and short (~2.5:1).
+    await page.screenshot({
+      path: "../manuscript/figures/shot_control_room.png",
+      clip: { x: 0, y: 0, width: 1600, height: 650 },
+    });
+  });
+
+  test("capture control room full", async ({ page }) => {
+    await mock(page);
+    await page.goto(`/dashboards/compliance?run=${SUMMARY.run_id}`);
+    await page.getByTestId("run-summary-view").waitFor({ timeout: 15000 });
+    await page.getByTestId("run-details-toggle").click();
+    await page.waitForTimeout(500);
+    await page.screenshot({
+      path: "../manuscript/figures/shot_control_room_full.png",
+      fullPage: true,
+    });
+  });
 });
 
 test("capture launch wizard", async ({ page }) => {

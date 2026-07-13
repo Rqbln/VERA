@@ -21,6 +21,8 @@ const COMPONENT_LABELS: Record<string, string> = {
   R01: "Robustness",
   R02: "Cyber",
   R05: "Privacy",
+  R06: "Capabilities",
+  R07: "Calibration",
   R12: "Toxicity",
 };
 
@@ -105,7 +107,7 @@ export function TrustFactorGauge({
       className="flex flex-col items-center"
       style={{ width }}
     >
-      <svg viewBox="0 0 220 130" width={width} height={(width * 130) / 220}>
+      <svg viewBox="-12 0 244 130" width={width} height={(width * 130) / 244}>
         {/* unfilled track under the segments */}
         <path d={arcPath(0, 100)} stroke="#eef1ef" strokeWidth={STROKE} fill="none" />
         {segments.map((s, i) => (

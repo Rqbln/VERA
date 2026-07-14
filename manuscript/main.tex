@@ -142,7 +142,9 @@ The EU AI Act~\cite{euaiact2024} follows a risk-based approach.
 It bans a narrow set of practices; it imposes risk management, technical documentation, and human oversight on the high-risk systems listed in its Annex~III; it sets transparency duties for limited-risk uses such as AI assistants (Art.~50); and it leaves minimal-risk systems largely free.
 Technical evidence is asked of high-risk systems, and the ethical principles behind these obligations draw on the non-binding HLEG guidelines~\cite{hleg2019trustworthyai}.
 NIST and ISO frameworks~\cite{nist2023airmf,iso42001_2023} guide organizational risk management, but stop short of runnable metrics.
-COMPL-AI~\cite{guldimann2024complai} narrows that gap.
+Prior software-engineering work extracts and checks regulatory requirements with NLP and LLM techniques, including on the AI Act itself~\cite{abualhaija2025llmregextraction,amaral2022nlpcompliance,abualhaija2024regchange}.
+VERA is complementary: it does not parse the regulation but operationalizes an existing requirement taxonomy into a runnable, auditable evaluation.
+COMPL-AI~\cite{guldimann2024complai} narrows the metrics gap.
 It is an independent effort by ETH Zurich, INSAIT, and LatticeFlow AI: it is not EU-funded, it is not part of the Act's harmonised standards, and a European Commission spokesperson described it as a first step toward operationalizing the Act.
 It groups the Act's ethical principles into six areas and maps them to eighteen technical requirements, twelve with measurable scores in $[0,1]$.
 It also ships its own open-source evaluation suite (27 benchmarks) and a public leaderboard.

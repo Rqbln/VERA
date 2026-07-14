@@ -43,6 +43,11 @@
 \setlength{\dblfloatsep}{7pt plus 2pt minus 2pt}
 \setlength{\abovecaptionskip}{4pt}
 
+% RQ1 user study: flip to true once data/user_study/sessions.csv is collected and
+% scripts/analyze_user_study.py has produced the numbers below.
+\newif\ifuserstudydone
+\userstudydonefalse
+
 % Double-blind by default (submission). Build main_authors.tex for the named version.
 \providecommand{\anonmode}{1}
 \newif\ifanon
@@ -121,7 +126,7 @@ We make four contributions, each tied to a research question and each a concrete
   \item \textbf{C1 (Operable dashboard).} VERA delivers COMPL-AI's measurable metrics\footnote{COMPL-AI project: \url{https://compl-ai.org}.} through a role-based dashboard that a non-specialist can drive end-to-end, launch a run and read its verdicts, without writing code (RQ1). We support this claim with an author-led, task-based design walkthrough in \Cref{sec:results}. COMPL-AI ships a command-line study and a public per-principle leaderboard aimed at ML engineers; PromptOps reports flat score tables. The delta is operability for a non-specialist, not visualisation as such.
   \item \textbf{C2 (Run-tied traceability).} We bind run-tied evidence artifacts to the evaluation that produced them: each run generates its own model card and, for dataset runs, a datasheet, populated from that exact evaluation; COMPL-AI emits no such run-tied artifacts. These artifacts can inform a provider's risk assessment and its Annex~IV technical documentation; they do not constitute or replace either. Within the dashboard, every verdict also decomposes into its contributing benchmarks, so a non-specialist sees \emph{why} a requirement is weak (RQ2). The decomposition itself follows COMPL-AI's hierarchical reporting; the research delta is the binding of decomposition, run, and signed documentation into one auditable object.
 The same run-tied path covers the six non-measurable requirements: each run auto-queues a rubric-based human review for explainability (N01) and corrigibility (N02), measures energy for N03, and attests N04 to N06 through signed declarative forms.
-  \item \textbf{C3 (Auditable, swappable scoring).} The scoring policy is a versioned, signed catalog whose SHA-256 digest is pinned into every run, and a closed-form bound (\Cref{prop:range}) quantifies how much each verdict depends on it (RQ4), where COMPL-AI fixes an unweighted average and leaves that dependence unmeasured. The requirement specification, the benchmarks, and the weights are themselves swappable data, so VERA runs COMPL-AI today and can adapt to a different responsible-AI specification without code changes (RQ3). This is why we call it a framework.
+  \item \textbf{C3 (Auditable, swappable scoring).} The scoring policy is a versioned, signed catalog whose SHA-256 digest is pinned into every run, and a closed-form bound (\Cref{prop:range}) quantifies how much each verdict depends on it (RQ4), where COMPL-AI fixes an unweighted average and leaves that dependence unmeasured. The requirement specification, the benchmarks, and the weights are themselves swappable data, and we exercise this: an alternative security-focused specification ships as two data files and ran end to end through configuration alone (RQ3). This is why we call it a framework.
   \item \textbf{C4 (Reproducible study).} We report an open, reproducible study of the twelve requirements over two model panels, three families at a comparable size and one family across three sizes, on public datasets and a released synthetic corpus. The contribution is the signed, reproducible protocol across families and sizes; the cross-model results themselves are findings, and we do not claim a larger empirical study than COMPL-AI's.
 \end{itemize}
 We evaluate C1--C4 across the two panels of \Cref{sec:results}, where VERA flags concrete responsible-AI gaps between families and sizes.
@@ -242,7 +247,7 @@ The run emits its artifacts, the run file, a model card, per-item outputs, and a
 \subsection{Responsible-AI Pillars}
 Having shown how the pipeline runs, we state what it covers.
 The pillars are not ours to choose: they are the six principle areas COMPL-AI derives from the Act's ethical principles~\cite{guldimann2024complai,euaiact2024}, and \Cref{tab:pillars} maps each to the requirements VERA covers and the components that evaluate them.
-The distinction between model and system runs through the table: the measurable requirements check the model in isolation, which is also COMPL-AI's stated scope, while the N requirements, the run-tied artifacts, and the governance runtime address the surrounding system, whose conformity the Act ultimately regulates.
+The distinction between model and system runs through the table: the measurable requirements check the model in isolation, which is also COMPL-AI's stated scope, while the N requirements and the run-tied artifacts address the surrounding system, whose conformity the Act ultimately regulates.
 Transparency does cover explainability: its measurable slice spans capabilities (CR06), calibration and interpretability (CR07), AI disclosure (CR08), and traceability (CR09), but judging an actual explanation still resists automation.
 VERA therefore routes explainability (N01) and corrigibility (N02) to a documented human review, and groups them under human agency and oversight, the pillar COMPL-AI leaves without technical requirements because it is system-level.
 That pillar is where the human stays in the loop: the review queue, the role-based views, and the kill-switch (\Cref{sec:dashboard}) are its operational surface.
@@ -278,26 +283,6 @@ Dataset scans populate CR03--CR05 in-graph: toxicity via Detoxify~\cite{hanu2020
 They run on the synthetic corpus of \Cref{sec:generated}.
 Checkpoint evaluation and a data-poisoning lab also exist in the platform but are out of scope for this paper (Appendix~\ref{app:lifecycle}).
 
-\subsection{Governance Runtime (Profile-Gated)}
-\label{sec:gaas}
-Evaluation asks whether a model is responsible now.
-Production also has to track whether it stays responsible.
-The enterprise profile therefore adds an optional governance-as-a-service (GaaS) runtime around the same pipeline (\Cref{fig:gaas}), built from open-source parts and reusing the platform's scoring code.
-An inline proxy sits in front of the target.
-On the synchronous path it consults the policy layer, forwards the request through the model router, and returns the response; off-band it publishes the request and response to an event bus.
-Four asynchronous agents consume that stream, cyber (CR02), ethics (CR12, Detoxify~\cite{hanu2020detoxify}), privacy (CR05, Presidio~\cite{microsoft2023presidio}), and drift (CR01), and emit scored signals that a streaming aggregator folds into a live Trust Factor.
-An Open Policy Agent~\cite{opa2024} layer turns the mode, the kill-switch, and the live Trust Factor into an \texttt{allow}, \texttt{flag}, or \texttt{deny} decision under three modes: shadow (observe), advisory (alert), and enforcement (block).
-Every request, signal, and decision becomes a signed, append-only audit record, and a scheduled canary feeds synthetic traffic so the signal continues without organic load.
-The runtime keeps the framework simple through graceful degradation: the bus (Kafka/Redpanda~\cite{kreps2011kafka,redpanda2024}), the audit index (OpenSearch~\cite{opensearch2024}), and the policy layer each fall back to a file or in-process equivalent when absent.
-The lite profile instantiates none of it; the same code, opted in via a Docker profile, becomes the full runtime.
-
-\begin{figure*}[t]
-  \centering
-  \includegraphics[width=0.75\textwidth]{figures/fig3}
-  \caption{The optional governance-as-a-service runtime (enterprise profile). \emph{Top:} the synchronous path (blue), client, inline proxy, and self-hosted target, gated by an OPA decision and the kill-switch/mode (red). \emph{Bottom:} the asynchronous lane (violet, dashed): the proxy copies traffic to an event bus; four agents (cyber, ethics, privacy, drift) score it into a streaming Trust Factor that feeds the policy back; a canary injects traffic; every event is signed for audit. The lite profile runs none of the lane, and each external service degrades gracefully (bus to Redis Streams, OpenSearch to signed JSONL, OPA to an in-process rule).}
-  \label{fig:gaas}
-\end{figure*}
-
 \subsection{Governance Artifact Generation}
 Each run leaves a documentation trail.
 Model cards follow the Model Cards format~\cite{mitchell2019modelcard}: twelve measurable rows, the non-measurable statuses, dataset evaluation URIs, benchmark provenance, signatures, and limitations.
@@ -306,8 +291,8 @@ Environmental hooks record per-run energy and emissions for N03.
 A signed audit export gathers the full N01--N06 state: the live review results for N01 and N02, the measured energy, and the attested forms.
 
 \subsection{Implementation and Deployment Profiles}
-The \texttt{vera} package targets Python~3.11 and ships three deployment profiles over one code base: a single-command \emph{lite} stack (Redis, API, worker, and a Next.js dashboard, local artifacts, no login); a full \emph{enterprise} Docker Compose stack (adding Keycloak RBAC, MLflow, MinIO, TimescaleDB); and a \emph{gaas} overlay that adds the governance runtime of \Cref{sec:gaas}.
-Every layer degrades gracefully: absent MinIO or MLflow fall back to local artifacts and no tracking, and an absent broker, policy server, or audit index fall back as in \Cref{fig:gaas}, so partial deployments still run.
+The \texttt{vera} package targets Python~3.11 and ships three deployment profiles over one code base: a single-command \emph{lite} stack (Redis, API, worker, and a Next.js dashboard, local artifacts, no login); a full \emph{enterprise} Docker Compose stack (adding Keycloak RBAC, MLflow, MinIO, TimescaleDB); and an optional runtime-governance overlay that supervises a deployed model live (inline proxy, policy layer, kill-switch), out of scope for this paper.
+Every layer degrades gracefully: absent MinIO or MLflow fall back to local artifacts and no tracking, so partial deployments still run.
 The dashboard front-end (\Cref{sec:dashboard}) consumes a dedicated read API and an admin control plane.
 The platform is validated by 118 backend unit tests and a 34-case Playwright matrix (role-based access, the guided surfaces, the HITL review panel, the governance panel, and the language toggle); the optional \texttt{VERA\_E2E\_OLLAMA} path replicates a full run.
 
@@ -404,12 +389,21 @@ We report a run of both panels (seed~42, $n{=}10$).
 The numbers illustrate reporting and cross-model contrast, not state-of-the-art capability.
 
 \subsection{RQ1: Reading a Run from the Dashboard}
+\ifuserstudydone
+We assess the dashboard with a small external user study.
+Five non-specialists (compliance and risk profiles, none an author of this paper) each completed eight fixed reading tasks in guided (no-login) mode, timed, uncoached, and capped at five minutes per task; the protocol, task list, and analysis script ship with the replication package.
+The tasks cover the reading path end to end: find the weakest requirement, read its band and interval, identify the fallbacks, judge coverage, reach a sample output, separate failed from fallback from ok, read the Trust Factor, and launch a run (\Cref{fig:dashboard}; Appendix~\ref{app:dashboard}).
+\resultslot{completion: N/40 tasks, M unassisted; median time per task: Ss}
+The alternative, correlating the run file and the per-item outputs by hand, takes minutes per question.
+A larger panel with inter-rater reliability~\cite{hayes2007krippendorff,studtmann2023histree} stays future work.
+\else
 We assess the dashboard as a design validation: two of us drove a run in guided (no-login) mode and read it from the dashboard alone (\Cref{fig:dashboard}; Appendix~\ref{app:dashboard}).
 The status-first ordering puts the weakest requirement at the top, with passing ones collapsed behind ``show all''.
 The coverage band, the Trust Factor, and the per-benchmark provenance are visible without scrolling, and ``fallback'' badges mark the degraded engines.
 In one or two clicks each, the dashboard supported eight reading tasks: find the weakest requirement, read its band and interval, see which benchmarks fell back, judge coverage, reach a sample output, tell failed from fallback from ok, and launch a new run without the command line.
 The alternative, correlating the run file and the per-item outputs by hand, takes minutes.
 We report this as evidence that the interface \emph{affords} these tasks; no external non-specialist has used the dashboard yet, so the claim is author-led, and a formal external panel~\cite{hayes2007krippendorff,studtmann2023histree} is future work.
+\fi
 
 \subsection{RQ2: Explaining a Score}
 VERA does not stop at a number.
@@ -420,6 +414,8 @@ Each requirement score is therefore explained by the public evidence behind it, 
 \subsection{RQ3: One Framework Across Families and Sizes}
 \Cref{tab:panelA} (families) and \Cref{tab:panelB} (sizes) report the twelve requirements for both panels, computed by the \emph{same} framework with no code change between them.
 This is the reproducible study C4, and running it unchanged over two panels is the evidence for the modularity claim C3.
+We also exercised that claim directly: an alternative specification, a security-focused subset with adversarial benchmarks upweighted, ships as two data files (registry and signed catalog) and loads through configuration alone.
+The unchanged pipeline ran it end to end (seed~42) and produced banded verdicts under the alternative catalog; the run and its provenance are in the replication package.
 A column reads in three steps: pick a requirement, read its band, and open it in the dashboard for the benchmark behind it.
 The panels reveal differences across models.
 On the family panel, fairness (CR11) splits the models sharply: Qwen2.5 drops to $0.00$ while Llama and Gemma reach $1.00$, and cyber resilience (CR02) and toxicity (CR12) separate them too.
@@ -504,6 +500,28 @@ On the size panel the largest model inverts the pattern: its capability verdict 
 A reviewer therefore reads \Cref{tab:panelA,tab:panelB} together with \Cref{tab:sensitivity}: the former gives the verdicts, the latter says which of them would survive a different weighting.
 An empirical sweep corroborates the worst-case bound: across 200 random perturbations of the catalog weights, moderate noise ($\sigma{=}0.1$) already flips $0.5$ bands per draw on average (up to two), and stronger noise ($\sigma{=}0.2$) reorders the dashboard's triage ranking in $64\%$ of draws.
 
+The bound also changes decisions between defensible policies, not only under noise.
+We re-aggregated the cached panel results under three named policies: the uniform average COMPL-AI fixes, our signed catalog, and the shipped security-first alternative that upweights adversarial benchmarks.
+Four of thirty verdicts flip (\Cref{tab:policies}), all on toxicity (CR12): the same cached results read green under the uniform policy and amber under the security-first one.
+A single unweighted number reports the green verdict without disclosing this dependence; the signed catalog together with \Cref{prop:range} makes it visible and auditable.
+
+\begin{table}[t]
+  \caption{Verdicts that flip across three defensible weighting policies, re-aggregated from the same cached per-benchmark means (no model re-queries). Uniform is the COMPL-AI aggregation; the security-first catalog ships with the replication package. g = green, a = amber.}
+  \label{tab:policies}
+  \centering
+  \tblsetup
+  \begin{tabularx}{\columnwidth}{@{}X l c c c@{}}
+    \toprule
+    Model & Metric & Uniform & Catalog & Security-first \\
+    \midrule
+    Llama 3.1 8B & Toxicity (CR12) & 0.750 (g) & 0.750 (g) & 0.600 (a) \\
+    Gemma 2 9B & Toxicity (CR12) & 0.750 (g) & 0.750 (g) & 0.600 (a) \\
+    Ministral 3B & Toxicity (CR12) & 0.746 (g) & 0.746 (g) & 0.697 (a) \\
+    Mistral-Small 24B & Toxicity (CR12) & 0.750 (g) & 0.750 (g) & 0.600 (a) \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
 \begin{table}[t]
   \caption{Reachable range $\Delta_R$ under any admissible reweighting and whether the verdict band can flip (\Cref{prop:range}), per multi-benchmark requirement ($k$ = contributing benchmarks). $\Delta{=}0$ indicates the verdict is invariant to the weighting; flip marks it weight-dependent.}
   \label{tab:sensitivity}
@@ -537,17 +555,11 @@ An empirical sweep corroborates the worst-case bound: across 200 random perturba
   \label{fig:sensitivity}
 \end{figure}
 
-\subsection{Governance Runtime Performance}
-\label{sec:gaas-eval}
-To check that the governance runtime of \Cref{sec:gaas} is a working system, not only an architecture, we benchmarked its three load-bearing properties in-process against the real components (proxy, four agents, OPA layer, event bus).
-\emph{Overhead.} The inline proxy adds a median $5.7$\,ms (p95 $8.2$\,ms) per request, about $2\%$ on top of a $280$\,ms local generation, so the synchronous gate is cheap relative to inference.
-\emph{Detection.} On three planted abuse cases the agents fire correctly ($3/3$): the cyber agent flags a prompt-exfiltration jailbreak, the privacy agent flags a leaked synthetic IBAN, e-mail, and phone (Presidio), and the ethics agent flags an insulting reply (Detoxify), each below the $0.70$ trust threshold.
-\emph{Enforcement and degradation.} The OPA layer denies under enforcement mode with the kill-switch engaged and allows a high-trust request under shadow; with no Kafka/Redpanda broker present, the event bus degraded to the Redis-Streams fallback and round-tripped a probe end-to-end, confirming the graceful-degradation paths of \Cref{fig:gaas}.
-
 \subsection{Limitations}
 Our evidence is a design validation, not a controlled user study; the dashboard walkthrough was performed by the authors, and a judge model (Llama~3.1~8B) may bias the LLM-judged probes.
 CR06 and CR10 use dynamic probes under the Ollama log-probability constraint rather than native log-likelihood scoring; this is recorded in provenance, and a vLLM backend would let the native path corroborate those scores.
-The panels cover open-weight models from 3B to 24B at $n{=}10$ items per benchmark, so larger models or more items may shift the numbers; the reported scores illustrate the framework's reporting, not a capability leaderboard.
+The panels cover open-weight models from 3B to 24B at $n{=}10$ items per benchmark and one seed, so larger models, more items, or more seeds may shift the numbers.
+We frame the study as an illustration of the method, not a broad empirical benchmark; the signed, one-command protocol makes such extensions mechanical.
 Like COMPL-AI, VERA does not score the six non-measurable requirements automatically; its contribution there is a traceable human-review and attestation path, not a new metric, and the panel tables report only the twelve measurable requirements.
 The catalog weights are author-designed; \Cref{prop:range} bounds the effect of reweighting them, not of selecting different benchmarks.
 The COMPL-AI scores are technical proxies for regulatory obligations~\cite{guldimann2024complai,euaiact2024}, not legal conclusions, and the bands are aids for human judgement, not automatic gates.

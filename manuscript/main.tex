@@ -632,6 +632,11 @@ Across both panels VERA flags concrete responsible-AI gaps, and it exposes a wat
 We release VERA as open-source software, available at \url{\repourl}, to speed up adoption and disseminate responsible-AI best practice.
 Future work includes a formal practitioner study with inter-rater reliability~\cite{hayes2007krippendorff,studtmann2023histree}, native log-probability runs on a vLLM backend, and the role-based, per-persona scoring that this software-focused paper only sketches.
 
+{\footnotesize
+\bibliographystyle{IEEEtran}
+\bibliography{references}
+}
+
 \appendices
 
 \section{Lifecycle Lab Extensions}
@@ -641,16 +646,34 @@ Both reuse the inference path's runners and catalog.
 
 \section{Dashboard Screens}
 \label{app:dashboard}
-\Cref{fig:app-shots} shows the more complete screens that back the hero view of \Cref{fig:dashboard}: the guided-mode home, the four-step launch wizard, the governance panel, and the full run view with its detail sections expanded (triage, non-measurable strip, run metadata, and harness provenance).
+\Cref{fig:app-home,fig:app-wizard,fig:app-gov,fig:app-full} show, at full size, the screens that back the hero view of \Cref{fig:dashboard}: the guided-mode home, the four-step launch wizard, the governance panel, and the complete run view with its detail sections expanded (triage, non-measurable strip, run metadata, and harness provenance).
 
-\begin{figure*}[t]
+\begin{figure*}[p]
   \centering
-  \includegraphics[width=0.19\textwidth]{figures/shot_home.png}\hfill
-  \includegraphics[width=0.19\textwidth]{figures/shot_wizard.png}\hfill
-  \includegraphics[width=0.19\textwidth]{figures/shot_governance.png}\hfill
-  \includegraphics[width=0.19\textwidth]{figures/shot_control_room_full.png}
-  \caption{Additional VERA screens, richer than the hero view: the guided-mode home, the four-step launch wizard, the governance panel, and the complete run view with the detail sections expanded.}
-  \label{fig:app-shots}
+  \includegraphics[width=\textwidth,height=0.92\textheight,keepaspectratio]{figures/shot_home.png}
+  \caption{The guided-mode home: onboarding actions, connected models, stack health, and the kill-switch, with no login required.}
+  \label{fig:app-home}
+\end{figure*}
+
+\begin{figure*}[p]
+  \centering
+  \includegraphics[width=\textwidth,height=0.92\textheight,keepaspectratio]{figures/shot_wizard.png}
+  \caption{The four-step launch wizard: pick a connected model, choose a recommended or custom requirement set, set options, review and submit.}
+  \label{fig:app-wizard}
+\end{figure*}
+
+\begin{figure*}[p]
+  \centering
+  \includegraphics[width=\textwidth,height=0.92\textheight,keepaspectratio]{figures/shot_governance.png}
+  \caption{The governance panel: per-model modes (shadow, advisory, enforcement), live Trust Factor, incidents, and the kill-switch.}
+  \label{fig:app-gov}
+\end{figure*}
+
+\begin{figure*}[p]
+  \centering
+  \includegraphics[width=\textwidth,height=0.92\textheight,keepaspectratio]{figures/shot_control_room_full.png}
+  \caption{The complete run view with the detail sections expanded: hero gauge, coverage band, status-first triage table, non-measurable strip (N01--N06), lifecycle rail, run metadata, and harness provenance.}
+  \label{fig:app-full}
 \end{figure*}
 
 \section{Banking Regulatory Mapping}
@@ -675,11 +698,5 @@ Both reuse the inference path's runners and catalog.
     \bottomrule
   \end{tabularx}
 \end{table}
-
-\balance
-{\footnotesize
-\bibliographystyle{IEEEtran}
-\bibliography{references}
-}
 
 \end{document}

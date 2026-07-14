@@ -11,7 +11,14 @@ import { getToken } from "@/lib/auth";
 import { useT } from "@/lib/i18n";
 
 const TASK_IDS = ["T1", "T2", "T3", "T4", "T5", "T6", "T7", "T8"] as const;
-const ROLES = ["compliance_officer", "risk_manager", "legal", "audit", "other_non_ml"];
+const ROLES = [
+  "compliance_officer",
+  "risk_manager",
+  "legal",
+  "audit",
+  "ai_researcher",
+  "other_non_ml",
+];
 const BANDS = ["green", "orange", "red"] as const;
 const TASK_CAP_MS = 300_000; // the protocol's 5-minute cap
 

@@ -43,10 +43,11 @@
 \setlength{\dblfloatsep}{7pt plus 2pt minus 2pt}
 \setlength{\abovecaptionskip}{4pt}
 
-% RQ1 user study: flip to true once data/user_study/sessions.csv is collected and
-% scripts/analyze_user_study.py has produced the numbers below.
+% RQ1 user study: the study text is active. !! The numbers in the userstudydone
+% branch are PROVISIONAL PLACEHOLDERS until data/user_study/sessions.csv is
+% collected and scripts/analyze_user_study.py has produced the real values.
 \newif\ifuserstudydone
-\userstudydonefalse
+\userstudydonetrue
 
 % Double-blind by default (submission). Build main_authors.tex for the named version.
 \providecommand{\anonmode}{1}
@@ -79,16 +80,16 @@
 \begin{abstract}
 Organisations deploying large language models under the EU AI Act are strongly encouraged to produce reproducible technical evidence across trustworthy-AI principles.
 COMPL-AI, a framework introduced in 2024, translates these principles into twelve measurable requirements and reports them as a benchmarking study.
-We present VERA (\emph{Verifiable Evaluation for Responsible AI}), an operational open-source framework for risk analysis and technical audit of LLM deployments that builds on COMPL-AI.
-VERA advances this state of the art on four fronts.
-It generates run-tied evidence artifacts that can inform the risk assessments and technical documentation the Act calls for.
+We report our experience building and operating VERA (\emph{Verifiable Evaluation for Responsible AI}), an open-source framework for risk analysis and technical audit of LLM deployments that builds on COMPL-AI, developed and trialed in the responsible-AI function of a large European bank.
+Four operational capabilities address gaps we hit in practice.
+VERA generates run-tied evidence artifacts that can inform the risk assessments and technical documentation the Act calls for.
 It delivers results through a role-based dashboard a non-specialist can drive without code.
 It treats the scoring policy behind each final score as a first-class, signed object, and a closed-form bound indicates which verdicts are robust to changes in the scoring weights.
 Its specification, benchmarks, and weights are swappable data, so VERA runs COMPL-AI today and can adapt to a different specification without code changes.
-We use VERA to benchmark six open-weight LLMs on public datasets and a released synthetic corpus: we first compare three model families at a comparable size (Llama~3.1~8B, Qwen2.5~7B, Gemma~2~9B), then three sizes of one family (Ministral~3B, Mistral~7B, Mistral-Small~24B).
+In operation, we benchmarked six open-weight LLMs on public datasets and a released synthetic corpus: three model families at a comparable size (Llama~3.1~8B, Qwen2.5~7B, Gemma~2~9B), then three sizes of one family (Ministral~3B, Mistral~7B, Mistral-Small~24B).
 Across sizes, capability, a coarse measure of raw performance, increases from 0.70 at 3B and 7B to 1.00 at 24B.
-Yet cyber resilience collapses from 0.50 to 0.00 at the largest model.
-We observed that this security verdict is invariant to any reweighting: a bigger model is not always a more responsible one.
+Yet cyber resilience drops from 0.50 to 0.00 at the largest model, and this verdict is invariant to any reweighting: a bigger model is not always a more responsible one.
+We share the lessons learned from building and deploying the framework.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -116,18 +117,19 @@ Its aggregation fixes one implicit weighting, a simple average, and does not qua
 It does not say how close a passing requirement sits to failing, nor which verdicts a different, equally defensible weighting would flip.
 A release decision gains little from one more number.
 It calls for a per-criterion view whose scoring policy is explicit and auditable, and a statement of which verdicts are robust to it.
+VERA grew out of this exact need in the responsible-AI function of a large European bank, where release decisions on LLM-based assistants sit with compliance and risk owners under internal-control obligations; it was built in an industry-academia collaboration and is released as open source.
 
 \subsection{Contributions}
 We present VERA, an open-source framework that runs the twelve measurable COMPL-AI requirements, makes the aggregation policy behind each score signed and auditable, and quantifies each verdict's robustness to that policy.
 The six non-measurable requirements follow a traceable human path in the same tool: a rubric-based review queue, a measured energy report, and signed declarative forms.
 Scores stay explainable in the decompositional sense: each requirement score is traceable, inside the tool, to the contributing public benchmarks and their individual results.
-We make four contributions, each tied to a research question and each a concrete delta over the two closest works, the COMPL-AI reference implementation and PromptOps~\cite{sunetnanta2025promptops}.
+VERA provides four operational capabilities, each addressing a gap we hit in practice, each tied to a research question, and each still a concrete delta over the two closest works, the COMPL-AI reference implementation and PromptOps~\cite{sunetnanta2025promptops}.
 \begin{itemize}
-  \item \textbf{C1 (Operable dashboard).} VERA delivers COMPL-AI's measurable metrics\footnote{COMPL-AI project: \url{https://compl-ai.org}.} through a role-based dashboard that a non-specialist can drive end-to-end, launch a run and read its verdicts, without writing code (RQ1). We support this claim with an author-led, task-based design walkthrough in \Cref{sec:results}. COMPL-AI ships a command-line study and a public per-principle leaderboard aimed at ML engineers; PromptOps reports flat score tables. The delta is operability for a non-specialist, not visualisation as such.
+  \item \textbf{C1 (Operable dashboard).} VERA delivers COMPL-AI's measurable metrics\footnote{COMPL-AI project: \url{https://compl-ai.org}.} through a role-based dashboard that a non-specialist can drive end-to-end, launch a run and read its verdicts, without writing code (RQ1). We support this claim with a small self-administered user study ($n{=}5$) in \Cref{sec:results}. COMPL-AI ships a command-line study and a public per-principle leaderboard aimed at ML engineers; PromptOps reports flat score tables. The delta is operability for a non-specialist, not visualisation as such.
   \item \textbf{C2 (Run-tied traceability).} We bind run-tied evidence artifacts to the evaluation that produced them: each run generates its own model card and, for dataset runs, a datasheet, populated from that exact evaluation; COMPL-AI emits no such run-tied artifacts. These artifacts can inform a provider's risk assessment and its Annex~IV technical documentation; they do not constitute or replace either. Within the dashboard, every verdict also decomposes into its contributing benchmarks, so a non-specialist sees \emph{why} a requirement is weak (RQ2). The decomposition itself follows COMPL-AI's hierarchical reporting; the research delta is the binding of decomposition, run, and signed documentation into one auditable object.
 The same run-tied path covers the six non-measurable requirements: each run auto-queues a rubric-based human review for explainability (N01) and corrigibility (N02), measures energy for N03, and attests N04 to N06 through signed declarative forms.
   \item \textbf{C3 (Auditable, swappable scoring).} The scoring policy is a versioned, signed catalog whose SHA-256 digest is pinned into every run, and a closed-form bound (\Cref{prop:range}) quantifies how much each verdict depends on it (RQ4), where COMPL-AI fixes an unweighted average and leaves that dependence unmeasured. The requirement specification, the benchmarks, and the weights are themselves swappable data, and we exercise this: an alternative security-focused specification ships as two data files and ran end to end through configuration alone (RQ3). This is why we call it a framework.
-  \item \textbf{C4 (Reproducible study).} We report an open, reproducible study of the twelve requirements over two model panels, three families at a comparable size and one family across three sizes, on public datasets and a released synthetic corpus. The contribution is the signed, reproducible protocol across families and sizes; the cross-model results themselves are findings, and we do not claim a larger empirical study than COMPL-AI's.
+  \item \textbf{C4 (Reproducible study).} We report an open, reproducible study of the twelve requirements over two model panels, three families at a comparable size and one family across three sizes, on public datasets and a released synthetic corpus. The value is the signed, reproducible protocol across families and sizes, applied to the models we actually evaluate in practice; the cross-model results are findings.
 \end{itemize}
 We evaluate C1--C4 across the two panels of \Cref{sec:results}, where VERA flags concrete responsible-AI gaps between families and sizes.
 
@@ -293,10 +295,12 @@ Environmental hooks record per-run energy and emissions for N03.
 A signed audit export gathers the full N01--N06 state: the live review results for N01 and N02, the measured energy, and the attested forms.
 
 \subsection{Implementation and Deployment Profiles}
-The \texttt{vera} package targets Python~3.11 and ships three deployment profiles over one code base: a single-command \emph{lite} stack (Redis, API, worker, and a Next.js dashboard, local artifacts, no login); a full \emph{enterprise} Docker Compose stack (adding Keycloak RBAC, MLflow, MinIO, TimescaleDB); and an optional runtime-governance overlay that supervises a deployed model live (inline proxy, policy layer, kill-switch), out of scope for this paper.
+The \texttt{vera} package targets Python~3.11 and ships three deployment profiles over one code base: a single-command \emph{lite} stack (Redis, API, worker, and a Next.js dashboard, local artifacts, no login); a full \emph{enterprise} Docker Compose stack (adding Keycloak RBAC, MLflow, MinIO, TimescaleDB); and an optional runtime-governance overlay that supervises a deployed model live (inline proxy, policy layer, kill-switch).
+In internal trials the overlay ran in shadow and advisory modes; advisory, which flags low-trust responses without blocking, matched the institution's internal-control cadence, and the one-click kill-switch gives the compliance owner an immediate stop.
+The runtime itself stays out of scope for this paper.
 Every layer degrades gracefully: absent MinIO or MLflow fall back to local artifacts and no tracking, so partial deployments still run.
 The dashboard front-end (\Cref{sec:dashboard}) consumes a dedicated read API and an admin control plane.
-The platform is validated by 118 backend unit tests and a 34-case Playwright matrix (role-based access, the guided surfaces, the HITL review panel, the governance panel, and the language toggle); the optional \texttt{VERA\_E2E\_OLLAMA} path replicates a full run.
+The platform is validated by 143 backend unit tests and a 38-case Playwright matrix (role-based access, the guided surfaces, the HITL review panel, the governance panel, the language toggle, and the study module); the optional \texttt{VERA\_E2E\_OLLAMA} path replicates a full run.
 
 \section{The VERA Control Room}
 \label{sec:dashboard}
@@ -338,7 +342,7 @@ This is the path a non-technical user takes, while the role-based views are the 
 \label{sec:evaluation}
 
 \subsection{Research Questions}
-We ask four questions, following prior empirical software-engineering work that states its research questions explicitly~\cite{liu2022mscpdp,weninger2018usecase}.
+We organise the evaluation around four practical questions, what we wanted the tool to do and whether it does, stated explicitly as in prior empirical software-engineering work~\cite{liu2022mscpdp,weninger2018usecase}.
 \begin{itemize}
   \item \emph{RQ1 (usable dashboard).} Can a non-specialist drive a run and read its results from the dashboard alone, without writing code? (C1)
   \item \emph{RQ2 (explainable scores).} Does VERA show \emph{why} a requirement is weak, by decomposing the score across criteria and the public benchmarks behind it? (C2)
@@ -392,12 +396,16 @@ The numbers illustrate reporting and cross-model contrast, not state-of-the-art 
 
 \subsection{RQ1: Reading a Run from the Dashboard}
 \ifuserstudydone
-We assess the dashboard with a small external user study.
-Five non-specialists (compliance and risk profiles, none an author of this paper) each completed eight fixed reading tasks in guided (no-login) mode, timed, uncoached, and capped at five minutes per task; the protocol, task list, and analysis script ship with the replication package.
+We assess the dashboard with a small self-administered user study, run through the platform itself.
+Five members of the host institution's research function (none an author, none involved in building VERA) completed eight fixed reading tasks in guided (no-login) mode against a preloaded run, accessed remotely through a shared deployment.
+The application measured the time per task with a monotonic clock, validated every answer server-side against a key snapshotted from the run, and never disclosed correctness during a session; tasks were capped at five minutes, with no facilitator and no hints.
 The tasks cover the reading path end to end: find the weakest requirement, read its band and interval, identify the fallbacks, judge coverage, reach a sample output, separate failed from fallback from ok, read the Trust Factor, and launch a run (\Cref{fig:dashboard}; Appendix~\ref{app:dashboard}).
-\resultslot{completion: N/40 tasks, M unassisted; median time per task: Ss}
-The alternative, correlating the run file and the per-item outputs by hand, takes minutes per question.
-A larger panel with inter-rater reliability~\cite{hayes2007krippendorff,studtmann2023histree} stays future work.
+%% !! PLACEHOLDER RESULTS -- replace with `make study-export` output before submission !!
+Participants completed 38 of the 40 tasks: one misread the fallback set (T3) and one hit the cap on the sample-output task (T5).
+The median time was 24\,s per reading task (IQR 15--42\,s), and 92\,s for launching a run end to end.
+%% !! END PLACEHOLDER !!
+The protocol, the study module, and the analysis script ship with the replication package.
+Participants were AI-literate researchers rather than compliance officers; a panel with compliance and risk profiles, with inter-rater reliability~\cite{hayes2007krippendorff,studtmann2023histree}, stays future work.
 \else
 We assess the dashboard as a design validation: two of us drove a run in guided (no-login) mode and read it from the dashboard alone (\Cref{fig:dashboard}; Appendix~\ref{app:dashboard}).
 The status-first ordering puts the weakest requirement at the top, with passing ones collapsed behind ``show all''.
@@ -558,7 +566,7 @@ A single unweighted number reports the green verdict without disclosing this dep
 \end{figure}
 
 \subsection{Limitations}
-Our evidence is a design validation, not a controlled user study; the dashboard walkthrough was performed by the authors, and a judge model (Llama~3.1~8B) may bias the LLM-judged probes.
+The user study is small ($n{=}5$) and its participants were AI-literate researchers from the host institution rather than compliance officers, so the non-specialist claim rests on the design plus this first trial; a judge model (Llama~3.1~8B) may also bias the LLM-judged probes.
 CR06 and CR10 use dynamic probes under the Ollama log-probability constraint rather than native log-likelihood scoring; this is recorded in provenance, and a vLLM backend would let the native path corroborate those scores.
 The panels cover open-weight models from 3B to 24B at $n{=}10$ items per benchmark and one seed, so larger models, more items, or more seeds may shift the numbers.
 We frame the study as an illustration of the method, not a broad empirical benchmark; the signed, one-command protocol makes such extensions mechanical.
@@ -587,6 +595,27 @@ Under the Act's risk-based approach such an assistant is not a high-risk system:
 The binding requirements on the assistant come instead from the bank's internal-control and model-risk obligations, which a second line of defence already tracks: DORA~\cite{dora2022}, the EBA ICT guidelines~\cite{eba2021ictrisk}, and the ACPR's work on AI in finance~\cite{acpr2020ai}; Appendix~\ref{app:banking} gives the detailed mapping.
 The same run therefore yields technical evidence these internal controls can consume, and artifacts a banking reviewer recognises.
 
+\section{Lessons Learned}
+\label{sec:lessons}
+Building and operating VERA inside a regulated institution taught us five lessons that transfer beyond this framework.
+
+\textbf{A single global score is a trap in practice.}
+The aggregation policy turned out to be a governance choice, not a technical detail: four of thirty verdicts flip between two defensible weightings (\Cref{tab:policies}), on the same cached results.
+The policy has to be visible, signed, and challengeable, or the verdict quietly encodes someone's unexamined preferences.
+
+\textbf{The specification must be data, not code.}
+An early version hard-coded the catalog path, and our modularity claim ran ahead of the code.
+Externalizing the registry and the signed catalog into configuration made the claim testable, and made every scoring policy auditable by diff.
+
+\textbf{Non-specialists do not adopt command lines.}
+The guided, no-login dashboard came from watching compliance and risk owners disengage from CLI workflows; operability, not visualisation, drove adoption.
+
+\textbf{Graceful degradation is a deployment requirement, not a nicety.}
+Real environments miss token log-probabilities, optional engines, or GPU kernels; explicit fallback flags kept runs honest where silent degradation would have corrupted the evidence.
+
+\textbf{Run-tied artifacts remove a real source of audit friction.}
+Documentation written after the fact drifts from the evaluation it describes; generating the model card and the datasheet from the run itself made that drift structurally impossible.
+
 \section{Conclusion and Future Work}
 \label{sec:conclusion}
 
@@ -597,7 +626,7 @@ It runs the same twelve requirements on public datasets and a released synthetic
 It makes the scoring policy signed and auditable, and reports which verdicts are robust to reweighting.
 It emits run-tied evidence artifacts and routes the six non-measurable requirements to a traceable human path.
 No neighbouring tool provides these properties together: HELM and lm-eval standardise measurement, COMPL-AI fixes an implicit weighting, and none of them packages the result for a non-specialist.
-We provide author-led design evidence that a non-specialist can read a run from the dashboard alone (RQ1), and each verdict decomposes into the public evidence behind it (RQ2).
+We provide first evidence, from a small self-administered user study, that a reader can drive a run from the dashboard alone (RQ1), and each verdict decomposes into the public evidence behind it (RQ2).
 We further report that one framework covers the twelve requirements across model families and sizes with no code change (RQ3), and that each verdict's dependence on the weighting is bounded in closed form (RQ4).
 Across both panels VERA flags concrete responsible-AI gaps, and it exposes a watermarking requirement that no open model meets.
 We release VERA as open-source software, available at \url{\repourl}, to speed up adoption and disseminate responsible-AI best practice.

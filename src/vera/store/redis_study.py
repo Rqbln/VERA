@@ -19,7 +19,14 @@ import redis
 from vera.config import Settings, get_settings
 
 TASK_IDS = tuple(f"T{i}" for i in range(1, 9))
-ROLE_OPTIONS = ("compliance_officer", "risk_manager", "legal", "audit", "other_non_ml")
+ROLE_OPTIONS = (
+    "compliance_officer",
+    "risk_manager",
+    "legal",
+    "audit",
+    "ai_researcher",
+    "other_non_ml",
+)
 
 
 @dataclass

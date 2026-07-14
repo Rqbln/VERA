@@ -1,0 +1,339 @@
+"""Self-administered RQ1 user study: sessions, app-measured task responses, CSV export.
+
+Answers are validated SERVER-side against an answer key snapshotted at session
+creation, and the HTTP responses never disclose correctness (no contamination
+between participants). Export matches the sessions.csv schema consumed by
+scripts/analyze_user_study.py.
+"""
+
+from __future__ import annotations
+
+import csv
+import io
+import os
+import random
+import re
+from datetime import UTC, datetime
+from typing import Annotated, Any
+
+from fastapi import APIRouter, Depends, HTTPException, Response
+from pydantic import BaseModel
+
+from vera.api.auth import AuthUser, get_current_user
+from vera.store.redis_run import RedisRunStore
+from vera.store.redis_study import (
+    ROLE_OPTIONS,
+    TASK_IDS,
+    RedisStudyStore,
+    StudySession,
+)
+
+router = APIRouter(prefix="/api/v1/study", tags=["study"])
+
+_SCORE_TOL = 0.005  # UI shows toFixed(2)
+_TRUST_TOL = 1.0  # gauge shows a rounded integer
+_MIN_EXCERPT = 15
+_UUID_RE = re.compile(r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}")
+
+
+# ── Pure helpers (unit-testable without HTTP) ────────────────────────────────────────
+def build_answer_key(summary: dict[str, Any]) -> dict[str, Any]:
+    """Snapshot the ground truth for the eight tasks from a run-summary payload."""
+    reqs = [r for r in (summary.get("requirements") or []) if r.get("triage") != "na"]
+    scored = [r for r in reqs if r.get("score") is not None]
+    weakest_ids: set[str] = set()
+    weakest_primary = ""
+    if scored:
+        low = min(float(r["score"]) for r in scored)
+        weakest_ids = {r["id"] for r in scored if float(r["score"]) == low}
+        weakest_primary = min(r["id"] for r in scored if float(r["score"]) == low)
+    if reqs:
+        weakest_ids.add(reqs[0]["id"])  # top triage row is an accepted reading
+    counts = summary.get("triage_counts") or {}
+    n_scored = sum(int(counts.get(k, 0)) for k in ("failed", "fallback", "ok"))
+    trust = summary.get("trust_factor") or {}
+    return {
+        "weakest_ids": sorted(weakest_ids),
+        "weakest_primary": weakest_primary,
+        "req_scores": {
+            r["id"]: {
+                "score": r.get("score"),
+                "ci_lower": r.get("score_ci_lower"),
+                "ci_upper": r.get("score_ci_upper"),
+            }
+            for r in scored
+        },
+        "fallback_set": sorted(
+            {b for r in reqs for b in (r.get("fallback_benchmarks") or [])}
+        ),
+        "t4_accepted": sorted({n_scored, len(summary.get("requested_requirements") or [])}),
+        "triage_counts": {k: int(counts.get(k, 0)) for k in ("failed", "fallback", "ok")},
+        "trust": {"score": trust.get("score"), "band": trust.get("band")},
+        "requirement_options": [{"id": r["id"], "name": r.get("name", "")} for r in reqs],
+        "benchmark_options": sorted(
+            {row.get("benchmark_id") for row in (summary.get("harness_provenance") or [])}
+            - {None}
+        ),
+    }
+
+
+def _close(value: Any, target: Any, tol: float) -> bool:
+    try:
+        # 1e-9 absorbs float representation error at the tolerance boundary.
+        return target is not None and abs(float(value) - float(target)) <= tol + 1e-9
+    except (TypeError, ValueError):
+        return False
+
+
+def validate_answer(
+    task_id: str,
+    answer: dict[str, Any],
+    key: dict[str, Any],
+    *,
+    t1_answer_id: str = "",
+    started_at: str = "",
+    run_lookup=None,
+) -> tuple[bool, str]:
+    """Return (completed, verdict) for one submitted answer."""
+    if task_id == "T1":
+        ok = str(answer.get("requirement_id")) in set(key.get("weakest_ids") or [])
+        return ok, "correct" if ok else "wrong"
+    if task_id == "T2":
+        ref = t1_answer_id or key.get("weakest_primary") or ""
+        target = (key.get("req_scores") or {}).get(ref) or {}
+        ok = (
+            _close(answer.get("score"), target.get("score"), _SCORE_TOL)
+            and _close(answer.get("ci_lower"), target.get("ci_lower"), _SCORE_TOL)
+            and _close(answer.get("ci_upper"), target.get("ci_upper"), _SCORE_TOL)
+        )
+        return ok, "correct" if ok else "wrong"
+    if task_id == "T3":
+        given = {str(b) for b in (answer.get("benchmarks") or [])}
+        ok = given == set(key.get("fallback_set") or [])
+        return ok, "correct" if ok else "wrong"
+    if task_id == "T4":
+        try:
+            ok = int(answer.get("count")) in set(key.get("t4_accepted") or [])
+        except (TypeError, ValueError):
+            ok = False
+        return ok, "correct" if ok else "wrong"
+    if task_id == "T5":
+        excerpt = str(answer.get("excerpt") or "").strip()
+        ok = bool(answer.get("confirmed")) and len(excerpt) >= _MIN_EXCERPT
+        return ok, "unverified" if ok else "wrong"
+    if task_id == "T6":
+        target = key.get("triage_counts") or {}
+        try:
+            ok = all(int(answer.get(k)) == target.get(k) for k in ("failed", "fallback", "ok"))
+        except (TypeError, ValueError):
+            ok = False
+        return ok, "correct" if ok else "wrong"
+    if task_id == "T7":
+        trust = key.get("trust") or {}
+        ok = _close(answer.get("score"), trust.get("score"), _TRUST_TOL) and str(
+            answer.get("band")
+        ) == str(trust.get("band"))
+        return ok, "correct" if ok else "wrong"
+    if task_id == "T8":
+        match = _UUID_RE.search(str(answer.get("run_id") or "").lower())
+        if not match or run_lookup is None:
+            return False, "wrong"
+        rec = run_lookup(match.group(0))
+        ok = bool(
+            rec
+            and rec.status in ("queued", "running", "completed")
+            and started_at
+            and (rec.created_at or "") > started_at
+        )
+        return ok, "correct" if ok else "wrong"
+    return False, "wrong"
+
+
+# ── Endpoints ────────────────────────────────────────────────────────────────────────
+class SessionBody(BaseModel):
+    role: str
+    locale: str = "en"
+    run_id: str | None = None
+
+
+class ResponseBody(BaseModel):
+    task_id: str
+    answer: dict[str, Any] = {}
+    seconds: float | None = None
+    gave_up: bool = False
+    reason: str = ""
+
+
+def _target_run(store: RedisRunStore, explicit: str | None):
+    run_id = explicit or os.environ.get("VERA_STUDY_RUN_ID")
+    if run_id:
+        rec = store.get(run_id)
+        if not rec:
+            raise HTTPException(status_code=404, detail="study run not found")
+        return rec
+    completed, _ = store.list_runs(status="completed", limit=1)
+    if not completed:
+        raise HTTPException(status_code=409, detail="no completed run to study")
+    return completed[0]
+
+
+@router.post("/sessions")
+def create_session(
+    body: SessionBody,
+    _user: Annotated[AuthUser, Depends(get_current_user)],
+) -> dict[str, Any]:
+    if body.role not in ROLE_OPTIONS:
+        raise HTTPException(status_code=400, detail=f"role must be one of {ROLE_OPTIONS}")
+    from vera.api.dashboard_routes import _run_summary_dict
+
+    rec = _target_run(RedisRunStore(), body.run_id)
+    key = build_answer_key(_run_summary_dict(rec))
+    session = RedisStudyStore().create_session(
+        role=body.role, run_id=rec.run_id, answer_key=key, locale=body.locale
+    )
+    # Options are shuffled and the summary itself is never sent to the study client.
+    requirement_options = list(key["requirement_options"])
+    benchmark_options = list(key["benchmark_options"])
+    random.Random(session.participant).shuffle(benchmark_options)
+    return {
+        "session_id": session.session_id,
+        "participant": session.participant,
+        "run_id": rec.run_id,
+        "requirement_options": requirement_options,
+        "benchmark_options": benchmark_options,
+    }
+
+
+def _get_session(session_id: str) -> StudySession:
+    session = RedisStudyStore().get_session(session_id)
+    if not session:
+        raise HTTPException(status_code=404, detail="study session not found")
+    return session
+
+
+@router.post("/sessions/{session_id}/tasks/{task_id}/start")
+def start_task(
+    session_id: str,
+    task_id: str,
+    _user: Annotated[AuthUser, Depends(get_current_user)],
+) -> dict[str, Any]:
+    if task_id not in TASK_IDS:
+        raise HTTPException(status_code=400, detail=f"task_id must be one of {TASK_IDS}")
+    RedisStudyStore().start_task(_get_session(session_id), task_id)
+    return {"task_id": task_id, "started": True}
+
+
+@router.post("/sessions/{session_id}/responses")
+def submit_response(
+    session_id: str,
+    body: ResponseBody,
+    _user: Annotated[AuthUser, Depends(get_current_user)],
+) -> dict[str, Any]:
+    if body.task_id not in TASK_IDS:
+        raise HTTPException(status_code=400, detail=f"task_id must be one of {TASK_IDS}")
+    session = _get_session(session_id)
+    store = RedisStudyStore()
+    response = store.start_task(session, body.task_id)  # ensures a started_at exists
+    if response.status == "submitted":
+        raise HTTPException(status_code=409, detail="task already submitted")
+
+    if body.gave_up:
+        completed, verdict = False, ("timeout" if body.reason == "timeout" else "gave_up")
+    else:
+        t1 = store.get_response(session_id, "T1")
+        t1_id = str((t1.answer or {}).get("requirement_id") or "") if t1 else ""
+        completed, verdict = validate_answer(
+            body.task_id,
+            body.answer,
+            session.answer_key,
+            t1_answer_id=t1_id,
+            started_at=response.started_at or session.created_at,
+            run_lookup=RedisRunStore().get,
+        )
+
+    now = datetime.now(UTC)
+    response.status = "submitted"
+    response.answer = body.answer
+    response.completed = completed
+    response.verdict = verdict
+    response.client_seconds = body.seconds
+    try:
+        started = datetime.fromisoformat(response.started_at)
+        response.server_seconds = round((now - started).total_seconds(), 1)
+    except ValueError:
+        response.server_seconds = None
+    response.submitted_at = now.isoformat()
+    store.save_response(response)
+    return {"recorded": True}  # correctness is deliberately not disclosed
+
+
+@router.get("/sessions")
+def list_sessions(
+    _user: Annotated[AuthUser, Depends(get_current_user)],
+) -> dict[str, Any]:
+    store = RedisStudyStore()
+    sessions = sorted(store.list_sessions(), key=lambda s: s.participant)
+    return {
+        "sessions": [
+            {
+                "session_id": s.session_id,
+                "participant": s.participant,
+                "role": s.role,
+                "run_id": s.run_id,
+                "created_at": s.created_at,
+                "responses": sum(
+                    1 for r in store.list_responses(s.session_id) if r.status == "submitted"
+                ),
+            }
+            for s in sessions
+        ]
+    }
+
+
+def _note_for(response) -> str:
+    if response.verdict == "unverified":
+        excerpt = str((response.answer or {}).get("excerpt") or "")[:80]
+        return f"unverified excerpt: {excerpt}"
+    if response.verdict == "wrong":
+        return "auto:wrong"
+    if response.verdict in ("gave_up", "timeout"):
+        return response.verdict.replace("_", " ")
+    if response.task_id == "T8":
+        rid = str((response.answer or {}).get("run_id") or "")[:8]
+        return f"run {rid}" if rid else ""
+    return ""
+
+
+@router.get("/export.csv")
+def export_csv(
+    _user: Annotated[AuthUser, Depends(get_current_user)],
+) -> Response:
+    store = RedisStudyStore()
+    sessions = {s.session_id: s for s in store.list_sessions()}
+    rows = [r for r in store.list_responses() if r.status == "submitted"]
+    rows.sort(key=lambda r: (int(r.participant.lstrip("P") or 0), r.task_id))
+
+    buf = io.StringIO()
+    writer = csv.writer(buf)
+    writer.writerow(["participant", "role", "task_id", "completed", "assisted", "seconds", "notes"])
+    for r in rows:
+        session = sessions.get(r.session_id)
+        seconds = ""
+        if r.completed and r.client_seconds is not None:
+            seconds = str(int(round(r.client_seconds)))
+        writer.writerow(
+            [
+                r.participant,
+                session.role if session else "",
+                r.task_id,
+                "yes" if r.completed else "no",
+                "no",  # self-administered variant: no facilitator, no hints
+                seconds,
+                _note_for(r),
+            ]
+        )
+    return Response(
+        content=buf.getvalue(),
+        media_type="text/csv",
+        headers={"Content-Disposition": 'attachment; filename="sessions.csv"'},
+    )

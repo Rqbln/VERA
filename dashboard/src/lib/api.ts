@@ -9,7 +9,9 @@ import type {
   StackHealth,
 } from "./types";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+// Empty string = relative base (single-origin deployment behind Next rewrites);
+// unset keeps the local default.
+const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
 export function apiBase(): string {
   return API_BASE.replace(/\/$/, "");
@@ -211,6 +213,54 @@ export async function submitHitlReview(
   body: { likert_score?: number; criteria?: Record<string, number>; comment?: string },
 ): Promise<{ task: HitlTask }> {
   return fetchApi(`/api/v1/hitl/tasks/${taskId}/review`, token, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+}
+
+// ── Self-administered user study (RQ1) ──────────────────────────────────────────────
+export interface StudySessionInfo {
+  session_id: string;
+  participant: string;
+  run_id: string;
+  requirement_options: { id: string; name: string }[];
+  benchmark_options: string[];
+}
+
+export async function createStudySession(
+  token: string | undefined,
+  body: { role: string; locale?: string },
+): Promise<StudySessionInfo> {
+  return fetchApi("/api/v1/study/sessions", token, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+}
+
+export async function startStudyTask(
+  token: string | undefined,
+  sessionId: string,
+  taskId: string,
+): Promise<{ task_id: string; started: boolean }> {
+  return fetchApi(`/api/v1/study/sessions/${sessionId}/tasks/${taskId}/start`, token, {
+    method: "POST",
+  });
+}
+
+export async function submitStudyResponse(
+  token: string | undefined,
+  sessionId: string,
+  body: {
+    task_id: string;
+    answer: Record<string, unknown>;
+    seconds: number;
+    gave_up?: boolean;
+    reason?: string;
+  },
+): Promise<{ recorded: boolean }> {
+  return fetchApi(`/api/v1/study/sessions/${sessionId}/responses`, token, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),

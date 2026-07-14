@@ -82,6 +82,42 @@ python scripts/analyze_user_study.py data/user_study/sessions.csv
 Prints per-task completion rate, assisted rate, median time with IQR, and the
 LaTeX rows for the paper's RQ1 table.
 
+## Self-administered variant (app-measured)
+
+The platform ships the study as a page: participants open `<deployment-url>/study`,
+consent, pick their role, and complete the same eight tasks. Methodology:
+
+- **Timing is measured by the application**: a monotonic client clock starts when
+  the participant presses *Start this task* and stops at submission; the server
+  independently records wall-clock start/submit timestamps as a sanity channel.
+- **Correctness is validated server-side** at submission time, against an answer
+  key snapshotted from the target run when the session is created. The participant
+  never sees whether an answer was correct (no contamination between tasks or
+  participants). T5 is recorded as `unverified` (the pasted excerpt is kept for a
+  manual audit against `raw_outputs.jsonl`); T8 is verified by checking that a new
+  run was created after the task started.
+- **No facilitator, no hints**: the `assisted` column is always `no` in this
+  variant (kept for schema compatibility with the facilitated variant above).
+- The 5-minute cap auto-fails a task (`timeout`); one submission per task, no retry.
+- Participant codes are assigned by the server (P1, P2, ...); the role comes from
+  a fixed list; no free-text identity fields exist.
+
+### Deployment (study day)
+
+```bash
+# stack in guided mode with one COMPLETED run preloaded (see quickstart-native),
+# dashboard built single-origin:
+cd dashboard && NEXT_PUBLIC_API_URL="" npm run build && \
+  cp -r .next/static .next/standalone/.next/ && cp -r public .next/standalone/ && \
+  NEXT_PUBLIC_API_URL="" node .next/standalone/server.js
+# optionally pin the study run: export VERA_STUDY_RUN_ID=<run_id> before uvicorn
+make study-tunnel        # share https://<host>/study
+make study-export        # after the sessions: sessions.csv + RQ1 numbers
+```
+
+Variant: host only the front on Vercel (set `NEXT_PUBLIC_API_URL` to a tunneled
+API origin); the backend stays local in all cases (Ollama).
+
 ## Ethics note
 
 No personal data beyond a role label; participation is voluntary; results are

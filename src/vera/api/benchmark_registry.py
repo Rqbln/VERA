@@ -1,8 +1,18 @@
-"""MVP2 benchmark IDs mapped to real runner implementations."""
+"""Benchmark IDs mapped to real runner implementations.
+
+The registry is the requirement specification's machine half: which benchmarks
+serve which requirement, and through which runner. Point VERA_REGISTRY_PATH at
+a YAML file (a list of entries, or {benchmarks: [...]}) to load an alternative
+specification without touching the code; the built-in registry stays the default.
+"""
 
 from __future__ import annotations
 
+import os
+from pathlib import Path
 from typing import Any
+
+import yaml
 
 # COMPL-AI mapping; weights in benchmarks/benchmarks_catalog.yaml.
 MVP2_BENCHMARK_REGISTRY: list[dict[str, Any]] = [
@@ -127,12 +137,38 @@ MVP2_BENCHMARK_REGISTRY: list[dict[str, Any]] = [
     },
 ]
 
-_REGISTRY_BY_ID: dict[str, dict[str, Any]] = {e["id"]: e for e in MVP2_BENCHMARK_REGISTRY}
+_CACHE: dict[str, list[dict[str, Any]]] = {}
+
+
+def _load_registry_file(path: str) -> list[dict[str, Any]]:
+    with open(path, encoding="utf-8") as f:
+        data = yaml.safe_load(f)
+    entries = data.get("benchmarks") if isinstance(data, dict) else data
+    valid = isinstance(entries, list) and all(
+        isinstance(e, dict) and e.get("id") for e in entries
+    )
+    if not valid:
+        msg = f"registry file {path} must be a list of entries with an 'id'"
+        raise ValueError(msg)
+    return [dict(e) for e in entries]
+
+
+def _registry() -> list[dict[str, Any]]:
+    override = os.environ.get("VERA_REGISTRY_PATH")
+    if not override:
+        return MVP2_BENCHMARK_REGISTRY
+    key = str(Path(override).expanduser().resolve())
+    if key not in _CACHE:
+        _CACHE[key] = _load_registry_file(key)
+    return _CACHE[key]
 
 
 def get_benchmark_entry(benchmark_id: str) -> dict[str, Any] | None:
-    return _REGISTRY_BY_ID.get(benchmark_id)
+    for entry in _registry():
+        if entry.get("id") == benchmark_id:
+            return entry
+    return None
 
 
 def list_benchmark_entries() -> list[dict[str, Any]]:
-    return list(MVP2_BENCHMARK_REGISTRY)
+    return list(_registry())

@@ -7,18 +7,17 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
 from vera.api.admin_routes import router as admin_router
-from vera.api.benchmark_registry import MVP2_BENCHMARK_REGISTRY
+from vera.api.benchmark_registry import list_benchmark_entries
 from vera.api.dashboard_routes import router as dashboard_router
 from vera.api.forms_routes import router as forms_router
 from vera.api.lab_routes import router as lab_router
 from vera.api.models_routes import router as models_router
+from vera.api.study_routes import router as study_router
 from vera.config import get_settings
 from vera.governance.kill_switch import kill_switch_status
 from vera.schemas.run_payload import RunCreateRequest
 from vera.store.redis_run import RedisRunStore
 from vera.tasks.eval import run_benchmark_job
-
-BENCHMARK_REGISTRY: list[dict[str, Any]] = list(MVP2_BENCHMARK_REGISTRY)
 
 app = FastAPI(title="VERA API", version="0.3.0")
 app.add_middleware(
@@ -32,6 +31,7 @@ app.include_router(lab_router)
 app.include_router(dashboard_router)
 app.include_router(models_router)
 app.include_router(forms_router)
+app.include_router(study_router)
 app.include_router(admin_router)
 
 
@@ -110,7 +110,7 @@ def get_run_artifacts(run_id: str) -> dict[str, Any]:
 
 @app.get("/api/v1/benchmarks")
 def list_benchmarks() -> dict[str, Any]:
-    return {"benchmarks": BENCHMARK_REGISTRY}
+    return {"benchmarks": list_benchmark_entries()}
 
 
 @app.delete("/api/v1/runs/{run_id}")

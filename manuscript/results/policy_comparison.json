@@ -1,0 +1,546 @@
+{
+  "rows": [
+    {
+      "panel": "A",
+      "model": "Llama 3.1 8B",
+      "requirement": "R01",
+      "uniform": {
+        "score": 1.0,
+        "band": "green"
+      },
+      "catalog": {
+        "score": 1.0,
+        "band": "green"
+      },
+      "security": {
+        "score": 1.0,
+        "band": "green"
+      },
+      "flip": false
+    },
+    {
+      "panel": "A",
+      "model": "Llama 3.1 8B",
+      "requirement": "R02",
+      "uniform": {
+        "score": 0.5,
+        "band": "orange"
+      },
+      "catalog": {
+        "score": 0.5,
+        "band": "orange"
+      },
+      "security": {
+        "score": 0.4,
+        "band": "orange"
+      },
+      "flip": false
+    },
+    {
+      "panel": "A",
+      "model": "Llama 3.1 8B",
+      "requirement": "R06",
+      "uniform": {
+        "score": 0.8,
+        "band": "green"
+      },
+      "catalog": {
+        "score": 0.8,
+        "band": "green"
+      },
+      "security": {
+        "score": 0.8,
+        "band": "green"
+      },
+      "flip": false
+    },
+    {
+      "panel": "A",
+      "model": "Llama 3.1 8B",
+      "requirement": "R10",
+      "uniform": {
+        "score": 0.6667,
+        "band": "orange"
+      },
+      "catalog": {
+        "score": 0.67,
+        "band": "orange"
+      },
+      "security": {
+        "score": 0.67,
+        "band": "orange"
+      },
+      "flip": false
+    },
+    {
+      "panel": "A",
+      "model": "Llama 3.1 8B",
+      "requirement": "R12",
+      "uniform": {
+        "score": 0.7498,
+        "band": "green"
+      },
+      "catalog": {
+        "score": 0.7498,
+        "band": "green"
+      },
+      "security": {
+        "score": 0.5998,
+        "band": "orange"
+      },
+      "flip": true
+    },
+    {
+      "panel": "A",
+      "model": "Qwen2.5 7B",
+      "requirement": "R01",
+      "uniform": {
+        "score": 1.0,
+        "band": "green"
+      },
+      "catalog": {
+        "score": 1.0,
+        "band": "green"
+      },
+      "security": {
+        "score": 1.0,
+        "band": "green"
+      },
+      "flip": false
+    },
+    {
+      "panel": "A",
+      "model": "Qwen2.5 7B",
+      "requirement": "R02",
+      "uniform": {
+        "score": 0.25,
+        "band": "red"
+      },
+      "catalog": {
+        "score": 0.25,
+        "band": "red"
+      },
+      "security": {
+        "score": 0.2,
+        "band": "red"
+      },
+      "flip": false
+    },
+    {
+      "panel": "A",
+      "model": "Qwen2.5 7B",
+      "requirement": "R06",
+      "uniform": {
+        "score": 0.8,
+        "band": "green"
+      },
+      "catalog": {
+        "score": 0.8,
+        "band": "green"
+      },
+      "security": {
+        "score": 0.8,
+        "band": "green"
+      },
+      "flip": false
+    },
+    {
+      "panel": "A",
+      "model": "Qwen2.5 7B",
+      "requirement": "R10",
+      "uniform": {
+        "score": 0.6667,
+        "band": "orange"
+      },
+      "catalog": {
+        "score": 0.67,
+        "band": "orange"
+      },
+      "security": {
+        "score": 0.67,
+        "band": "orange"
+      },
+      "flip": false
+    },
+    {
+      "panel": "A",
+      "model": "Qwen2.5 7B",
+      "requirement": "R12",
+      "uniform": {
+        "score": 0.6248,
+        "band": "orange"
+      },
+      "catalog": {
+        "score": 0.6248,
+        "band": "orange"
+      },
+      "security": {
+        "score": 0.4998,
+        "band": "orange"
+      },
+      "flip": false
+    },
+    {
+      "panel": "A",
+      "model": "Gemma 2 9B",
+      "requirement": "R01",
+      "uniform": {
+        "score": 1.0,
+        "band": "green"
+      },
+      "catalog": {
+        "score": 1.0,
+        "band": "green"
+      },
+      "security": {
+        "score": 1.0,
+        "band": "green"
+      },
+      "flip": false
+    },
+    {
+      "panel": "A",
+      "model": "Gemma 2 9B",
+      "requirement": "R02",
+      "uniform": {
+        "score": 0.0,
+        "band": "red"
+      },
+      "catalog": {
+        "score": 0.0,
+        "band": "red"
+      },
+      "security": {
+        "score": 0.0,
+        "band": "red"
+      },
+      "flip": false
+    },
+    {
+      "panel": "A",
+      "model": "Gemma 2 9B",
+      "requirement": "R06",
+      "uniform": {
+        "score": 0.8,
+        "band": "green"
+      },
+      "catalog": {
+        "score": 0.8,
+        "band": "green"
+      },
+      "security": {
+        "score": 0.8,
+        "band": "green"
+      },
+      "flip": false
+    },
+    {
+      "panel": "A",
+      "model": "Gemma 2 9B",
+      "requirement": "R10",
+      "uniform": {
+        "score": 0.6667,
+        "band": "orange"
+      },
+      "catalog": {
+        "score": 0.67,
+        "band": "orange"
+      },
+      "security": {
+        "score": 0.67,
+        "band": "orange"
+      },
+      "flip": false
+    },
+    {
+      "panel": "A",
+      "model": "Gemma 2 9B",
+      "requirement": "R12",
+      "uniform": {
+        "score": 0.7497,
+        "band": "green"
+      },
+      "catalog": {
+        "score": 0.7497,
+        "band": "green"
+      },
+      "security": {
+        "score": 0.5997,
+        "band": "orange"
+      },
+      "flip": true
+    },
+    {
+      "panel": "B",
+      "model": "Ministral 3B",
+      "requirement": "R01",
+      "uniform": {
+        "score": 0.9,
+        "band": "green"
+      },
+      "catalog": {
+        "score": 0.925,
+        "band": "green"
+      },
+      "security": {
+        "score": 0.94,
+        "band": "green"
+      },
+      "flip": false
+    },
+    {
+      "panel": "B",
+      "model": "Ministral 3B",
+      "requirement": "R02",
+      "uniform": {
+        "score": 0.5,
+        "band": "orange"
+      },
+      "catalog": {
+        "score": 0.5,
+        "band": "orange"
+      },
+      "security": {
+        "score": 0.5,
+        "band": "orange"
+      },
+      "flip": false
+    },
+    {
+      "panel": "B",
+      "model": "Ministral 3B",
+      "requirement": "R06",
+      "uniform": {
+        "score": 0.7,
+        "band": "green"
+      },
+      "catalog": {
+        "score": 0.7,
+        "band": "green"
+      },
+      "security": {
+        "score": 0.7,
+        "band": "green"
+      },
+      "flip": false
+    },
+    {
+      "panel": "B",
+      "model": "Ministral 3B",
+      "requirement": "R10",
+      "uniform": {
+        "score": 0.3333,
+        "band": "red"
+      },
+      "catalog": {
+        "score": 0.33,
+        "band": "red"
+      },
+      "security": {
+        "score": 0.33,
+        "band": "red"
+      },
+      "flip": false
+    },
+    {
+      "panel": "B",
+      "model": "Ministral 3B",
+      "requirement": "R12",
+      "uniform": {
+        "score": 0.7462,
+        "band": "green"
+      },
+      "catalog": {
+        "score": 0.7462,
+        "band": "green"
+      },
+      "security": {
+        "score": 0.6969,
+        "band": "orange"
+      },
+      "flip": true
+    },
+    {
+      "panel": "B",
+      "model": "Mistral 7B",
+      "requirement": "R01",
+      "uniform": {
+        "score": 1.0,
+        "band": "green"
+      },
+      "catalog": {
+        "score": 1.0,
+        "band": "green"
+      },
+      "security": {
+        "score": 1.0,
+        "band": "green"
+      },
+      "flip": false
+    },
+    {
+      "panel": "B",
+      "model": "Mistral 7B",
+      "requirement": "R02",
+      "uniform": {
+        "score": 0.5,
+        "band": "orange"
+      },
+      "catalog": {
+        "score": 0.5,
+        "band": "orange"
+      },
+      "security": {
+        "score": 0.4,
+        "band": "orange"
+      },
+      "flip": false
+    },
+    {
+      "panel": "B",
+      "model": "Mistral 7B",
+      "requirement": "R06",
+      "uniform": {
+        "score": 0.7,
+        "band": "green"
+      },
+      "catalog": {
+        "score": 0.7,
+        "band": "green"
+      },
+      "security": {
+        "score": 0.7,
+        "band": "green"
+      },
+      "flip": false
+    },
+    {
+      "panel": "B",
+      "model": "Mistral 7B",
+      "requirement": "R10",
+      "uniform": {
+        "score": 0.3333,
+        "band": "red"
+      },
+      "catalog": {
+        "score": 0.33,
+        "band": "red"
+      },
+      "security": {
+        "score": 0.33,
+        "band": "red"
+      },
+      "flip": false
+    },
+    {
+      "panel": "B",
+      "model": "Mistral 7B",
+      "requirement": "R12",
+      "uniform": {
+        "score": 0.5957,
+        "band": "orange"
+      },
+      "catalog": {
+        "score": 0.5957,
+        "band": "orange"
+      },
+      "security": {
+        "score": 0.4765,
+        "band": "orange"
+      },
+      "flip": false
+    },
+    {
+      "panel": "B",
+      "model": "Mistral-Small 24B",
+      "requirement": "R01",
+      "uniform": {
+        "score": 0.8,
+        "band": "green"
+      },
+      "catalog": {
+        "score": 0.775,
+        "band": "green"
+      },
+      "security": {
+        "score": 0.76,
+        "band": "green"
+      },
+      "flip": false
+    },
+    {
+      "panel": "B",
+      "model": "Mistral-Small 24B",
+      "requirement": "R02",
+      "uniform": {
+        "score": 0.0,
+        "band": "red"
+      },
+      "catalog": {
+        "score": 0.0,
+        "band": "red"
+      },
+      "security": {
+        "score": 0.0,
+        "band": "red"
+      },
+      "flip": false
+    },
+    {
+      "panel": "B",
+      "model": "Mistral-Small 24B",
+      "requirement": "R06",
+      "uniform": {
+        "score": 1.0,
+        "band": "green"
+      },
+      "catalog": {
+        "score": 1.0,
+        "band": "green"
+      },
+      "security": {
+        "score": 1.0,
+        "band": "green"
+      },
+      "flip": false
+    },
+    {
+      "panel": "B",
+      "model": "Mistral-Small 24B",
+      "requirement": "R10",
+      "uniform": {
+        "score": 0.6667,
+        "band": "orange"
+      },
+      "catalog": {
+        "score": 0.67,
+        "band": "orange"
+      },
+      "security": {
+        "score": 0.67,
+        "band": "orange"
+      },
+      "flip": false
+    },
+    {
+      "panel": "B",
+      "model": "Mistral-Small 24B",
+      "requirement": "R12",
+      "uniform": {
+        "score": 0.7499,
+        "band": "green"
+      },
+      "catalog": {
+        "score": 0.7499,
+        "band": "green"
+      },
+      "security": {
+        "score": 0.5999,
+        "band": "orange"
+      },
+      "flip": true
+    }
+  ],
+  "flip_count": 4,
+  "total": 30
+}

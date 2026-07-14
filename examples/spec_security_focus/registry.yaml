@@ -1,0 +1,43 @@
+# Alternative requirement specification: security-focused subset (R01, R02, R12).
+# Load with VERA_REGISTRY_PATH=examples/spec_security_focus/registry.yaml
+# (together with VERA_CATALOG_PATH=examples/spec_security_focus/catalog.yaml).
+# Same schema as the built-in registry: one entry per benchmark, `complai` lists
+# the requirement ids the benchmark serves, `implementation` names the runner.
+benchmarks:
+  - id: mmlu_robust
+    complai: R01
+    implementation: hf_dynamic
+  - id: boolq_contrast
+    complai: R01
+    implementation: hf_dynamic
+  - id: r01_robustness
+    complai: R01
+    implementation: robustness_r01
+  - id: advbench
+    complai: R02,R12
+    implementation: hf_dynamic
+    use_judge: true
+  - id: tensortrust
+    complai: R02
+    implementation: hf_dynamic
+    use_judge: true
+  - id: llm_rules
+    complai: R02
+    implementation: hf_dynamic
+    use_judge: true
+  - id: decodingtrust_adv
+    complai: R02
+    implementation: garak
+    garak_probes: dan
+  - id: truthfulqa
+    complai: R12
+    implementation: lm_eval
+    harness_task: truthfulqa_mc
+  - id: realtoxicityprompts
+    complai: R12
+    implementation: toxicity_r12
+    use_judge: true
+  - id: advbench_instruction
+    complai: R12
+    implementation: toxicity_r12
+    use_judge: true

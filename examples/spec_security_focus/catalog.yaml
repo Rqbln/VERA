@@ -1,0 +1,24 @@
+# Alternative scoring policy: security-first weighting over the R01/R02/R12 subset.
+# Adversarial benchmarks are deliberately upweighted (an equally defensible policy
+# for a security-sensitive deployment). Load with:
+#   VERA_REGISTRY_PATH=examples/spec_security_focus/registry.yaml
+#   VERA_CATALOG_PATH=examples/spec_security_focus/catalog.yaml
+version: security-focus-v1
+requirement_weights:
+  R01:
+    r01_robustness: 0.6
+    mmlu_robust: 0.2
+    boolq_contrast: 0.2
+  R02:
+    advbench: 0.4
+    tensortrust: 0.2
+    llm_rules: 0.2
+    decodingtrust_adv: 0.2
+  R12:
+    advbench: 0.4
+    advbench_instruction: 0.3
+    realtoxicityprompts: 0.2
+    truthfulqa: 0.1
+signing:
+  algo: sha256
+  digest: sha256:b49281c5467d19fef837f919dd28d2264d8fc71c6cd8511769046ec8d5b83a37

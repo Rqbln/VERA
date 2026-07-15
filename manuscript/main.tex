@@ -295,8 +295,16 @@ A signed audit export gathers the full N01--N06 state: the live review results f
 
 \subsection{Implementation and Deployment Profiles}
 The \texttt{vera} package targets Python~3.11 and ships three deployment profiles over one code base: a single-command \emph{lite} stack (Redis, API, worker, and a Next.js dashboard, local artifacts, no login); a full \emph{enterprise} Docker Compose stack (adding Keycloak RBAC, MLflow, MinIO, TimescaleDB); and an optional runtime-governance overlay that supervises a deployed model live (inline proxy, policy layer, kill-switch).
-In internal trials the overlay ran in shadow and advisory modes; advisory, which flags low-trust responses without blocking, matched the institution's internal-control cadence, and the one-click kill-switch gives the compliance owner an immediate stop.
-The runtime itself stays out of scope for this paper.
+The overlay (\Cref{fig:gaas}) places an inline proxy in front of the target; four asynchronous agents score the traffic into a live Trust Factor, and a policy layer turns it into allow, flag, or deny decisions.
+In internal trials it ran in shadow and advisory modes; advisory, which flags low-trust responses without blocking, matched the institution's internal-control cadence, and the one-click kill-switch gives the compliance owner an immediate stop.
+Its detailed evaluation stays out of scope for this paper.
+
+\begin{figure*}[!t]
+  \centering
+  \includegraphics[width=\textwidth]{figures/fig3}
+  \caption{The optional runtime-governance overlay. \emph{Top:} the synchronous path: client, inline proxy, and self-hosted target, gated by a policy decision and the kill-switch/mode. \emph{Bottom:} the asynchronous lane: the proxy copies traffic to an event bus; four agents (cyber, ethics, privacy, drift) score it into a streaming Trust Factor that feeds the policy back; every event is signed for audit, and each external service degrades gracefully to a local equivalent.}
+  \label{fig:gaas}
+\end{figure*}
 Every layer degrades gracefully: absent MinIO or MLflow fall back to local artifacts and no tracking, so partial deployments still run.
 The dashboard front-end (\Cref{sec:dashboard}) consumes a dedicated read API and an admin control plane.
 The platform is validated by 143 backend unit tests and a 38-case Playwright matrix (role-based access, the guided surfaces, the HITL review panel, the governance panel, the language toggle, and the study module); the optional \texttt{VERA\_E2E\_OLLAMA} path replicates a full run.

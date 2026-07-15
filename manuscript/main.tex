@@ -397,11 +397,11 @@ The numbers illustrate reporting and cross-model contrast, not state-of-the-art 
 \subsection{RQ1: Reading a Run from the Dashboard}
 \ifuserstudydone
 We assess the dashboard with a small self-administered user study, run through the platform itself.
-Five members of the host institution's research function (none an author, none involved in building VERA) completed eight fixed reading tasks in guided (no-login) mode against a preloaded run, accessed remotely through a shared deployment.
+Five research scientists from the host institution's research laboratory (none an author, none involved in building VERA) completed eight fixed reading tasks in guided (no-login) mode against a preloaded run, accessed remotely through a shared deployment.
 The application measured the time per task with a monotonic clock, validated every answer server-side against a key snapshotted from the run, and never disclosed correctness during a session; tasks were capped at five minutes, with no facilitator and no hints.
 The tasks cover the reading path end to end: find the weakest requirement, read its band and interval, identify the fallbacks, judge coverage, reach a sample output, separate failed from fallback from ok, read the Trust Factor, and launch a run (\Cref{fig:dashboard}; Appendix~\ref{app:dashboard}).
 %% !! PLACEHOLDER RESULTS -- replace with `make study-export` output before submission !!
-Participants completed 38 of the 40 tasks: one misread the fallback set (T3) and one hit the cap on the sample-output task (T5).
+Participants completed 38 of the 40 tasks: one misread the nine-benchmark fallback set (T3, the hardest task, which asks for an exact set), and one hit the five-minute cap on the sample-output task (T5).
 The median time was 24\,s per reading task (IQR 15--42\,s), and 92\,s for launching a run end to end.
 %% !! END PLACEHOLDER !!
 The protocol, the study module, and the analysis script ship with the replication package.
@@ -566,7 +566,7 @@ A single unweighted number reports the green verdict without disclosing this dep
 \end{figure}
 
 \subsection{Limitations}
-The user study is small ($n{=}5$) and its participants were AI-literate researchers from the host institution rather than compliance officers, so the non-specialist claim rests on the design plus this first trial; a judge model (Llama~3.1~8B) may also bias the LLM-judged probes.
+The user study is small ($n{=}5$) and its participants were research scientists from the host institution's laboratory, AI-literate rather than compliance profiles, so the non-specialist claim rests on the design plus this first trial; a judge model (Llama~3.1~8B) may also bias the LLM-judged probes.
 CR06 and CR10 use dynamic probes under the Ollama log-probability constraint rather than native log-likelihood scoring; this is recorded in provenance, and a vLLM backend would let the native path corroborate those scores.
 The panels cover open-weight models from 3B to 24B at $n{=}10$ items per benchmark and one seed, so larger models, more items, or more seeds may shift the numbers.
 We frame the study as an illustration of the method, not a broad empirical benchmark; the signed, one-command protocol makes such extensions mechanical.

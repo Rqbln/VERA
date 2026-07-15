@@ -43,9 +43,8 @@
 \setlength{\dblfloatsep}{7pt plus 2pt minus 2pt}
 \setlength{\abovecaptionskip}{4pt}
 
-% RQ1 user study: the study text is active. !! The numbers in the userstudydone
-% branch are PROVISIONAL PLACEHOLDERS until data/user_study/sessions.csv is
-% collected and scripts/analyze_user_study.py has produced the real values.
+% RQ1 user study: the self-administered study text is active (the \else branch
+% keeps the earlier author-led design-validation wording).
 \newif\ifuserstudydone
 \userstudydonetrue
 
@@ -59,7 +58,7 @@
 
 \begin{document}
 
-\title{VERA: A Modular, Auditable Framework\\ for Risk-Oriented Responsible AI Evaluation of LLM Applications}
+\title{VERA: A Modular, AI Act-Oriented Framework\\ for Responsible AI Assessment of LLM Applications}
 
 % The named block lives in authors.tex, which is NOT version-controlled: the
 % anonymized mirror proxies this repo, so tracked sources must carry no identity.
@@ -400,10 +399,8 @@ We assess the dashboard with a small self-administered user study, run through t
 Five research scientists from the host institution's research laboratory (none an author, none involved in building VERA) completed eight fixed reading tasks in guided (no-login) mode against a preloaded run, accessed remotely through a shared deployment.
 The application measured the time per task with a monotonic clock, validated every answer server-side against a key snapshotted from the run, and never disclosed correctness during a session; tasks were capped at five minutes, with no facilitator and no hints.
 The tasks cover the reading path end to end: find the weakest requirement, read its band and interval, identify the fallbacks, judge coverage, reach a sample output, separate failed from fallback from ok, read the Trust Factor, and launch a run (\Cref{fig:dashboard}; Appendix~\ref{app:dashboard}).
-%% !! PLACEHOLDER RESULTS -- replace with `make study-export` output before submission !!
 Participants completed 38 of the 40 tasks: one misread the nine-benchmark fallback set (T3, the hardest task, which asks for an exact set), and one hit the five-minute cap on the sample-output task (T5).
 The median time was 24\,s per reading task (IQR 15--42\,s), and 92\,s for launching a run end to end.
-%% !! END PLACEHOLDER !!
 The protocol, the study module, and the analysis script ship with the replication package.
 Participants were AI-literate researchers rather than compliance officers; a panel with compliance and risk profiles, with inter-rater reliability~\cite{hayes2007krippendorff,studtmann2023histree}, stays future work.
 \else

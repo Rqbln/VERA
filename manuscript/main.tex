@@ -48,8 +48,10 @@
 \newif\ifuserstudydone
 \userstudydonetrue
 
-% Double-blind by default (submission). Build main_authors.tex for the named version.
-\providecommand{\anonmode}{1}
+% SEIP is not double-anonymous: the named build is the default. Set \anonmode=1
+% for an anonymized build (authors.tex stays untracked; the mirror falls back to
+% the anonymous block automatically when it is absent).
+\providecommand{\anonmode}{0}
 \newif\ifanon
 \ifnum\anonmode=1 \anontrue\else\anonfalse\fi
 % Repository URL. Default is the anonymized mirror; the named build (authors.tex,

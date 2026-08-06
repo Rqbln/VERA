@@ -22,10 +22,18 @@ from pydantic import BaseModel
 from vera.api.auth import AuthUser, get_current_user
 from vera.store.redis_run import RedisRunStore
 from vera.store.redis_study import (
+    AI_EXPERIENCE_OPTIONS,
+    AIACT_FAMILIARITY_OPTIONS,
+    COMMENT_MAX,
+    LIKERT_MAX,
+    LIKERT_MIN,
     ROLE_OPTIONS,
+    SENIORITY_OPTIONS,
+    SURVEY_ITEMS,
     TASK_IDS,
     RedisStudyStore,
     StudySession,
+    StudySurvey,
 )
 
 router = APIRouter(prefix="/api/v1/study", tags=["study"])
@@ -75,6 +83,29 @@ def build_answer_key(summary: dict[str, Any]) -> dict[str, Any]:
             - {None}
         ),
     }
+
+
+def validate_survey(items: dict[str, Any], comment: str = "") -> tuple[dict[str, int], str]:
+    """Whitelist the TAM item ids, coerce values to ints in 1..5, cap the comment.
+
+    A partial map is accepted: the UI enforces completeness, the server stays
+    permissive so a closed tab remains representable.
+    """
+    clean: dict[str, int] = {}
+    for key, raw in (items or {}).items():
+        if key not in SURVEY_ITEMS:
+            msg = f"unknown survey item {key}; expected one of {SURVEY_ITEMS}"
+            raise ValueError(msg)
+        try:
+            value = int(raw)
+        except (TypeError, ValueError) as exc:
+            msg = f"survey item {key} must be an integer in {LIKERT_MIN}..{LIKERT_MAX}"
+            raise ValueError(msg) from exc
+        if not LIKERT_MIN <= value <= LIKERT_MAX:
+            msg = f"survey item {key} must be in {LIKERT_MIN}..{LIKERT_MAX}"
+            raise ValueError(msg)
+        clean[key] = value
+    return clean, str(comment or "")[:COMMENT_MAX]
 
 
 def _close(value: Any, target: Any, tol: float) -> bool:
@@ -154,6 +185,9 @@ class SessionBody(BaseModel):
     role: str
     locale: str = "en"
     run_id: str | None = None
+    ai_experience: str = ""
+    aiact_familiarity: str = ""
+    seniority: str = ""
 
 
 class ResponseBody(BaseModel):
@@ -162,6 +196,18 @@ class ResponseBody(BaseModel):
     seconds: float | None = None
     gave_up: bool = False
     reason: str = ""
+
+
+class SurveyBody(BaseModel):
+    # Values stay Any so a bad type surfaces as a readable 400, not a 422.
+    items: dict[str, Any] = {}
+    comment: str = ""
+
+
+def _require_choice(value: str, options: tuple[str, ...], field: str) -> str:
+    if value not in options:
+        raise HTTPException(status_code=400, detail=f"{field} must be one of {options}")
+    return value
 
 
 def _target_run(store: RedisRunStore, explicit: str | None):
@@ -182,14 +228,22 @@ def create_session(
     body: SessionBody,
     _user: Annotated[AuthUser, Depends(get_current_user)],
 ) -> dict[str, Any]:
-    if body.role not in ROLE_OPTIONS:
-        raise HTTPException(status_code=400, detail=f"role must be one of {ROLE_OPTIONS}")
+    _require_choice(body.role, ROLE_OPTIONS, "role")
+    _require_choice(body.ai_experience, AI_EXPERIENCE_OPTIONS, "ai_experience")
+    _require_choice(body.aiact_familiarity, AIACT_FAMILIARITY_OPTIONS, "aiact_familiarity")
+    _require_choice(body.seniority, SENIORITY_OPTIONS, "seniority")
     from vera.api.dashboard_routes import _run_summary_dict
 
     rec = _target_run(RedisRunStore(), body.run_id)
     key = build_answer_key(_run_summary_dict(rec))
     session = RedisStudyStore().create_session(
-        role=body.role, run_id=rec.run_id, answer_key=key, locale=body.locale
+        role=body.role,
+        run_id=rec.run_id,
+        answer_key=key,
+        locale=body.locale,
+        ai_experience=body.ai_experience,
+        aiact_familiarity=body.aiact_familiarity,
+        seniority=body.seniority,
     )
     # Options are shuffled and the summary itself is never sent to the study client.
     requirement_options = list(key["requirement_options"])
@@ -267,6 +321,41 @@ def submit_response(
     return {"recorded": True}  # correctness is deliberately not disclosed
 
 
+@router.post("/sessions/{session_id}/survey")
+def submit_survey(
+    session_id: str,
+    body: SurveyBody,
+    _user: Annotated[AuthUser, Depends(get_current_user)],
+) -> dict[str, Any]:
+    """Record the closing TAM questionnaire.
+
+    Last write wins on purpose: a survey carries no timing or contamination
+    semantics, and a 409 after a reload would strand a participant on the final
+    screen with no way forward.
+    """
+    session = _get_session(session_id)
+    store = RedisStudyStore()
+    try:
+        items, comment = validate_survey(body.items, body.comment)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    existing = store.get_survey(session_id)
+    store.save_survey(
+        StudySurvey(
+            session_id=session_id,
+            participant=session.participant,
+            items=items,
+            comment=comment,
+            locale=session.locale,
+            # Keep the first submission's timestamp when a participant resubmits.
+            submitted_at=(existing.submitted_at if existing else "")
+            or datetime.now(UTC).isoformat(),
+        )
+    )
+    return {"recorded": True}
+
+
 @router.get("/sessions")
 def list_sessions(
     _user: Annotated[AuthUser, Depends(get_current_user)],
@@ -336,4 +425,67 @@ def export_csv(
         content=buf.getvalue(),
         media_type="text/csv",
         headers={"Content-Disposition": 'attachment; filename="sessions.csv"'},
+    )
+
+
+@router.get("/export_survey.csv")
+def export_survey_csv(
+    _user: Annotated[AuthUser, Depends(get_current_user)],
+) -> Response:
+    """Long-format TAM export, driven by sessions.
+
+    Every session emits one row per item even when the participant never reached
+    the questionnaire, so the participant table stays complete and abandonment is
+    visible through `tasks_submitted`.
+    """
+    store = RedisStudyStore()
+    surveys = {s.session_id: s for s in store.list_surveys()}
+    responses = store.list_responses()
+    submitted = {}
+    for r in responses:
+        if r.status == "submitted":
+            submitted[r.session_id] = submitted.get(r.session_id, 0) + 1
+    sessions = sorted(
+        store.list_sessions(), key=lambda s: int(s.participant.lstrip("P") or 0)
+    )
+
+    buf = io.StringIO()
+    writer = csv.writer(buf)
+    writer.writerow(
+        [
+            "participant",
+            "role",
+            "ai_experience",
+            "aiact_familiarity",
+            "seniority",
+            "locale",
+            "tasks_submitted",
+            "item",
+            "value",
+            "comment",
+        ]
+    )
+    for s in sessions:
+        survey = surveys.get(s.session_id)
+        items = survey.items if survey else {}
+        comment = survey.comment if survey else ""
+        for item in SURVEY_ITEMS:
+            writer.writerow(
+                [
+                    s.participant,
+                    s.role,
+                    s.ai_experience,
+                    s.aiact_familiarity,
+                    s.seniority,
+                    s.locale,
+                    submitted.get(s.session_id, 0),
+                    item,
+                    items.get(item, ""),
+                    comment,
+                ]
+            )
+    return Response(
+        content=buf.getvalue(),
+        media_type="text/csv",
+        headers={"Content-Disposition": 'attachment; filename="survey.csv"'},
     )

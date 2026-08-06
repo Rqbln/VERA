@@ -27,6 +27,18 @@ ROLE_OPTIONS = (
     "ai_researcher",
     "other_non_ml",
 )
+# Participant profile: closed option lists only, so no free-text field can ever
+# carry identifying information.
+AI_EXPERIENCE_OPTIONS = ("none", "user", "reviewer", "builder")
+AIACT_FAMILIARITY_OPTIONS = ("none", "heard", "working", "expert")
+SENIORITY_OPTIONS = ("lt2", "2to5", "6to10", "gt10")
+
+# Technology Acceptance Model instrument (Davis 1989), 5-point Likert.
+PU_ITEMS = ("PU1", "PU2", "PU3", "PU4")
+PEOU_ITEMS = ("PEOU1", "PEOU2", "PEOU3", "PEOU4")
+SURVEY_ITEMS = PU_ITEMS + PEOU_ITEMS
+LIKERT_MIN, LIKERT_MAX = 1, 5
+COMMENT_MAX = 500
 
 
 @dataclass
@@ -38,6 +50,25 @@ class StudySession:
     answer_key: dict[str, Any] = field(default_factory=dict)
     locale: str = "en"
     created_at: str = ""
+    # Profile fields default to "" so records written before they existed still load.
+    ai_experience: str = ""
+    aiact_familiarity: str = ""
+    seniority: str = ""
+
+    def to_dict(self) -> dict[str, Any]:
+        return asdict(self)
+
+
+@dataclass
+class StudySurvey:
+    """The closing TAM questionnaire; one record per session."""
+
+    session_id: str
+    participant: str
+    items: dict[str, int] = field(default_factory=dict)
+    comment: str = ""
+    locale: str = "en"
+    submitted_at: str = ""
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -78,8 +109,19 @@ class RedisStudyStore:
     def _rkey(self, session_id: str, task_id: str) -> str:
         return f"{self.prefix}response:{session_id}:{task_id}"
 
+    def _vkey(self, session_id: str) -> str:
+        return f"{self.prefix}survey:{session_id}"
+
     def create_session(
-        self, *, role: str, run_id: str, answer_key: dict[str, Any], locale: str = "en"
+        self,
+        *,
+        role: str,
+        run_id: str,
+        answer_key: dict[str, Any],
+        locale: str = "en",
+        ai_experience: str = "",
+        aiact_familiarity: str = "",
+        seniority: str = "",
     ) -> StudySession:
         seq = int(self._r.incr(f"{self.prefix}participant_seq"))
         session = StudySession(
@@ -90,6 +132,9 @@ class RedisStudyStore:
             answer_key=answer_key,
             locale=locale,
             created_at=_now(),
+            ai_experience=ai_experience,
+            aiact_familiarity=aiact_familiarity,
+            seniority=seniority,
         )
         self._r.set(self._skey(session.session_id), json.dumps(session.to_dict()))
         return session
@@ -123,12 +168,22 @@ class RedisStudyStore:
             json.dumps(response.to_dict()),
         )
 
+    def get_survey(self, session_id: str) -> StudySurvey | None:
+        raw = self._r.get(self._vkey(session_id))
+        return StudySurvey(**json.loads(raw)) if raw else None
+
+    def save_survey(self, survey: StudySurvey) -> None:
+        self._r.set(self._vkey(survey.session_id), json.dumps(survey.to_dict()))
+
     def list_sessions(self) -> list[StudySession]:
         return self._scan(f"{self.prefix}session:*", StudySession)
 
     def list_responses(self, session_id: str | None = None) -> list[StudyResponse]:
         pattern = f"{self.prefix}response:{session_id or '*'}:*"
         return self._scan(pattern, StudyResponse)
+
+    def list_surveys(self) -> list[StudySurvey]:
+        return self._scan(f"{self.prefix}survey:*", StudySurvey)
 
     def _scan(self, pattern: str, cls):
         items = []

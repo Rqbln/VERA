@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import csv
 import importlib.util
+import io
 import sys
 from pathlib import Path
 
@@ -76,10 +78,36 @@ def study_run():
     _wipe_study_keys(study)
 
 
-def _session(client, study_run, role="risk_manager"):
-    resp = client.post("/api/v1/study/sessions", json={"role": role, "run_id": study_run})
+def _session(client, study_run, role="risk_manager", **profile):
+    body = {
+        "role": role,
+        "run_id": study_run,
+        "ai_experience": "reviewer",
+        "aiact_familiarity": "working",
+        "seniority": "6to10",
+        **profile,
+    }
+    resp = client.post("/api/v1/study/sessions", json=body)
     assert resp.status_code == 200
     return resp.json()
+
+
+FULL_SURVEY = {
+    "PU1": 4, "PU2": 4, "PU3": 5, "PU4": 4,
+    "PEOU1": 5, "PEOU2": 4, "PEOU3": 4, "PEOU4": 5,
+}
+
+
+def _survey(client, sid, items=None, comment=""):
+    return client.post(
+        f"/api/v1/study/sessions/{sid}/survey",
+        json={"items": FULL_SURVEY if items is None else items, "comment": comment},
+    )
+
+
+def _survey_rows(client):
+    text = client.get("/api/v1/study/export_survey.csv").text
+    return list(csv.DictReader(io.StringIO(text)))
 
 
 def _submit(client, sid, task_id, answer, seconds=12.0, **kw):
@@ -183,6 +211,106 @@ def test_export_roundtrips_into_analyzer(client, study_run, tmp_path):
     summary = analyze.summarize(analyze.load_rows(f))
     assert summary["T1"]["completed"] == 1 and summary["T1"]["median_s"] == 30.0
     assert summary["T6"]["completed"] == 0
+
+
+# ── TAM survey (APSEC acceptability study) ───────────────────────────────────────────
+def test_session_profile_fields_whitelisted(client, study_run):
+    assert _session(client, study_run)["participant"] == "P1"
+    for field in ("ai_experience", "aiact_familiarity", "seniority"):
+        bad = client.post(
+            "/api/v1/study/sessions",
+            json={
+                "role": "legal",
+                "run_id": study_run,
+                "ai_experience": "reviewer",
+                "aiact_familiarity": "working",
+                "seniority": "6to10",
+                field: "nope",
+            },
+        )
+        assert bad.status_code == 400, field
+    missing = client.post(
+        "/api/v1/study/sessions", json={"role": "legal", "run_id": study_run}
+    )
+    assert missing.status_code == 400  # profile is mandatory
+
+
+def test_survey_persisted_and_exported(client, study_run):
+    sid = _session(client, study_run)["session_id"]
+    assert _survey(client, sid, comment="clear and fast").json() == {"recorded": True}
+    rows = _survey_rows(client)
+    assert len(rows) == 8
+    assert {r["item"] for r in rows} == set(FULL_SURVEY)
+    by_item = {r["item"]: r for r in rows}
+    assert by_item["PU3"]["value"] == "5" and by_item["PEOU1"]["value"] == "5"
+    assert by_item["PU1"]["role"] == "risk_manager"
+    assert by_item["PU1"]["ai_experience"] == "reviewer"
+    assert by_item["PU1"]["aiact_familiarity"] == "working"
+    assert by_item["PU1"]["seniority"] == "6to10"
+    assert by_item["PU1"]["comment"] == "clear and fast"
+
+
+def test_survey_rejects_out_of_range_and_unknown_items(client, study_run):
+    sid = _session(client, study_run)["session_id"]
+    for bad in ({"PU1": 0}, {"PU1": 6}, {"PU9": 3}, {"PU1": "abc"}):
+        assert _survey(client, sid, items=bad).status_code == 400, bad
+
+
+def test_survey_resubmit_overwrites(client, study_run):
+    sid = _session(client, study_run)["session_id"]
+    _survey(client, sid)
+    second = dict(FULL_SURVEY, PU1=2)
+    assert _survey(client, sid, items=second).status_code == 200  # no 409
+    rows = {r["item"]: r["value"] for r in _survey_rows(client)}
+    assert rows["PU1"] == "2"
+
+
+def test_survey_export_includes_sessions_without_survey(client, study_run):
+    _session(client, study_run)  # never answers anything
+    rows = _survey_rows(client)
+    assert len(rows) == 8
+    assert all(r["value"] == "" for r in rows)
+    assert all(r["tasks_submitted"] == "0" for r in rows)
+
+
+def test_survey_comment_truncated(client, study_run):
+    sid = _session(client, study_run)["session_id"]
+    _survey(client, sid, comment="x" * 900)
+    assert len(_survey_rows(client)[0]["comment"]) == 500
+
+
+def test_task_export_unchanged_by_survey(client, study_run):
+    """The 7-column task CSV is frozen: the analyzer and the replication package rely on it."""
+    sid = _session(client, study_run)["session_id"]
+    _submit(client, sid, "T1", {"requirement_id": "R02"})
+    _survey(client, sid)
+    text = client.get("/api/v1/study/export.csv").text
+    lines = text.strip().splitlines()
+    assert lines[0] == "participant,role,task_id,completed,assisted,seconds,notes"
+    assert "PU" not in text and "PEOU" not in text
+
+
+def test_partial_session_exports_partial_rows(client, study_run):
+    sid = _session(client, study_run)["session_id"]
+    for task, answer in (("T1", {"requirement_id": "R02"}), ("T4", {"count": 3})):
+        _submit(client, sid, task, answer)
+    task_rows = client.get("/api/v1/study/export.csv").text.strip().splitlines()[1:]
+    assert len(task_rows) == 2
+    assert all(r["tasks_submitted"] == "2" for r in _survey_rows(client))
+
+
+def test_survey_export_roundtrips_into_analyzer(client, study_run, tmp_path):
+    sid = _session(client, study_run)["session_id"]
+    _survey(client, sid)
+    f = tmp_path / "survey.csv"
+    f.write_text(client.get("/api/v1/study/export_survey.csv").text, encoding="utf-8")
+    rows = analyze.load_survey_rows(f)
+    matrix = analyze.survey_matrix(rows)
+    assert matrix["P1"]["PU3"] == 5
+    pu = analyze.construct_stats(matrix, analyze.PU_ITEMS)
+    assert pu["mean"] == 4.25  # (4+4+5+4)/4
+    profiles = analyze.profile_table(rows)
+    assert len(profiles) == 1 and profiles[0]["seniority"] == "6to10"
 
 
 # ── Pure-function edges ──────────────────────────────────────────────────────────────

@@ -230,9 +230,27 @@ export interface StudySessionInfo {
 
 export async function createStudySession(
   token: string | undefined,
-  body: { role: string; locale?: string },
+  body: {
+    role: string;
+    ai_experience: string;
+    aiact_familiarity: string;
+    seniority: string;
+    locale?: string;
+  },
 ): Promise<StudySessionInfo> {
   return fetchApi("/api/v1/study/sessions", token, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+}
+
+export async function submitStudySurvey(
+  token: string | undefined,
+  sessionId: string,
+  body: { items: Record<string, number>; comment?: string },
+): Promise<{ recorded: boolean }> {
+  return fetchApi(`/api/v1/study/sessions/${sessionId}/survey`, token, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),

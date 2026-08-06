@@ -76,16 +76,56 @@ P1,risk officer,T2,yes,no,21,
 ## Analysis
 
 ```bash
-python scripts/analyze_user_study.py data/user_study/sessions.csv
+make study-export     # pulls both CSVs and runs the analysis
+# or directly:
+python scripts/analyze_user_study.py data/user_study/sessions.csv \
+       --survey data/user_study/survey.csv [--exclude P1] [--min-tasks 8] [--comments]
 ```
 
-Prints per-task completion rate, assisted rate, median time with IQR, and the
-LaTeX rows for the paper's RQ1 table.
+Prints per-task completion, assisted rate and median time with IQR; then, with a
+survey file, the participant profile table, the TAM table (mean, SD, median per
+item and per construct), Cronbach's alpha with its n, and a straight-lining
+warning. All LaTeX rows are emitted ready to paste. Comments print only under
+`--comments`: vet them before sharing, `data/user_study/` is not gitignored.
+
+## Acceptability questionnaire (TAM)
+
+After the eighth task, the same page asks eight statements on a 5-point Likert
+scale, following the Technology Acceptance Model: four on **perceived usefulness**
+(faster evaluation, understanding failures, justifying a decision, evaluation
+quality) and four on **perceived ease of use** (clear interface, finding
+information, launching a run alone, learning effort), plus an optional free-text
+comment capped at 500 characters.
+
+Method notes to carry into the paper's threats section:
+
+- Items are grouped by construct in a **fixed order** (comprehension beats
+  randomisation at this sample size) and **none is reverse-coded** (reverse items
+  depress alpha at small n); a straight-lining check compensates.
+- The instrument **mixes tenses**: some items report the session just experienced,
+  others project onto the participant's real work. That is standard for a
+  single-session TAM but must be stated.
+- Cronbach's alpha is unstable below n≈8; the analysis script prints it with its n
+  attached and it must be reported as indicative.
+
+Participants also declare, from fixed lists only (no free-text identity field):
+role, AI/ML experience, EU AI Act familiarity, and years of experience.
+
+Two CSVs come out of the deployment:
+
+| Endpoint | File | Columns |
+|---|---|---|
+| `GET /api/v1/study/export.csv` | `sessions.csv` | `participant,role,task_id,completed,assisted,seconds,notes` (frozen) |
+| `GET /api/v1/study/export_survey.csv` | `survey.csv` | `participant,role,ai_experience,aiact_familiarity,seniority,locale,tasks_submitted,item,value,comment` |
+
+The survey export is **session-driven**: every participant emits eight rows even
+when they never reached the questionnaire, so abandonment stays visible through
+`tasks_submitted` and the participant table is never silently truncated.
 
 ## Self-administered variant (app-measured)
 
 The platform ships the study as a page: participants open `<deployment-url>/study`,
-consent, pick their role, and complete the same eight tasks. Methodology:
+consent, declare their profile, and complete the same eight tasks. Methodology:
 
 - **Timing is measured by the application**: a monotonic client clock starts when
   the participant presses *Start this task* and stops at submission; the server

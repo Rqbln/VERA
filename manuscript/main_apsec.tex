@@ -53,12 +53,14 @@
 \title{VERA: An Operable Dashboard for Assessing\\ LLM Deployments against the EU AI Act}
 
 % APSEC SEIP is not double-anonymous, so this paper always builds named. The
-% block itself lives in authors.tex, which is NOT version-controlled: the
+% block lives in authors_apsec.tex, which is NOT version-controlled: the
 % anonymized mirror proxies this repo, so tracked sources carry no identity.
+% It is deliberately separate from authors.tex, which serves main.tex (ICSE):
+% the two papers do not share an author list.
 \author{%
-  \InputIfFileExists{authors}{}{%
+  \InputIfFileExists{authors_apsec}{}{%
     \IEEEauthorblockN{Author list withheld}
-    \IEEEauthorblockA{authors.tex is absent from this checkout}%
+    \IEEEauthorblockA{authors\_apsec.tex is absent from this checkout}%
   }%
 }
 

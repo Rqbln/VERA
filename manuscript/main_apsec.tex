@@ -29,6 +29,10 @@
   \renewcommand{\arraystretch}{1.02}%
 }
 
+% At most one full-width float at the top of a page: two stacked diagrams
+% (the pipeline and the governance overlay) leave no readable text behind them.
+\setcounter{dbltopnumber}{1}
+
 % Tighter float spacing than the IEEEtran defaults (page budget).
 \setlength{\textfloatsep}{7pt plus 2pt minus 3pt}
 \setlength{\dbltextfloatsep}{7pt plus 2pt minus 3pt}
@@ -326,7 +330,7 @@ Artifacts revert to disk and tracking goes silent, so an incomplete deployment s
 No shape requires a proprietary cloud service or an API key.
 The single outbound call is the initial download of the public benchmark corpora, which can be pre-seeded before the machine is isolated.
 
-\begin{figure*}[!t]
+\begin{figure*}[t]
   \centering
   \includegraphics[width=\textwidth]{figures/fig3}
   \caption{Watching a model already in production: the optional overlay. \emph{Above:} the request path, where an inline proxy stands between the client and the self-hosted target and consults a policy decision and the kill-switch before letting a call through. \emph{Below:} the observation lane, where a copy of the traffic reaches four agents (cyber, ethics, privacy, drift) whose scores feed a live Trust Factor back into the policy. Events are signed for audit, and every external dependency has a local fallback.}

@@ -1,0 +1,537 @@
+% main_apsec.tex — APSEC 2026 SEIP tool paper (10 pages + 1 page of references).
+% Scope: the TOOL. The scoring-policy analysis, the verdict-sensitivity bound and
+% the reproducible model study belong to a separate research paper and must not
+% appear here.
+\documentclass[10pt,conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{microtype}
+\usepackage{siunitx}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{cleveref}
+\definecolor{brandgreen}{HTML}{00915A}
+\hypersetup{colorlinks=true,allcolors=brandgreen}
+\newcommand{\best}[1]{\textbf{#1}}
+\newcommand{\cmark}{\textcolor{brandgreen}{\textbf{Y}}}
+\newcommand{\xmark}{\textcolor{black!35}{--}}
+
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcommand{\tblsetup}{%
+  \footnotesize%
+  \setlength{\tabcolsep}{3pt}%
+  \renewcommand{\arraystretch}{1.02}%
+}
+
+% Tighter float spacing than the IEEEtran defaults (page budget).
+\setlength{\textfloatsep}{7pt plus 2pt minus 3pt}
+\setlength{\dbltextfloatsep}{7pt plus 2pt minus 3pt}
+\setlength{\floatsep}{7pt plus 2pt minus 2pt}
+\setlength{\dblfloatsep}{7pt plus 2pt minus 2pt}
+\setlength{\abovecaptionskip}{4pt}
+
+% !! Flip to true once data/user_study/{sessions,survey}.csv are collected and
+% scripts/analyze_user_study.py has produced the numbers. The \else branch keeps
+% the paper compiling with visible placeholders in the meantime.
+\newif\ifstudydone
+\studydonefalse
+% Filled from `make study-export` output when the flag above is flipped.
+\newcommand{\studyN}{N of M}
+\newcommand{\studyCell}{\textit{--}}
+\newcommand{\studyParticipantRows}{}
+
+\providecommand{\repourl}{https://github.com/Rqbln/VERA}
+
+\begin{document}
+
+\title{VERA: An Operable Dashboard for Assessing\\ LLM Deployments against the EU AI Act}
+
+% APSEC SEIP is not double-anonymous, so this paper always builds named. The
+% block itself lives in authors.tex, which is NOT version-controlled: the
+% anonymized mirror proxies this repo, so tracked sources carry no identity.
+\author{%
+  \InputIfFileExists{authors}{}{%
+    \IEEEauthorblockN{Author list withheld}
+    \IEEEauthorblockA{authors.tex is absent from this checkout}%
+  }%
+}
+
+\maketitle
+
+\begin{abstract}
+Before a bank deploys an assistant built on a large language model, someone has to sign off.
+That person is a compliance or risk owner, not a machine-learning engineer, and the EU AI Act expects technical evidence on robustness, privacy, transparency, fairness and human oversight.
+The evaluation suites that produce such evidence are command-line tools written for engineers: they report numbers, not a view a sign-off owner can act on.
+We present VERA, an open-source, self-hostable dashboard that makes an AI Act evaluation operable by a non-specialist.
+We derive six requirements from regulatory text and from practice in the responsible-AI function of a large European bank, and we describe the six features that answer them: a guided four-step wizard, role-based views, verdicts that decompose into the public benchmarks behind them, a human-review path for the requirements no benchmark can score, run-tied evidence artifacts, and a specification that is swappable data rather than code.
+We report a self-administered study in which participants completed eight fixed reading tasks against a live deployment, with the application measuring time and validating answers server-side, followed by a technology-acceptance questionnaire.
+\ifstudydone
+Participants completed \studyN{} of the tasks, and both acceptance constructs scored above the scale midpoint.
+\fi
+VERA is released as open source, and the study module ships with it so the measurement can be replayed.
+\end{abstract}
+
+\begin{IEEEkeywords}
+Tool, Responsible AI, EU AI Act, Dashboard, Compliance, Open source
+\end{IEEEkeywords}
+
+\section{Introduction}
+\label{sec:intro}
+
+A retail bank wants to put a conversational assistant in front of its customers: account questions, product explanations, complaint triage.
+Before it ships, someone signs off.
+In our institution that person sits in the second line of defence, in compliance or risk management, and the question they must answer is not whether the model is good, but whether deploying it is defensible.
+The EU AI Act~\cite{euaiact2024} sets the terms of that defence: it asks for technical evidence spanning the trustworthy-AI principles, robustness and privacy and transparency and fairness and human oversight among them.
+
+The material to produce that evidence exists.
+COMPL-AI~\cite{guldimann2024complai} translates the Act's ethical principles into eighteen technical requirements, twelve of which carry a measurable score, and ships an evaluation suite and a public leaderboard.
+HELM~\cite{liang2023helm} standardises which scenarios to report and the lm-evaluation harness~\cite{gao2021lmevalharness} standardises how a benchmark is executed.
+Garak~\cite{derczynski2024garak} probes jailbreaks and prompt injection; DecodingTrust~\cite{wang2023decodingtrust} assembles a trustworthiness suite.
+Each solves one part of the measurement problem, and solves it well.
+
+What none of them solves is the last step before a signature, and we hit three specific walls while trying to take that step.
+First, every one of these suites is driven from a command line aimed at machine-learning engineers, while the person accountable for the decision does not write code; in practice the evaluation was run by an engineer and then flattened into a slide, which is where the evidence stopped being evidence.
+Second, results arrive as a table of numbers with no path back to what produced them, so a reviewer asking \emph{why} a requirement is weak has to correlate a run file with per-item outputs by hand.
+Third, the documentation that accompanies a release is written after the fact and drifts from the evaluation it claims to describe.
+
+A sign-off decision therefore does not need one more score.
+It needs an evaluation a non-specialist can run and read end to end, verdicts that decompose into the public evidence behind them, and documentation bound to the run that produced it.
+
+This paper reports the tool we built for that need and what we learned deploying it.
+Our contribution is threefold.
+We derive \textbf{six requirements} for an operable AI Act evaluation tool, each traced to regulatory text, to the literature, or to observed practice in the responsible-AI function of a large European bank (\Cref{sec:requirements}).
+We describe \textbf{VERA}, an open-source, self-hostable framework whose six features answer those requirements, and we show how the requirement-to-feature mapping closes (\Cref{sec:design,sec:features}).
+We report a \textbf{self-administered user study} in which participants drove a live deployment through eight fixed reading tasks, instrumented by the application itself, followed by a technology-acceptance questionnaire (\Cref{sec:evaluation}).
+VERA and the study module are available at \url{\repourl}.
+
+\section{Related Work}
+\label{sec:related}
+
+\Cref{tab:related} positions VERA against the tools a practitioner would consider.
+We group them by the layer they occupy.
+
+\paragraph{Requirement frameworks}
+COMPL-AI~\cite{guldimann2024complai} is the closest reference point and the one VERA builds on: an independent effort by ETH Zurich, INSAIT and LatticeFlow AI that maps the Act's principles to eighteen technical requirements and benchmarks the twelve measurable ones.
+It is not EU-funded and is not part of the Act's harmonised standards.
+It publishes a study and a leaderboard; VERA adopts its taxonomy and turns it into something an operator drives.
+NIST and ISO frameworks~\cite{nist2023airmf,iso42001_2023} guide organisational risk management but stop short of runnable metrics.
+
+\paragraph{Regulatory requirements engineering}
+Another line of software-engineering research applies NLP and LLM techniques to the regulation itself, extracting obligations and checking artifacts against them, the AI Act included~\cite{abualhaija2025llmregextraction,amaral2022nlpcompliance,abualhaija2024regchange}.
+That work stops where ours starts: we take a requirement taxonomy as given and make it executable, rather than deriving one from legal text.
+
+\paragraph{Evaluation harnesses}
+HELM~\cite{liang2023helm}, lm-evaluation~\cite{gao2021lmevalharness}, Garak~\cite{derczynski2024garak} and DecodingTrust~\cite{wang2023decodingtrust} are measurement building blocks.
+VERA reuses them through its runners rather than competing with them.
+They expose no requirement-level view and no notion of a role.
+
+\paragraph{Trustworthiness tools}
+PromptOps~\cite{sunetnanta2025promptops} is the most recent tool in this space and shares our diagnosis, that the absence of a usable interface holds back adoption.
+It scores a model prompt by prompt through metamorphic testing and reports a flat set of numbers.
+VERA differs on three axes: results map to a full requirement taxonomy rather than to individual prompts, every verdict decomposes into its contributing benchmarks, and the requirement set itself is swappable data.
+
+\paragraph{Documentation artifacts}
+Model Cards~\cite{mitchell2019modelcard} and Datasheets for Datasets~\cite{gebru2021datasheets} are the community formats for describing a model and a corpus.
+Both are normally authored after the fact.
+VERA generates them from the run itself, which is what makes them evidence rather than description.
+
+\paragraph{Tool evaluation}
+For the evaluation of the tool we follow the pattern used by HISTREE~\cite{studtmann2023histree}, which pairs a requirements-to-features argument with a technology-acceptance questionnaire~\cite{davis1989tam}.
+
+\begin{table*}[t]
+  \caption{Where VERA sits among tools a practitioner would consider. \cmark{} = provided, \xmark{} = absent. ``Requirement view'' means results are reported per regulatory requirement rather than per prompt or per scenario; ``decomposable'' means a verdict can be opened, inside the tool, down to the benchmarks that produced it.}
+  \label{tab:related}
+  \centering
+  \tblsetup
+  \begin{tabularx}{\textwidth}{@{}l*{6}{>{\centering\arraybackslash}X}@{}}
+    \toprule
+    Tool & Requirement view & Non-specialist UI & Decomposable verdicts & Role-based views & Run-tied artifacts & Swappable specification \\
+    \midrule
+    COMPL-AI~\cite{guldimann2024complai} & \cmark & \xmark{} (CLI + leaderboard) & Partial & \xmark & \xmark & Partial \\
+    HELM~\cite{liang2023helm} & \xmark & \xmark & Partial & \xmark & \xmark & Partial \\
+    lm-evaluation~\cite{gao2021lmevalharness} & \xmark & \xmark & \xmark & \xmark & \xmark & \cmark \\
+    Garak~\cite{derczynski2024garak} & \xmark & \xmark & \xmark & \xmark & \xmark & \cmark \\
+    DecodingTrust~\cite{wang2023decodingtrust} & Partial & \xmark & Partial & \xmark & \xmark & \xmark \\
+    PromptOps~\cite{sunetnanta2025promptops} & \xmark{} (per prompt) & \cmark & Limited & \xmark & \xmark & \xmark \\
+    \best{VERA (this paper)} & \best{\cmark} & \best{\cmark} & \best{\cmark} & \best{\cmark} & \best{\cmark} & \best{\cmark} \\
+    \bottomrule
+  \end{tabularx}
+\end{table*}
+
+\section{Requirements for an Operable Evaluation Tool}
+\label{sec:requirements}
+
+The six requirements below come from three sources: the text of the EU AI Act, the tool literature of \Cref{sec:related}, and practice observed over a year in the responsible-AI function of a large European bank, where model release decisions are prepared for compliance and risk owners under internal-control obligations.
+We state the source of each, because a requirements section that reports the authors' preferences is only a feature list in disguise.
+
+\paragraph{R1: a non-specialist must be able to run an evaluation and read its verdict without writing code}
+\emph{Source: observed practice.}
+The person who signs a release is accountable but not technical.
+When the evaluation runs through an engineer, the sign-off owner receives a summary rather than evidence, and cannot interrogate it.
+PromptOps~\cite{sunetnanta2025promptops} reaches the same conclusion for developers.
+
+\paragraph{R2: every verdict must decompose into the public tests that produced it}
+\emph{Source: literature and practice.}
+A single aggregate hides why a model fails.
+Reviewers in our setting consistently asked the same follow-up question, which benchmark drove this number, and answering it by hand from run files took minutes per question.
+
+\paragraph{R3: documentation must be generated from the run, not written after it}
+\emph{Source: regulatory text.}
+For high-risk systems the Act fixes, in law, a list of what the technical file must contain (Art.~11, Annex~IV).
+A file assembled weeks later from memory and screenshots describes an evaluation that no longer exists.
+Whatever evidence is meant to feed such a file must therefore carry, with it, the identity of the run it came from.
+
+\paragraph{R4: views must differ by role}
+\emph{Source: observed practice.}
+Legal, responsible-AI and data-science reviewers do not need the same subset of requirements and do not share a vocabulary.
+Serving all of them one page means serving none of them well.
+
+\paragraph{R5: the requirement set and the benchmarks must be replaceable without touching the code}
+\emph{Source: regulatory dynamics.}
+Regulation and the reference frameworks that operationalise it evolve faster than tools do.
+A tool that hard-codes one taxonomy becomes obsolete when the taxonomy moves.
+
+\paragraph{R6: the tool must be self-hostable, with no proprietary cloud dependency}
+\emph{Source: institutional constraint.}
+In a banking environment, prompts and evaluation outputs cannot transit through a third-party service.
+Every component, including the models under evaluation, must be able to run inside the institution's own perimeter.
+
+\section{Design and Architecture}
+\label{sec:design}
+
+Whoever drives the tool -- a reviewer in the second line of defence, a security engineer, a data scientist -- follows the same four moments, laid out in \Cref{fig:journey}: choose what to evaluate, run it, read the outcome through the lens attached to their role, and take the evidence out.
+The architecture exists to keep those four moments available to a user who writes no code.
+
+\begin{figure*}[t]
+  \centering
+  \includegraphics[width=0.80\textwidth]{figures/fig1}
+  \caption{Four moments, one path. Whatever the role, the user selects a served model and a requirement set, runs public benchmarks against it, reads the outcome through a role-filtered view in which each score can be opened, and exports the evidence tied to that run.}
+  \label{fig:journey}
+\end{figure*}
+
+\subsection{Runtime pipeline}
+\Cref{fig:architecture} follows a launch request until it becomes a scored, documented run.
+Whichever surface issues it -- the \texttt{vera-eval} command line, the \texttt{POST /runs} endpoint, or the guided wizard that needs no login -- the request is normalised into one declarative job description and placed on a Celery/Redis queue, which doubles as the run store and carries the kill-switch.
+A worker picks the job up and runs a controller in two steps.
+The \texttt{evaluate} step walks the requirement set, looks up in a registry which benchmarks serve each requirement and under which runner, and lets the runners issue their inference calls through a self-hosted router that fronts both the model under test and the judge model.
+The \texttt{aggregate} step then reads the cached per-item scores back and folds them, requirement by requirement, into a single score with a bootstrap interval.
+What leaves the worker is a bundle -- run file, model card, per-item outputs, content signature -- written to object storage or to the local disk, from where a read-only API hands it to the dashboard.
+
+Two choices in that pipeline are load-bearing for the requirements of \Cref{sec:requirements}.
+Because inference never leaves the self-hosted router, the whole path can run inside an institutional perimeter (R6).
+Because the requirement-to-benchmark mapping and the aggregation weights sit in two data files rather than in the controller, the specification can be replaced without recompiling anything (R5).
+
+\begin{figure*}[t]
+  \centering
+  \includegraphics[width=\textwidth]{figures/fig2}
+  \caption{From request to evidence. Any of the three entry points produces the same declarative job; a worker resolves requirements to benchmarks through the registry, drives the runners against self-hosted models, then folds the cached item scores into per-requirement scores using the catalog. A read-only API exposes scores and artifacts to the dashboard.}
+  \label{fig:architecture}
+\end{figure*}
+
+\subsection{Specification as data}
+The requirement specification is split in two files.
+A registry lists, per benchmark, which requirements it serves and through which runner.
+A catalog lists, per requirement, which benchmarks contribute and with which weights; it is versioned and signed, and every run pins its SHA-256 digest next to the scores.
+Which pair to load is a configuration value, so an alternative specification costs an environment variable and no code change.
+Two guards keep the substitution honest.
+A benchmark the catalog does not list is dropped from the aggregate instead of receiving an implicit weight, and the registry and the catalog are cross-checked at launch, so the number a reader sees can always be recomputed from the rows shown underneath it.
+
+\subsection{Deployment profiles}
+One code base, written for Python~3.11, ships in three shapes.
+The \emph{lite} shape starts with a single command and holds only what an evaluation needs -- queue, API, worker, dashboard, artifacts on disk, no authentication -- which is what an evaluator installs to try the tool.
+The \emph{enterprise} shape layers access control, experiment tracking, object storage and a time-series database onto the same services.
+A third, optional overlay (\Cref{fig:gaas}) leaves the evaluation setting altogether and watches a model already in production, through an inline proxy, four scoring agents and a policy layer.
+Missing optional services do not stop a run: artifacts revert to disk and tracking simply goes silent, so an incomplete deployment still produces evidence.
+Nothing in any shape requires a proprietary cloud service or an API key; the single outbound call is the initial download of the public benchmark corpora, which can be pre-seeded before the machine is isolated.
+
+\begin{figure*}[!t]
+  \centering
+  \includegraphics[width=\textwidth]{figures/fig3}
+  \caption{Watching a model already in production: the optional overlay. \emph{Above:} the request path, where an inline proxy stands between the client and the self-hosted target and consults a policy decision and the kill-switch before letting a call through. \emph{Below:} the observation lane, where a copy of the traffic reaches four agents (cyber, ethics, privacy, drift) whose scores feed a live Trust Factor back into the policy. Events are signed for audit, and every external dependency has a local fallback.}
+  \label{fig:gaas}
+\end{figure*}
+
+\section{Features}
+\label{sec:features}
+
+\Cref{tab:mapping} maps the six features to the six requirements.
+Each subsection describes one feature and names the requirement it answers.
+
+\subsection{F1: guided launch wizard}
+Starting an evaluation costs neither an account nor a YAML file: the wizard of \Cref{fig:wizard} asks four questions in sequence -- which served model, which requirements, which options, and a final review -- and every one of them arrives with a defensible default already selected.
+A user who accepts the defaults submits a run in four clicks.
+That is the operational answer to R1: the shortest path to evidence no longer passes through an engineer.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\columnwidth]{figures/shot_wizard.png}
+  \caption{F1, the launch surface for a non-specialist. Four questions, each pre-answered with a recommended value, and a review step before submission. No account, no configuration file.}
+  \label{fig:wizard}
+\end{figure}
+
+\subsection{F2: role-based views}
+The same run is presented through three lenses -- responsible-AI, cyber, data science -- each showing the subset of requirements its audience is accountable for and naming them in that audience's vocabulary.
+The lens is not decoration: in the enterprise profile it is bound to role-based access control, so what a reader may open and what a reader is shown stay consistent, and a link shared into a chat resolves to the recipient's own lens rather than the sender's.
+For occasional readers the guided profile drops authentication entirely and serves the responsible-AI lens by default, and either profile switches between English and French, which matters in an institution where the legal reading happens in one language and the engineering in another.
+This answers R4 directly and R1 indirectly: the fastest way to make a page readable by a non-specialist is to remove from it everything that specialist is not accountable for.
+
+\subsection{F3: explainable verdicts}
+The run summary opens on an uncluttered hero view (\Cref{fig:dashboard}): a semicircular gauge places an overall Trust Factor on three band-aligned segments, next to the verdict counts and the weakest requirements.
+Underneath, the requirement table is ordered by how much attention a row deserves -- failed, then degraded, then uncovered, then healthy -- and never by identifier, so nothing weak is buried at position eleven.
+Each row carries a colour band instead of a pass or a fail, because a release decision is a judgement someone has to make and a threshold would only hide that judgement inside the tool.
+Expanding a row is what makes the verdict answerable: it lists the public benchmarks that fed the score, what each of them returned, and one real model answer from the run; a separate inspector exposes the run file, the code revision, the signature, and, wherever an optional engine was unavailable and a simpler check stood in, an explicit marker saying so.
+This is R2.
+
+\subsection{F4: a documented path for what benchmarks cannot score}
+Six of the eighteen requirements admit no automated score, and the reference framework reports them as not applicable -- an honest choice, but one that leaves a reader unable to distinguish \emph{not measurable} from \emph{not looked at}.
+VERA gives each of the six a route instead of a blank.
+Explainability and corrigibility open a review queue at the end of every run, where named reviewers score a four-criterion rubric and their aggregated judgement becomes the requirement's state, with the reviewer identities and timestamps retained.
+Energy consumption is instrumented during the run itself.
+The three remaining requirements are attested through declarative forms that are signed and pinned to the run, so an assertion always carries who made it and against which evaluation.
+A strip at the top of the run summary reports the live state of all six, and a requirement still awaiting review is displayed as awaiting review rather than folded into the aggregate.
+This extends R2 beyond the measurable subset and supplies R3 with the non-measurable half of the evidence.
+
+\subsection{F5: run-tied evidence artifacts}
+A run does not only leave scores behind.
+It writes a model card filled from its own measurements, a datasheet when a dataset was involved, and a signed export collecting the state of the requirements no benchmark scored.
+None of these is authored by a human afterwards, which is precisely why none of them can drift away from the evaluation it describes -- the failure mode R3 was written against.
+The artifacts feed a provider's risk assessment and its Annex~IV file; they are inputs to that work, not a substitute for it.
+
+\subsection{F6: swappable specification, self-hosted stack}
+Claiming that a specification is replaceable is cheap, so the repository ships a second one: a security-focused registry and catalog that keep the requirement identifiers but redistribute weight towards adversarial benchmarks.
+Loading it is one environment variable, and we ran it -- the unchanged pipeline executed end to end and produced its verdicts under the alternative catalog, with the new digest pinned to the run so a reader can tell which specification a score was computed under.
+The substitution touches no Python.
+Together with the deployment profiles of \Cref{sec:design}, which keep every component and every model inside the host's own perimeter, this covers R5 and R6.
+
+\begin{table}[t]
+  \caption{Requirements to features. Every requirement is answered by at least one feature, and every feature answers at least one requirement.}
+  \label{tab:mapping}
+  \centering
+  \tblsetup
+  \begin{tabularx}{\columnwidth}{@{}X *{6}{>{\centering\arraybackslash}p{0.055\columnwidth}}@{}}
+    \toprule
+    Requirement & F1 & F2 & F3 & F4 & F5 & F6 \\
+    \midrule
+    R1 No code needed & \cmark & \cmark & & & & \\
+    R2 Decomposable verdicts & & & \cmark & \cmark & & \\
+    R3 Run-tied documentation & & & & \cmark & \cmark & \\
+    R4 Role-based views & & \cmark & & & & \\
+    R5 Swappable specification & & & & & & \cmark \\
+    R6 Self-hostable & & & & & & \cmark \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+\begin{figure*}[!t]
+  \centering
+  \includegraphics[width=0.92\textwidth]{figures/shot_control_room.png}
+  \caption{What a reader sees first, in guided mode. The gauge places the Trust Factor on segments that match the verdict bands themselves (red under 0.40, amber up to 0.70, green above), flanked by the verdict counts, the requirements scoring worst, and how much of the requirement set the run actually covered. Everything that can be opened -- the triage table, the per-requirement detail -- sits below this fold.}
+  \label{fig:dashboard}
+\end{figure*}
+
+\subsection{Implementation}
+A Python~3.11 package on the server side, a TypeScript single-page application on the client side.
+Regression is guarded by 161 unit tests on the backend and 41 browser scenarios that drive the product as a user would, across access control, the guided surfaces, the review panel, the governance panel, the language toggle, and the study module of \Cref{sec:evaluation}.
+A slower optional path replays an entire run against a locally served model when the machine has one available.
+
+\section{User Study}
+\label{sec:evaluation}
+
+We evaluate the tool on the two questions a tool paper has to answer: can the intended user complete the intended tasks, and do they find the tool useful and usable.
+
+\subsection{Method}
+The study is self-administered and instrumented by the platform itself: participants open a shared deployment at a \texttt{/study} URL, consent, declare their profile from fixed option lists, and work through eight fixed tasks against a preloaded evaluation run.
+Together the eight tasks trace the whole reading path, from the first glance to the next run: locating the requirement that scores worst, then its band and interval; spotting the checks that ran degraded; saying how much of the requirement set was covered; getting down to one real model answer; counting how many requirements failed, fell back or passed; reading the Trust Factor together with the verdict it implies; and finally launching an evaluation of their own through the wizard.
+
+The application starts a monotonic clock when the participant presses \emph{start} and stops it at submission, and records server-side timestamps independently as a sanity channel.
+Every answer is validated server-side against a key snapshotted from the target run when the session opens, and correctness is never disclosed during a session, so no participant can be steered by feedback on an earlier task.
+Tasks are capped at five minutes, there is no facilitator and no hints, and each task accepts one submission.
+
+After the eighth task the same page presents a technology-acceptance questionnaire~\cite{davis1989tam}: four statements on perceived usefulness and four on perceived ease of use, each on a five-point Likert scale, followed by an optional free-text comment.
+Items are grouped by construct in a fixed order and none is reverse-coded; we compensate with a straight-lining check.
+No name, employer or free-text identity field is collected: participants are identified by a server-assigned code, and the profile questions use closed lists.
+
+\subsection{Participants}
+\Cref{tab:participants} describes the panel: role, experience with AI/ML models, familiarity with the EU AI Act, years of professional experience, and how many of the eight tasks each participant submitted.
+\ifstudydone
+\else
+\emph{[Rows are emitted by \texttt{analyze\_user\_study.py --survey}; the table below is the generated skeleton.]}
+\fi
+
+\begin{table}[t]
+  \caption{Study participants (self-reported, fixed option lists; no free-text identity field).}
+  \label{tab:participants}
+  \centering
+  \tblsetup
+  \begin{tabularx}{\columnwidth}{@{}l X l l l c@{}}
+    \toprule
+    ID & Role & AI/ML experience & EU AI Act & Yrs & Tasks \\
+    \midrule
+    \ifstudydone
+    \studyParticipantRows{}
+    \else
+    P1 & --- & --- & --- & --- & --/8 \\
+    \fi
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+\subsection{Task completion and time}
+\Cref{tab:tasks} reports, per task, how many participants completed it and the median time with its interquartile range.
+Completion is decided server-side against the snapshotted answer key, so it reflects a correct answer rather than a self-report.
+
+\begin{table}[t]
+  \caption{Task completion and time on task. Completion is validated server-side; time is measured by the application from a monotonic clock.}
+  \label{tab:tasks}
+  \centering
+  \tblsetup
+  \begin{tabularx}{\columnwidth}{@{}l X c c@{}}
+    \toprule
+    Task & What the participant had to do & Completed & Median time \\
+    \midrule
+    T1 & Find the weakest requirement & \studyCell{} & \studyCell{} \\
+    T2 & Read its score and interval & \studyCell{} & \studyCell{} \\
+    T3 & Identify the degraded checks & \studyCell{} & \studyCell{} \\
+    T4 & Judge coverage & \studyCell{} & \studyCell{} \\
+    T5 & Reach a sample model output & \studyCell{} & \studyCell{} \\
+    T6 & Separate failed / fallback / ok & \studyCell{} & \studyCell{} \\
+    T7 & Read the Trust Factor and its band & \studyCell{} & \studyCell{} \\
+    T8 & Launch an evaluation & \studyCell{} & \studyCell{} \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+\subsection{Technology acceptance}
+\Cref{tab:tam} reports the eight statements, per item and per construct.
+Internal consistency is reported with its sample size and is indicative at this scale.
+
+\begin{table}[t]
+  \caption{Technology acceptance (5-point Likert, 1 strongly disagree to 5 strongly agree). Internal-consistency estimates are indicative at this sample size.}
+  \label{tab:tam}
+  \centering
+  \tblsetup
+  \begin{tabularx}{\columnwidth}{@{}l X c c c@{}}
+    \toprule
+    Item & Statement (abridged) & Mean & SD & Mdn \\
+    \midrule
+    PU1 & Faster evaluation & \studyCell{} & \studyCell{} & \studyCell{} \\
+    PU2 & Understand failures & \studyCell{} & \studyCell{} & \studyCell{} \\
+    PU3 & Justify a decision & \studyCell{} & \studyCell{} & \studyCell{} \\
+    PU4 & Better evaluation quality & \studyCell{} & \studyCell{} & \studyCell{} \\
+    \multicolumn{2}{@{}l}{\textbf{Perceived usefulness}} & \studyCell{} & \studyCell{} & \studyCell{} \\
+    \midrule
+    PEOU1 & Clear interface & \studyCell{} & \studyCell{} & \studyCell{} \\
+    PEOU2 & Found information & \studyCell{} & \studyCell{} & \studyCell{} \\
+    PEOU3 & Launch a run alone & \studyCell{} & \studyCell{} & \studyCell{} \\
+    PEOU4 & Little learning effort & \studyCell{} & \studyCell{} & \studyCell{} \\
+    \multicolumn{2}{@{}l}{\textbf{Perceived ease of use}} & \studyCell{} & \studyCell{} & \studyCell{} \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
+
+The protocol, the study module and the analysis script ship with the tool, so the measurement can be replayed by a reader on their own deployment.
+
+\section{Threats to Validity}
+\label{sec:threats}
+
+\paragraph{Construct}
+The acceptance instrument mixes tenses: some statements report the session just experienced, others project onto the participant's own work.
+This is standard for a single-session acceptance study but it means the projective items measure intention rather than behaviour.
+Items are presented in a fixed order grouped by construct, which favours comprehension over the mitigation of order effects; we report a straight-lining check to detect response sets.
+Internal-consistency estimates are unstable at small sample sizes and we report them as indicative only.
+
+\paragraph{Internal}
+The eight tasks were designed by the authors and validated automatically against a snapshot of the target run, which removes grader subjectivity but also fixes what counts as a correct answer.
+Two tasks admit more than one defensible reading, and the validator accepts both.
+Timing is measured from a client-side monotonic clock; a mid-task page reload restarts it, and the server-side timestamps are the sanity channel that reveals such cases.
+
+\paragraph{External}
+Participants come from one institution and are AI-literate researchers rather than the compliance and risk profiles the tool ultimately targets, so the results speak to whether the interface affords the reading tasks, not to whether it changes a real sign-off decision.
+The sample is small, as is usual for tool evaluations at this stage, and the study exercises one preloaded run on one model family.
+A panel drawn from compliance and risk functions, measuring decision outcomes rather than reading tasks, is the natural next step.
+
+\paragraph{Conclusion}
+Participation was voluntary and self-selected, which plausibly favours respondents already interested in the topic.
+We report the instrument, the raw exports and the analysis script so that the inference from data to claim can be checked.
+
+\section{Lessons Learned}
+\label{sec:lessons}
+
+The tool was built inside the responsible-AI function of a bank, against real reviewers, and four things we did not expect at the start now look like the transferable part of the experience.
+
+\paragraph{L1: the barrier was the first click, not the chart}
+We assumed the hard part of making evaluation results legible was presentation, and we spent the early effort on how scores should be drawn.
+What actually unblocked non-specialists was removing the login and the configuration file.
+Reviewers who had never opened an evaluation tool would explore one they could reach in a browser and abandon one that asked them to obtain credentials first, whatever it showed them afterwards.
+The generalisable form: for a governance tool, the cost of the first interaction dominates the quality of every later one, and a guided mode that a stranger can reach is worth more than another visualisation.
+
+\paragraph{L2: a specification that lives in code will lag the regulation}
+Our first version hard-coded the requirement taxonomy and its weights.
+Every adjustment -- a benchmark deprecated upstream, a weight a reviewer disputed -- became a code change, a review and a release, and the tool started drifting behind the discussions it was supposed to support.
+Moving the taxonomy into a signed registry and catalog turned those adjustments into configuration, and had a side effect we had not anticipated: because the specification became a versioned artifact, disagreements about weighting stopped being arguments about the software and became arguments about a file that could be diffed, pinned to a run, and audited.
+Externalising a normative model is not only an extensibility decision, it is what makes the norm reviewable.
+
+\paragraph{L3: silent degradation is worse than a missing number}
+Several checks depend on optional engines that a given deployment may not have, and our first implementation quietly substituted a simpler check.
+The numbers still looked like measurements, and in one internal review a degraded result was read as a real one.
+We now propagate a fallback flag from the runner to the requirement row and into the exported artifacts, and the dashboard sorts degraded rows near the top rather than hiding them among the healthy ones.
+Any tool producing evidence for a decision should treat the provenance of a number as part of the number.
+
+\paragraph{L4: instrument the tool, not the session}
+We built the acceptance study into the product: consent, timing, server-side answer validation and the questionnaire are pages of the application, and both exports are endpoints.
+It cost roughly a working week and removed the facilitator, the transcription step and the scheduling constraint, and it made the measurement replayable by anyone who deploys the tool.
+It also imposes a discipline, since the answer key is snapshotted from the run under study, the deployment has to be pinned and purged before the first participant -- a step we got wrong once in rehearsal, which is how we learned to write it into the protocol.
+
+\section{Conclusion and Future Work}
+\label{sec:conclusion}
+
+Evaluation suites for the EU AI Act produce the right measurements and stop one step short of the decision they are meant to inform.
+VERA takes that step: it derives six requirements for an operable evaluation tool from regulation and practice, and answers them with a guided wizard, role-based views, verdicts that decompose into the public benchmarks behind them, a documented path for the requirements no benchmark can score, run-tied evidence artifacts, and a specification that is data rather than code.
+A self-administered study, instrumented by the platform, indicates that participants can complete the intended reading tasks and find the tool usable.
+
+Two lines of work are in progress.
+The first examines how much a requirement verdict depends on the aggregation policy behind it, which is a property of the scoring method rather than of the tool.
+The second replaces reading tasks with decision tasks, measuring whether practitioners choose differently when they see a full evaluation, with a panel drawn from compliance and risk functions.
+
+\section*{Acknowledgements}
+We thank the study participants for their time.
+
+{\footnotesize
+\bibliographystyle{IEEEtran}
+\bibliography{references}
+}
+
+\appendices
+\section{Additional Screens}
+\label{app:screens}
+
+\Cref{fig:home,fig:governance,fig:full} show the surfaces the body of the paper refers to but has no room to display: the entry point a first-time user lands on, the runtime-governance panel of the optional overlay, and the full run summary from which \Cref{fig:dashboard} shows only the top fold.
+
+\begin{figure*}[p]
+  \centering
+  \includegraphics[width=0.94\textwidth]{figures/shot_home.png}
+  \caption{The entry point (F1, F2). A first-time visitor in guided mode sees the state of the stack, the runs already available, and a single call to action that opens the wizard of \Cref{fig:wizard}. Nothing on this page requires an account.}
+  \label{fig:home}
+\end{figure*}
+
+\begin{figure*}[p]
+  \centering
+  \includegraphics[width=0.94\textwidth]{figures/shot_governance.png}
+  \caption{The runtime-governance panel of the optional overlay (\Cref{fig:gaas}). Live traffic is scored by the four agents into a rolling Trust Factor; the policy state and the kill-switch are operated from the same page, and every displayed event is signed.}
+  \label{fig:governance}
+\end{figure*}
+
+\begin{figure*}[p]
+  \centering
+  \includegraphics[width=0.80\textwidth]{figures/shot_control_room_full.png}
+  \caption{The complete run summary, of which \Cref{fig:dashboard} shows the top fold only. Below the gauge: the triage table ordered by state, the strip covering the six requirements no benchmark scores (F4), the artifacts produced by this run (F5), and the run inspector exposing the code revision, the catalog digest and the per-benchmark provenance.}
+  \label{fig:full}
+\end{figure*}
+
+\end{document}

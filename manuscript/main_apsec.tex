@@ -1,4 +1,4 @@
-% main_apsec.tex — APSEC 2026 SEIP tool paper (10 pages + 1 page of references).
+% main_apsec.tex — APSEC 2026 SEIP tool paper (9 pages incl. appendix, refs on p.8).
 % Scope: the TOOL. The scoring-policy analysis, the verdict-sensitivity bound and
 % the reproducible model study belong to a separate research paper and must not
 % appear here.
@@ -264,16 +264,9 @@ Nothing in any shape requires a proprietary cloud service or an API key; the sin
 Each subsection describes one feature and names the requirement it answers.
 
 \subsection{F1: guided launch wizard}
-Starting an evaluation costs neither an account nor a YAML file: the wizard of \Cref{fig:wizard} asks four questions in sequence -- which served model, which requirements, which options, and a final review -- and every one of them arrives with a defensible default already selected.
+Starting an evaluation costs neither an account nor a YAML file: a wizard asks four questions in sequence -- which served model, which requirements, which options, and a final review -- and every one of them arrives with a defensible default already selected.
 A user who accepts the defaults submits a run in four clicks.
 That is the operational answer to R1: the shortest path to evidence no longer passes through an engineer.
-
-\begin{figure}[t]
-  \centering
-  \includegraphics[width=\columnwidth]{figures/shot_wizard.png}
-  \caption{F1, the launch surface for a non-specialist. Four questions, each pre-answered with a recommended value, and a review step before submission. No account, no configuration file.}
-  \label{fig:wizard}
-\end{figure}
 
 \subsection{F2: role-based views}
 The same run is presented through three lenses -- responsible-AI, cyber, data science -- each showing the subset of requirements its audience is accountable for and naming them in that audience's vocabulary.
@@ -511,25 +504,18 @@ We thank the study participants for their time.
 \section{Additional Screens}
 \label{app:screens}
 
-\Cref{fig:home,fig:governance,fig:full} show the surfaces the body of the paper refers to but has no room to display: the entry point a first-time user lands on, the runtime-governance panel of the optional overlay, and the full run summary from which \Cref{fig:dashboard} shows only the top fold.
+\Cref{fig:home,fig:full} show the two surfaces the body of the paper refers to but has no room to display: the entry point a first-time user lands on, and the full run summary from which \Cref{fig:dashboard} shows only the top fold.
 
 \begin{figure*}[p]
   \centering
-  \includegraphics[width=0.94\textwidth]{figures/shot_home.png}
-  \caption{The entry point (F1, F2). A first-time visitor in guided mode sees the state of the stack, the runs already available, and a single call to action that opens the wizard of \Cref{fig:wizard}. Nothing on this page requires an account.}
+  \includegraphics[width=0.86\textwidth]{figures/shot_home.png}
+  \caption{The entry point (F1, F2). A first-time visitor in guided mode sees the state of the stack, the runs already available, and a single call to action that opens the four-step launch wizard. Nothing on this page requires an account.}
   \label{fig:home}
 \end{figure*}
 
 \begin{figure*}[p]
   \centering
-  \includegraphics[width=0.94\textwidth]{figures/shot_governance.png}
-  \caption{The runtime-governance panel of the optional overlay (\Cref{fig:gaas}). Live traffic is scored by the four agents into a rolling Trust Factor; the policy state and the kill-switch are operated from the same page, and every displayed event is signed.}
-  \label{fig:governance}
-\end{figure*}
-
-\begin{figure*}[p]
-  \centering
-  \includegraphics[width=0.80\textwidth]{figures/shot_control_room_full.png}
+  \includegraphics[width=0.72\textwidth]{figures/shot_control_room_full.png}
   \caption{The complete run summary, of which \Cref{fig:dashboard} shows the top fold only. Below the gauge: the triage table ordered by state, the strip covering the six requirements no benchmark scores (F4), the artifacts produced by this run (F5), and the run inspector exposing the code revision, the catalog digest and the per-benchmark provenance.}
   \label{fig:full}
 \end{figure*}

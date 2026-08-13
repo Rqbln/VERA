@@ -136,3 +136,82 @@ def test_existing_summarize_unchanged(tmp_path):
 def test_tasks_without_data_are_omitted(tmp_path):
     summary = mod.summarize(_rows(tmp_path))
     assert "T3" not in summary
+
+
+# ── Two-condition quiz analysis ──────────────────────────────────────────────────────
+def _quiz_row(pid, pair, cond, completed, seconds="10", verdict="correct", arm="alpha_first"):
+    return {
+        "participant": pid, "role": "ai_researcher", "ai_experience": "reviewer",
+        "aiact_familiarity": "working", "seniority": "6to10", "locale": "en",
+        "arm": arm, "condition": cond, "set": "A" if cond == "baseline" else "B",
+        "pair": pair, "item": f"Q{pair}{'A' if cond == 'baseline' else 'B'}",
+        "completed": completed, "verdict": verdict,
+        "client_seconds": seconds, "server_seconds": seconds,
+    }
+
+
+def test_wilcoxon_exact_hand_checked():
+    # All-positive deltas [1,2,3]: W+=6 of 6, two-sided p = 2/8.
+    r = mod.wilcoxon_exact([1, 2, 3])
+    assert r["n"] == 3 and abs(r["p"] - 0.25) < 1e-12
+    # Mixed [2,-1,3]: W+=5, p = P(W>=5)+P(W<=1) = 2/8 + 2/8.
+    r = mod.wilcoxon_exact([2, -1, 3])
+    assert abs(r["p"] - 0.5) < 1e-12
+    # Zeros are dropped: only one non-zero delta left -> p = 1.
+    r = mod.wilcoxon_exact([0, 1])
+    assert r["n"] == 1 and abs(r["p"] - 1.0) < 1e-12
+    # Ties get average ranks: [1,1] both positive -> W+=3 of 3, p = 2/4.
+    r = mod.wilcoxon_exact([1, 1])
+    assert abs(r["p"] - 0.5) < 1e-12
+    # Empty after dropping zeros.
+    assert mod.wilcoxon_exact([0, 0])["p"] == 1.0
+
+
+def test_mcnemar_exact_hand_checked():
+    assert abs(mod.mcnemar_exact(0, 5) - 0.0625) < 1e-12  # 2 * 1/32
+    assert mod.mcnemar_exact(2, 2) == 1.0  # capped
+    assert mod.mcnemar_exact(0, 0) == 1.0
+
+
+def test_paired_quality_and_time():
+    rows = []
+    # P1: baseline 1/2 correct, vera 2/2; times 30/40 vs 10/20.
+    rows.append(_quiz_row("P1", "1", "baseline", "yes", "30"))
+    rows.append(_quiz_row("P1", "1", "vera", "yes", "10"))
+    rows.append(_quiz_row("P1", "2", "baseline", "no", "40"))
+    rows.append(_quiz_row("P1", "2", "vera", "yes", "20"))
+    # P2: pair 1 only in baseline -> not paired; pair 2 paired but gave up in baseline.
+    rows.append(_quiz_row("P2", "1", "baseline", "yes", "15"))
+    rows.append(_quiz_row("P2", "2", "baseline", "no", "300", verdict="timeout"))
+    rows.append(_quiz_row("P2", "2", "vera", "yes", "25"))
+
+    quality = mod.paired_quality(rows)
+    assert quality["P1"] == {"pairs": 2, "baseline": 1, "vera": 2, "delta": 1}
+    assert quality["P2"]["pairs"] == 1  # only pair 2 is answered in both conditions
+
+    time = mod.paired_time(rows)
+    assert time["P1"]["baseline"] == 35 and time["P1"]["vera"] == 15
+    assert "P2" not in time  # its only shared pair is censored by the timeout
+
+
+def test_per_pair_table_mcnemar_counts():
+    rows = []
+    for pid, base_ok, vera_ok in (("P1", "no", "yes"), ("P2", "no", "yes"), ("P3", "yes", "yes")):
+        rows.append(_quiz_row(pid, "1", "baseline", base_ok))
+        rows.append(_quiz_row(pid, "1", "vera", vera_ok))
+    table = mod.per_pair_table(rows)
+    s = table["1"]
+    assert s["n"] == 3 and s["baseline"] == 1 and s["vera"] == 3
+    assert s["b"] == 0 and s["c"] == 2
+    assert abs(s["p"] - 0.5) < 1e-12  # 2 * (1/4)
+
+
+def test_latex_quiz_emitters_shapes():
+    rows = [
+        _quiz_row("P1", "1", "baseline", "yes", "30"),
+        _quiz_row("P1", "1", "vera", "yes", "12"),
+    ]
+    pair_lines = mod.latex_pair_rows(mod.per_pair_table(rows))
+    assert pair_lines and pair_lines[0].startswith("    1 & ")
+    paired = mod.latex_paired_rows(mod.paired_quality(rows), mod.paired_time(rows))
+    assert paired == ["    P1 & 1/1 & 1/1 & 30 & 12 \\\\"]

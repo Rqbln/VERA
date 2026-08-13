@@ -19,6 +19,16 @@ import redis
 from vera.config import Settings, get_settings
 
 TASK_IDS = tuple(f"T{i}" for i in range(1, 9))
+
+# Two-condition quiz (baseline raw artifacts vs the VERA dashboard). Two matched
+# six-item sets; the server assigns which set lands in which phase (the `arm`),
+# so content learning between phases is neutralised while the condition order
+# stays fixed (baseline first, dashboard second) for every participant.
+QUIZ_SET_A = tuple(f"Q{i}A" for i in range(1, 7))
+QUIZ_SET_B = tuple(f"Q{i}B" for i in range(1, 7))
+QUIZ_ITEMS = QUIZ_SET_A + QUIZ_SET_B
+ARM_OPTIONS = ("alpha_first", "beta_first")
+CONDITIONS = ("baseline", "vera")
 ROLE_OPTIONS = (
     "compliance_officer",
     "risk_manager",
@@ -54,6 +64,10 @@ class StudySession:
     ai_experience: str = ""
     aiact_familiarity: str = ""
     seniority: str = ""
+    # Set-to-phase pairing for the two-condition quiz ("" on pre-quiz records):
+    # alpha_first = set A in the baseline phase, set B on the dashboard;
+    # beta_first the reverse. Assigned by participant_seq parity, never chosen.
+    arm: str = ""
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -135,6 +149,9 @@ class RedisStudyStore:
             ai_experience=ai_experience,
             aiact_familiarity=aiact_familiarity,
             seniority=seniority,
+            # The sequence counter doubles as the balancing hook: odd P-codes
+            # take set A first, even P-codes set B first.
+            arm=ARM_OPTIONS[(seq + 1) % 2],
         )
         self._r.set(self._skey(session.session_id), json.dumps(session.to_dict()))
         return session

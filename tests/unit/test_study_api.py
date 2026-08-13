@@ -351,3 +351,147 @@ def test_validate_tolerance_edges():
     assert ok7  # +-1 on the rounded gauge score
     bad7, _ = validate_answer("T7", {"score": 64, "band": "orange"}, key)
     assert not bad7
+
+
+# ── Two-condition quiz (baseline raw artifacts vs dashboard) ─────────────────────────
+def test_arm_alternates_and_items_order(client, study_run):
+    s1 = _session(client, study_run)
+    s2 = _session(client, study_run)
+    assert s1["arm"] == "alpha_first"
+    assert s2["arm"] == "beta_first"
+    for s, first_letter in ((s1, "A"), (s2, "B")):
+        items = s["items"]
+        assert len(items) == 12
+        assert [i["condition"] for i in items] == ["baseline"] * 6 + ["vera"] * 6
+        assert all(i["id"].endswith(first_letter) for i in items[:6])
+        # Params never leak an answer: named targets only.
+        for i in items:
+            assert not set(i["params"]) & {"score", "ci_lower", "ci_upper", "count"}
+
+
+def test_quiz_item_params_carry_named_targets(client, study_run):
+    items = {i["id"]: i["params"] for i in _session(client, study_run)["items"]}
+    # Q2: the two highest-scoring requirements, named.
+    assert items["Q2A"]["requirement_id"] == "R01"
+    assert items["Q2B"]["requirement_id"] == "R06"
+    assert items["Q2A"]["requirement_name"]
+    # Q3B: requirement with the most contributing benchmarks (tie -> lowest id).
+    assert items["Q3B"]["requirement_id"] == "R01"
+    # Q6: first and last benchmark alphabetically.
+    assert items["Q6A"]["benchmark_id"] == "advbench"
+    assert items["Q6B"]["benchmark_id"] == "mmlu"
+
+
+def test_quiz_answer_key_pairs():
+    key = build_answer_key(
+        {
+            "requirements": [
+                {"id": "R02", "name": "Cyber", "triage": "failed", "score": 0.3,
+                 "score_ci_lower": 0.2, "score_ci_upper": 0.4, "band": "red",
+                 "contributing_benchmarks": ["advbench", "decoding_trust"],
+                 "fallback_benchmarks": []},
+                {"id": "R06", "name": "Cap", "triage": "fallback", "score": 0.72,
+                 "score_ci_lower": 0.65, "score_ci_upper": 0.79, "band": "green",
+                 "contributing_benchmarks": ["mmlu"], "fallback_benchmarks": ["mmlu"]},
+                {"id": "R01", "name": "Rob", "triage": "ok", "score": 0.85,
+                 "score_ci_lower": 0.8, "score_ci_upper": 0.9, "band": "green",
+                 "contributing_benchmarks": ["mmlu_robust"], "fallback_benchmarks": []},
+            ],
+            "triage_counts": {"failed": 1, "fallback": 1, "ok": 1, "uncovered": 0, "na": 0},
+            "requested_requirements": ["R01", "R02", "R06"],
+            "trust_factor": {"score": 62.0, "band": "orange"},
+            "harness_provenance": [{"benchmark_id": "mmlu"}, {"benchmark_id": "advbench"}],
+        }
+    )
+    assert key["second_ids"] == ["R06"]  # next distinct score + second triage row
+    assert key["q2_targets"] == {"A": "R01", "B": "R06"}
+    assert key["q3b_target"] == "R02"  # two contributing benchmarks beat one
+    assert key["q3b_benchmarks"] == ["advbench", "decoding_trust"]
+    assert key["q4b_accepted"] == [2]
+    assert key["band_counts"] == {"red": 1, "orange": 0, "green": 2}
+    assert key["q6_targets"] == {"A": "advbench", "B": "mmlu"}
+
+
+def test_quiz_second_ids_single_distinct_score():
+    key = build_answer_key(
+        {
+            "requirements": [
+                {"id": "R01", "name": "Rob", "triage": "ok", "score": 0.5, "band": "orange",
+                 "contributing_benchmarks": [], "fallback_benchmarks": []},
+                {"id": "R02", "name": "Cyber", "triage": "ok", "score": 0.5, "band": "orange",
+                 "contributing_benchmarks": [], "fallback_benchmarks": []},
+            ],
+            "triage_counts": {"failed": 0, "fallback": 0, "ok": 2, "uncovered": 0, "na": 0},
+            "requested_requirements": ["R01", "R02"],
+            "trust_factor": {"score": 50.0, "band": "orange"},
+            "harness_provenance": [],
+        }
+    )
+    # One distinct score: any weakest reading is accepted for the second rank too.
+    assert set(key["second_ids"]) == set(key["weakest_ids"])
+
+
+def test_quiz_validators_end_to_end(client, study_run):
+    sid = _session(client, study_run)["session_id"]
+    store = RedisStudyStore()
+
+    def verdict(item):
+        return store.get_response(sid, item).verdict
+
+    _submit(client, sid, "Q1A", {"requirement_id": "R02"})
+    _submit(client, sid, "Q1B", {"requirement_id": "R06"})
+    _submit(client, sid, "Q2A", {"score": 0.85, "ci_lower": 0.8, "ci_upper": 0.9})
+    _submit(client, sid, "Q2B", {"score": 0.72, "ci_lower": 0.65, "ci_upper": 0.80})  # wrong upper
+    _submit(client, sid, "Q3A", {"benchmarks": ["mmlu"]})
+    _submit(client, sid, "Q3B", {"benchmarks": ["mmlu_robust"]})
+    _submit(client, sid, "Q4A", {"count": 3})
+    _submit(client, sid, "Q4B", {"count": 2})
+    _submit(client, sid, "Q5A", {"failed": 1, "fallback": 1, "ok": 1})
+    _submit(client, sid, "Q5B", {"red": 1, "orange": 0, "green": 2})
+    _submit(client, sid, "Q6A", {"excerpt": "a genuine model answer", "confirmed": True})
+    _submit(client, sid, "Q6B", {"excerpt": "short", "confirmed": True})
+
+    assert verdict("Q1A") == "correct"
+    assert verdict("Q1B") == "correct"
+    assert verdict("Q2A") == "correct"
+    assert verdict("Q2B") == "wrong"
+    assert verdict("Q3A") == "correct"
+    assert verdict("Q3B") == "correct"
+    assert verdict("Q4A") == "correct"
+    assert verdict("Q4B") == "correct"
+    assert verdict("Q5A") == "correct"
+    assert verdict("Q5B") == "correct"
+    assert verdict("Q6A") == "unverified"
+    assert verdict("Q6B") == "wrong"
+
+
+def test_quiz_export_schema_and_conditions(client, study_run):
+    s1 = _session(client, study_run)  # alpha_first
+    s2 = _session(client, study_run)  # beta_first
+    _submit(client, s1["session_id"], "Q1A", {"requirement_id": "R02"})
+    _submit(client, s1["session_id"], "Q1B", {"requirement_id": "R01"})
+    _submit(client, s2["session_id"], "Q1A", {"requirement_id": "R02"})
+
+    text = client.get("/api/v1/study/export_quiz.csv").text
+    rows = list(csv.DictReader(io.StringIO(text)))
+    assert list(rows[0].keys()) == [
+        "participant", "role", "ai_experience", "aiact_familiarity", "seniority",
+        "locale", "arm", "condition", "set", "pair", "item", "completed", "verdict",
+        "client_seconds", "server_seconds",
+    ]
+    by = {(r["participant"], r["item"]): r for r in rows}
+    assert by[("P1", "Q1A")]["condition"] == "baseline"  # alpha_first: set A first
+    assert by[("P1", "Q1B")]["condition"] == "vera"
+    assert by[("P2", "Q1A")]["condition"] == "vera"  # beta_first: set A second
+    assert by[("P1", "Q1A")]["set"] == "A"
+    assert by[("P1", "Q1A")]["pair"] == "1"
+    assert by[("P1", "Q1B")]["completed"] == "no"  # R01 is not the second-weakest
+
+
+def test_old_exports_untouched_by_quiz(client, study_run):
+    sid = _session(client, study_run)["session_id"]
+    _submit(client, sid, "T1", {"requirement_id": "R02"})
+    _submit(client, sid, "Q1A", {"requirement_id": "R02"})
+    text = client.get("/api/v1/study/export.csv").text
+    assert text.splitlines()[0] == "participant,role,task_id,completed,assisted,seconds,notes"
+    assert "Q1A" not in text  # quiz rows live in export_quiz.csv only

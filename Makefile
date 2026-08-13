@@ -48,8 +48,9 @@ study-tunnel: ## Expose the dashboard (and the study at /study) via an ephemeral
 	@echo "Share the printed URL with participants as https://<host>/study"
 	cloudflared tunnel --url http://localhost:3000
 
-study-export: ## Export study responses + TAM survey and print the paper numbers
+study-export: ## Export study responses (quiz + legacy tasks + TAM) and print the paper numbers
 	curl -fsS http://localhost:8000/api/v1/study/export.csv -o data/user_study/sessions.csv
 	curl -fsS http://localhost:8000/api/v1/study/export_survey.csv -o data/user_study/survey.csv
+	curl -fsS http://localhost:8000/api/v1/study/export_quiz.csv -o data/user_study/quiz.csv
 	python scripts/analyze_user_study.py data/user_study/sessions.csv \
-		--survey data/user_study/survey.csv
+		--survey data/user_study/survey.csv --quiz data/user_study/quiz.csv

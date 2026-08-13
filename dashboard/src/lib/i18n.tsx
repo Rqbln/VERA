@@ -109,7 +109,7 @@ const EN = {
   "study.title": "VERA user study",
   "study.intro.heading": "Reading an evaluation run",
   "study.intro.consent":
-    "You will answer eight questions using the VERA dashboard, then a short questionnaire about the tool. The time you spend on each task is recorded by the application. No name or personal data is collected: only a participant code, your role, and three background questions. Results are reported in aggregate in a research paper.",
+    "The study has two parts. In part one you answer six questions about a completed AI evaluation using its raw result files. In part two you answer six similar questions using the VERA dashboard, then a bonus task and a short questionnaire. It takes about 20 minutes. The time you spend on each question is measured by the application. No name or personal data is collected: only a participant code and four background questions with fixed choices. Results are reported in aggregate in a research paper.",
   "study.intro.consent_check": "I agree to participate",
   "study.intro.role": "Your role",
   "study.intro.ai_experience": "Your experience with AI/ML models",
@@ -164,6 +164,42 @@ const EN = {
   "study.t7.band": "Verdict",
   "study.t8.instruction": "Launch a new evaluation on the recommended model with the recommended settings, then paste the address of the page you land on.",
   "study.t8.label": "Run page address (URL)",
+  "study.part1": "Part 1 — raw files",
+  "study.part2": "Part 2 — dashboard",
+  "study.bonus": "Bonus task",
+  "study.question": "Question",
+  "study.materials.title": "Your documents for this part",
+  "study.materials.hint":
+    "Answer using only the documents below. They are the raw files produced by the evaluation, as an engineer would hand them over.",
+  "study.materials.tab_run": "Run record",
+  "study.materials.tab_provenance": "Harness log",
+  "study.materials.tab_raw": "Model outputs",
+  "study.materials.benchmark": "Benchmark",
+  "study.materials.prev": "Previous",
+  "study.materials.next": "Next",
+  "study.transition.heading": "Part 1 complete",
+  "study.transition.body":
+    "In part two you answer six similar questions about the same evaluation, this time using the VERA dashboard. Open it with the button shown above each question.",
+  "study.transition.continue": "Start part 2",
+  "study.q1a.instruction": "Which requirement is the model weakest on?",
+  "study.q1b.instruction": "Which requirement is the model second weakest on?",
+  "study.q2.instruction":
+    "What are the score and the confidence interval of the requirement \u201c{name}\u201d?",
+  "study.q3a.instruction": "Which checks ran in a degraded (fallback) mode?",
+  "study.q3b.instruction":
+    "Which public benchmarks contributed to the score of the requirement \u201c{name}\u201d?",
+  "study.q4a.instruction": "How many requirements were evaluated in this run?",
+  "study.q4b.instruction": "How many distinct benchmarks were executed in this run?",
+  "study.q5a.instruction":
+    "How many requirements failed, how many are in fallback, how many are OK?",
+  "study.q5b.instruction":
+    "How many requirements fall in the red, orange and green score bands? (red below 0.40, orange from 0.40, green from 0.70)",
+  "study.q5b.red": "Red",
+  "study.q5b.orange": "Orange",
+  "study.q5b.green": "Green",
+  "study.q6.instruction":
+    "Find one actual model answer produced by the benchmark \u201c{benchmark}\u201d and paste a fragment of it below.",
+  "study.q6.confirm": "I found this in the materials provided",
   "study.survey.heading": "One last step: your view of the tool",
   "study.survey.intro":
     "Eight statements about VERA. There is no right answer; we are measuring your impression after using it.",
@@ -304,7 +340,7 @@ const FR: Record<Key, string> = {
   "study.title": "Étude utilisateur VERA",
   "study.intro.heading": "Lire une évaluation",
   "study.intro.consent":
-    "Vous répondrez à huit questions à l'aide du tableau de bord VERA, puis à un court questionnaire sur l'outil. Le temps passé sur chaque tâche est mesuré par l'application. Aucun nom ni donnée personnelle n'est collecté : seulement un code participant, votre rôle et trois questions de contexte. Les résultats sont rapportés de façon agrégée dans un article de recherche.",
+    "L'étude comporte deux parties. Dans la première, vous répondez à six questions sur une évaluation d'IA terminée, à partir de ses fichiers de résultats bruts. Dans la seconde, vous répondez à six questions similaires à l'aide du tableau de bord VERA, puis une tâche bonus et un court questionnaire. Comptez environ 20 minutes. Le temps passé sur chaque question est mesuré par l'application. Aucun nom ni donnée personnelle n'est collecté : seulement un code participant et quatre questions de contexte à choix fermés. Les résultats sont rapportés de façon agrégée dans un article de recherche.",
   "study.intro.consent_check": "J'accepte de participer",
   "study.intro.role": "Votre rôle",
   "study.intro.ai_experience": "Votre expérience des modèles d'IA/ML",
@@ -359,6 +395,42 @@ const FR: Record<Key, string> = {
   "study.t7.band": "Verdict",
   "study.t8.instruction": "Lancez une nouvelle évaluation sur le modèle recommandé avec les réglages recommandés, puis collez l'adresse de la page d'arrivée.",
   "study.t8.label": "Adresse de la page du run (URL)",
+  "study.part1": "Partie 1 — fichiers bruts",
+  "study.part2": "Partie 2 — tableau de bord",
+  "study.bonus": "Tâche bonus",
+  "study.question": "Question",
+  "study.materials.title": "Vos documents pour cette partie",
+  "study.materials.hint":
+    "Répondez uniquement à partir des documents ci-dessous. Ce sont les fichiers bruts produits par l'évaluation, tels qu'un ingénieur les transmettrait.",
+  "study.materials.tab_run": "Compte rendu du run",
+  "study.materials.tab_provenance": "Journal du harnais",
+  "study.materials.tab_raw": "Sorties du modèle",
+  "study.materials.benchmark": "Benchmark",
+  "study.materials.prev": "Précédent",
+  "study.materials.next": "Suivant",
+  "study.transition.heading": "Partie 1 terminée",
+  "study.transition.body":
+    "Dans la seconde partie, vous répondez à six questions similaires sur la même évaluation, cette fois à l'aide du tableau de bord VERA. Ouvrez-le avec le bouton affiché au-dessus de chaque question.",
+  "study.transition.continue": "Commencer la partie 2",
+  "study.q1a.instruction": "Sur quelle exigence le modèle est-il le plus faible ?",
+  "study.q1b.instruction": "Sur quelle exigence le modèle est-il le deuxième plus faible ?",
+  "study.q2.instruction":
+    "Quels sont le score et l'intervalle de confiance de l'exigence « {name} » ?",
+  "study.q3a.instruction": "Quels contrôles ont tourné en mode dégradé (fallback) ?",
+  "study.q3b.instruction":
+    "Quels benchmarks publics ont contribué au score de l'exigence « {name} » ?",
+  "study.q4a.instruction": "Combien d'exigences ont été évaluées dans ce run ?",
+  "study.q4b.instruction": "Combien de benchmarks distincts ont été exécutés dans ce run ?",
+  "study.q5a.instruction":
+    "Combien d'exigences sont en échec, combien en fallback, combien OK ?",
+  "study.q5b.instruction":
+    "Combien d'exigences tombent dans les bandes rouge, orange et verte ? (rouge sous 0,40, orange à partir de 0,40, vert à partir de 0,70)",
+  "study.q5b.red": "Rouge",
+  "study.q5b.orange": "Orange",
+  "study.q5b.green": "Verte",
+  "study.q6.instruction":
+    "Retrouvez une vraie réponse du modèle produite par le benchmark « {benchmark} » et collez-en un fragment ci-dessous.",
+  "study.q6.confirm": "Je l'ai trouvée dans les documents fournis",
   "study.survey.heading": "Dernière étape : votre avis sur l'outil",
   "study.survey.intro":
     "Huit affirmations sur VERA. Il n'y a pas de bonne réponse : nous mesurons votre impression après usage.",

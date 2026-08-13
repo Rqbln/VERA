@@ -3,15 +3,18 @@
 import { useEffect, useRef, useState } from "react";
 import {
   createStudySession,
+  getBenchmarkRun,
+  getProvenance,
+  getRawOutputs,
   startStudyTask,
   submitStudyResponse,
   submitStudySurvey,
+  type StudyQuizItem,
   type StudySessionInfo,
 } from "@/lib/api";
 import { getToken } from "@/lib/auth";
 import { useI18n, useT } from "@/lib/i18n";
 
-const TASK_IDS = ["T1", "T2", "T3", "T4", "T5", "T6", "T7", "T8"] as const;
 const ROLES = [
   "compliance_officer",
   "risk_manager",
@@ -27,10 +30,17 @@ const PU_ITEMS = ["PU1", "PU2", "PU3", "PU4"] as const;
 const PEOU_ITEMS = ["PEOU1", "PEOU2", "PEOU3", "PEOU4"] as const;
 const SURVEY_ITEMS = [...PU_ITEMS, ...PEOU_ITEMS];
 const LIKERT = [1, 2, 3, 4, 5] as const;
-const BANDS = ["green", "orange", "red"] as const;
 const TASK_CAP_MS = 300_000; // the protocol's 5-minute cap
+const BASELINE_COUNT = 6; // six baseline items, then six dashboard items, then T8
 
-type Phase = "intro" | "task" | "survey" | "done";
+type Phase = "intro" | "task" | "transition" | "survey" | "done";
+
+/** One step of the session: a quiz item, or the non-comparative T8 epilogue. */
+interface Step {
+  id: string;
+  condition: "baseline" | "vera";
+  params: Record<string, string>;
+}
 
 interface Saved {
   session: StudySessionInfo;
@@ -41,10 +51,28 @@ interface Saved {
 function loadSaved(): Saved | null {
   try {
     const raw = sessionStorage.getItem("vera-study");
-    return raw ? (JSON.parse(raw) as Saved) : null;
+    const saved = raw ? (JSON.parse(raw) as Saved) : null;
+    // Pre-quiz sessions carry no item plan; they cannot be resumed meaningfully.
+    if (saved && !Array.isArray(saved.session.items)) {
+      sessionStorage.removeItem("vera-study");
+      return null;
+    }
+    return saved;
   } catch {
     return null;
   }
+}
+
+function buildSteps(session: StudySessionInfo | null): Step[] {
+  if (!session) return [];
+  return [
+    ...session.items.map((i: StudyQuizItem) => ({
+      id: i.id,
+      condition: i.condition,
+      params: i.params ?? {},
+    })),
+    { id: "T8", condition: "vera" as const, params: {} },
+  ];
 }
 
 export function StudyRunner() {
@@ -70,13 +98,17 @@ export function StudyRunner() {
   const startRef = useRef(0);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  const steps = buildSteps(session);
+
   useEffect(() => {
     const saved = loadSaved();
     if (saved) {
       setSession(saved.session);
       setTaskIndex(saved.taskIndex);
-      if (saved.taskIndex < TASK_IDS.length) setPhase("task");
-      else setPhase(saved.surveyDone ? "done" : "survey");
+      const total = saved.session.items.length + 1;
+      if (saved.taskIndex >= total) setPhase(saved.surveyDone ? "done" : "survey");
+      else if (saved.taskIndex === BASELINE_COUNT) setPhase("transition");
+      else setPhase("task");
     }
   }, []);
 
@@ -118,17 +150,17 @@ export function StudyRunner() {
       setSubmitting(false);
       return; // the button stays enabled: task data is already server-side
     }
-    persist(session, TASK_IDS.length, true);
+    persist(session, steps.length, true);
     setSubmitting(false);
     setPhase("done");
   };
 
-  const taskId = TASK_IDS[Math.min(taskIndex, TASK_IDS.length - 1)];
+  const step: Step | undefined = steps[Math.min(taskIndex, Math.max(steps.length - 1, 0))];
 
   const startTask = async () => {
-    if (!session) return;
+    if (!session || !step) return;
     try {
-      await startStudyTask(token, session.session_id, taskId);
+      await startStudyTask(token, session.session_id, step.id);
     } catch {
       // Server start ping is a sanity channel; the client clock still runs.
     }
@@ -142,13 +174,13 @@ export function StudyRunner() {
   };
 
   const finish = async (gaveUp: boolean, reason = "") => {
-    if (!session || submitting) return;
+    if (!session || !step || submitting) return;
     setSubmitting(true);
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
     const seconds = Math.max(1, Math.round((performance.now() - startRef.current) / 1000));
     try {
       await submitStudyResponse(token, session.session_id, {
-        task_id: taskId,
+        task_id: step.id,
         answer,
         seconds,
         gave_up: gaveUp,
@@ -166,7 +198,8 @@ export function StudyRunner() {
     setSubmitting(false);
     setTaskIndex(next);
     persist(session, next);
-    if (next >= TASK_IDS.length) setPhase("survey");
+    if (next >= steps.length) setPhase("survey");
+    else if (next === BASELINE_COUNT) setPhase("transition");
   };
 
   if (phase === "intro") {
@@ -223,6 +256,23 @@ export function StudyRunner() {
           {t("study.intro.begin")}
         </button>
         {error ? <p className="mt-3 text-xs text-status-blocked">{t("study.error")}</p> : null}
+      </section>
+    );
+  }
+
+  if (phase === "transition") {
+    return (
+      <section data-testid="study-transition" className="card p-6 shadow-sm">
+        <h1 className="mb-2 text-lg font-semibold text-ink">{t("study.transition.heading")}</h1>
+        <p className="mb-4 text-sm text-ink-secondary">{t("study.transition.body")}</p>
+        <button
+          type="button"
+          data-testid="study-transition-continue"
+          onClick={() => setPhase("task")}
+          className="btn-primary"
+        >
+          {t("study.transition.continue")}
+        </button>
       </section>
     );
   }
@@ -311,11 +361,21 @@ export function StudyRunner() {
     );
   }
 
+  const isBaseline = step?.condition === "baseline";
+  const isBonus = step?.id === "T8";
+  const partLabel = isBonus
+    ? t("study.bonus")
+    : isBaseline
+      ? t("study.part1")
+      : t("study.part2");
+  const withinIndex = isBonus ? 1 : isBaseline ? taskIndex + 1 : taskIndex - BASELINE_COUNT + 1;
+  const withinTotal = isBonus ? 1 : BASELINE_COUNT;
+
   return (
     <section data-testid="study-task" className="card p-6 shadow-sm">
       <div className="mb-3 flex items-center justify-between text-xs text-ink-secondary">
-        <span>
-          {t("study.progress")} {taskIndex + 1} {t("study.of")} {TASK_IDS.length}
+        <span data-testid="study-progress">
+          {partLabel} · {t("study.question")} {withinIndex} {t("study.of")} {withinTotal}
         </span>
         {running ? (
           <span className="flex items-center gap-1.5">
@@ -324,7 +384,7 @@ export function StudyRunner() {
           </span>
         ) : null}
       </div>
-      <p className="mb-4 text-sm font-medium text-ink">{t(`study.${taskId.toLowerCase()}.instruction`)}</p>
+      <p className="mb-4 text-sm font-medium text-ink">{instructionFor(t, step)}</p>
 
       {!running ? (
         <button
@@ -337,16 +397,24 @@ export function StudyRunner() {
         </button>
       ) : (
         <div className="space-y-4">
-          <button
-            type="button"
-            data-testid="study-open-dashboard"
-            onClick={() => window.open("/home", "vera-study-dashboard")}
-            className="btn-secondary"
-          >
-            {t("study.open_dashboard")} ↗
-          </button>
+          {isBaseline ? (
+            <MaterialsPanel
+              token={token}
+              runId={session?.run_id ?? ""}
+              benchmarks={session?.benchmark_options ?? []}
+            />
+          ) : (
+            <button
+              type="button"
+              data-testid="study-open-dashboard"
+              onClick={() => window.open("/home", "vera-study-dashboard")}
+              className="btn-secondary"
+            >
+              {t("study.open_dashboard")} ↗
+            </button>
+          )}
 
-          <TaskFields taskId={taskId} session={session} answer={answer} setAnswer={setAnswer} />
+          <TaskFields step={step} session={session} answer={answer} setAnswer={setAnswer} />
 
           <div className="flex items-center gap-3">
             <button
@@ -376,13 +444,166 @@ export function StudyRunner() {
   );
 }
 
+function instructionFor(t: (k: string) => string, step: Step | undefined): string {
+  if (!step) return "";
+  if (step.id === "T8") return t("study.t8.instruction");
+  const pair = step.id.slice(0, 2); // "Q1".."Q6"
+  const variant = step.id.slice(2).toLowerCase(); // "a" | "b"
+  if (pair === "Q2")
+    return t("study.q2.instruction").replace(
+      "{name}",
+      step.params.requirement_name || step.params.requirement_id || "",
+    );
+  if (step.id === "Q3B")
+    return t("study.q3b.instruction").replace(
+      "{name}",
+      step.params.requirement_name || step.params.requirement_id || "",
+    );
+  if (pair === "Q6")
+    return t("study.q6.instruction").replace("{benchmark}", step.params.benchmark_id || "");
+  if (pair === "Q4" || pair === "Q5" || pair === "Q1" || pair === "Q3")
+    return t(`study.${pair.toLowerCase()}${variant}.instruction`);
+  return "";
+}
+
+/** Baseline materials: the raw artifacts of the run, displayed in-page so the
+ *  clock keeps measuring. No VERA presentation: pretty-printed JSON only. */
+function MaterialsPanel({
+  token,
+  runId,
+  benchmarks,
+}: {
+  token: string | undefined;
+  runId: string;
+  benchmarks: string[];
+}) {
+  const t = useT();
+  const [tab, setTab] = useState<"run" | "provenance" | "raw">("run");
+  const [runDoc, setRunDoc] = useState<unknown>(null);
+  const [provenance, setProvenance] = useState<unknown>(null);
+  const [rawRows, setRawRows] = useState<Record<string, unknown>[] | null>(null);
+  const [benchmark, setBenchmark] = useState(benchmarks[0] ?? "");
+  const [page, setPage] = useState(1);
+  const [total, setTotal] = useState(0);
+  const [failed, setFailed] = useState(false);
+
+  useEffect(() => {
+    let alive = true;
+    setFailed(false);
+    if (tab === "run" && runDoc === null) {
+      getBenchmarkRun(token, runId)
+        .then((r) => alive && setRunDoc(r.document))
+        .catch(() => alive && setFailed(true));
+    }
+    if (tab === "provenance" && provenance === null) {
+      getProvenance(token, runId)
+        .then((r) => alive && setProvenance(r.provenance))
+        .catch(() => alive && setFailed(true));
+    }
+    if (tab === "raw" && benchmark) {
+      setRawRows(null);
+      getRawOutputs(token ?? "", runId, benchmark, page)
+        .then((r) => {
+          if (!alive) return;
+          setRawRows(r.rows);
+          setTotal(r.total);
+        })
+        .catch(() => alive && setFailed(true));
+    }
+    return () => {
+      alive = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tab, benchmark, page, runId]);
+
+  const body =
+    tab === "run" ? runDoc : tab === "provenance" ? provenance : rawRows;
+
+  return (
+    <div data-testid="study-materials" className="rounded border border-default">
+      <div className="border-b border-default px-3 py-2">
+        <div className="kpi-label">{t("study.materials.title")}</div>
+        <p className="text-[11px] text-ink-secondary">{t("study.materials.hint")}</p>
+      </div>
+      <div className="flex items-center gap-2 border-b border-default px-3 py-1.5 text-xs">
+        {(
+          [
+            ["run", "study.materials.tab_run"],
+            ["provenance", "study.materials.tab_provenance"],
+            ["raw", "study.materials.tab_raw"],
+          ] as const
+        ).map(([id, key]) => (
+          <button
+            key={id}
+            type="button"
+            data-testid={`study-materials-tab-${id}`}
+            onClick={() => setTab(id)}
+            className={
+              tab === id
+                ? "rounded bg-surface-strong px-2 py-0.5 font-medium text-ink"
+                : "px-2 py-0.5 text-ink-secondary hover:text-ink"
+            }
+          >
+            {t(key)}
+          </button>
+        ))}
+        {tab === "raw" ? (
+          <span className="ml-auto flex items-center gap-2">
+            <select
+              data-testid="study-materials-benchmark"
+              value={benchmark}
+              onChange={(e) => {
+                setBenchmark(e.target.value);
+                setPage(1);
+              }}
+              className="input py-0.5 text-xs"
+            >
+              {benchmarks.map((b) => (
+                <option key={b} value={b}>
+                  {b}
+                </option>
+              ))}
+            </select>
+            <button
+              type="button"
+              disabled={page <= 1}
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              className="text-ink-secondary disabled:opacity-40"
+            >
+              ← {t("study.materials.prev")}
+            </button>
+            <button
+              type="button"
+              disabled={page * 20 >= total}
+              onClick={() => setPage((p) => p + 1)}
+              className="text-ink-secondary disabled:opacity-40"
+            >
+              {t("study.materials.next")} →
+            </button>
+          </span>
+        ) : null}
+      </div>
+      <pre
+        data-testid="study-materials-body"
+        className="max-h-80 overflow-auto whitespace-pre-wrap break-words px-3 py-2 font-mono text-[11px] leading-relaxed text-ink"
+      >
+        {failed
+          ? t("study.error")
+          : body === null
+            ? t("common.loading")
+            : JSON.stringify(body, null, 2)}
+      </pre>
+    </div>
+  );
+}
+
 function TaskFields({
-  taskId,
+  step,
   session,
   answer,
   setAnswer,
 }: {
-  taskId: string;
+  step: Step | undefined;
   session: StudySessionInfo | null;
   answer: Record<string, unknown>;
   setAnswer: (a: Record<string, unknown>) => void;
@@ -391,8 +612,10 @@ function TaskFields({
   const set = (key: string, value: unknown) => setAnswer({ ...answer, [key]: value });
   const num = (key: string) => (value: string) =>
     set(key, value === "" ? undefined : Number(value));
+  if (!step) return null;
+  const pair = step.id.slice(0, 2);
 
-  if (taskId === "T1") {
+  if (pair === "Q1") {
     return (
       <Labeled label={t("study.t1.label")}>
         <select
@@ -413,7 +636,7 @@ function TaskFields({
       </Labeled>
     );
   }
-  if (taskId === "T2") {
+  if (pair === "Q2") {
     return (
       <div className="flex flex-wrap gap-3">
         {(["score", "ci_lower", "ci_upper"] as const).map((field) => (
@@ -431,7 +654,7 @@ function TaskFields({
       </div>
     );
   }
-  if (taskId === "T3") {
+  if (pair === "Q3") {
     const selected = new Set((answer.benchmarks as string[]) ?? []);
     return (
       <div className="grid gap-1 sm:grid-cols-2">
@@ -454,14 +677,14 @@ function TaskFields({
       </div>
     );
   }
-  if (taskId === "T4") {
+  if (pair === "Q4") {
     return (
       <Labeled label={t("study.t4.label")}>
         <input
           data-testid="study-answer-count"
           type="number"
           min={0}
-          max={12}
+          max={30}
           value={answer.count === undefined ? "" : String(answer.count)}
           onChange={(e) => num("count")(e.target.value)}
           className="input w-24"
@@ -469,30 +692,7 @@ function TaskFields({
       </Labeled>
     );
   }
-  if (taskId === "T5") {
-    return (
-      <div className="space-y-2">
-        <textarea
-          data-testid="study-answer-excerpt"
-          value={String(answer.excerpt ?? "")}
-          onChange={(e) => set("excerpt", e.target.value)}
-          placeholder={t("study.t5.placeholder")}
-          rows={3}
-          className="input w-full"
-        />
-        <label className="flex items-center gap-2 text-xs text-ink">
-          <input
-            type="checkbox"
-            data-testid="study-answer-confirmed"
-            checked={Boolean(answer.confirmed)}
-            onChange={(e) => set("confirmed", e.target.checked)}
-          />
-          {t("study.t5.confirm")}
-        </label>
-      </div>
-    );
-  }
-  if (taskId === "T6") {
+  if (step.id === "Q5A") {
     return (
       <div className="flex flex-wrap gap-3">
         {(["failed", "fallback", "ok"] as const).map((field) => (
@@ -510,37 +710,44 @@ function TaskFields({
       </div>
     );
   }
-  if (taskId === "T7") {
+  if (step.id === "Q5B") {
     return (
       <div className="flex flex-wrap gap-3">
-        <Labeled label={t("study.t7.score")}>
+        {(["red", "orange", "green"] as const).map((field) => (
+          <Labeled key={field} label={t(`study.q5b.${field}`)}>
+            <input
+              data-testid={`study-answer-${field}`}
+              type="number"
+              min={0}
+              value={answer[field] === undefined ? "" : String(answer[field])}
+              onChange={(e) => num(field)(e.target.value)}
+              className="input w-20"
+            />
+          </Labeled>
+        ))}
+      </div>
+    );
+  }
+  if (pair === "Q6") {
+    return (
+      <div className="space-y-2">
+        <textarea
+          data-testid="study-answer-excerpt"
+          value={String(answer.excerpt ?? "")}
+          onChange={(e) => set("excerpt", e.target.value)}
+          placeholder={t("study.t5.placeholder")}
+          rows={3}
+          className="input w-full"
+        />
+        <label className="flex items-center gap-2 text-xs text-ink">
           <input
-            data-testid="study-answer-trust"
-            type="number"
-            min={0}
-            max={100}
-            value={answer.score === undefined ? "" : String(answer.score)}
-            onChange={(e) => num("score")(e.target.value)}
-            className="input w-24"
+            type="checkbox"
+            data-testid="study-answer-confirmed"
+            checked={Boolean(answer.confirmed)}
+            onChange={(e) => set("confirmed", e.target.checked)}
           />
-        </Labeled>
-        <Labeled label={t("study.t7.band")}>
-          <select
-            data-testid="study-answer-band"
-            value={String(answer.band ?? "")}
-            onChange={(e) => set("band", e.target.value)}
-            className="input"
-          >
-            <option value="" disabled>
-              —
-            </option>
-            {BANDS.map((b) => (
-              <option key={b} value={b}>
-                {t(`summary.band.${b}`)}
-              </option>
-            ))}
-          </select>
-        </Labeled>
+          {t("study.q6.confirm")}
+        </label>
       </div>
     );
   }

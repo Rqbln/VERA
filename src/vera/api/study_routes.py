@@ -106,6 +106,13 @@ def build_answer_key(summary: dict[str, Any]) -> dict[str, Any]:
     q6a_target = benchmark_options[0] if benchmark_options else ""
     q6b_target = benchmark_options[-1] if benchmark_options else ""
 
+    def carrier(benchmark: str) -> str:
+        # The requirement whose drawer holds this benchmark's sample output.
+        for r in sorted(scored, key=lambda r: r["id"]):
+            if benchmark in (r.get("contributing_benchmarks") or []):
+                return r["id"]
+        return ""
+
     return {
         "weakest_ids": sorted(weakest_ids),
         "weakest_primary": weakest_primary,
@@ -130,6 +137,7 @@ def build_answer_key(summary: dict[str, Any]) -> dict[str, Any]:
         "q3b_target": q3b_target,
         "q3b_benchmarks": q3b_benchmarks,
         "q6_targets": {"A": q6a_target, "B": q6b_target},
+        "q6_requirements": {"A": carrier(q6a_target), "B": carrier(q6b_target)},
         "requirement_options": [{"id": r["id"], "name": r.get("name", "")} for r in reqs],
         "benchmark_options": benchmark_options,
     }
@@ -293,7 +301,14 @@ def quiz_plan(arm: str, key: dict[str, Any]) -> list[dict[str, Any]]:
             rid = key.get("q3b_target") or ""
             return {"requirement_id": rid, "requirement_name": names.get(rid, rid)}
         if item.startswith("Q6"):
-            return {"benchmark_id": (key.get("q6_targets") or {}).get(item[-1]) or ""}
+            rid = (key.get("q6_requirements") or {}).get(item[-1]) or ""
+            return {
+                "benchmark_id": (key.get("q6_targets") or {}).get(item[-1]) or "",
+                # Carrier requirement: lets the client deep-link to the drawer
+                # that holds this benchmark's sample output.
+                "requirement_id": rid,
+                "requirement_name": names.get(rid, rid),
+            }
         return {}
 
     first, second = (QUIZ_SET_A, QUIZ_SET_B) if arm == "alpha_first" else (QUIZ_SET_B, QUIZ_SET_A)

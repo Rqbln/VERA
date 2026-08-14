@@ -407,7 +407,13 @@ export function StudyRunner() {
             <button
               type="button"
               data-testid="study-open-dashboard"
-              onClick={() => window.open("/home", "vera-study-dashboard")}
+              data-href={step ? dashboardHref(step, session?.run_id ?? "") : "/home"}
+              onClick={() =>
+                window.open(
+                  step ? dashboardHref(step, session?.run_id ?? "") : "/home",
+                  "vera-study-dashboard",
+                )
+              }
               className="btn-secondary"
             >
               {t("study.open_dashboard")} ↗
@@ -442,6 +448,20 @@ export function StudyRunner() {
       )}
     </section>
   );
+}
+
+/** Dashboard-phase deep link: the view that holds the item's answer.
+ *  Same granularity as the baseline document tabs: a view, never the answer. */
+function dashboardHref(step: Step, runId: string): string {
+  const base = `/dashboards/compliance?run=${encodeURIComponent(runId)}`;
+  if (step.id === "T8") return "/launch";
+  const pair = step.id.slice(0, 2);
+  if (pair === "Q2" || step.id === "Q3B" || pair === "Q6") {
+    const rid = step.params.requirement_id;
+    return rid ? `${base}&req=${encodeURIComponent(rid)}` : base;
+  }
+  if (step.id === "Q3A" || step.id === "Q4B") return `${base}&details=1`;
+  return base; // Q1*, Q4A, Q5*: hero gauge, coverage bar and triage table
 }
 
 function instructionFor(t: (k: string) => string, step: Step | undefined): string {

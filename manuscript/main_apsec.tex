@@ -342,6 +342,10 @@ The item text states the band thresholds where they are needed, so the baseline 
 
 \subsection{Instrumentation}
 The platform administers the study itself at a \texttt{/study} URL: consent, profile, both phases, and the questionnaire are pages of the product.
+Access is symmetric by construction.
+In the baseline phase, the raw files sit in tabs on the question page.
+In the dashboard phase, each question carries a link that opens the dashboard on the view holding the answer: the run summary, a named requirement's drawer, or the harness log.
+Both conditions therefore start one click from the right material, and neither link ever selects an answer.
 A monotonic client clock starts when the participant presses start and stops at submission; server-side timestamps form an independent sanity channel.
 Every answer is validated server-side against a key snapshotted when the session opens, and correctness is never disclosed during a session.
 Questions are capped at five minutes, accept one submission, and offer an explicit give-up.

@@ -31,7 +31,8 @@ function paramsFor(id: string): Record<string, string> {
   if (id.startsWith("Q2"))
     return { requirement_id: "R01", requirement_name: "Robustness" };
   if (id === "Q3B") return { requirement_id: "R01", requirement_name: "Robustness" };
-  if (id.startsWith("Q6")) return { benchmark_id: "advbench" };
+  if (id.startsWith("Q6"))
+    return { benchmark_id: "advbench", requirement_id: "R02", requirement_name: "Cyber resilience" };
   return {};
 }
 
@@ -194,12 +195,40 @@ test("transition screen separates part 1 from part 2, which uses the dashboard",
   await page.getByTestId("study-task-start").click();
   await expect(page.getByTestId("study-open-dashboard")).toBeVisible();
   await expect(page.getByTestId("study-materials")).toHaveCount(0);
+  // Q1B deep-links to the run's compliance view (triage table).
+  await expect(page.getByTestId("study-open-dashboard")).toHaveAttribute(
+    "data-href",
+    "/dashboards/compliance?run=run-0001",
+  );
   // Part 2 submissions carry set-B item ids.
   await page.getByTestId("study-task-giveup").click();
   await page.getByTestId("study-task-giveup").click();
   await expect
     .poll(() => state.submissions.map((s) => s.task_id).at(-1), { timeout: 5_000 })
     .toBe("Q1B");
+  // Q2B deep-links straight to the named requirement's drawer.
+  await page.getByTestId("study-task-start").click();
+  await expect(page.getByTestId("study-open-dashboard")).toHaveAttribute(
+    "data-href",
+    "/dashboards/compliance?run=run-0001&req=R01",
+  );
+});
+
+test("T8 deep-links to the launch wizard", async ({ page }) => {
+  const state = newState();
+  await mockApi(page, state);
+  await beginStudy(page);
+  for (let i = 0; i < 12; i++) {
+    if (i === 6) await page.getByTestId("study-transition-continue").click();
+    await page.getByTestId("study-task-start").click();
+    await page.getByTestId("study-task-giveup").click();
+    await page.getByTestId("study-task-giveup").click();
+  }
+  await page.getByTestId("study-task-start").click();
+  await expect(page.getByTestId("study-open-dashboard")).toHaveAttribute(
+    "data-href",
+    "/launch",
+  );
 });
 
 test("give up requires confirmation and posts gave_up", async ({ page }) => {

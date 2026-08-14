@@ -33,8 +33,12 @@ result files an engineer would hand over. Output: per-item correctness
   neutralised across the sample.
 - **Baseline materials**: the study page shows the run's raw files in-page
   (parsed `benchmark_run.yaml`, the harness provenance log, paginated
-  `raw_outputs.jsonl`). No dashboard access exists during part 1; part 2 uses
-  the open-dashboard button. Time stays app-measured in both parts.
+  `raw_outputs.jsonl`). No dashboard access exists during part 1.
+- **Symmetric access**: in part 2, each question's button deep-links to the
+  view holding the answer (`?run=` summary, `?req=` requirement drawer,
+  `?details=1` harness log; T8 links to `/launch`). This mirrors the baseline
+  tabs: both conditions start one click from the right material, and a link
+  selects a view, never an answer. Time stays app-measured in both parts.
 - **The six pairs** (set A / set B): weakest vs second-weakest requirement;
   score + CI of a named requirement (two different targets); fallback
   benchmarks vs contributing benchmarks of a named requirement; count of

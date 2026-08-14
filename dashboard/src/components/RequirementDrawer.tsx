@@ -31,7 +31,11 @@ export function RequirementDrawer({ row, runId, token, onClose }: Props) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex justify-end bg-black/50" onClick={onClose}>
+    <div
+      data-testid="requirement-drawer"
+      className="fixed inset-0 z-50 flex justify-end bg-black/50"
+      onClick={onClose}
+    >
       <div
         className="h-full w-full max-w-lg overflow-y-auto border-l border-default bg-white p-4 text-xs"
         onClick={(e) => e.stopPropagation()}

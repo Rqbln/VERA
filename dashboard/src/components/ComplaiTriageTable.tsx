@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { RequirementRow } from "@/lib/types";
 import { RequirementDrawer } from "./RequirementDrawer";
 
@@ -17,11 +17,29 @@ interface Props {
   runId: string;
   token: string | undefined;
   artifactLinks?: Record<string, string>;
+  /** Deep link: open this requirement's drawer on arrival (?req=R02). */
+  initialReq?: string;
 }
 
-export function ComplaiTriageTable({ requirements, runId, token, artifactLinks }: Props) {
+export function ComplaiTriageTable({
+  requirements,
+  runId,
+  token,
+  artifactLinks,
+  initialReq,
+}: Props) {
   const [showAll, setShowAll] = useState(false);
   const [drawer, setDrawer] = useState<RequirementRow | null>(null);
+
+  useEffect(() => {
+    if (!initialReq) return;
+    const row = requirements.find((r) => r.id === initialReq);
+    if (row) {
+      setShowAll(true); // the target row may sit among the healthy ones
+      setDrawer(row);
+    }
+    // Re-run only when the deep-link target or the run's rows change.
+  }, [initialReq, requirements]);
 
   const visible = showAll
     ? requirements

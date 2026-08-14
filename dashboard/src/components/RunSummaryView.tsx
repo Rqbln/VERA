@@ -21,16 +21,20 @@ import { useEffect, useState } from "react";
 interface Props {
   lens: "compliance" | "cyber" | "ds";
   defaultRunId?: string;
+  /** Deep link: open this requirement's drawer on arrival (?req=R02). */
+  initialReq?: string;
+  /** Deep link: start with the run-details panel (harness log) expanded (?details=1). */
+  initialDetails?: boolean;
 }
 
-export function RunSummaryView({ lens, defaultRunId }: Props) {
+export function RunSummaryView({ lens, defaultRunId, initialReq, initialDetails }: Props) {
   const token = getToken();
   const t = useT();
   const [lifecycleFilter, setLifecycleFilter] = useState("");
   const [stageRail, setStageRail] = useState("inference");
   const [runId, setRunId] = useState<string | null>(defaultRunId || null);
   const [showAdvanced, setShowAdvanced] = useState(false);
-  const [showDetails, setShowDetails] = useState(false);
+  const [showDetails, setShowDetails] = useState(Boolean(initialDetails));
   const [trendReq, setTrendReq] = useState("R02");
   const [pdfError, setPdfError] = useState<string | null>(null);
 
@@ -94,6 +98,7 @@ export function RunSummaryView({ lens, defaultRunId }: Props) {
             runId={summary.run_id}
             token={token}
             artifactLinks={summary.artifacts}
+            initialReq={initialReq}
           />
           <NonMeasurableStrip slots={summary.non_measurable} runId={summary.run_id} />
 

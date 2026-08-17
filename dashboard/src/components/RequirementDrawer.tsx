@@ -17,16 +17,16 @@ export function RequirementDrawer({ row, runId, token, onClose }: Props) {
   const { data: raw } = useQuery({
     queryKey: ["raw-outputs", runId, benchmark],
     queryFn: () => getRawOutputs(token || "", runId, benchmark || ""),
-    enabled: !!benchmark && !!token,
+    // Guided mode carries no token; the read API accepts token-less calls.
+    enabled: !!benchmark,
   });
 
   async function openArtifact(kind: string) {
-    if (!token) return;
     try {
-      const { url } = await presignArtifact(token, runId, kind);
+      const { url } = await presignArtifact(token || "", runId, kind);
       window.open(url, "_blank");
     } catch {
-      /* presign may fail without MinIO */
+      /* presign 404s when the artifact file is absent */
     }
   }
 

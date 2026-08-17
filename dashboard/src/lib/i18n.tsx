@@ -182,7 +182,7 @@ const EN = {
     "In part two you answer six similar questions about the same evaluation, this time using the VERA dashboard. Open it with the button shown above each question.",
   "study.transition.continue": "Start part 2",
   "study.q1a.instruction": "Which requirement is the model weakest on?",
-  "study.q1b.instruction": "Which requirement is the model second weakest on?",
+  "study.q1b.instruction": "Which requirement is the model **second** weakest on?",
   "study.q2.instruction":
     "What are the score and the confidence interval of the requirement \u201c{name}\u201d?",
   "study.q3a.instruction": "Which checks ran in a degraded (fallback) mode?",
@@ -191,9 +191,9 @@ const EN = {
   "study.q4a.instruction": "How many requirements were evaluated in this run?",
   "study.q4b.instruction": "How many distinct benchmarks were executed in this run?",
   "study.q5a.instruction":
-    "How many requirements failed, how many are in fallback, how many are OK?",
+    "How many requirements failed, how many are in fallback, how many are OK? Count **requirements**, not benchmarks or test items.",
   "study.q5b.instruction":
-    "How many requirements fall in the red, orange and green score bands? (red below 0.40, orange from 0.40, green from 0.70)",
+    "How many requirements fall in the red, orange and green score bands? (red below 0.40, orange from 0.40, green from 0.70) Count **requirements**, not benchmarks or test items.",
   "study.q5b.red": "Red",
   "study.q5b.orange": "Orange",
   "study.q5b.green": "Green",
@@ -413,7 +413,7 @@ const FR: Record<Key, string> = {
     "Dans la seconde partie, vous répondez à six questions similaires sur la même évaluation, cette fois à l'aide du tableau de bord VERA. Ouvrez-le avec le bouton affiché au-dessus de chaque question.",
   "study.transition.continue": "Commencer la partie 2",
   "study.q1a.instruction": "Sur quelle exigence le modèle est-il le plus faible ?",
-  "study.q1b.instruction": "Sur quelle exigence le modèle est-il le deuxième plus faible ?",
+  "study.q1b.instruction": "Sur quelle exigence le modèle est-il le **deuxième** plus faible ?",
   "study.q2.instruction":
     "Quels sont le score et l'intervalle de confiance de l'exigence « {name} » ?",
   "study.q3a.instruction": "Quels contrôles ont tourné en mode dégradé (fallback) ?",
@@ -422,9 +422,9 @@ const FR: Record<Key, string> = {
   "study.q4a.instruction": "Combien d'exigences ont été évaluées dans ce run ?",
   "study.q4b.instruction": "Combien de benchmarks distincts ont été exécutés dans ce run ?",
   "study.q5a.instruction":
-    "Combien d'exigences sont en échec, combien en fallback, combien OK ?",
+    "Combien d'exigences sont en échec, combien en fallback, combien OK ? Comptez des **exigences**, pas des benchmarks ni des items de test.",
   "study.q5b.instruction":
-    "Combien d'exigences tombent dans les bandes rouge, orange et verte ? (rouge sous 0,40, orange à partir de 0,40, vert à partir de 0,70)",
+    "Combien d'exigences tombent dans les bandes rouge, orange et verte ? (rouge sous 0,40, orange à partir de 0,40, vert à partir de 0,70) Comptez des **exigences**, pas des benchmarks ni des items de test.",
   "study.q5b.red": "Rouge",
   "study.q5b.orange": "Orange",
   "study.q5b.green": "Verte",

@@ -384,7 +384,9 @@ export function StudyRunner() {
           </span>
         ) : null}
       </div>
-      <p className="mb-4 text-sm font-medium text-ink">{instructionFor(t, step)}</p>
+      <p className="mb-4 text-sm font-medium text-ink">
+        {renderEmphasis(instructionFor(t, step))}
+      </p>
 
       {!running ? (
         <button
@@ -462,6 +464,15 @@ function dashboardHref(step: Step, runId: string): string {
   }
   if (step.id === "Q3A" || step.id === "Q4B") return `${base}&details=1`;
   return base; // Q1*, Q4A, Q5*: hero gauge, coverage bar and triage table
+}
+
+/** Render "**segment**" markers in an instruction string as <strong>. */
+function renderEmphasis(text: string) {
+  const parts = text.split("**");
+  if (parts.length < 3) return text;
+  return parts.map((part, i) =>
+    i % 2 === 1 ? <strong key={i}>{part}</strong> : part,
+  );
 }
 
 function instructionFor(t: (k: string) => string, step: Step | undefined): string {

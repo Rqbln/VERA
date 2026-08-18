@@ -47,7 +47,7 @@
 \newif\ifstudydone
 \studydonetrue
 % Filled from `make study-export` output when the flag above is flipped.
-\newcommand{\studyN}{eight}
+\newcommand{\studyN}{ten}
 \newcommand{\studyCell}{\textit{--}}
 \providecommand{\repourl}{https://github.com/Rqbln/VERA}
 
@@ -82,8 +82,8 @@ We report a within-subject study run by the platform itself.
 Each participant answered six factual questions about a completed evaluation from its raw result files, then six matched questions on the dashboard.
 The application measured the time per question and validated every answer server-side against a snapshotted key.
 \ifstudydone
-On eight paired sessions, correctness rose from 18 to 32 answers out of 48 with the dashboard; six participants improved, two tied, none did worse (exact Wilcoxon p = .031).
-Median time per question fell from 56 to 29 seconds, a difference short of significance at this sample size (p = .078).
+On ten paired sessions, correctness rose from 27 to 42 answers out of 60 with the dashboard; seven participants improved, three tied, none did worse (exact Wilcoxon p = .016).
+Median time per question fell from 56 to 30 seconds, a difference short of significance at this sample size (p = .065).
 \fi
 The study module ships with the tool, so the measurement can be replayed on any deployment.
 \end{abstract}
@@ -372,10 +372,11 @@ The analysis script ships with the tool and emits the rows of the tables in \Cre
 \fi
 
 \subsection{Participants}
-Twenty-five sessions were opened, twelve reached the first question, and eight were completed end to end; \Cref{tab:participants} describes the eight completers.
-The panel is nearly homogeneous: seven completers are AI researchers of the institution, most of whom build models and have under two years of professional experience; the eighth reports a non-ML role and no AI experience.
-The server alternated the set assignment evenly, but attrition concentrated in one arm: seven completers saw set~$\alpha$ in the baseline phase and one saw set~$\beta$.
+Twenty-seven sessions were opened, twelve reached the first question, and ten were completed end to end; \Cref{tab:participants} describes the ten completers.
+The panel is nearly homogeneous: nine completers are AI researchers of the institution, most of whom build models and have under two years of professional experience; the tenth reports a non-ML role and no AI experience.
+The server alternated the set assignment evenly, but attrition concentrated in one arm: eight completers saw set~$\alpha$ in the baseline phase and two saw set~$\beta$.
 Both facts bound what the results can claim and are taken up in \Cref{sec:threats}.
+One completer's closing questionnaire is missing: a tunnel outage cut that session after its twelfth question, so the acceptance statistics below cover nine respondents.
 
 \begin{table}[t]
   \caption{Study participants (self-reported, fixed option lists; no free-text identity field).}
@@ -386,7 +387,7 @@ Both facts bound what the results can claim and are taken up in \Cref{sec:threat
     \toprule
     ID & Role & AI/ML experience & EU AI Act & Yrs & Tasks \\
     \midrule
-    % Emitted by scripts/analyze_user_study.py from data/user_study/ (2026-08-18).
+    % Emitted by scripts/analyze_user_study.py from data/user_study/ (2026-08-18, n=10).
     P1 & AI researcher & Builds models & Regular & $<$2 & 13/13 \\
     P3 & AI researcher & Builds models & Heard of it & $<$2 & 13/13 \\
     P15 & AI researcher & Builds models & Heard of it & $<$2 & 13/13 \\
@@ -395,19 +396,21 @@ Both facts bound what the results can claim and are taken up in \Cref{sec:threat
     P19 & AI researcher & Reviews models & Heard of it & $<$2 & 13/13 \\
     P21 & AI researcher & Builds models & Heard of it & 2--5 & 13/13 \\
     P25 & Other (non-ML) & Never worked with & None & $<$2 & 13/13 \\
+    P26 & AI researcher & Builds models & Working know. & $<$2 & 12/13 \\
+    P27 & AI researcher & Builds models & Heard of it & $<$2 & 13/13 \\
     \bottomrule
   \end{tabularx}
 \end{table}
 
 \subsection{RQ1: correctness by condition}
-Participants answered 18 of 48 questions correctly from the raw files and 32 of 48 on the dashboard (38\% versus 67\%).
-Six of the eight improved with the dashboard, two tied, and none did worse; the exact Wilcoxon signed-rank test on the paired counts gives p = .031.
+Participants answered 27 of 60 questions correctly from the raw files and 42 of 60 on the dashboard (45\% versus 70\%).
+Seven of the ten improved with the dashboard, three tied, and none did worse; the exact Wilcoxon signed-rank test on the paired counts gives p = .016.
 \Cref{tab:pairs} breaks the effect down by question pair and \Cref{tab:paired} by participant.
-The largest effect is pair 5: no participant could count the verdict bands from the raw files, and seven of eight could on the dashboard (exact McNemar p = .016), where the coloured bands make the classification visible instead of computable.
-Pair 4 is the one reversal, 5/8 against 2/8 in favour of the raw files: counting executed benchmarks is easier in a log that lists them line by line than in a view that aggregates them per requirement.
+The largest effect is pair 5: one participant of ten could count the verdict bands from the raw files, at a cost of 108 seconds, and nine of ten could on the dashboard in a fraction of that time (exact McNemar p = .008); the coloured bands make the classification visible instead of computable.
+Pair 4 is the one reversal, 7/10 against 3/10 in favour of the raw files: counting executed benchmarks is easier in a log that lists them line by line than in a view that aggregates them per requirement.
 We report it as measured; it shows the instrument does not mechanically favour the tool.
 One session, P25, was completed in a median of 8 seconds per question on the raw files and 3 on the dashboard, with seven give-ups; it ties at 1/6, is flagged by the straight-lining check, and no pre-registered rule allows excluding it.
-Removing it leaves the quality result unchanged (p = .031) and moves the time result from p = .078 to p = .109.
+Removing it leaves the quality result unchanged (p = .016) and moves the time result from p = .065 to p = .074.
 An audit note on pair 6 closes \Cref{sec:results}.
 
 \begin{table}[t]
@@ -419,23 +422,23 @@ An audit note on pair 6 closes \Cref{sec:results}.
     \toprule
     Pair & Question type & Raw files & Dashboard & p \\
     \midrule
-    % Emitted by scripts/analyze_user_study.py (2026-08-18).
-    1 & Rank a requirement by weakness & 2/8 & 7/8 & .062 \\
-    2 & Score and interval, named req. & 4/8 & 6/8 & .500 \\
-    3 & Benchmark provenance & 4/8 & 6/8 & .500 \\
-    4 & Count the coverage & 5/8 & 2/8 & .453 \\
-    5 & Band and verdict counts & 0/8 & 7/8 & .016 \\
-    6 & Reach a raw model output & 3/8 & 4/8 & 1.00 \\
+    % Emitted by scripts/analyze_user_study.py (2026-08-18, n=10).
+    1 & Rank a requirement by weakness & 3/10 & 8/10 & .125 \\
+    2 & Score and interval, named req. & 6/10 & 8/10 & .500 \\
+    3 & Benchmark provenance & 5/10 & 8/10 & .250 \\
+    4 & Count the coverage & 7/10 & 3/10 & .289 \\
+    5 & Band and verdict counts & 1/10 & 9/10 & .008 \\
+    6 & Reach a raw model output & 5/10 & 6/10 & 1.00 \\
     \bottomrule
   \end{tabularx}
 \end{table}
 
 \subsection{RQ2: time by condition}
-The median of the per-participant median times is 56 seconds per question on the raw files and 29 seconds on the dashboard.
-Six of eight participants were faster with the dashboard, one tied, one was slower; the exact Wilcoxon test gives p = .078, directionally consistent but short of significance at n = 8.
+The median of the per-participant median times is 56 seconds per question on the raw files and 30 seconds on the dashboard.
+Seven of ten participants were faster with the dashboard, one tied, two were slower; the exact Wilcoxon test gives p = .065, directionally consistent but short of significance at n = 10.
 The per-participant values sit in \Cref{tab:paired}; P25's times measure give-ups, not reading.
-The exceptions are informative: P21 tied at 50 seconds, and P3, the weakest genuine performer, gained correctness (0 to 2) but no speed.
-Conversely P15, the strongest baseline reader at 5/6 in both conditions, halved their time, from 60 to 30 seconds.
+The exceptions are informative: P21 tied at 50 seconds; P3, the weakest genuine performer, gained correctness (0 to 2) but no speed; P27 gained one correct answer for six extra seconds.
+Conversely the two strongest baseline readers, P15 and P26, tied on quality at 5/6 and nearly halved their time, one from each arm of the set assignment.
 Readers who succeed on raw files gain speed; readers who fail on them gain correctness.
 
 \begin{table}[t]
@@ -449,7 +452,7 @@ Readers who succeed on raw files gain speed; readers who fail on them gain corre
     \cmidrule(lr){2-3} \cmidrule(lr){4-5}
     ID & Raw & Dash. & Raw & Dash. \\
     \midrule
-    % Emitted by scripts/analyze_user_study.py (2026-08-18).
+    % Emitted by scripts/analyze_user_study.py (2026-08-18, n=10).
     P1 & 2 & 4 & 54 & 16 \\
     P3 & 0 & 2 & 57 & 78 \\
     P15 & 5 & 5 & 60 & 30 \\
@@ -458,22 +461,24 @@ Readers who succeed on raw files gain speed; readers who fail on them gain corre
     P19 & 2 & 5 & 104 & 51 \\
     P21 & 4 & 5 & 50 & 50 \\
     P25 & 1 & 1 & 8 & 3 \\
+    P26 & 5 & 5 & 66 & 38 \\
+    P27 & 4 & 5 & 24 & 30 \\
     \bottomrule
   \end{tabularx}
 \end{table}
 
 \subsection{RQ3: acceptance (secondary)}
 \Cref{tab:tam} reports the eight perception statements.
-Perceived usefulness averages 4.28 of 5 (Cronbach's $\alpha$ = .87, n = 8) and perceived ease of use 3.91 ($\alpha$ = .58, indicative only at this size).
-The two lowest items are finding the information (3.75) and learning effort (3.62), which matches the behavioural record: the dashboard errors we observed were lookup slips, not reading failures.
-The participant with the lowest usefulness ratings is the strongest baseline reader, who tied on quality; the perception tracks the experienced benefit.
-Two respondents answered every item identically and are flagged by the straight-lining check; excluding both moves the construct means by at most 0.20.
+Perceived usefulness averages 4.36 of 5 (Cronbach's $\alpha$ = .88, n = 9) and perceived ease of use 4.00 ($\alpha$ = .62, indicative only at this size).
+The two lowest items are learning effort (3.78) and finding the information (3.89), which matches the behavioural record: the dashboard errors we observed were lookup slips, not reading failures.
+The participant with the lowest usefulness ratings is among the strongest baseline readers, who tied on quality; the perception tracks the experienced benefit.
+Two respondents answered every item identically and are flagged by the straight-lining check; excluding both moves the construct means by at most 0.14.
 These are perceptions, collected after both phases; they complement the behavioural measures above and do not replace them.
 
 \subsection{Audit note on pair 6}
 Pair 6 answers are free-text excerpts, recorded as unverified and audited manually against the run's raw outputs, per protocol.
 The audit found five genuine excerpts submitted without the confirmation checkbox, which the server rule therefore scored as incorrect.
-Under a written audit rule that accepts a genuine excerpt regardless of the checkbox, pair 6 reads 6/8 in both conditions instead of 3/8 versus 4/8.
+Under a written audit rule that accepts a genuine excerpt regardless of the checkbox, pair 6 reads 8/10 in both conditions instead of 5/10 versus 6/10.
 The primary tables keep the stricter server rule; either reading leaves the RQ1 conclusion unchanged.
 
 \begin{table}[t]
@@ -485,17 +490,17 @@ The primary tables keep the stricter server rule; either reading leaves the RQ1 
     \toprule
     Item & Statement (abridged) & Mean & SD & Mdn \\
     \midrule
-    PU1 & Faster evaluation & 4.25 & 0.89 & 4 \\
-    PU2 & Understand failures & 4.25 & 1.04 & 4 \\
-    PU3 & Justify a decision & 4.12 & 0.99 & 4 \\
-    PU4 & Better evaluation quality & 4.50 & 0.53 & 4 \\
-    \multicolumn{2}{@{}l}{\textbf{Perceived usefulness}} & 4.28 & 0.75 & 4.38 \\
+    PU1 & Faster evaluation & 4.33 & 0.87 & 5 \\
+    PU2 & Understand failures & 4.33 & 1.00 & 5 \\
+    PU3 & Justify a decision & 4.22 & 0.97 & 5 \\
+    PU4 & Better evaluation quality & 4.56 & 0.53 & 5 \\
+    \multicolumn{2}{@{}l}{\textbf{Perceived usefulness}} & 4.36 & 0.74 & 4.50 \\
     \midrule
-    PEOU1 & Clear interface & 4.25 & 0.46 & 4 \\
-    PEOU2 & Found information & 3.75 & 0.71 & 4 \\
-    PEOU3 & Launch a run alone & 4.00 & 1.31 & 4 \\
-    PEOU4 & Little learning effort & 3.62 & 1.19 & 4 \\
-    \multicolumn{2}{@{}l}{\textbf{Perceived ease of use}} & 3.91 & 0.65 & 3.88 \\
+    PEOU1 & Clear interface & 4.22 & 0.44 & 4 \\
+    PEOU2 & Found information & 3.89 & 0.78 & 4 \\
+    PEOU3 & Launch a run alone & 4.11 & 1.27 & 4 \\
+    PEOU4 & Little learning effort & 3.78 & 1.20 & 4 \\
+    \multicolumn{2}{@{}l}{\textbf{Perceived ease of use}} & 4.00 & 0.67 & 4.00 \\
     \bottomrule
   \end{tabularx}
 \end{table}
@@ -528,7 +533,7 @@ The two sets are matched by question type, not proven equally hard; the arm alte
 The acceptance items are perceptions and are reported as secondary.
 
 \paragraph{Internal}
-Attrition weakened the set counterbalance: assignment alternated evenly, but seven of the eight completers carried the same arm, so set and condition are nearly confounded in the analysed sample.
+Attrition weakened the set counterbalance: assignment alternated evenly, but eight of the ten completers carried the same arm, so set and condition remain largely confounded in the analysed sample; the strongest-reader pattern replicating in both arms mitigates, without removing, this concern.
 The matched-by-construction argument, not the counterbalance, carries the set-difficulty control at this n.
 The condition order is fixed, baseline first.
 Any residual learning therefore inflates the dashboard, which we accept and declare rather than counterbalance, and the matched sets remove the content component of that learning.
@@ -536,7 +541,7 @@ Nothing technically prevents a participant from opening the dashboard in another
 Timing uses a client-side monotonic clock, which a mid-question reload restarts; the server timestamps reveal such cases.
 
 \paragraph{External}
-The realised panel is narrower than targeted: seven of eight completers are AI researchers of one institution, most with under two years of experience, not the compliance and risk owners the tool ultimately targets.
+The realised panel is narrower than targeted: nine of ten completers are AI researchers of one institution, most with under two years of experience, not the compliance and risk owners the tool ultimately targets.
 For the reading tasks this population is, if anything, adversarial to the hypothesis, since raw benchmark files are their native format; a gap in their favour of the dashboard is unlikely to shrink in a less technical population.
 The study exercises one preloaded run on one model family.
 Results speak to whether the dashboard changes what a reader extracts, not to whether it changes a sign-off decision.

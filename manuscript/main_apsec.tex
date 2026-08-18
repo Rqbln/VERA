@@ -45,14 +45,10 @@
 % scripts/analyze_user_study.py --quiz has produced the numbers. The \else
 % branch keeps the paper compiling with visible placeholders in the meantime.
 \newif\ifstudydone
-\studydonefalse
+\studydonetrue
 % Filled from `make study-export` output when the flag above is flipped.
-\newcommand{\studyN}{N}
+\newcommand{\studyN}{eight}
 \newcommand{\studyCell}{\textit{--}}
-\newcommand{\studyParticipantRows}{}
-\newcommand{\studyPairRows}{}
-\newcommand{\studyPairedRows}{}
-
 \providecommand{\repourl}{https://github.com/Rqbln/VERA}
 
 \begin{document}
@@ -86,7 +82,8 @@ We report a within-subject study run by the platform itself.
 Each participant answered six factual questions about a completed evaluation from its raw result files, then six matched questions on the dashboard.
 The application measured the time per question and validated every answer server-side against a snapshotted key.
 \ifstudydone
-With the dashboard, participants answered more questions correctly and took less time, on \studyN{} paired sessions.
+On eight paired sessions, correctness rose from 18 to 32 answers out of 48 with the dashboard; six participants improved, two tied, none did worse (exact Wilcoxon p = .031).
+Median time per question fell from 56 to 29 seconds, a difference short of significance at this sample size (p = .078).
 \fi
 The study module ships with the tool, so the measurement can be replayed on any deployment.
 \end{abstract}
@@ -375,7 +372,10 @@ The analysis script ships with the tool and emits the rows of the tables in \Cre
 \fi
 
 \subsection{Participants}
-\Cref{tab:participants} describes the panel: role, experience with AI/ML models, familiarity with the EU AI Act, years of professional experience, and tasks submitted.
+Twenty-five sessions were opened, twelve reached the first question, and eight were completed end to end; \Cref{tab:participants} describes the eight completers.
+The panel is nearly homogeneous: seven completers are AI researchers of the institution, most of whom build models and have under two years of professional experience; the eighth reports a non-ML role and no AI experience.
+The server alternated the set assignment evenly, but attrition concentrated in one arm: seven completers saw set~$\alpha$ in the baseline phase and one saw set~$\beta$.
+Both facts bound what the results can claim and are taken up in \Cref{sec:threats}.
 
 \begin{table}[t]
   \caption{Study participants (self-reported, fixed option lists; no free-text identity field).}
@@ -386,21 +386,29 @@ The analysis script ships with the tool and emits the rows of the tables in \Cre
     \toprule
     ID & Role & AI/ML experience & EU AI Act & Yrs & Tasks \\
     \midrule
-    \ifstudydone
-    \studyParticipantRows{}
-    \else
-    P1 & \studyCell{} & \studyCell{} & \studyCell{} & \studyCell{} & \studyCell{} \\
-    \fi
+    % Emitted by scripts/analyze_user_study.py from data/user_study/ (2026-08-18).
+    P1 & AI researcher & Builds models & Regular & $<$2 & 13/13 \\
+    P3 & AI researcher & Builds models & Heard of it & $<$2 & 13/13 \\
+    P15 & AI researcher & Builds models & Heard of it & $<$2 & 13/13 \\
+    P16 & AI researcher & Builds models & Working know. & $<$2 & 13/13 \\
+    P17 & AI researcher & Builds models & Heard of it & $<$2 & 13/13 \\
+    P19 & AI researcher & Reviews models & Heard of it & $<$2 & 13/13 \\
+    P21 & AI researcher & Builds models & Heard of it & 2--5 & 13/13 \\
+    P25 & Other (non-ML) & Never worked with & None & $<$2 & 13/13 \\
     \bottomrule
   \end{tabularx}
 \end{table}
 
 \subsection{RQ1: correctness by condition}
-\Cref{tab:pairs} reports, per question pair, how many participants answered correctly in each condition, with the exact McNemar p-value on the discordant pairs.
-\Cref{tab:paired} reports the per-participant paired counts.
-\ifstudydone
-The exact Wilcoxon signed-rank test on the paired per-participant counts is reported with the table.
-\fi
+Participants answered 18 of 48 questions correctly from the raw files and 32 of 48 on the dashboard (38\% versus 67\%).
+Six of the eight improved with the dashboard, two tied, and none did worse; the exact Wilcoxon signed-rank test on the paired counts gives p = .031.
+\Cref{tab:pairs} breaks the effect down by question pair and \Cref{tab:paired} by participant.
+The largest effect is pair 5: no participant could count the verdict bands from the raw files, and seven of eight could on the dashboard (exact McNemar p = .016), where the coloured bands make the classification visible instead of computable.
+Pair 4 is the one reversal, 5/8 against 2/8 in favour of the raw files: counting executed benchmarks is easier in a log that lists them line by line than in a view that aggregates them per requirement.
+We report it as measured; it shows the instrument does not mechanically favour the tool.
+One session, P25, was completed in a median of 8 seconds per question on the raw files and 3 on the dashboard, with seven give-ups; it ties at 1/6, is flagged by the straight-lining check, and no pre-registered rule allows excluding it.
+Removing it leaves the quality result unchanged (p = .031) and moves the time result from p = .078 to p = .109.
+An audit note on pair 6 closes \Cref{sec:results}.
 
 \begin{table}[t]
   \caption{Correct answers per question pair and condition. p is the exact two-sided McNemar test on the discordant pairs.}
@@ -411,25 +419,24 @@ The exact Wilcoxon signed-rank test on the paired per-participant counts is repo
     \toprule
     Pair & Question type & Raw files & Dashboard & p \\
     \midrule
-    \ifstudydone
-    \studyPairRows{}
-    \else
-    1 & Rank a requirement by weakness & \studyCell{} & \studyCell{} & \studyCell{} \\
-    2 & Score and interval, named req. & \studyCell{} & \studyCell{} & \studyCell{} \\
-    3 & Benchmark provenance & \studyCell{} & \studyCell{} & \studyCell{} \\
-    4 & Count the coverage & \studyCell{} & \studyCell{} & \studyCell{} \\
-    5 & Band and verdict counts & \studyCell{} & \studyCell{} & \studyCell{} \\
-    6 & Reach a raw model output & \studyCell{} & \studyCell{} & \studyCell{} \\
-    \fi
+    % Emitted by scripts/analyze_user_study.py (2026-08-18).
+    1 & Rank a requirement by weakness & 2/8 & 7/8 & .062 \\
+    2 & Score and interval, named req. & 4/8 & 6/8 & .500 \\
+    3 & Benchmark provenance & 4/8 & 6/8 & .500 \\
+    4 & Count the coverage & 5/8 & 2/8 & .453 \\
+    5 & Band and verdict counts & 0/8 & 7/8 & .016 \\
+    6 & Reach a raw model output & 3/8 & 4/8 & 1.00 \\
     \bottomrule
   \end{tabularx}
 \end{table}
 
 \subsection{RQ2: time by condition}
-\Cref{tab:paired} also reports each participant's median time per question in both conditions.
-\ifstudydone
-The exact Wilcoxon signed-rank test on the paired time deltas is reported with the table.
-\fi
+The median of the per-participant median times is 56 seconds per question on the raw files and 29 seconds on the dashboard.
+Six of eight participants were faster with the dashboard, one tied, one was slower; the exact Wilcoxon test gives p = .078, directionally consistent but short of significance at n = 8.
+The per-participant values sit in \Cref{tab:paired}; P25's times measure give-ups, not reading.
+The exceptions are informative: P21 tied at 50 seconds, and P3, the weakest genuine performer, gained correctness (0 to 2) but no speed.
+Conversely P15, the strongest baseline reader at 5/6 in both conditions, halved their time, from 60 to 30 seconds.
+Readers who succeed on raw files gain speed; readers who fail on them gain correctness.
 
 \begin{table}[t]
   \caption{Per-participant paired results: correct answers out of six and median seconds per question, in each condition. A give-up or timeout counts as incorrect and censors its pair for time.}
@@ -442,18 +449,32 @@ The exact Wilcoxon signed-rank test on the paired time deltas is reported with t
     \cmidrule(lr){2-3} \cmidrule(lr){4-5}
     ID & Raw & Dash. & Raw & Dash. \\
     \midrule
-    \ifstudydone
-    \studyPairedRows{}
-    \else
-    P1 & \studyCell{} & \studyCell{} & \studyCell{} & \studyCell{} \\
-    \fi
+    % Emitted by scripts/analyze_user_study.py (2026-08-18).
+    P1 & 2 & 4 & 54 & 16 \\
+    P3 & 0 & 2 & 57 & 78 \\
+    P15 & 5 & 5 & 60 & 30 \\
+    P16 & 0 & 5 & 34 & 15 \\
+    P17 & 4 & 5 & 113 & 28 \\
+    P19 & 2 & 5 & 104 & 51 \\
+    P21 & 4 & 5 & 50 & 50 \\
+    P25 & 1 & 1 & 8 & 3 \\
     \bottomrule
   \end{tabularx}
 \end{table}
 
 \subsection{RQ3: acceptance (secondary)}
 \Cref{tab:tam} reports the eight perception statements.
+Perceived usefulness averages 4.28 of 5 (Cronbach's $\alpha$ = .87, n = 8) and perceived ease of use 3.91 ($\alpha$ = .58, indicative only at this size).
+The two lowest items are finding the information (3.75) and learning effort (3.62), which matches the behavioural record: the dashboard errors we observed were lookup slips, not reading failures.
+The participant with the lowest usefulness ratings is the strongest baseline reader, who tied on quality; the perception tracks the experienced benefit.
+Two respondents answered every item identically and are flagged by the straight-lining check; excluding both moves the construct means by at most 0.20.
 These are perceptions, collected after both phases; they complement the behavioural measures above and do not replace them.
+
+\subsection{Audit note on pair 6}
+Pair 6 answers are free-text excerpts, recorded as unverified and audited manually against the run's raw outputs, per protocol.
+The audit found five genuine excerpts submitted without the confirmation checkbox, which the server rule therefore scored as incorrect.
+Under a written audit rule that accepts a genuine excerpt regardless of the checkbox, pair 6 reads 6/8 in both conditions instead of 3/8 versus 4/8.
+The primary tables keep the stricter server rule; either reading leaves the RQ1 conclusion unchanged.
 
 \begin{table}[t]
   \caption{Technology acceptance (5-point Likert, 1 strongly disagree to 5 strongly agree). A secondary perception measure; internal-consistency estimates are indicative at this sample size.}
@@ -464,17 +485,17 @@ These are perceptions, collected after both phases; they complement the behaviou
     \toprule
     Item & Statement (abridged) & Mean & SD & Mdn \\
     \midrule
-    PU1 & Faster evaluation & \studyCell{} & \studyCell{} & \studyCell{} \\
-    PU2 & Understand failures & \studyCell{} & \studyCell{} & \studyCell{} \\
-    PU3 & Justify a decision & \studyCell{} & \studyCell{} & \studyCell{} \\
-    PU4 & Better evaluation quality & \studyCell{} & \studyCell{} & \studyCell{} \\
-    \multicolumn{2}{@{}l}{\textbf{Perceived usefulness}} & \studyCell{} & \studyCell{} & \studyCell{} \\
+    PU1 & Faster evaluation & 4.25 & 0.89 & 4 \\
+    PU2 & Understand failures & 4.25 & 1.04 & 4 \\
+    PU3 & Justify a decision & 4.12 & 0.99 & 4 \\
+    PU4 & Better evaluation quality & 4.50 & 0.53 & 4 \\
+    \multicolumn{2}{@{}l}{\textbf{Perceived usefulness}} & 4.28 & 0.75 & 4.38 \\
     \midrule
-    PEOU1 & Clear interface & \studyCell{} & \studyCell{} & \studyCell{} \\
-    PEOU2 & Found information & \studyCell{} & \studyCell{} & \studyCell{} \\
-    PEOU3 & Launch a run alone & \studyCell{} & \studyCell{} & \studyCell{} \\
-    PEOU4 & Little learning effort & \studyCell{} & \studyCell{} & \studyCell{} \\
-    \multicolumn{2}{@{}l}{\textbf{Perceived ease of use}} & \studyCell{} & \studyCell{} & \studyCell{} \\
+    PEOU1 & Clear interface & 4.25 & 0.46 & 4 \\
+    PEOU2 & Found information & 3.75 & 0.71 & 4 \\
+    PEOU3 & Launch a run alone & 4.00 & 1.31 & 4 \\
+    PEOU4 & Little learning effort & 3.62 & 1.19 & 4 \\
+    \multicolumn{2}{@{}l}{\textbf{Perceived ease of use}} & 3.91 & 0.65 & 3.88 \\
     \bottomrule
   \end{tabularx}
 \end{table}
@@ -507,13 +528,16 @@ The two sets are matched by question type, not proven equally hard; the arm alte
 The acceptance items are perceptions and are reported as secondary.
 
 \paragraph{Internal}
+Attrition weakened the set counterbalance: assignment alternated evenly, but seven of the eight completers carried the same arm, so set and condition are nearly confounded in the analysed sample.
+The matched-by-construction argument, not the counterbalance, carries the set-difficulty control at this n.
 The condition order is fixed, baseline first.
 Any residual learning therefore inflates the dashboard, which we accept and declare rather than counterbalance, and the matched sets remove the content component of that learning.
 Nothing technically prevents a participant from opening the dashboard in another tab during the baseline phase; the page shows no link to it and the instructions forbid it.
 Timing uses a client-side monotonic clock, which a mid-question reload restarts; the server timestamps reveal such cases.
 
 \paragraph{External}
-Participants are researchers, data scientists and adjacent profiles of one institution, not the compliance and risk owners the tool ultimately targets.
+The realised panel is narrower than targeted: seven of eight completers are AI researchers of one institution, most with under two years of experience, not the compliance and risk owners the tool ultimately targets.
+For the reading tasks this population is, if anything, adversarial to the hypothesis, since raw benchmark files are their native format; a gap in their favour of the dashboard is unlikely to shrink in a less technical population.
 The study exercises one preloaded run on one model family.
 Results speak to whether the dashboard changes what a reader extracts, not to whether it changes a sign-off decision.
 

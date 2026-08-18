@@ -189,7 +189,7 @@ def latex_profile_rows(profiles: list[dict[str, str]]) -> list[str]:
         f"& {AIEXP_LABEL.get(p['ai_experience'], p['ai_experience'])} "
         f"& {AIACT_LABEL.get(p['aiact_familiarity'], p['aiact_familiarity'])} "
         f"& {SENIORITY_LABEL.get(p['seniority'], p['seniority'])} "
-        f"& {p['tasks_submitted']}/8 \\\\"
+        f"& {p['tasks_submitted']}/13 \\\\"
         for p in profiles
     ]
 

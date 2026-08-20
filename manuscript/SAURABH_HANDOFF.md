@@ -122,6 +122,36 @@ note). **Headline for the caption:** Gemma's n=10 cyber zero becomes 0.375 [.355
 at n=150 — a resolution artefact, not a property of the model; no model reaches green;
 Qwen's TF is stable across n (58.9 at both budgets).
 
+### 14b. Known public values vs this run — the gap, stated
+
+The R06 aggregate hides saturated components. Per-benchmark means at n=150, against the
+figures the model cards report (approximate; shot settings differ between cards, which
+is itself part of the gap):
+
+| Benchmark | Llama 3.1 8B | Qwen2.5 7B | Gemma 2 9B | Mistral 7B | Public (card, ≈) |
+|---|---|---|---|---|---|
+| mmlu | **1.000** | **1.000** | **1.000** | 0.500 | 0.69 / 0.74 / 0.71 / 0.60 |
+| gsm8k | **0.000** | **0.000** | **0.000** | **0.000** | 0.84 / 0.85 / 0.69 / 0.40 |
+| humaneval | 1.000 | 1.000 | **1.000** | **1.000** | 0.73 / 0.85 / 0.40 / 0.29 |
+| truthfulqa | 1.000 | 1.000 | 1.000 | 1.000 | — (metric not comparable) |
+| bbh | 1.000 | 1.000 | 1.000 | 1.000 | 0.5–0.7 range |
+
+**Reading.** These are not leaderboard reproductions and must not be presented as such.
+Three protocol causes, all documented rather than masked (this was the agreed guardrail):
+(1) the no-logprob serving path scores capability items through judge/parse heuristics
+that saturate toward 0/1 instead of grading; (2) prompt format differs from the cards
+(no few-shot); (3) gsm8k at 0.000 for all four models — including Qwen, publicly ≈0.85 —
+is an answer-parser mismatch with chain-of-thought outputs, not a model property.
+Direction is inconsistent too (Gemma's humaneval: ours 1.00, card ≈0.40), so no
+correction factor exists.
+
+**Recommendation for the paper.** Present R06 as an internal-harness score that supports
+cross-model comparison *within this protocol only*, or drop the capability row from the
+claims entirely; never write that the values are consistent with public scores. If the
+paper keeps R06, one sentence naming the three causes above is the honest form. Note the
+Trust Factor is untouched by this: {R01, R02, R05, R12} contains no capability
+benchmark.
+
 ### 15. Constant calibration row (0.90)
 **ANSWER (one clause):** the value is a property of the confidence-binning procedure at
 this sampling budget, not of the models. (With the reduced table the row can also

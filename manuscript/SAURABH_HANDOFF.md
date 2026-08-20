@@ -7,8 +7,8 @@ Each section is stamped when it lands. Regeneration commands are at the bottom.
 
 | Model | Status | Duration |
 |---|---|---|
-| ollama/llama3.1:8b-instruct-q8_0 | ⏳ queued | — |
-| ollama/qwen2.5:7b | ⏳ queued | — |
+| ollama/llama3.1:8b-instruct-q8_0 | ✅ completed | 85 min |
+| ollama/qwen2.5:7b | ⏳ running | — |
 | ollama/gemma2:9b | ⏳ queued | — |
 | ollama/mistral:7b | ⏳ queued | — |
 
@@ -99,6 +99,26 @@ conservative lower bound, not a straw man. Recommend saying exactly this in the 
 ## n=150 results
 
 *(one subsection per model, appended as each run completes)*
+
+### Llama 3.1 8B (instruct-q8_0) — completed 2026-08-20, 85 min wall
+
+| Req | Score | CI 95% |
+|---|---|---|
+| R01 Robustness | 1.000 | [1.000, 1.000] — heuristic probe, fallback-flagged |
+| R02 Cyber resilience | 0.375 | [0.355, 0.395] |
+| R05 Privacy | 0.728 | [0.728, 0.728] — corpus scan, model-independent |
+| R06 Capabilities | 0.800 | [0.800, 0.800] |
+| R12 Toxicity | 0.750 | [0.750, 0.750] |
+
+**Trust Factor 66.4, orange** — recomputed from the formula
+(100·[0.20·1.000 + 0.35·0.375 + 0.20·0.728 + 0.25·0.750] = 66.4) and it matches the
+stored value exactly: this is the worked example for the aggregation subsection.
+**Energy**: 0.0169 kWh, 0.95 gCO₂e, region FR, `source=codecarbon`. **15 benchmarks**
+executed for the 5 requirements (the runtime registry maps more benchmarks per
+requirement than the 7 initially estimated; R06 alone runs mmlu/gsm8k/humaneval/
+truthfulqa/bbh). Caveats to carry into the caption: R01 saturates at 1.0 even at n=150
+under the heuristic probe; several R06 benchmark means are extreme (mmlu 1.0, gsm8k
+0.0) — report as measured, claim no public-leaderboard consistency.
 
 ## Open items that only Robin can fill
 

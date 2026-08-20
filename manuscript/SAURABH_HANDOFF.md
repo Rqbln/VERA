@@ -1,234 +1,194 @@
-# SEIP regeneration pack — living document
+# SEIP data pack — answers to the annotated TODOs, in document order
 
-This file is built incrementally while the n=150 benchmark runs execute.
-Each section is stamped when it lands. Regeneration commands are at the bottom.
+Companion to your annotated `main_apsec.tex`. **The tex file is untouched**: every
+answer below is keyed to your own note, in the order the notes appear in the document,
+ready to paste. Counts: the draft carries **53 `\todo{}` markers on 42 lines**. This
+pack **answers 29 of them with measured data**; **17 are prose calls that stay yours**;
+**7 are items only Robin can supply** (some markers count twice when a note asks for
+both data and a rewrite).
 
-## Run status
+Data provenance: a refreshed evaluation run on four open-weight models of comparable
+size (Llama 3.1 8B instruct-q8_0, Qwen2.5 7B, Gemma 2 9B, Mistral 7B), **150 items per
+benchmark, seed 42**, executed 2026-08-20 on an Apple M4 Max (36 GB): 85 + 66 + 79 + 68
+minutes = **4 h 58 total**. Plus the final user-study exports (10 completers). JSONs in
+`manuscript/results/` (`paper_results_n150_*.json`, merged `paper_results_multi.json`;
+the old n=10 panel is preserved as `paper_results_multi_n10.json`).
 
-| Model | Status | Duration |
-|---|---|---|
-| ollama/llama3.1:8b-instruct-q8_0 | ✅ completed | 85 min |
-| ollama/qwen2.5:7b | ✅ completed | 66 min |
-| ollama/gemma2:9b | ✅ completed | 79 min |
-| ollama/mistral:7b | ✅ completed | 68 min |
+---
 
-**Scope of the refreshed runs (decision record).** Five requirements, seven benchmarks:
-R01 (mmlu_robust, boolq_contrast), R02 (advbench, decoding_trust_cyber), R05
-(privacy_leakage, corpus stage), R06 (mmlu), R12 (realtoxicityprompts). Rationale:
-{R01, R02, R05, R12} is exactly the Trust Factor's security-critical set (weights
-0.20/0.35/0.20/0.25), so the refreshed table can recompute the gauge end to end; R06
-adds the one score every reader can anchor (MMLU). Cut, each with one stated reason:
-CR07 (constant 0.90 — a property of the confidence-binning procedure, not of models),
-CR09 (0 for every open-weight model, no watermark), CR03/CR04 (corpus scans, identical
-across models by construction; R05 already illustrates the corpus stage), CR08/CR10/CR11
-(discriminating but required by no reviewer note). n=150 per benchmark, seed 42;
-per-benchmark effective n reported after the runs (some suites may cap below 150).
+## The notes, one by one, in document order
 
-**Execution note (2026-08-20):** `VERA_REQUIRE_NATIVE` is NOT set for these runs. R01's
-native harness needs token log-probabilities, which the Ollama serving path does not
-expose (vLLM would); R01 therefore runs its documented heuristic probe and carries an
-explicit fallback flag, exactly as in the July n=10 panel and as the tool's provenance
-feature reports. The refreshed table must show that flag on R01 rather than hide it.
+### 1. Introduction — the reviewer anecdote (`\todo{v}`, `\todo{n}` ×3 + note)
+**→ ROBIN.** The score, the minutes and the log length must come from the internal
+review record. If no single case can be reconstructed, use your own fallback wording
+("the typical time to answer one such question…").
 
-## Formulas (verified in code — ready now, 2026-08-20)
+### 2. Related-work table — tool versions and access dates
+**→ YOURS (prose).** No measurement involved; record version + access date per row.
 
-**Level 1 — benchmark → requirement** (`src/vera/benchmarks/catalog.py`): each requirement
-R aggregates its contributing benchmarks by weighted mean, s_R = Σ w_b·m_b with w_b ≥ 0,
-Σ w_b = 1, weights from the signed catalog (SHA-256 digest pinned per run). A benchmark
-with no catalog weight is excluded, never silently defaulted.
+### 3. Requirements section — one reference per requirement
+**→ YOURS (prose).** The bibliography now contains Wohlin et al. 2012 and
+Ko/LaToza/Burnett 2015 if you want them among the anchors.
 
-**Level 2 — Trust Factor** (`src/vera/governance/trust_factor.py`): renormalised weighted
-mean over the security-critical subset S = {R01, R02, R05, R12}, default weights
-R01=0.20, R02=0.35, R05=0.20, R12=0.25 (overridable via `VERA_TRUST_FACTOR_WEIGHTS`),
-scaled to 0–100. Bands: red < 0.40 ≤ orange < 0.70 ≤ green. Reproduced example
-(Llama 3.1 8B, n=10 archive): 0.35·0.50 + 0.25·0.75 + 0.20·0.728 + 0.20·1.00 = 0.708 →
-70.8, green — matches the stored value exactly.
+### 4. Trust Factor aggregation (the requirement-level formula)
+**ANSWER (verified in `src/vera/governance/trust_factor.py`):** the Trust Factor is the
+weighted mean of the security-critical subset {R01 robustness, R02 cyber, R05 privacy,
+R12 toxicity}, renormalised over the requirements present, scaled to 0–100. Default
+weights: **R02 = 0.35, R12 = 0.25, R05 = 0.20, R01 = 0.20**, overridable via
+`VERA_TRUST_FACTOR_WEIGHTS` and recorded per run. Bands: red < 0.40 ≤ orange < 0.70 ≤
+green. Worked example on the refreshed Llama run:
+`100·(0.20·1.000 + 0.35·0.375 + 0.20·0.728 + 0.25·0.750) = 66.4` — equals the stored
+value exactly (all four models verified the same way).
 
-**COMPL-AI baseline for §Background** (verified against arXiv:2410.07959): COMPL-AI
-aggregates each requirement by a simple unweighted mean — the special case w_b = 1/|B_R|.
-VERA's delta: it makes the weighting explicit, versioned and signed, where COMPL-AI fixes
-it implicitly. (The verdict-sensitivity analysis stays out of this paper.)
+### 5. Pin the browser suite to a commit and date
+**ANSWER:** at commit `8a71cf3` (August 20, 2026): **178 backend unit tests, 52 browser
+scenarios** (counted by `pytest --collect-only` and `playwright test --list`).
 
-## User-study extractions (ready now, 2026-08-20; n = 10 completers)
+### 6. F×R mapping — mark partial cells
+**→ YOURS (prose).** Design judgement, no data involved.
 
-**Pairs surviving time-censoring per participant** (fills the new column of the paired
-table): P1 6/6 · P3 4/6 · P15 6/6 · P16 5/6 · P17 6/6 · P19 6/6 · P21 6/6 · P25 2/6 ·
-P26 6/6 · P27 6/6. **No question hit the five-minute cap in either condition**; the 10
-give-ups (P25 ×7, P3 ×2, P16 ×1) are explicit give-ups, not timeouts.
+### 7. Energy figures (`\todo{v}` kWh, `\todo{v}` kgCO₂e + method note)
+**ANSWER:** the refreshed 8B run (five requirements, fifteen benchmarks) reports
+**0.0169 kWh and 0.00095 kgCO₂e** — CodeCarbon **3.2.8**, online mode (live
+grid-intensity API), French grid factor, `energy.source == "codecarbon"` verified in
+the JSON for all four models. Full column: Llama 0.0169 · Qwen 0.0134 · Gemma 0.0156 ·
+Mistral 0.0139 kWh. ⚠️ Wording: the measured set is the five-requirement table, not
+"a full requirement set" — phrase accordingly.
 
-**Drop-out phases of the four partial sessions** (all four dropped during or at the end
-of the baseline phase — the conservative direction, biasing the sample toward people who
-can read raw files): P2 and P18 stopped after baseline question 1; P20 and P24 completed
-all six baseline questions and stopped at the transition screen, before seeing the
-dashboard phase at all.
+### 8. Energy-claim uniqueness check against other Act-oriented tools
+**→ YOURS (prose check).** COMPL-AI's published interpretation collects training-time
+resources through a form; none of the tools in the related-work table measures the
+evaluation run itself. Verify before the claim goes in.
 
-**Server-timestamp sanity channel**: 10 of 128 submissions differ from the client clock
-by more than 2 s. Two are consistent with a mid-question page reload (P2 Q1B: 74 s client
-vs 135 s server; P3 Q1A: 99 vs 137), both in the baseline phase; the remaining eight are
-≤ 10 s and consistent with tunnel transport latency (P24's session shows a systematic
-~5 s offset).
+### 9. Corpus size and the two fallbacks against the refreshed run
+**ANSWER:** the corpus holds **230 documents** (`config.corpus_docs` in the merged
+JSON). Both recorded fallbacks reproduce at n=150: no token log-probabilities on the
+Ollama path (R01's native harness needs a vLLM backend, so the heuristic probe runs
+fallback-flagged), and the Apple-Silicon adversarial-probe fallback.
 
-**Bonus launch task T8** (only direct evidence for R1): 9 of 10 completers reached it
-(P26's session was cut by a tunnel outage before T8). 5 of 9 launched a run successfully
-at first attempt, median 55 s among successes (22–180 s). Of the four others: one hit
-the five-minute cap, two gave up within seconds, one pasted the wrong page's address.
+### 10. HISTREE anchoring + Ko/LaToza/Burnett
+**→ YOURS (prose).** The `ko2015practical` BibTeX entry is already in `references.bib`.
 
-**Ethics/pre-registration**: no pre-registration exists; the honest sentence stays. No
-personal data was collected (server-assigned codes, closed lists); ethics-body status is
-Robin's item below.
-
-## Study run specification (tab:runspec — ready now, 2026-08-20)
-
-The run participants read (pinned via `VERA_STUDY_RUN_ID`, answer key snapshotted at
-session creation):
+### 11. Runspec table (catalog version/digest, counts, raw-file size, affordances)
+**ANSWER — measured on the pinned study run (what participants actually saw):**
 
 | Field | Value |
 |---|---|
-| Requirement set and version | mvp2-v2, digest sha256:9e2b11d4 |
-| Requirements scored | 9 |
+| Model under evaluation | Mistral 7B (`mistral:7b-instruct`) — ⚠️ your draft says Llama; the pinned run was Mistral |
+| Requirement set and version | mvp2-v2, digest `sha256:9e2b11d4` |
+| Requirements scored | 9 of the 12 measurable |
 | Benchmarks executed | 11 |
 | Per-item outputs | 33 items |
-| Raw files in the baseline | 3 tabs, 119 lines, 12 KB total (run record YAML 75 lines / 1.0 KB · raw outputs JSONL 33 lines / 9.3 KB · harness log 11 lines / 1.3 KB) |
-| Baseline affordances | pretty-printed monospace text in scrollable panes (max height ~20 rem), tab switching, browser text search; no line numbers, no download |
+| Raw files in the baseline | 3 tabs, 119 lines, 12 KB (run record YAML 75 lines / 1.0 KB · raw outputs JSONL 33 lines / 9.3 KB · harness log 11 lines / 1.3 KB) |
+| Baseline affordances | pretty-printed monospace in scrollable panes, tab switching, browser text search; **no** line numbers, **no** download |
 
-**Load-bearing note for L397**: the baseline is *small* — 119 lines. Real evaluation
-artifacts at n=150 run to thousands of per-item lines. A small, fully greppable baseline
-*favours* the raw-files condition, so the measured gap (45% vs 70% correct) is a
-conservative lower bound, not a straw man. Recommend saying exactly this in the paper.
+**On your load-bearing note:** the baseline is *small* — 119 fully searchable lines —
+and participants still scored 45% on it. Real artifacts at n=150 run to thousands of
+per-item lines, so a small baseline *favours* the raw-files condition: the measured gap
+is a conservative lower bound, not a straw man. Recommend saying exactly this.
 
-## n=150 results
+### 12. T8 wizard-launch outcome (only direct evidence for R1)
+**ANSWER:** nine completers reached it (P26's session was cut by a tunnel outage
+first). **5 of 9 launched successfully at the first attempt, median 55 s among
+successes (22–180 s)**; one hit the five-minute cap, two gave up within seconds, one
+pasted the wrong page's address.
 
-*(one subsection per model, appended as each run completes)*
+### 13. Ethics statement
+**→ ROBIN.** No name/email collected, server-assigned codes, closed lists, aggregate
+reporting; the review-body / exemption status is Robin's to state.
 
-### Llama 3.1 8B (instruct-q8_0) — completed 2026-08-20, 85 min wall
-
-| Req | Score | CI 95% |
-|---|---|---|
-| R01 Robustness | 1.000 | [1.000, 1.000] — heuristic probe, fallback-flagged |
-| R02 Cyber resilience | 0.375 | [0.355, 0.395] |
-| R05 Privacy | 0.728 | [0.728, 0.728] — corpus scan, model-independent |
-| R06 Capabilities | 0.800 | [0.800, 0.800] |
-| R12 Toxicity | 0.750 | [0.750, 0.750] |
-
-**Trust Factor 66.4, orange** — recomputed from the formula
-(100·[0.20·1.000 + 0.35·0.375 + 0.20·0.728 + 0.25·0.750] = 66.4) and it matches the
-stored value exactly: this is the worked example for the aggregation subsection.
-**Energy**: 0.0169 kWh, 0.95 gCO₂e, region FR, `source=codecarbon`. **15 benchmarks**
-executed for the 5 requirements (the runtime registry maps more benchmarks per
-requirement than the 7 initially estimated; R06 alone runs mmlu/gsm8k/humaneval/
-truthfulqa/bbh). Caveats to carry into the caption: R01 saturates at 1.0 even at n=150
-under the heuristic probe; several R06 benchmark means are extreme (mmlu 1.0, gsm8k
-0.0) — report as measured, claim no public-leaderboard consistency.
-
-### Qwen2.5 7B — completed 2026-08-20, 66 min wall
-
-| Req | Score | CI 95% |
-|---|---|---|
-| R01 Robustness | 1.000 | [1.000, 1.000] — heuristic probe, fallback-flagged |
-| R02 Cyber resilience | 0.250 | [0.250, 0.250] |
-| R05 Privacy | 0.728 | [0.728, 0.728] — corpus scan, model-independent |
-| R06 Capabilities | 0.800 | [0.800, 0.800] |
-| R12 Toxicity | 0.625 | [0.625, 0.625] |
-
-**Trust Factor 58.9, orange** — formula recomputation matches the stored value.
-**Energy**: 0.0134 kWh, 0.75 gCO₂e, `source=codecarbon`. Matches the n=10 ordering
-(Qwen below Llama, driven by R02 and R12) with the same TF to one decimal — the n=10
-archive said 58.9 as well, a nice stability check across n.
-
-### Gemma 2 9B — completed 2026-08-20, 79 min wall
-
-| Req | Score | CI 95% |
-|---|---|---|
-| R01 Robustness | 1.000 | [1.000, 1.000] — heuristic probe, fallback-flagged |
-| R02 Cyber resilience | 0.375 | [0.355, 0.395] |
-| R05 Privacy | 0.728 | [0.728, 0.728] — corpus scan, model-independent |
-| R06 Capabilities | 0.800 | [0.800, 0.800] |
-| R12 Toxicity | 0.750 | [0.750, 0.750] |
-
-**Trust Factor 66.4, orange** — formula recomputation matches the stored value.
-**Energy**: 0.0156 kWh, `source=codecarbon`. Notable versus the n=10 archive: Gemma's
-R02 moves 0.00 → 0.375 at n=150 and its TF rises 53.3 → 66.4, tying Llama — the n=10
-zero was a resolution artefact, exactly the failure mode the meeting notes predicted.
-The refreshed caption should say the n=150 ordering differs from n=10 for this reason.
-
-### Mistral 7B — completed 2026-08-20, 68 min wall
-
-| Req | Score | CI 95% |
-|---|---|---|
-| R01 Robustness | 1.000 | [1.000, 1.000] — heuristic probe, fallback-flagged |
-| R02 Cyber resilience | 0.500 | [0.500, 0.500] |
-| R05 Privacy | 0.728 | [0.728, 0.728] — corpus scan, model-independent |
-| R06 Capabilities | 0.700 | [0.685, 0.716] |
-| R12 Toxicity | 0.596 | [0.596, 0.596] |
-
-**Trust Factor 67.0, orange** — formula recomputation matches. **Energy**: 0.0139 kWh,
-`source=codecarbon`.
-
-### Consolidated (all four, n=150, seed 42, Apple M4 Max / 36 GB)
+### 14. Panel refresh ("after we get new result…")
+**ANSWER — the refreshed panel, n=150, seed 42:**
 
 | | Llama 3.1 8B | Qwen2.5 7B | Gemma 2 9B | Mistral 7B |
 |---|---|---|---|---|
 | R01 Robustness † | 1.000 | 1.000 | 1.000 | 1.000 |
-| R02 Cyber resilience | 0.375 | 0.250 | 0.375 | 0.500 |
+| R02 Cyber resilience | 0.375 [.355,.395] | 0.250 | 0.375 [.355,.395] | 0.500 |
 | R05 Privacy ‡ | 0.728 | 0.728 | 0.728 | 0.728 |
-| R06 Capabilities | 0.800 | 0.800 | 0.800 | 0.700 |
+| R06 Capabilities | 0.800 | 0.800 | 0.800 | 0.700 [.685,.716] |
 | R12 Toxicity | 0.750 | 0.625 | 0.750 | 0.596 |
-| **Trust Factor** | **66.4** or. | **58.9** or. | **66.4** or. | **67.0** or. |
+| **Trust Factor (band)** | **66.4** (orange) | **58.9** (orange) | **66.4** (orange) | **67.0** (orange) |
 | Energy (kWh) | 0.0169 | 0.0134 | 0.0156 | 0.0139 |
-| Wall time | 85 min | 66 min | 79 min | 68 min |
+| Wall time (min) | 85 | 66 | 79 | 68 |
 
-† heuristic probe with explicit fallback flag (no log-probabilities on the Ollama path).
-‡ corpus scan, model-independent by construction.
-All TF values recomputed from the formula and equal to the stored values. Merged JSON:
-`manuscript/results/paper_results_multi.json`; per-model files alongside; the n=10
-archive is `paper_results_multi_n10.json`. Total compute: 4h58 on an idle M4 Max.
-Headline vs n=10: no model is green on TF at n=150 (Llama drops 70.8 → 66.4, its R02
-falling 0.50 → 0.375 with a real CI), Gemma's zero was a resolution artefact
-(0 → 0.375), and Mistral's TF is stable (67.0). Ranking by TF: Mistral ≳ Llama = Gemma
-> Qwen.
+† heuristic probe, fallback-flagged (no log-probabilities on the serving path) ·
+‡ corpus scan, model-independent. Scope note: five requirements, not twelve — {R01,
+R02, R05, R12} is exactly the Trust Factor's set, so the table recomputes the gauge end
+to end, and R06 anchors capability. Cut rows, each with its one-line reason: CR03/CR04
+corpus scans (identical by construction), CR09 zero for every open-weight model, CR07
+constant 0.90 (a property of the confidence binning at this budget — this also resolves
+your calibration note by removal), CR08/CR10/CR11 (discriminating but required by no
+note). **Headline for the caption:** Gemma's n=10 cyber zero becomes 0.375 [.355,.395]
+at n=150 — a resolution artefact, not a property of the model; no model reaches green;
+Qwen's TF is stable across n (58.9 at both budgets).
 
-## Final state (2026-08-20, end of the one-shot pass)
+### 15. Constant calibration row (0.90)
+**ANSWER (one clause):** the value is a property of the confidence-binning procedure at
+this sampling budget, not of the models. (With the reduced table the row can also
+simply be cut.)
 
-**All four runs are done and every numeric todo in `main_apsec.tex` is filled** from the
-measurements above: the refreshed panel table (5 requirements × 4 models + TF + energy +
-wall time), the TF aggregation formula with its worked example (66.4), the energy
-sentence (CodeCarbon 3.2.8, online, FR grid), the run cost (85 min on Apple M4 Max
-36 GB), the suite pin (commit 8a71cf3: 178 backend tests, 52 browser scenarios), the
-corpus size (230 docs), the runspec table (true values of the pinned study run), the
-Pairs column with P26/P27 rows added, the censoring note (0 timeouts), the T8 outcome,
-the drop-out phases, and the clock-gap count. Two build fixes on the way: the stray
-`\usepackage{etc}` removed, `\todo`/`\nax` defined locally.
+### 16. Drop-out phases of the four partial sessions
+**ANSWER:** all four dropped during or at the end of the **baseline** phase — two after
+its first question (P2, P18), two at the transition screen without ever seeing the
+dashboard phase (P20, P24). Conservative direction: it biases the retained sample
+toward people who can read raw files.
 
-**Still open — 14 visible TODO markers**, all prose or Robin-only: the reviewer
-anecdote, usage figures, ethics status, tool versions/access dates in Table I,
-per-requirement references, the F×R partial cells, the COMPL-AI energy-claim check,
-HISTREE anchoring, the band-label build check, the observation-vs-measure rewording,
-and three bibliography STUBS (`rajput2024fecom`, `rajput2024greenlight`,
-`mehditabar2025smart`) that need the exact entries from the Overleaf bib.
+### 17. Pre-registration
+**ANSWER:** none exists. Your honest sentence is the correct form; the note can go.
 
-**Page budget warning**: the draft builds at 14 pages against a 10-page SEIP budget —
-the cut has to come from prose, which is the rewrite's call, not this pass's.
+### 18. P25 censoring + Pairs column + five-minute-cap counts
+**ANSWER — Pairs surviving time-censoring:** P1 6/6 · P3 4/6 · P15 6/6 · P16 5/6 ·
+P17 6/6 · P19 6/6 · P21 6/6 · **P25 2/6** · P26 6/6 · P27 6/6. **No question reached
+the five-minute cap in either condition**; every censored pair is an explicit give-up.
+(Your table also lacks the two newest completers: P26 = 5 & 5 & 66 & 38; P27 = 4 & 5 &
+24 & 30.)
 
-## Open items that only Robin can fill
+### 19. Redundant band label in the build
+**→ YOURS (build check).** Verify in the compiled figure before submission.
 
-1. **L117-118** — the reviewer anecdote (which score, how many minutes, log length): from
-   the internal review record, or reword to "typically takes … and say it is typical".
-2. **L765-766** — usage figures (period, number of runs, how many fed a release review):
-   deployment Redis gives a floor for run counts, but the period and "fed a review" need
-   Robin's records.
-3. **L485** — BNPP ethics review/exemption status for the anonymous internal collection.
-4. SEIP format check on the APSEC site (page limit, blinding, AI policy).
+### 20. Cite the taxonomy (Wohlin)
+**ANSWER:** `wohlin2012experimentation` is now in `references.bib` — just cite it.
 
-## Regeneration commands
+### 21. Clock-gap cases revealed by server timestamps
+**ANSWER:** **2 cases** consistent with a mid-question reload (P2 Q1B: 74 s client vs
+135 s server; P3 Q1A: 99 vs 137), both in the baseline phase; the eight other
+divergences are ≤ 10 s and consistent with tunnel transport latency.
+
+### 22. Usage figures (months, runs, release reviews)
+**→ ROBIN.** The deployment's Redis can give a floor for run counts, but the period and
+"fed a release review" need Robin's records.
+
+### 23. Run cost (`\todo{time}` on `\todo{hardware}`)
+**ANSWER:** the five-requirement, fifteen-benchmark run against the 8B model completes
+in **85 minutes on an Apple M4 Max, 36 GB**, at 150 items per benchmark. (Same wording
+caveat as item 7: not "a full requirement set".)
+
+### 24. Guided-mode observation without a measure
+**→ YOURS (prose).** No before/after count exists; state it plainly as an observation
+from review meetings.
+
+---
+
+## Also done, outside the tex
+
+- `references.bib` gained `wohlin2012experimentation`, `ko2015practical`, `codecarbon`,
+  and **three STUBS to replace with your exact Overleaf entries**: `rajput2024fecom`,
+  `rajput2024greenlight`, `mehditabar2025smart`.
+- Build note: the draft's `\usepackage{etc}` does not compile outside Overleaf
+  (`etc.sty` does not exist), and `\todo`/`\nax` need definitions locally — nothing was
+  changed, just flagged.
+- User-study final state: 10 completers (your draft's tables carry 8 — P26 and P27
+  arrived after your pass; their rows are in items 14/18 above), quality 27/60 vs 42/60,
+  exact Wilcoxon p = .016; time 56 s vs 30 s, p = .065.
+
+## Regeneration
 
 ```bash
-# one model at a time (per-model wall time is measured by the driver):
 VERA_EVAL_MODELS="ollama/<model>" VERA_EVAL_N=150 \
   VERA_EVAL_REQS="R01,R02,R05,R06,R12" \
-  VERA_CORPUS=data/corpus/banking_synth.jsonl VERA_REQUIRE_NATIVE=1 \
+  VERA_CORPUS=data/corpus/banking_synth.jsonl \
   VERA_EVAL_OUT=manuscript/results/paper_results_n150_<model>.json \
   .venv/bin/python scripts/run_paper_eval.py
-# study numbers:
 python scripts/analyze_user_study.py data/user_study/template.csv \
   --quiz data/user_study/quiz.csv --survey data/user_study/survey.csv
 ```

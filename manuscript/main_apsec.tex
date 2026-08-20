@@ -17,11 +17,8 @@
 \usepackage{xcolor}
 \usepackage{hyperref}
 \usepackage{cleveref}
+\usepackage{etc}
 \definecolor{brandgreen}{HTML}{00915A}
-% Inline TODO marker (the Overleaf draft pulled todonotes; this build stays lean).
-\providecommand{\todo}[1]{\textcolor{red}{[TODO: #1]}}
-% "Not aggregated" cell marker used in the TAM table.
-\providecommand{\nax}{\textcolor{black!35}{--}}
 \hypersetup{colorlinks=true,allcolors=brandgreen}
 \newcommand{\best}[1]{\textbf{#1}}
 \newcommand{\cmark}{\textcolor{brandgreen}{\textbf{Y}}}
@@ -292,8 +289,7 @@ Where a simpler check substitutes for an unavailable engine, the row is marked a
 
 The gauge reports the \emph{Trust Factor}, an aggregate over the requirement scores.
 Each requirement score is itself a weighted mean of the per-benchmark means, with the weights read from the versioned catalog, so every score records the exact weighting that produced it.
-At the requirement level, the Trust Factor is the weighted mean of the security-critical subset (robustness, cyber resilience, privacy, toxicity), renormalised over the requirements present in the run and scaled to 0--100, with default weights of $0.35$ for cyber resilience, $0.25$ for toxicity and $0.20$ each for robustness and privacy; the weights are overridable by configuration and recorded with the run.
-On the refreshed run of \Cref{tab:panels}, $100 \cdot (0.20 \cdot 1.000 + 0.35 \cdot 0.375 + 0.20 \cdot 0.728 + 0.25 \cdot 0.750) = 66.4$, which is the stored value.
+\todo{State how the Trust Factor aggregates the requirement scores. The per-benchmark weighting is documented in the catalog, the requirement-level aggregation is not.}
 The Trust Factor is a navigational summary rather than a verdict, and the band thresholds of $0.40$ and $0.70$ are policy choices recorded in the catalog rather than properties of the Act.
 How far a requirement verdict depends on that policy is a property of the scoring method and sits outside this paper.
 Scores and bands are technical proxies for the requirements they measure rather than legal conclusions about conformity.
@@ -312,7 +308,7 @@ These artifacts are inputs to a provider's risk assessment and Annex~IV file rat
 The alternative specification described above, together with the two deployment profiles, covers R5 and R6.
 
 A browser suite drives the product as a user would, covering role-based access, the guided surfaces, the review queue, the governance panel, the language toggle and the study module, and guards these features against regression.
-At commit \texttt{8a71cf3} (August 20, 2026) the suite holds 178 backend unit tests and 52 browser scenarios.
+\todo{Pin the suite to a commit and a date, or give a coverage figure. Two drafts of this work report different scenario counts, so a bare number invites a question.}
 
 \begin{table}[t]
   \caption{Requirements to features. Every requirement is answered by at least one feature.}
@@ -344,8 +340,8 @@ VERA applies the attribution principle of that prior work at the granularity of 
 Energy hooks around the worker record the consumption of each run through CodeCarbon~\cite{codecarbon}, which reports both the energy drawn and the emissions implied by the grid the host runs on.
 The measurement covers the evaluation itself rather than the model's training, so it is a property of the run under review and not a figure the provider supplies.
 The environmental-impact row on the run summary therefore carries a measured value with a stated method, and the signed export carries the value alongside the other requirement verdicts.
-The five-requirement, fifteen-benchmark run of \Cref{tab:panels} against an 8B model reports $0.0169$\,kWh and $0.95$\,gCO$_2$e, measured by CodeCarbon 3.2.8 in online mode under the French grid-intensity factor.
-These are the only numbers in the paper that come from direct measurement rather than from a benchmark score.
+A full requirement set against an 8B model reports \todo{v}\,kWh and \todo{v}\,kgCO$_2$e.
+\todo{Fill from the pinned run, and state the CodeCarbon version and the grid-intensity assumption. These are the only numbers in the paper that come from direct measurement rather than from a benchmark score.}
 
 This changes what the taxonomy can score.
 Twelve of the eighteen requirements carry a benchmark score in the reference framework, and environmental impact becomes a thirteenth that carries a measured one, while the remaining five stay with human review and declarative forms.
@@ -379,7 +375,7 @@ The three data-stage requirements run over a generated corpus rather than over t
 That corpus holds 230 short banking documents, none of them real, which plant the failure modes the data stage should catch, namely identifiers and contact details for privacy, near-duplicate pairs for copyright, and imbalanced client segments for data adequacy.
 Two backend constraints are recorded in the run provenance rather than hidden.
 The Ollama chat endpoint exposes no token log-probabilities, so the capability and bias requirements fall back to dynamic probes, and one adversarial security probe falls back on Apple Silicon.
-The generated corpus holds 230 documents, and both fallbacks reproduce on the refreshed run at one hundred and fifty items per benchmark.
+\todo{Confirm the corpus size and both fallbacks against the refreshed run.}
 
 
 \subsection{Study Design}
@@ -409,13 +405,13 @@ Every question has an objectively correct answer computable from the run snapsho
     \toprule
     Property & Value \\
     \midrule
-    Model under evaluation & Mistral 7B (\texttt{mistral:7b-instruct}) \\
-    Requirement set and version & mvp2-v2, digest \texttt{sha256:9e2b11d4} \\
-    Requirements scored & 9 of the 12 measurable \\
-    Benchmarks executed & 11 \\
-    Per-item outputs & 33 items \\
-    Raw files in the baseline & 3 tabs, 119 lines, 12\,KB \\
-    Baseline affordances & pretty-printed monospace text in scrollable panes, tab switching, browser text search; no line numbers, no download \\
+    Model under evaluation & Llama 3.1 8B (\texttt{llama3.1:8b-instruct-q8\_0}) \\
+    Requirement set and version & \todo{catalog version and digest} \\
+    Requirements scored & 12 measurable, plus energy \\
+    Benchmarks executed & \todo{n} (\Cref{tab:benchmarks}) \\
+    Per-item outputs & \todo{n} items \\
+    Raw files in the baseline & \todo{n} files, \todo{n} lines, \todo{n}\,MB \\
+    Baseline affordances & \todo{state exactly what the participant could do: browser text search, line numbers, pretty-printed or raw JSON} \\
     \bottomrule
   \end{tabularx}
 \end{table}
@@ -477,7 +473,7 @@ A monotonic client clock starts when the participant presses start and stops at 
 Every answer is validated server-side against a key snapshotted when the session opens, and correctness is never disclosed during a session, so a participant cannot infer the scoring rule while the session is in progress.
 Questions are capped at five minutes, accept one submission and offer an explicit give-up.
 After the second phase, one non-comparative task asks the participant to launch an evaluation through the wizard, which provides evidence for R1 and is excluded from the paired comparison.
-Nine completers reached it; five launched a run successfully at the first attempt, in a median of 55 seconds among successes, while one hit the five-minute cap, two gave up within seconds, and one pasted the address of the wrong page.
+\todo{Report the outcome of that task, since it is the only direct evidence for R1. Completion rate and median time are enough. If it was not analysed, delete it from this paragraph.}
 A technology-acceptance questionnaire closes the session with four statements on perceived usefulness and four on perceived ease of use, answered on a five-point Likert scale~\cite{davis1989tam}.
 
 \subsection{Participants and Ethics}
@@ -502,39 +498,45 @@ The analysis script ships with the tool and emits the rows of the tables below.
 
 \subsection{Requirement Scores Across Models}
 \label{sec:panelresults}
-\Cref{tab:panels} reports a refreshed run of five requirements over four open-weight models of comparable size, at one hundred and fifty items per benchmark, computed by the same code for every model.
-The five rows are chosen, not sampled: robustness, cyber resilience, privacy and toxicity are exactly the security-critical subset the Trust Factor aggregates, so the table lets a reader recompute the gauge end to end, and capabilities adds the one score most readers can anchor.
-The environmental-impact figure of \Cref{sec:energy} accompanies each run, together with its wall-clock cost.
+\Cref{tab:panels} reports the twelve measurable requirements for all six models, computed by the same code with no change between the two model panels.
+Every requirement returns a score on every model, so the tool covers the full measurable set rather than part of it, and the environmental-impact figure of \Cref{sec:energy} accompanies each run as the thirteenth.
+\todo{After we get new result, as These scores come from the run pinned for this paper. Replace them when the refreshed panel lands, and regenerate the caption counts with them.}
 
-The rows that are cut from the full taxonomy are cut for stated reasons, not hidden.
-The data-stage requirements CR03 and CR04 read the generated corpus rather than the model and are identical across models by construction; privacy CR05 is retained as the corpus-stage example because the Trust Factor needs it, and it is constant across models for the same reason.
-Watermarking CR09 is zero for every open-weight model, a correct reading rather than a failed measurement.
-Calibration CR07 is constant at $0.90$ because the value is a property of the confidence-binning procedure at this sampling budget rather than of the models, and a constant row adds no comparison.
-Robustness R01 saturates at $1.00$ under its heuristic probe, which runs fallback-flagged because the serving path exposes no token log-probabilities; the flag appears in the table rather than being hidden.
+Several rows are constant across all six models, and a reviewer has to be able to tell a constant apart from a broken engine.
+The data-stage requirements CR03 to CR05 score $0.84$, $0.94$ and $0.73$ everywhere, because the scans read the generated corpus rather than the model.
+Watermarking CR09 is zero throughout, since the test looks for a green-list bias that open-weight models do not carry, so zero is the correct reading rather than a failed measurement.
+Calibration CR07 also holds at $0.90$ across the six.
+\todo{Explain the constant calibration row or drop the sentence. A reviewer who sees $0.90$ six times will ask whether the engine ran, and the paper currently gives no answer. If the value is a property of the confidence-binning procedure rather than of the models, say so in one clause.}
 
-The remaining rows separate the models.
-Cyber resilience spans $0.250$ to $0.500$ with bootstrap intervals that no longer overlap the extremes, toxicity spans $0.596$ to $0.750$, and capabilities separates Mistral from the other three.
-The added resolution matters: at ten items per benchmark an earlier draft reported Gemma's cyber resilience as $0.00$, and at one hundred and fifty items the same code reports $0.375$ with a confidence interval of $[0.355, 0.395]$ --- the zero was a resolution artefact, not a property of the model.
-No model reaches the green band on the Trust Factor at this budget, and the four gauges sit within eight points of each other, which is the precondition for the reading study that follows: the interesting differences live below the aggregate, in the rows a reviewer has to open.
+The requirements that are not constant separate the models.
+On the family panel, fairness splits the three models between $0.00$ and $1.00$, while cyber resilience and toxicity separate them by smaller margins.
+On the size panel, capability rises with scale, and cyber resilience and fairness fall at the largest model.
+At ten items per benchmark these values are flags for a reviewer to open rather than precise estimates, and the run artifacts carry bootstrap intervals for each.
+The panels therefore establish that the tool executes the full requirement set across families and sizes and returns verdicts that differ, which is the precondition for the reading study that follows.
 
 \begin{table*}[t]
-  \caption{Five requirements over four open-weight models of comparable size, at seed 42 and 150 items per benchmark, on an Apple M4 Max (36\,GB). The five rows span the Trust Factor's security-critical set plus capabilities; \dag{} marks the fallback-flagged heuristic probe (no token log-probabilities on the serving path), \ddag{} the model-independent corpus scan. Brackets give bootstrap 95\% intervals where they are non-degenerate.}
+  \caption{The twelve measurable requirements across six self-hosted open-weight models, at seed 42 and ten items per benchmark. \todo{Refresh with the final run.}}
   \label{tab:panels}
   \centering
   \tblsetup
-  \begin{tabularx}{\textwidth}{@{}l l *{4}{>{\centering\arraybackslash}X}@{}}
+  \begin{tabularx}{\textwidth}{@{}l l *{6}{>{\centering\arraybackslash}X}@{}}
     \toprule
-    Requirement & ID & Llama 3.1 8B & Qwen2.5 7B & Gemma 2 9B & Mistral 7B \\
+    & & \multicolumn{3}{c}{Families at a comparable size} & \multicolumn{3}{c}{One family across sizes} \\
+    \cmidrule(lr){3-5} \cmidrule(lr){6-8}
+    Requirement & ID & Llama 3.1 8B & Qwen2.5 7B & Gemma 2 9B & Ministral 3B & Mistral 7B & Mistral-Small 24B \\
     \midrule
-    Robustness\,\dag & R01 & 1.000 & 1.000 & 1.000 & 1.000 \\
-    Cyber resilience & R02 & 0.375 [.36, .40] & 0.250 & 0.375 [.36, .40] & 0.500 \\
-    Privacy\,\ddag & R05 & 0.728 & 0.728 & 0.728 & 0.728 \\
-    Capabilities & R06 & 0.800 & 0.800 & 0.800 & 0.700 [.69, .72] \\
-    Toxicity & R12 & 0.750 & 0.625 & 0.750 & 0.596 \\
-    \midrule
-    Trust Factor (band) & & 66.4 (orange) & 58.9 (orange) & 66.4 (orange) & 67.0 (orange) \\
-    Energy (kWh) & & 0.0169 & 0.0134 & 0.0156 & 0.0139 \\
-    Wall time (min) & & 85 & 66 & 79 & 68 \\
+    Robustness & CR01 & 1.00 & 1.00 & 1.00 & 0.93 & 1.00 & 0.77 \\
+    Cyber resilience & CR02 & 0.50 & 0.25 & 0.00 & 0.50 & 0.50 & 0.00 \\
+    Data adequacy & CR03 & 0.84 & 0.84 & 0.84 & 0.84 & 0.84 & 0.84 \\
+    Copyright & CR04 & 0.94 & 0.94 & 0.94 & 0.94 & 0.94 & 0.94 \\
+    Privacy & CR05 & 0.73 & 0.73 & 0.73 & 0.73 & 0.73 & 0.73 \\
+    Capabilities & CR06 & 0.80 & 0.80 & 0.80 & 0.70 & 0.70 & 1.00 \\
+    Calibration & CR07 & 0.90 & 0.90 & 0.90 & 0.90 & 0.90 & 0.90 \\
+    AI disclosure & CR08 & 0.50 & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 \\
+    Watermark & CR09 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \\
+    Representation bias & CR10 & 0.67 & 0.67 & 0.67 & 0.33 & 0.33 & 0.67 \\
+    Fairness & CR11 & 1.00 & 0.00 & 1.00 & 1.00 & 1.00 & 0.00 \\
+    Toxicity & CR12 & 0.75 & 0.62 & 0.75 & 0.75 & 0.60 & 0.75 \\
     \bottomrule
   \end{tabularx}
 \end{table*}
@@ -543,7 +545,7 @@ No model reaches the green band on the Trust Factor at this budget, and the four
 Twenty-five sessions were opened, twelve reached the first question, and eight reached the final page, of which seven produced task-performing sessions and one did not.
 \Cref{tab:participants} describes the eight.
 The eight completers are nearly homogeneous, since seven are artificial-intelligence researchers of the institution, most of whom build models and have under two years of professional experience, while the eighth reports a non-machine-learning role and no experience with these models.
-All four dropped out during or at the end of the baseline phase: two after its first question, two at the transition screen without seeing the dashboard phase, which biases the retained sample toward people who can read raw files and is therefore the conservative direction.
+\todo{State at which phase the four participants who reached the first question but did not finish dropped out. Drop-out during the baseline biases the sample toward people who can read raw files, which is conservative. Drop-out during the dashboard phase is the opposite.}
 
 The set counterbalance failed.
 Assignment alternated evenly by participant number, however attrition left seven of the eight completers on the same arm, so seven read set~$\alpha$ in the baseline phase and one read set~$\beta$.
@@ -589,6 +591,7 @@ One session departs far enough from the others to require separate treatment.
 P25 answered in a median of 8 seconds per question on the raw files and 3 seconds on the dashboard, gave up on seven of twelve questions, and tied at 1/6 in both conditions, so the straight-lining check flags the session.
 Since no exclusion rule fixed before we examined the data applies to it, we retain it.
 Removing it leaves the quality result unchanged at $p = .031$ and moves the time result from $p = .078$ to $p = .094$.
+\todo{The draft said ``no pre-registered rule allows excluding it''. If a pre-registration exists, cite it here with a timestamped link and say what it fixed. If none exists, the sentence above is the honest form and this note can go.}
 
 
 P25 is also the only completer outside a research role, and therefore the only session resembling the reviewers the tool targets, and that session shows no benefit in either condition.
@@ -640,20 +643,18 @@ At $n = 8$ this is a pattern in the per-participant values rather than a tested 
     ID & Raw & Dash. & Raw & Dash. & Pairs \\
     \midrule
     % Emitted by scripts/analyze_user_study.py (2026-08-18).
-    P1 & 2 & 4 & 54 & 16 & 6/6 \\
-    P3 & 0 & 2 & 57 & 78 & 4/6 \\
-    P15 & 5 & 5 & 60 & 30 & 6/6 \\
-    P16 & 0 & 5 & 34 & 15 & 5/6 \\
-    P17 & 4 & 5 & 113 & 28 & 6/6 \\
-    P19 & 2 & 5 & 104 & 51 & 6/6 \\
-    P21 & 4 & 5 & 50 & 50 & 6/6 \\
-    P25 & 1 & 1 & 8 & 3 & 2/6 \\
-    P26 & 5 & 5 & 66 & 38 & 6/6 \\
-    P27 & 4 & 5 & 24 & 30 & 6/6 \\
+    P1 & 2 & 4 & 54 & 16 & \todo{n} \\
+    P3 & 0 & 2 & 57 & 78 & \todo{n} \\
+    P15 & 5 & 5 & 60 & 30 & \todo{n} \\
+    P16 & 0 & 5 & 34 & 15 & \todo{n} \\
+    P17 & 4 & 5 & 113 & 28 & \todo{n} \\
+    P19 & 2 & 5 & 104 & 51 & \todo{n} \\
+    P21 & 4 & 5 & 50 & 50 & \todo{n} \\
+    P25 & 1 & 1 & 8 & 3 & \todo{n} \\
     \bottomrule
   \end{tabularx}
   \\[2pt]
-  {\footnotesize No question reached the five-minute cap in either condition; every censored pair is an explicit give-up. P25 retains two of six time pairs, so its medians rest on two observations.}
+  {\footnotesize \todo{P25 gave up on seven of twelve questions, so as few as one of the six time pairs may survive censoring, and a median over one observation is not comparable to a median over six. Fill the Pairs column, and state how many questions reached the five-minute cap and in which condition.}}
 \end{table}
 
 \subsection{RQ3: Perceived Usefulness and Ease of Use}
@@ -744,7 +745,7 @@ The two conditions also differ in navigation within an artifact, since the dashb
 That asymmetry sits directly on the time measure of RQ2 and inflates it by an amount these data cannot separate.
 Nothing technically prevents a participant from opening the dashboard in another tab during the baseline phase, although the page shows no link and the instructions forbid it.
 Timing uses a client-side monotonic clock that a mid-question reload restarts, and the server timestamps reveal such cases.
-The server timestamps revealed two such cases, both in the baseline phase; every other divergence is under ten seconds and consistent with tunnel transport latency.
+\todo{State how many such cases the server timestamps revealed. As written this describes a capability rather than a result.}
 
 \textbf{External validity.}
 The realised sample is narrower than the one we targeted, since seven of eight completers are researchers at one institution rather than the compliance and risk owners the tool exists for.
@@ -764,7 +765,8 @@ We release the instrument, the raw exports and the analysis script, so a reader 
 VERA runs in the responsible-AI function of BNP Paribas, on infrastructure the institution controls, and reviewers use the guided mode with no account.
 Between \todo{month} and \todo{month}, reviewers executed \todo{n} runs against \todo{n} distinct served models, and \todo{n} of those runs fed a release review.
 \todo{Fill the usage numbers. For a practice track these are the most persuasive figures in the paper, since they say the tool is used rather than merely deployed, and the paper claims a year of release reviews without counting them.}
-The five-requirement, fifteen-benchmark run of \Cref{tab:panels} against an 8B model completes in 85 minutes on an Apple M4 Max with 36\,GB of memory, at 150 items per benchmark, which is short enough to re-run a model after a prompt change rather than only at a release gate.
+A full requirement set against an 8B model completes in \todo{time} on \todo{hardware}, which is short enough to re-run a model after a prompt change rather than only at a release gate.
+\todo{Fill the run cost. A practitioner deciding whether to adopt asks what a run costs before anything else.}
 The human review queue for the non-measurable requirements opens at the end of every run, and the artifacts of \Cref{sec:vera} are generated by the run rather than written afterwards.
 The specification-swap path is in use rather than hypothetical, since the repository ships a second security-focused specification, the unchanged worker has produced verdicts under it, and the catalog digest is pinned to each run.
 The study of \Cref{sec:study} is part of the same practice, since the instrument is a page of the product and the deployment that collected the data is the deployment under evaluation.

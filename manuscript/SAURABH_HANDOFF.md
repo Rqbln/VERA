@@ -109,8 +109,8 @@ three-lines-of-defence governance. Robin's supplied wording:
 > involved, consistent with the bank's three-lines-of-defence governance for internal
 > tooling."
 
-⚠️ Double-blind note: in the submitted version this sentence must not name the bank
-(see item 25). Open confirmations are listed at the end.
+The submission is single-blind (item 25), so naming the bank in this sentence is
+fine. Open confirmations are listed at the end.
 
 ### 14. Panel refresh ("after we get new result…")
 **ANSWER — the refreshed panel, n=150, seed 42:**
@@ -218,20 +218,20 @@ in **85 minutes on an Apple M4 Max, 36 GB**, at 150 items per benchmark. (Same s
 ### 24. Guided-mode observation without a measure
 **→ Prose — awaiting your rewrite.** (Fact: no before/after count exists.)
 
-### 25. SEIP format — VERIFIED on the official APSEC 2026 site (three hard findings)
+### 25. SEIP format — VERIFIED on the official APSEC 2026 site (corrected)
 
 **ANSWER (from Robin, conf.researchr.org/track/apsec-2026):**
-1. **10 pages maximum for everything** — main text *including appendices, figures,
-   tables AND references*. No separate reference page.
-2. **DOUBLE-BLIND, contrary to our working assumption.** Names/affiliations off the
-   title page, self-citations in the third person, anonymized artifacts; violations
-   risk desk rejection. Consequences: use the anonymous build (no named author block),
-   replace the public `github.com/Rqbln/VERA` URL with the anonymized mirror, and the
-   ethics sentence must not name the bank.
-3. **Strict AI \& Originality policy**: AI tools only for minor linguistic assistance;
-   generating manuscript text is prohibited, and authors attest the core contributions
-   are theirs. The prose must be author-written — which is the division of labour this
-   pack already follows.
+1. **10 + 1 pages**: 10 pages of content (appendices, figures and tables included)
+   plus **one dedicated page for references**. Short papers 5 pages (refs included),
+   extended abstracts 2 pages. IEEE two-column, A4, EasyChair, at least three PC
+   reviewers.
+2. **Single-blind — the submission is NAMED.** No anonymity requirement: submit with
+   the real author block, keep `github.com/Rqbln/VERA` in the clear (the anonymized
+   mirror and the identity purge are no longer submission constraints), and the
+   screenshots may show the industry--academia partnership, which is an asset for
+   SEIP.
+3. **IEEE Authorship Policy applies**; the prose stays author-written — which is the
+   division of labour this pack already follows.
 
 ---
 
@@ -258,8 +258,8 @@ Items 1, 13, 22 and 25 are answered above; what stays open:
 1. A Risk \& Compliance protocol/reference number for the ethics sentence, if one
    exists.
 2. The seventh co-author's exact affiliation (Group Data Office?) and spelling
-   ("Lebecq" vs "Le Becq") — moot on the title page under double-blind, still needed
-   for the camera-ready.
+   ("Lebecq" vs "Le Becq") — the submission is named, so this appears on the title
+   page from the start.
 3. Re-identification check: verify the role+seniority+experience combinations in
    `survey.csv` cannot single out an individual in a small team.
 4. Consent coverage: confirm participants accepted aggregate publication (the

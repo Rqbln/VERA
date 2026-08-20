@@ -24,6 +24,12 @@ across models by construction; R05 already illustrates the corpus stage), CR08/C
 (discriminating but required by no reviewer note). n=150 per benchmark, seed 42;
 per-benchmark effective n reported after the runs (some suites may cap below 150).
 
+**Execution note (2026-08-20):** `VERA_REQUIRE_NATIVE` is NOT set for these runs. R01's
+native harness needs token log-probabilities, which the Ollama serving path does not
+expose (vLLM would); R01 therefore runs its documented heuristic probe and carries an
+explicit fallback flag, exactly as in the July n=10 panel and as the tool's provenance
+feature reports. The refreshed table must show that flag on R01 rather than hide it.
+
 ## Formulas (verified in code — ready now, 2026-08-20)
 
 **Level 1 — benchmark → requirement** (`src/vera/benchmarks/catalog.py`): each requirement

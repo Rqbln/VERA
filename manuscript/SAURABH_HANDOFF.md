@@ -3,9 +3,9 @@
 Companion to your annotated `main_apsec.tex`. **The tex file is untouched**: every
 answer below is keyed to your own note, in the order the notes appear in the document,
 ready to paste. Counts: the draft carries **53 `\todo{}` markers on 42 lines**. This
-pack **answers 29 of them with measured data**; **17 are prose calls that stay yours**;
-**7 are items only Robin can supply** (some markers count twice when a note asks for
-both data and a rewrite).
+pack **answers 29 of them with measured data**; **17 await your prose** (marked
+"awaiting rewrite", nothing else to say about them here); **7 are items only Robin can
+supply** (some markers count twice when a note asks for both data and a rewrite).
 
 Data provenance: a refreshed evaluation run on four open-weight models of comparable
 size (Llama 3.1 8B instruct-q8_0, Qwen2.5 7B, Gemma 2 9B, Mistral 7B), **150 items per
@@ -24,11 +24,11 @@ review record. If no single case can be reconstructed, use your own fallback wor
 ("the typical time to answer one such question…").
 
 ### 2. Related-work table — tool versions and access dates
-**→ YOURS (prose).** No measurement involved; record version + access date per row.
+**→ Prose — awaiting your rewrite.**
 
 ### 3. Requirements section — one reference per requirement
-**→ YOURS (prose).** The bibliography now contains Wohlin et al. 2012 and
-Ko/LaToza/Burnett 2015 if you want them among the anchors.
+**→ Prose — awaiting your rewrite.** (Fact: `wohlin2012experimentation` and
+`ko2015practical` are already in `references.bib`.)
 
 ### 4. Trust Factor aggregation (the requirement-level formula)
 **ANSWER (verified in `src/vera/governance/trust_factor.py`):** the Trust Factor is the
@@ -45,20 +45,19 @@ value exactly (all four models verified the same way).
 scenarios** (counted by `pytest --collect-only` and `playwright test --list`).
 
 ### 6. F×R mapping — mark partial cells
-**→ YOURS (prose).** Design judgement, no data involved.
+**→ Prose — awaiting your rewrite.**
 
 ### 7. Energy figures (`\todo{v}` kWh, `\todo{v}` kgCO₂e + method note)
 **ANSWER:** the refreshed 8B run (five requirements, fifteen benchmarks) reports
 **0.0169 kWh and 0.00095 kgCO₂e** — CodeCarbon **3.2.8**, online mode (live
 grid-intensity API), French grid factor, `energy.source == "codecarbon"` verified in
 the JSON for all four models. Full column: Llama 0.0169 · Qwen 0.0134 · Gemma 0.0156 ·
-Mistral 0.0139 kWh. ⚠️ Wording: the measured set is the five-requirement table, not
-"a full requirement set" — phrase accordingly.
+Mistral 0.0139 kWh. (Fact: the measured set is the five-requirement table, not the full
+requirement set.)
 
 ### 8. Energy-claim uniqueness check against other Act-oriented tools
-**→ YOURS (prose check).** COMPL-AI's published interpretation collects training-time
-resources through a form; none of the tools in the related-work table measures the
-evaluation run itself. Verify before the claim goes in.
+**→ Prose — awaiting your rewrite.** (Fact: COMPL-AI's published interpretation
+collects training-time resources through a form.)
 
 ### 9. Corpus size and the two fallbacks against the refreshed run
 **ANSWER:** the corpus holds **230 documents** (`config.corpus_docs` in the merged
@@ -67,7 +66,7 @@ Ollama path (R01's native harness needs a vLLM backend, so the heuristic probe r
 fallback-flagged), and the Apple-Silicon adversarial-probe fallback.
 
 ### 10. HISTREE anchoring + Ko/LaToza/Burnett
-**→ YOURS (prose).** The `ko2015practical` BibTeX entry is already in `references.bib`.
+**→ Prose — awaiting your rewrite.** (Fact: `ko2015practical` is in `references.bib`.)
 
 ### 11. Runspec table (catalog version/digest, counts, raw-file size, affordances)
 **ANSWER — measured on the pinned study run (what participants actually saw):**
@@ -82,10 +81,8 @@ fallback-flagged), and the Apple-Silicon adversarial-probe fallback.
 | Raw files in the baseline | 3 tabs, 119 lines, 12 KB (run record YAML 75 lines / 1.0 KB · raw outputs JSONL 33 lines / 9.3 KB · harness log 11 lines / 1.3 KB) |
 | Baseline affordances | pretty-printed monospace in scrollable panes, tab switching, browser text search; **no** line numbers, **no** download |
 
-**On your load-bearing note:** the baseline is *small* — 119 fully searchable lines —
-and participants still scored 45% on it. Real artifacts at n=150 run to thousands of
-per-item lines, so a small baseline *favours* the raw-files condition: the measured gap
-is a conservative lower bound, not a straw man. Recommend saying exactly this.
+(Fact for your load-bearing note: participants scored 45% on these 119 searchable
+lines; a raw artifact at n=150 runs to thousands of per-item lines.)
 
 ### 12. T8 wizard-launch outcome (only direct evidence for R1)
 **ANSWER:** nine completers reached it (P26's session was cut by a tunnel outage
@@ -118,9 +115,9 @@ to end, and R06 anchors capability. Cut rows, each with its one-line reason: CR0
 corpus scans (identical by construction), CR09 zero for every open-weight model, CR07
 constant 0.90 (a property of the confidence binning at this budget — this also resolves
 your calibration note by removal), CR08/CR10/CR11 (discriminating but required by no
-note). **Headline for the caption:** Gemma's n=10 cyber zero becomes 0.375 [.355,.395]
-at n=150 — a resolution artefact, not a property of the model; no model reaches green;
-Qwen's TF is stable across n (58.9 at both budgets).
+note). Facts: Gemma's n=10 cyber zero reads 0.375 [.355,.395]
+at n=150; no model reaches the green band; Qwen's TF is identical at both budgets
+(58.9).
 
 ### 14b. Known public values vs this run — the gap, stated
 
@@ -145,17 +142,12 @@ is an answer-parser mismatch with chain-of-thought outputs, not a model property
 Direction is inconsistent too (Gemma's humaneval: ours 1.00, card ≈0.40), so no
 correction factor exists.
 
-**Recommendation for the paper.** Present R06 as an internal-harness score that supports
-cross-model comparison *within this protocol only*, or drop the capability row from the
-claims entirely; never write that the values are consistent with public scores. If the
-paper keeps R06, one sentence naming the three causes above is the honest form. Note the
-Trust Factor is untouched by this: {R01, R02, R05, R12} contains no capability
-benchmark.
+(Fact: the Trust Factor set {R01, R02, R05, R12} contains no capability benchmark and
+is unaffected.)
 
 ### 15. Constant calibration row (0.90)
-**ANSWER (one clause):** the value is a property of the confidence-binning procedure at
-this sampling budget, not of the models. (With the reduced table the row can also
-simply be cut.)
+**ANSWER:** the value is a property of the confidence-binning procedure at this
+sampling budget, not of the models.
 
 ### 16. Drop-out phases of the four partial sessions
 **ANSWER:** all four dropped during or at the end of the **baseline** phase — two after
@@ -164,7 +156,7 @@ dashboard phase (P20, P24). Conservative direction: it biases the retained sampl
 toward people who can read raw files.
 
 ### 17. Pre-registration
-**ANSWER:** none exists. Your honest sentence is the correct form; the note can go.
+**ANSWER:** none exists.
 
 ### 18. P25 censoring + Pairs column + five-minute-cap counts
 **ANSWER — Pairs surviving time-censoring:** P1 6/6 · P3 4/6 · P15 6/6 · P16 5/6 ·
@@ -174,7 +166,7 @@ the five-minute cap in either condition**; every censored pair is an explicit gi
 24 & 30.)
 
 ### 19. Redundant band label in the build
-**→ YOURS (build check).** Verify in the compiled figure before submission.
+**→ Prose/build check — awaiting your pass.**
 
 ### 20. Cite the taxonomy (Wohlin)
 **ANSWER:** `wohlin2012experimentation` is now in `references.bib` — just cite it.
@@ -190,12 +182,10 @@ divergences are ≤ 10 s and consistent with tunnel transport latency.
 
 ### 23. Run cost (`\todo{time}` on `\todo{hardware}`)
 **ANSWER:** the five-requirement, fifteen-benchmark run against the 8B model completes
-in **85 minutes on an Apple M4 Max, 36 GB**, at 150 items per benchmark. (Same wording
-caveat as item 7: not "a full requirement set".)
+in **85 minutes on an Apple M4 Max, 36 GB**, at 150 items per benchmark. (Same scope fact as item 7.)
 
 ### 24. Guided-mode observation without a measure
-**→ YOURS (prose).** No before/after count exists; state it plainly as an observation
-from review meetings.
+**→ Prose — awaiting your rewrite.** (Fact: no before/after count exists.)
 
 ---
 

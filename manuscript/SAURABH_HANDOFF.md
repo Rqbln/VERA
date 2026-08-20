@@ -19,9 +19,16 @@ the old n=10 panel is preserved as `paper_results_multi_n10.json`).
 ## The notes, one by one, in document order
 
 ### 1. Introduction — the reviewer anecdote (`\todo{v}`, `\todo{n}` ×3 + note)
-**→ ROBIN.** The score, the minutes and the log length must come from the internal
-review record. If no single case can be reconstructed, use your own fallback wording
-("the typical time to answer one such question…").
+**ANSWER (verified on the stored runs):** the score is **0.50 — AI disclosure (R08) on
+Llama 3.1 8B** (the other models sit at 1.00). A full 12-requirement n=10 run's harness
+log is **209 JSONL lines**, of which the R08 self-disclosure probe accounts for **10
+model responses**. The **minutes were never measured** — no clock existed on that
+reading task, so the "\todo{n} minutes" cannot be filled with a real number. Robin's
+supplied wording that keeps only measured facts:
+> "a reviewer asked which benchmarks produced the AI-disclosure score of 0.50 for one
+> model; answering meant scanning the 209-line harness log to isolate the 10
+> self-disclosure responses behind that requirement — every fact was already in the
+> files, just not surfaced." 
 
 ### 2. Related-work table — tool versions and access dates
 **→ Prose — awaiting your rewrite.**
@@ -91,8 +98,19 @@ successes (22–180 s)**; one hit the five-minute cap, two gave up within second
 pasted the wrong page's address.
 
 ### 13. Ethics statement
-**→ ROBIN.** No name/email collected, server-assigned codes, closed lists, aggregate
-reporting; the review-body / exemption status is Robin's to state.
+**ANSWER (from Robin):** the work was reviewed and approved by the bank's Responsible
+AI and Risk \& Compliance functions, whose members are co-authors (Responsible AI;
+Responsible AI + Risk \& Compliance; Group Data Office); no separate academic ethics
+board exists at the bank — Risk/Compliance plays that role under the
+three-lines-of-defence governance. Robin's supplied wording:
+> "The study involved internal participants and anonymous-by-design data collection.
+> It was reviewed and approved by the bank's Responsible AI and Risk \& Compliance
+> functions, whose members are co-authors; no separate academic ethics board was
+> involved, consistent with the bank's three-lines-of-defence governance for internal
+> tooling."
+
+⚠️ Double-blind note: in the submitted version this sentence must not name the bank
+(see item 25). Open confirmations are listed at the end.
 
 ### 14. Panel refresh ("after we get new result…")
 **ANSWER — the refreshed panel, n=150, seed 42:**
@@ -133,14 +151,20 @@ is itself part of the gap):
 | truthfulqa | 1.000 | 1.000 | 1.000 | 1.000 | — (metric not comparable) |
 | bbh | 1.000 | 1.000 | 1.000 | 1.000 | 0.5–0.7 range |
 
-**Reading.** These are not leaderboard reproductions and must not be presented as such.
-Three protocol causes, all documented rather than masked (this was the agreed guardrail):
-(1) the no-logprob serving path scores capability items through judge/parse heuristics
-that saturate toward 0/1 instead of grading; (2) prompt format differs from the cards
-(no few-shot); (3) gsm8k at 0.000 for all four models — including Qwen, publicly ≈0.85 —
-is an answer-parser mismatch with chain-of-thought outputs, not a model property.
-Direction is inconsistent too (Gemma's humaneval: ours 1.00, card ≈0.40), so no
-correction factor exists.
+**Reading — decision recorded (Robin, 2026-08-20).** The harness scores MMLU (and
+peers) as aggregated **pass/fail at a fixed sample budget** — discrete values
+(0 / 0.5 / 1.0), not a continuous accuracy — so the re-run did not and cannot align
+these numbers with the public leaderboard accuracies (≈0.68–0.74 for MMLU). **The
+public-match ambition is formally abandoned**: never present R06 components as "the
+model's MMLU score"; R06 = 0.800 means 4 of 5 benchmarks pass the internal threshold.
+Any wording implying alignment with public figures must be removed. Contributing
+protocol causes, documented rather than masked: the no-logprob path's judge/parse
+scoring, no few-shot prompting, and a gsm8k answer-parser mismatch with
+chain-of-thought outputs (0.000 for all four models, including Qwen at ≈0.85 publicly).
+Robin's supplied sentence for §Results or §Threats:
+> "Our per-benchmark values are internal pass/fail checks at a fixed sample budget,
+> not a reproduction of the public leaderboard accuracies; they are intended for
+> relative, within-tool comparison, not to match reported MMLU/GSM8K figures." 
 
 (Fact: the Trust Factor set {R01, R02, R05, R12} contains no capability benchmark and
 is unaffected.)
@@ -177,8 +201,15 @@ the five-minute cap in either condition**; every censored pair is an explicit gi
 divergences are ≤ 10 s and consistent with tunnel transport latency.
 
 ### 22. Usage figures (months, runs, release reviews)
-**→ ROBIN.** The deployment's Redis can give a floor for run counts, but the period and
-"fed a release review" need Robin's records.
+**ANSWER (from Robin — the sentence as drafted would be false and must be reframed):**
+the runs behind this paper are production runs for the paper, not reviewer adoption.
+Decision: use exclusively the runs of 20 August 2026 — **4 evaluation runs, one per
+model, 4 distinct served models** (llama3.1:8b-instruct-q8\_0, qwen2.5:7b, gemma2:9b,
+mistral:7b, all via local Ollama), 150 samples per benchmark on 5 requirements.
+**No run fed a release review — do not claim one.** Robin's supplied replacement:
+> "To produce the results in this paper, we ran VERA on four served models (Llama 3.1
+> 8B, Qwen2.5 7B, Gemma 2 9B, Mistral 7B) at 150 samples per benchmark, on 20 August
+> 2026." 
 
 ### 23. Run cost (`\todo{time}` on `\todo{hardware}`)
 **ANSWER:** the five-requirement, fifteen-benchmark run against the 8B model completes
@@ -187,19 +218,53 @@ in **85 minutes on an Apple M4 Max, 36 GB**, at 150 items per benchmark. (Same s
 ### 24. Guided-mode observation without a measure
 **→ Prose — awaiting your rewrite.** (Fact: no before/after count exists.)
 
+### 25. SEIP format — VERIFIED on the official APSEC 2026 site (three hard findings)
+
+**ANSWER (from Robin, conf.researchr.org/track/apsec-2026):**
+1. **10 pages maximum for everything** — main text *including appendices, figures,
+   tables AND references*. No separate reference page.
+2. **DOUBLE-BLIND, contrary to our working assumption.** Names/affiliations off the
+   title page, self-citations in the third person, anonymized artifacts; violations
+   risk desk rejection. Consequences: use the anonymous build (no named author block),
+   replace the public `github.com/Rqbln/VERA` URL with the anonymized mirror, and the
+   ethics sentence must not name the bank.
+3. **Strict AI \& Originality policy**: AI tools only for minor linguistic assistance;
+   generating manuscript text is prohibited, and authors attest the core contributions
+   are theirs. The prose must be author-written — which is the division of labour this
+   pack already follows.
+
 ---
 
 ## Also done, outside the tex
 
-- `references.bib` gained `wohlin2012experimentation`, `ko2015practical`, `codecarbon`,
-  and **three STUBS to replace with your exact Overleaf entries**: `rajput2024fecom`,
-  `rajput2024greenlight`, `mehditabar2025smart`.
+- `references.bib` is now the **merge of the Overleaf bibliography (48 entries,
+  authoritative on shared keys — the former stubs are replaced by the real
+  rajput/mehditabar/weninger/liu entries, plus `rajput2026codegreen`) with three
+  local-only additions** (`wohlin2012experimentation`, `ko2015practical`,
+  `codecarbon`). The ICSE paper still builds against it with zero undefined citations.
+  Two flags: `zou2023advbench` is cited only inside a commented line (fix only if
+  uncommented), and `mehditabar2025smart` carries arXiv 2511.07698 — confirm that ID
+  before submission.
 - Build note: the draft's `\usepackage{etc}` does not compile outside Overleaf
   (`etc.sty` does not exist), and `\todo`/`\nax` need definitions locally — nothing was
   changed, just flagged.
 - User-study final state: 10 completers (your draft's tables carry 8 — P26 and P27
   arrived after your pass; their rows are in items 14/18 above), quality 27/60 vs 42/60,
   exact Wilcoxon p = .016; time 56 s vs 30 s, p = .065.
+
+## Remaining open confirmations (Robin)
+
+Items 1, 13, 22 and 25 are answered above; what stays open:
+1. A Risk \& Compliance protocol/reference number for the ethics sentence, if one
+   exists.
+2. The seventh co-author's exact affiliation (Group Data Office?) and spelling
+   ("Lebecq" vs "Le Becq") — moot on the title page under double-blind, still needed
+   for the camera-ready.
+3. Re-identification check: verify the role+seniority+experience combinations in
+   `survey.csv` cannot single out an individual in a small team.
+4. Consent coverage: confirm participants accepted aggregate publication (the
+   Risk \& Compliance approval should cover it).
+5. Confirm arXiv 2511.07698 for `mehditabar2025smart`.
 
 ## Regeneration
 

@@ -1,23 +1,3 @@
-# SEIP data pack — answers to the annotated TODOs, in document order
-
-Companion to your annotated `main_apsec.tex`. **The tex file is untouched**: every
-answer below is keyed to your own note, in the order the notes appear in the document,
-ready to paste. Counts: the draft carries **53 `\todo{}` markers on 42 lines**. This
-pack **answers 29 of them with measured data**; **17 await your prose** (marked
-"awaiting rewrite", nothing else to say about them here); **7 are items only Robin can
-supply** (some markers count twice when a note asks for both data and a rewrite).
-
-Data provenance: a refreshed evaluation run on four open-weight models of comparable
-size (Llama 3.1 8B instruct-q8_0, Qwen2.5 7B, Gemma 2 9B, Mistral 7B), **150 items per
-benchmark, seed 42**, executed 2026-08-20 on an Apple M4 Max (36 GB): 85 + 66 + 79 + 68
-minutes = **4 h 58 total**. Plus the final user-study exports (10 completers). JSONs in
-`manuscript/results/` (`paper_results_n150_*.json`, merged `paper_results_multi.json`;
-the old n=10 panel is preserved as `paper_results_multi_n10.json`).
-
----
-
-## The notes, one by one, in document order
-
 ### 1. Introduction — the reviewer anecdote (`\todo{v}`, `\todo{n}` ×3 + note)
 **ANSWER (verified on the stored runs):** the score is **0.50 — AI disclosure (R08) on
 Llama 3.1 8B** (the other models sit at 1.00). A full 12-requirement n=10 run's harness
@@ -218,7 +198,7 @@ in **85 minutes on an Apple M4 Max, 36 GB**, at 150 items per benchmark. (Same s
 ### 24. Guided-mode observation without a measure
 **→ Prose — awaiting your rewrite.** (Fact: no before/after count exists.)
 
-### 25. SEIP format — VERIFIED on the official APSEC 2026 site (corrected)
+### 25. SEIP format — VERIFIED on the official APSEC 2026 site 
 
 **ANSWER (from Robin, conf.researchr.org/track/apsec-2026):**
 1. **10 + 1 pages**: 10 pages of content (appendices, figures and tables included)
@@ -233,38 +213,7 @@ in **85 minutes on an Apple M4 Max, 36 GB**, at 150 items per benchmark. (Same s
 3. **IEEE Authorship Policy applies**; the prose stays author-written — which is the
    division of labour this pack already follows.
 
----
 
-## Also done, outside the tex
-
-- `references.bib` is now the **merge of the Overleaf bibliography (48 entries,
-  authoritative on shared keys — the former stubs are replaced by the real
-  rajput/mehditabar/weninger/liu entries, plus `rajput2026codegreen`) with three
-  local-only additions** (`wohlin2012experimentation`, `ko2015practical`,
-  `codecarbon`). The ICSE paper still builds against it with zero undefined citations.
-  Two flags: `zou2023advbench` is cited only inside a commented line (fix only if
-  uncommented), and `mehditabar2025smart` carries arXiv 2511.07698 — confirm that ID
-  before submission.
-- Build note: the draft's `\usepackage{etc}` does not compile outside Overleaf
-  (`etc.sty` does not exist), and `\todo`/`\nax` need definitions locally — nothing was
-  changed, just flagged.
-- User-study final state: 10 completers (your draft's tables carry 8 — P26 and P27
-  arrived after your pass; their rows are in items 14/18 above), quality 27/60 vs 42/60,
-  exact Wilcoxon p = .016; time 56 s vs 30 s, p = .065.
-
-## Remaining open confirmations (Robin)
-
-Items 1, 13, 22 and 25 are answered above; what stays open:
-1. A Risk \& Compliance protocol/reference number for the ethics sentence, if one
-   exists.
-2. The seventh co-author's exact affiliation (Group Data Office?) and spelling
-   ("Lebecq" vs "Le Becq") — the submission is named, so this appears on the title
-   page from the start.
-3. Re-identification check: verify the role+seniority+experience combinations in
-   `survey.csv` cannot single out an individual in a small team.
-4. Consent coverage: confirm participants accepted aggregate publication (the
-   Risk \& Compliance approval should cover it).
-5. Confirm arXiv 2511.07698 for `mehditabar2025smart`.
 
 ## Regeneration
 

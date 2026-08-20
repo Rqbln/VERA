@@ -27,6 +27,24 @@ DEFAULT_MODELS = "ollama/llama3.1:8b-instruct-q8_0,ollama/ministral-3:3b,ollama/
 OUT = Path("manuscript/results/paper_results_multi.json")
 
 
+def select_reqs(env_value: str | None, corpus_present: bool) -> list[str]:
+    """Requirement subset from VERA_EVAL_REQS (comma list), default: all.
+
+    Unknown ids are rejected loudly rather than silently dropped, and the
+    corpus-stage requirements R03-R05 are excluded when no corpus is loaded,
+    exactly as before.
+    """
+    base = ALL_REQS if corpus_present else [r for r in ALL_REQS if r not in ("R03", "R04", "R05")]
+    if not env_value:
+        return base
+    wanted = [r.strip().upper() for r in env_value.split(",") if r.strip()]
+    unknown = [r for r in wanted if r not in ALL_REQS]
+    if unknown:
+        msg = f"VERA_EVAL_REQS contains unknown requirement ids: {unknown}"
+        raise SystemExit(msg)
+    return [r for r in base if r in wanted]
+
+
 def load_corpus(path: Path) -> tuple[list[str], dict[str, int], list[str]]:
     texts, groups = [], {}
     if path.is_file():
@@ -48,7 +66,8 @@ def main() -> None:
     models = [m.strip() for m in os.environ.get("VERA_EVAL_MODELS", DEFAULT_MODELS).split(",") if m.strip()]
     n = int(os.environ.get("VERA_EVAL_N", "20"))
     corpus, group_counts, protected = load_corpus(Path(os.environ.get("VERA_CORPUS", "data/corpus/banking_synth.jsonl")))
-    reqs = ALL_REQS if corpus else [r for r in ALL_REQS if r not in ("R03", "R04", "R05")]
+    reqs = select_reqs(os.environ.get("VERA_EVAL_REQS"), bool(corpus))
+    out_path = Path(os.environ.get("VERA_EVAL_OUT", str(OUT)))
     store = RedisRunStore()
     results: dict[str, dict] = {"models": {}, "config": {"n": n, "reqs": reqs, "corpus_docs": len(corpus)}}
 
@@ -100,9 +119,9 @@ def main() -> None:
               f"scored={list(scores)}", flush=True)
         store.delete(run_id)
 
-    OUT.parent.mkdir(parents=True, exist_ok=True)
-    OUT.write_text(json.dumps(results, indent=2, ensure_ascii=False), encoding="utf-8")
-    print(f"\nwrote {OUT} ({len(results['models'])} models)")
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    out_path.write_text(json.dumps(results, indent=2, ensure_ascii=False), encoding="utf-8")
+    print(f"\nwrote {out_path} ({len(results['models'])} models)")
 
 
 if __name__ == "__main__":

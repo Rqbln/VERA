@@ -187,6 +187,28 @@ falling 0.50 → 0.375 with a real CI), Gemma's zero was a resolution artefact
 (0 → 0.375), and Mistral's TF is stable (67.0). Ranking by TF: Mistral ≳ Llama = Gemma
 > Qwen.
 
+## Final state (2026-08-20, end of the one-shot pass)
+
+**All four runs are done and every numeric todo in `main_apsec.tex` is filled** from the
+measurements above: the refreshed panel table (5 requirements × 4 models + TF + energy +
+wall time), the TF aggregation formula with its worked example (66.4), the energy
+sentence (CodeCarbon 3.2.8, online, FR grid), the run cost (85 min on Apple M4 Max
+36 GB), the suite pin (commit 8a71cf3: 178 backend tests, 52 browser scenarios), the
+corpus size (230 docs), the runspec table (true values of the pinned study run), the
+Pairs column with P26/P27 rows added, the censoring note (0 timeouts), the T8 outcome,
+the drop-out phases, and the clock-gap count. Two build fixes on the way: the stray
+`\usepackage{etc}` removed, `\todo`/`\nax` defined locally.
+
+**Still open — 14 visible TODO markers**, all prose or Robin-only: the reviewer
+anecdote, usage figures, ethics status, tool versions/access dates in Table I,
+per-requirement references, the F×R partial cells, the COMPL-AI energy-claim check,
+HISTREE anchoring, the band-label build check, the observation-vs-measure rewording,
+and three bibliography STUBS (`rajput2024fecom`, `rajput2024greenlight`,
+`mehditabar2025smart`) that need the exact entries from the Overleaf bib.
+
+**Page budget warning**: the draft builds at 14 pages against a 10-page SEIP budget —
+the cut has to come from prose, which is the rewrite's call, not this pass's.
+
 ## Open items that only Robin can fill
 
 1. **L117-118** — the reviewer anecdote (which score, how many minutes, log length): from

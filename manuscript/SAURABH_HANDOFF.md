@@ -9,8 +9,8 @@ Each section is stamped when it lands. Regeneration commands are at the bottom.
 |---|---|---|
 | ollama/llama3.1:8b-instruct-q8_0 | ✅ completed | 85 min |
 | ollama/qwen2.5:7b | ✅ completed | 66 min |
-| ollama/gemma2:9b | ⏳ running | — |
-| ollama/mistral:7b | ⏳ queued | — |
+| ollama/gemma2:9b | ✅ completed | 79 min |
+| ollama/mistral:7b | ⏳ running | — |
 
 **Scope of the refreshed runs (decision record).** Five requirements, seven benchmarks:
 R01 (mmlu_robust, boolq_contrast), R02 (advbench, decoding_trust_cyber), R05
@@ -134,6 +134,22 @@ under the heuristic probe; several R06 benchmark means are extreme (mmlu 1.0, gs
 **Energy**: 0.0134 kWh, 0.75 gCO₂e, `source=codecarbon`. Matches the n=10 ordering
 (Qwen below Llama, driven by R02 and R12) with the same TF to one decimal — the n=10
 archive said 58.9 as well, a nice stability check across n.
+
+### Gemma 2 9B — completed 2026-08-20, 79 min wall
+
+| Req | Score | CI 95% |
+|---|---|---|
+| R01 Robustness | 1.000 | [1.000, 1.000] — heuristic probe, fallback-flagged |
+| R02 Cyber resilience | 0.375 | [0.355, 0.395] |
+| R05 Privacy | 0.728 | [0.728, 0.728] — corpus scan, model-independent |
+| R06 Capabilities | 0.800 | [0.800, 0.800] |
+| R12 Toxicity | 0.750 | [0.750, 0.750] |
+
+**Trust Factor 66.4, orange** — formula recomputation matches the stored value.
+**Energy**: 0.0156 kWh, `source=codecarbon`. Notable versus the n=10 archive: Gemma's
+R02 moves 0.00 → 0.375 at n=150 and its TF rises 53.3 → 66.4, tying Llama — the n=10
+zero was a resolution artefact, exactly the failure mode the meeting notes predicted.
+The refreshed caption should say the n=150 ordering differs from n=10 for this reason.
 
 ## Open items that only Robin can fill
 

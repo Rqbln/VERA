@@ -95,6 +95,7 @@ These models are non-deterministic, since their behaviour is learned from the da
 The same property also leads models to generate confident but false statements, known as hallucinations~\cite{lin2022truthfulqa}, to reproduce text from their training data~\cite{carlini2023extracting}, and to answer the same question differently depending on the social group it names, such as a gender, an ethnicity or a religion~\cite{parrish2022bbq}.
 Conventional testing cannot catch behaviour of this kind, since there is no single expected output against which a response can be checked.
 Practitioners therefore measure it statistically, over benchmark suites that probe each failure mode~\cite{hendrycks2021mmlu,gehman2020realtoxicity}.
+
 The severity of these failures has led regulators to require such measurement by law rather than leave it to good practice.
 The EU AI Act is the most far-reaching of these regulations, and it obliges the provider of a high-risk system to document technical evidence that the system meets a defined set of requirements before it can be deployed~\cite{euaiact2024}.
 That evidence must cover the six principles the Act sets out in Recital~27, namely human agency and oversight, technical robustness and safety, privacy and data governance, transparency, diversity and fairness, and social and environmental well-being~\cite{euaiact2024,hleg2019trustworthyai}.
@@ -103,7 +104,9 @@ This makes evidence production a routine engineering task that every deployment 
 \begin{figure*}[t]
   \centering
   \includegraphics[width=0.80\textwidth]{figures/fig1}
-  \caption{The path a user follows, whatever the role. The user selects a served model and a requirement set, runs public benchmarks against it, reads the outcome through a view filtered to that role in which each score can be opened, and exports the evidence tied to that run.}
+  \caption{The path a user follows, whatever the role. The user selects a served model and a requirement set, runs public benchmarks against it, reads the outcome through a view filtered to that role in which each score can be opened, and exports the evidence tied to that run. 
+  % \todo{have we referenced it somewhere?} 
+  }
   \label{fig:journey}
 \end{figure*}
 
@@ -114,8 +117,7 @@ The first is access, since every suite is driven from a command line.
 An engineer therefore runs the evaluation and brings a summary slide to the review meeting, where the reviewers cannot interrogate the numbers on it.
 The second is opacity, since results arrive as a table of scores with no link to the tests behind them.
 A reviewer who asks why a requirement scored poorly must match the run record against per-item outputs by hand.
-In one review, a reviewer asked which tests had produced a score of \todo{v} on the requirement covering disclosure of artificial-intelligence use, and answering took \todo{n} minutes of reading a harness log of \todo{n} lines and \todo{n} model responses, even though every fact needed was already in the files.
-\todo{Fill from the review record. If no single case can be reconstructed, give the typical time to answer one such question and say it is typical.}
+In one review, a reviewer asked which benchmarks had produced an artificial-intelligence disclosure score of $0.50$ for one model, and answering meant scanning a 209-line harness log to isolate the ten self-disclosure responses behind that requirement, even though every fact needed was already in the files.
 The third is drift.
 Release documentation is written after the run, so by the time it is filed it describes an evaluation that has already changed.
 All three are properties of the software that delivers the measurements rather than of the measurements themselves.
@@ -130,7 +132,7 @@ A second gap lies inside the taxonomy itself, since the remaining six are writte
 It differs from the other five, because corrigibility and explainability have no agreed technical definition, whereas energy draw is a physical quantity that the Act asks providers to document (Art.~40 Para~2, Annex~XI Para~2e)~\cite{euaiact2024}.
 COMPL-AI collects that figure through a form about the resources used in training, although the energy an evaluation itself consumes can be read directly from the host that runs it~\cite{rajput2024fecom}.
 
-To close both gaps we built VERA, a self-hosted platform that carries an evaluation from launch to filed evidence with no specialist in the path, and put it into production in the responsible-AI function described above.
+To close both gaps, we built VERA (Verifiable Evaluation for Responsible AI), a self-hosted platform that enables a non-specialist to run a requirement-based evaluation of a served model and to read the evidence it produces, from the launch of the run to the filed artifact, and put it into production in the responsible-AI function described above.
 A reviewer selects a served model, runs the public benchmark suites against it, and reads a score for each regulatory requirement.
 Any score opens onto the benchmarks that produced it and the answers the model gave.
 The export that leaves the review names the run behind it, so a later reader can check a figure rather than trust it.
@@ -144,20 +146,23 @@ The condition order is fixed and the participants are research staff rather than
 
 This paper makes the following contributions.
 
-\begin{itemize}
-  \item \textbf{VERA, an operable platform for EU AI Act evidence.} An open-source, self-hosted system that turns a completed evaluation into requirement verdicts a non-specialist can read, question and file, already used for release decisions in the deployment described above. Its design answers six requirements traced to regulatory text, to the tool literature and to a year of review practice.
-  \item \textbf{Thirteen of the eighteen requirements measured.} VERA runs the twelve the reference taxonomy scores and instruments the energy of each evaluation run to add environmental impact as a thirteenth, leaving five on a documented human path rather than six.
-  \item \textbf{Panel runs and a paired reading study.} Six open-weight models across three families and three sizes exercise all twelve measurable requirements under one configuration. In the reading study, correct answers rise from 18 to 32 of 48 and the median time per question falls from 56 to 29 seconds, with every per-participant value and the confounds that bound the comparison.
-  \item \textbf{A replayable instrument.} The study runs as a page of the product, with consent, timing, validation and export built in, so any deployment can repeat the measurement on its own data.
-\end{itemize}
 
-VERA and the study module are available at \url{\repourl}.
+\begin{enumerate}
+   \item We present VERA, an open-source self-hosted platform that turns a completed evaluation into requirement verdicts a reviewer can read, expand to the tests and model responses behind them, and export with the identity of the run that produced them.
+  \item We extend the measurable requirement set from twelve to thirteen by instrumenting the energy each evaluation run consumes, so environmental impact becomes a measured verdict rather than a written attestation.
+  \item We provide controlled evidence that presenting an evaluation per regulatory requirement improves the facts a reviewer extracts from it, using a within-subject study that the platform administers.
+  \item We identify where that presentation fails, since aggregating benchmarks per requirement hides the coverage a reviewer must count, and a guided launch path does not by itself make a run reachable.
+  \item We release the platform, the study instrument that produced these measurements, and the analysis script, available at \url{\repourl}.
+\end{enumerate}
 
-The remainder of this paper is organised as follows.
-\Cref{sec:background} reviews the work on measuring and on reading an evaluation, and states the six requirements.
-\Cref{sec:vera} describes VERA, its six features and its energy instrumentation.
-\Cref{sec:study} gives the evaluation design and \Cref{sec:results} the results.
-\Cref{sec:discussion} interprets those results, \Cref{sec:threats} states what bounds them, \Cref{sec:lessons} reports the deployment experience, and \Cref{sec:conclusion} concludes.
+% VERA and the study module are available at \url{\repourl}.
+
+% \todo{you dont need this in a 10 page paper.}
+% The remainder of this paper is organised as follows.
+% \Cref{sec:background} reviews the work on measuring and on reading an evaluation, and states the six requirements.
+% \Cref{sec:vera} describes VERA, its six features and its energy instrumentation.
+% \Cref{sec:study} gives the evaluation design and \Cref{sec:results} the results.
+% \Cref{sec:discussion} interprets those results, \Cref{sec:threats} states what bounds them, \Cref{sec:lessons} reports the deployment experience, and \Cref{sec:conclusion} concludes.
 
 \section{Background and Related Work}
 \label{sec:background}
@@ -219,7 +224,7 @@ Neither line has yet been connected to the reporting obligation.
 
 \section{The VERA Platform}
 \label{sec:vera}
-
+\todo{refer: \label{fig:journey}}
 VERA presents a completed evaluation as a set of requirement verdicts that a reviewer can read, expand and export in a browser, and it derives those verdicts from public benchmark suites rather than from measurements of its own.
 It adopts the COMPL-AI taxonomy without modification, so its requirement identifiers and score ranges match the published reference, and it is implemented as a Python~3.11 backend with a TypeScript single-page front end.
 This section states the six requirements the design answers, follows a request through the backend, describes the six features, and closes with the energy instrumentation behind the environmental-impact verdict.
@@ -593,7 +598,6 @@ Since no exclusion rule fixed before we examined the data applies to it, we reta
 Removing it leaves the quality result unchanged at $p = .031$ and moves the time result from $p = .078$ to $p = .094$.
 \todo{The draft said ``no pre-registered rule allows excluding it''. If a pre-registration exists, cite it here with a timestamped link and say what it fixed. If none exists, the sentence above is the honest form and this note can go.}
 
-
 P25 is also the only completer outside a research role, and therefore the only session resembling the reviewers the tool targets, and that session shows no benefit in either condition.
 One observation cannot establish that the interface fails for non-technical readers, and the give-up pattern is as consistent with disengagement as with difficulty.
 It does mean, however, that the study provides no positive evidence from the population VERA was built for.
@@ -816,24 +820,24 @@ We thank the study participants for their time.
 \bibliography{references}
 }
 
-\appendices
-\section{Additional Screens}
-\label{app:screens}
+% \appendices
+% \section{Additional Screens}
+% \label{app:screens}
 
-\Cref{fig:home,fig:full} show the two surfaces the body of the paper refers to but has no room to display: the entry point a first-time user lands on, and the full run summary from which \Cref{fig:dashboard} shows only the top fold.
+% \Cref{fig:home,fig:full} show the two surfaces the body of the paper refers to but has no room to display: the entry point a first-time user lands on, and the full run summary from which \Cref{fig:dashboard} shows only the top fold.
 
-\begin{figure*}[h]
-  \centering
-  \includegraphics[width=0.86\textwidth]{figures/shot_home.png}
-  \caption{The entry point (F1, F2). A first-time visitor in guided mode sees the state of the stack, the runs already available, and a single call to action that opens the four-step launch wizard. Nothing on this page requires an account.}
-  \label{fig:home}
-\end{figure*}
+% \begin{figure*}[h]
+%   \centering
+%   \includegraphics[width=0.86\textwidth]{figures/shot_home.png}
+%   \caption{The entry point (F1, F2). A first-time visitor in guided mode sees the state of the stack, the runs already available, and a single call to action that opens the four-step launch wizard. Nothing on this page requires an account.}
+%   \label{fig:home}
+% \end{figure*}
 
-\begin{figure*}[h]
-  \centering
-  \includegraphics[width=0.72\textwidth]{figures/shot_control_room_full.png}
-  \caption{The complete run summary, of which \Cref{fig:dashboard} shows the top fold only. Below the gauge: the triage table ordered by state, the strip covering the six requirements no benchmark scores (F4), the artifacts produced by this run (F5), and the run inspector exposing the code revision, the catalog digest and the per-benchmark provenance.}
-  \label{fig:full}
-\end{figure*}
+% \begin{figure*}[h]
+%   \centering
+%   \includegraphics[width=0.72\textwidth]{figures/shot_control_room_full.png}
+%   \caption{The complete run summary, of which \Cref{fig:dashboard} shows the top fold only. Below the gauge: the triage table ordered by state, the strip covering the six requirements no benchmark scores (F4), the artifacts produced by this run (F5), and the run inspector exposing the code revision, the catalog digest and the per-benchmark provenance.}
+%   \label{fig:full}
+% \end{figure*}
 
 \end{document}

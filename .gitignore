@@ -20,6 +20,7 @@ htmlcov/
 # Identity: kept out of the repo (anonymized mirror proxies it)
 VERA_DOSSIER_RAPPORT_S2.md
 manuscript/authors.tex
+manuscript/authors_apsec.tex
 docs/ANONYMIZATION_ROADMAP.md
 
 # Claude Code session/config

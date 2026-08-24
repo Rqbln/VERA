@@ -1,17 +1,83 @@
 ---
 doc:
-  title: "VERA user study protocol (RQ1, external non-specialists)"
+  title: "VERA user study protocol (two-condition quiz + TAM)"
   slug: user-study-protocol
   language: en
   summary: |
-    Fixed-task, timed walkthrough of the control room with n>=5 external
-    non-specialists (compliance / risk profiles, not authors). Produces the
-    completion and timing data behind the paper's RQ1 claim.
+    Within-subject, two-condition quiz: six questions answered from the run's
+    raw artifacts, then six matched questions answered from the dashboard.
+    Produces the paired quality and time data behind the paper's claim, plus
+    a TAM questionnaire as a secondary perception measure.
   audience: [human]
-last_reviewed: "2026-07-13"
+last_reviewed: "2026-08-13"
 ---
 
-# VERA user study protocol (RQ1)
+# VERA user study protocol
+
+**Goal.** Measure whether a user answers factual questions about a completed
+evaluation **more correctly and faster** with the dashboard than from the raw
+result files an engineer would hand over. Output: per-item correctness
+(validated server-side) and time, paired within participant, for n >= 12.
+
+## Two-condition design (the current protocol)
+
+- **Within-subject, fixed condition order**: every participant answers six
+  questions in the *baseline* condition first (raw artifacts only), then six
+  in the *dashboard* condition. The order is fixed by design decision; the
+  learning threat is mitigated by the matched sets below and declared in the
+  paper's threats section.
+- **Two matched six-item sets (A and B)**: same question types, different
+  named targets, both answerable in both conditions from the same snapshot.
+  The server assigns which set lands in which phase (the session's `arm`,
+  alternating by participant number), so content learning between phases is
+  neutralised across the sample.
+- **Baseline materials**: the study page shows the run's raw files in-page
+  (parsed `benchmark_run.yaml`, the harness provenance log, paginated
+  `raw_outputs.jsonl`). No dashboard access exists during part 1.
+- **Symmetric access**: in part 2, each question's button deep-links to the
+  view holding the answer (`?run=` summary, `?req=` requirement drawer,
+  `?details=1` harness log; T8 links to `/launch`). This mirrors the baseline
+  tabs: both conditions start one click from the right material, and a link
+  selects a view, never an answer. Time stays app-measured in both parts.
+- **The six pairs** (set A / set B): weakest vs second-weakest requirement;
+  score + CI of a named requirement (two different targets); fallback
+  benchmarks vs contributing benchmarks of a named requirement; count of
+  requirements evaluated vs count of benchmarks executed; triage counts vs
+  band counts; reach a raw output of a named benchmark (two targets, verdict
+  `unverified`, audited manually).
+- **Epilogue (non-comparative)**: T8, launch a run through the wizard. It
+  feeds the operability claim and is excluded from the paired comparison.
+- **TAM questionnaire**: kept, reported as a secondary perception measure.
+
+**Analysis** (`scripts/analyze_user_study.py --quiz data/user_study/quiz.csv`):
+per-participant correct counts and median times per condition; exact two-sided
+Wilcoxon signed-rank on the paired deltas (stdlib, sign-permutation DP); exact
+McNemar per pair; a gave-up or timed-out item censors its pair for the time
+comparison and counts as incorrect for quality. LaTeX rows are emitted for the
+paper's tables.
+
+**Compliance note (webapp vs Microsoft Forms).** The webapp is the primary
+instrument because it gives monotonic per-question timing and server-side
+validation. It matches an internal Microsoft Forms on the points that matter:
+no name, employer, IP or free-text identity field is stored; participants are
+identified by a server-assigned code (P1, P2, ...); every profile question is
+a closed list; results are reported in aggregate only. Invitation tracking
+(who was invited, reminder dates, response rate) lives in a private
+spreadsheet OUTSIDE the application: sends are tracked, responses are not.
+
+**Fallback: Microsoft Forms.** If compliance declines the webapp, rebuild the
+quiz in an internal MS Forms: one section per part (back navigation locked),
+the six baseline questions with screenshots of the raw files, the six
+dashboard questions with a link to the deployment, timing per section from
+Forms timestamps (coarser than per-question), answers scored offline against
+the same snapshotted key. The question bank and scoring key are this
+document plus the answer-key JSON of the pinned run.
+
+## Legacy protocol (single-condition reading tasks)
+
+The eight-task reading protocol below produced the earlier RQ1 design and
+stays documented because the T1-T8 task ids, the facilitated variant and the
+frozen `sessions.csv` schema still exist in the code and tests.
 
 **Goal.** Measure whether a non-specialist can read an evaluation run from the
 dashboard alone. Output: per-task completion (unassisted / assisted / failed)
@@ -76,16 +142,57 @@ P1,risk officer,T2,yes,no,21,
 ## Analysis
 
 ```bash
-python scripts/analyze_user_study.py data/user_study/sessions.csv
+make study-export     # pulls both CSVs and runs the analysis
+# or directly:
+python scripts/analyze_user_study.py data/user_study/sessions.csv \
+       --survey data/user_study/survey.csv [--exclude P1] [--min-tasks 8] [--comments]
 ```
 
-Prints per-task completion rate, assisted rate, median time with IQR, and the
-LaTeX rows for the paper's RQ1 table.
+Prints per-task completion, assisted rate and median time with IQR; then, with a
+survey file, the participant profile table, the TAM table (mean, SD, median per
+item and per construct), Cronbach's alpha with its n, and a straight-lining
+warning. All LaTeX rows are emitted ready to paste. Comments print only under
+`--comments`: vet them before sharing, `data/user_study/` is not gitignored.
+
+## Acceptability questionnaire (TAM)
+
+After the eighth task, the same page asks eight statements on a 5-point Likert
+scale, following the Technology Acceptance Model: four on **perceived usefulness**
+(faster evaluation, understanding failures, justifying a decision, evaluation
+quality) and four on **perceived ease of use** (clear interface, finding
+information, launching a run alone, learning effort), plus an optional free-text
+comment capped at 500 characters.
+
+Method notes to carry into the paper's threats section:
+
+- Items are grouped by construct in a **fixed order** (comprehension beats
+  randomisation at this sample size) and **none is reverse-coded** (reverse items
+  depress alpha at small n); a straight-lining check compensates.
+- The instrument **mixes tenses**: some items report the session just experienced,
+  others project onto the participant's real work. That is standard for a
+  single-session TAM but must be stated.
+- Cronbach's alpha is unstable below n≈8; the analysis script prints it with its n
+  attached and it must be reported as indicative.
+
+Participants also declare, from fixed lists only (no free-text identity field):
+role, AI/ML experience, EU AI Act familiarity, and years of experience.
+
+Two CSVs come out of the deployment:
+
+| Endpoint | File | Columns |
+|---|---|---|
+| `GET /api/v1/study/export.csv` | `sessions.csv` | `participant,role,task_id,completed,assisted,seconds,notes` (frozen, T1-T8 rows only) |
+| `GET /api/v1/study/export_survey.csv` | `survey.csv` | `participant,role,ai_experience,aiact_familiarity,seniority,locale,tasks_submitted,item,value,comment` |
+| `GET /api/v1/study/export_quiz.csv` | `quiz.csv` | `participant,role,ai_experience,aiact_familiarity,seniority,locale,arm,condition,set,pair,item,completed,verdict,client_seconds,server_seconds` |
+
+The survey export is **session-driven**: every participant emits eight rows even
+when they never reached the questionnaire, so abandonment stays visible through
+`tasks_submitted` and the participant table is never silently truncated.
 
 ## Self-administered variant (app-measured)
 
 The platform ships the study as a page: participants open `<deployment-url>/study`,
-consent, pick their role, and complete the same eight tasks. Methodology:
+consent, declare their profile, and complete the same eight tasks. Methodology:
 
 - **Timing is measured by the application**: a monotonic client clock starts when
   the participant presses *Start this task* and stops at submission; the server

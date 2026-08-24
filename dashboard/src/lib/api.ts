@@ -220,19 +220,60 @@ export async function submitHitlReview(
 }
 
 // ── Self-administered user study (RQ1) ──────────────────────────────────────────────
+export interface StudyQuizItem {
+  id: string;
+  condition: "baseline" | "vera";
+  params: Record<string, string>;
+}
+
 export interface StudySessionInfo {
   session_id: string;
   participant: string;
   run_id: string;
+  arm: string;
+  items: StudyQuizItem[];
   requirement_options: { id: string; name: string }[];
   benchmark_options: string[];
 }
 
+/** Raw run record (parsed benchmark_run.yaml) — the baseline study materials. */
+export async function getBenchmarkRun(
+  token: string | undefined,
+  runId: string,
+): Promise<{ run_id: string; document: unknown }> {
+  return fetchApi(`/api/v1/runs/${runId}/benchmark-run`, token);
+}
+
+export async function getProvenance(
+  token: string | undefined,
+  runId: string,
+): Promise<{ run_id: string; provenance: Record<string, unknown>[] }> {
+  return fetchApi(`/api/v1/runs/${runId}/provenance`, token);
+}
+
 export async function createStudySession(
   token: string | undefined,
-  body: { role: string; locale?: string },
+  body: {
+    role: string;
+    ai_experience: string;
+    aiact_familiarity: string;
+    seniority: string;
+    locale?: string;
+  },
 ): Promise<StudySessionInfo> {
   return fetchApi("/api/v1/study/sessions", token, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+}
+
+export async function submitStudySurvey(
+  token: string | undefined,
+  sessionId: string,
+  body: { items: Record<string, number>; comment?: string },
+): Promise<{ recorded: boolean }> {
+  return fetchApi(`/api/v1/study/sessions/${sessionId}/survey`, token, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),

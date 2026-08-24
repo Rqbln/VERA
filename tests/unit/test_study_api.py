@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import csv
 import importlib.util
+import io
 import sys
 from pathlib import Path
 
@@ -76,10 +78,36 @@ def study_run():
     _wipe_study_keys(study)
 
 
-def _session(client, study_run, role="risk_manager"):
-    resp = client.post("/api/v1/study/sessions", json={"role": role, "run_id": study_run})
+def _session(client, study_run, role="risk_manager", **profile):
+    body = {
+        "role": role,
+        "run_id": study_run,
+        "ai_experience": "reviewer",
+        "aiact_familiarity": "working",
+        "seniority": "6to10",
+        **profile,
+    }
+    resp = client.post("/api/v1/study/sessions", json=body)
     assert resp.status_code == 200
     return resp.json()
+
+
+FULL_SURVEY = {
+    "PU1": 4, "PU2": 4, "PU3": 5, "PU4": 4,
+    "PEOU1": 5, "PEOU2": 4, "PEOU3": 4, "PEOU4": 5,
+}
+
+
+def _survey(client, sid, items=None, comment=""):
+    return client.post(
+        f"/api/v1/study/sessions/{sid}/survey",
+        json={"items": FULL_SURVEY if items is None else items, "comment": comment},
+    )
+
+
+def _survey_rows(client):
+    text = client.get("/api/v1/study/export_survey.csv").text
+    return list(csv.DictReader(io.StringIO(text)))
 
 
 def _submit(client, sid, task_id, answer, seconds=12.0, **kw):
@@ -185,6 +213,106 @@ def test_export_roundtrips_into_analyzer(client, study_run, tmp_path):
     assert summary["T6"]["completed"] == 0
 
 
+# ── TAM survey (APSEC acceptability study) ───────────────────────────────────────────
+def test_session_profile_fields_whitelisted(client, study_run):
+    assert _session(client, study_run)["participant"] == "P1"
+    for field in ("ai_experience", "aiact_familiarity", "seniority"):
+        bad = client.post(
+            "/api/v1/study/sessions",
+            json={
+                "role": "legal",
+                "run_id": study_run,
+                "ai_experience": "reviewer",
+                "aiact_familiarity": "working",
+                "seniority": "6to10",
+                field: "nope",
+            },
+        )
+        assert bad.status_code == 400, field
+    missing = client.post(
+        "/api/v1/study/sessions", json={"role": "legal", "run_id": study_run}
+    )
+    assert missing.status_code == 400  # profile is mandatory
+
+
+def test_survey_persisted_and_exported(client, study_run):
+    sid = _session(client, study_run)["session_id"]
+    assert _survey(client, sid, comment="clear and fast").json() == {"recorded": True}
+    rows = _survey_rows(client)
+    assert len(rows) == 8
+    assert {r["item"] for r in rows} == set(FULL_SURVEY)
+    by_item = {r["item"]: r for r in rows}
+    assert by_item["PU3"]["value"] == "5" and by_item["PEOU1"]["value"] == "5"
+    assert by_item["PU1"]["role"] == "risk_manager"
+    assert by_item["PU1"]["ai_experience"] == "reviewer"
+    assert by_item["PU1"]["aiact_familiarity"] == "working"
+    assert by_item["PU1"]["seniority"] == "6to10"
+    assert by_item["PU1"]["comment"] == "clear and fast"
+
+
+def test_survey_rejects_out_of_range_and_unknown_items(client, study_run):
+    sid = _session(client, study_run)["session_id"]
+    for bad in ({"PU1": 0}, {"PU1": 6}, {"PU9": 3}, {"PU1": "abc"}):
+        assert _survey(client, sid, items=bad).status_code == 400, bad
+
+
+def test_survey_resubmit_overwrites(client, study_run):
+    sid = _session(client, study_run)["session_id"]
+    _survey(client, sid)
+    second = dict(FULL_SURVEY, PU1=2)
+    assert _survey(client, sid, items=second).status_code == 200  # no 409
+    rows = {r["item"]: r["value"] for r in _survey_rows(client)}
+    assert rows["PU1"] == "2"
+
+
+def test_survey_export_includes_sessions_without_survey(client, study_run):
+    _session(client, study_run)  # never answers anything
+    rows = _survey_rows(client)
+    assert len(rows) == 8
+    assert all(r["value"] == "" for r in rows)
+    assert all(r["tasks_submitted"] == "0" for r in rows)
+
+
+def test_survey_comment_truncated(client, study_run):
+    sid = _session(client, study_run)["session_id"]
+    _survey(client, sid, comment="x" * 900)
+    assert len(_survey_rows(client)[0]["comment"]) == 500
+
+
+def test_task_export_unchanged_by_survey(client, study_run):
+    """The 7-column task CSV is frozen: the analyzer and the replication package rely on it."""
+    sid = _session(client, study_run)["session_id"]
+    _submit(client, sid, "T1", {"requirement_id": "R02"})
+    _survey(client, sid)
+    text = client.get("/api/v1/study/export.csv").text
+    lines = text.strip().splitlines()
+    assert lines[0] == "participant,role,task_id,completed,assisted,seconds,notes"
+    assert "PU" not in text and "PEOU" not in text
+
+
+def test_partial_session_exports_partial_rows(client, study_run):
+    sid = _session(client, study_run)["session_id"]
+    for task, answer in (("T1", {"requirement_id": "R02"}), ("T4", {"count": 3})):
+        _submit(client, sid, task, answer)
+    task_rows = client.get("/api/v1/study/export.csv").text.strip().splitlines()[1:]
+    assert len(task_rows) == 2
+    assert all(r["tasks_submitted"] == "2" for r in _survey_rows(client))
+
+
+def test_survey_export_roundtrips_into_analyzer(client, study_run, tmp_path):
+    sid = _session(client, study_run)["session_id"]
+    _survey(client, sid)
+    f = tmp_path / "survey.csv"
+    f.write_text(client.get("/api/v1/study/export_survey.csv").text, encoding="utf-8")
+    rows = analyze.load_survey_rows(f)
+    matrix = analyze.survey_matrix(rows)
+    assert matrix["P1"]["PU3"] == 5
+    pu = analyze.construct_stats(matrix, analyze.PU_ITEMS)
+    assert pu["mean"] == 4.25  # (4+4+5+4)/4
+    profiles = analyze.profile_table(rows)
+    assert len(profiles) == 1 and profiles[0]["seniority"] == "6to10"
+
+
 # ── Pure-function edges ──────────────────────────────────────────────────────────────
 def test_answer_key_ties_and_t4_readings():
     key = build_answer_key(
@@ -223,3 +351,147 @@ def test_validate_tolerance_edges():
     assert ok7  # +-1 on the rounded gauge score
     bad7, _ = validate_answer("T7", {"score": 64, "band": "orange"}, key)
     assert not bad7
+
+
+# ── Two-condition quiz (baseline raw artifacts vs dashboard) ─────────────────────────
+def test_arm_alternates_and_items_order(client, study_run):
+    s1 = _session(client, study_run)
+    s2 = _session(client, study_run)
+    assert s1["arm"] == "alpha_first"
+    assert s2["arm"] == "beta_first"
+    for s, first_letter in ((s1, "A"), (s2, "B")):
+        items = s["items"]
+        assert len(items) == 12
+        assert [i["condition"] for i in items] == ["baseline"] * 6 + ["vera"] * 6
+        assert all(i["id"].endswith(first_letter) for i in items[:6])
+        # Params never leak an answer: named targets only.
+        for i in items:
+            assert not set(i["params"]) & {"score", "ci_lower", "ci_upper", "count"}
+
+
+def test_quiz_item_params_carry_named_targets(client, study_run):
+    items = {i["id"]: i["params"] for i in _session(client, study_run)["items"]}
+    # Q2: the two highest-scoring requirements, named.
+    assert items["Q2A"]["requirement_id"] == "R01"
+    assert items["Q2B"]["requirement_id"] == "R06"
+    assert items["Q2A"]["requirement_name"]
+    # Q3B: requirement with the most contributing benchmarks (tie -> lowest id).
+    assert items["Q3B"]["requirement_id"] == "R01"
+    # Q6: first and last benchmark alphabetically.
+    assert items["Q6A"]["benchmark_id"] == "advbench"
+    assert items["Q6B"]["benchmark_id"] == "mmlu"
+
+
+def test_quiz_answer_key_pairs():
+    key = build_answer_key(
+        {
+            "requirements": [
+                {"id": "R02", "name": "Cyber", "triage": "failed", "score": 0.3,
+                 "score_ci_lower": 0.2, "score_ci_upper": 0.4, "band": "red",
+                 "contributing_benchmarks": ["advbench", "decoding_trust"],
+                 "fallback_benchmarks": []},
+                {"id": "R06", "name": "Cap", "triage": "fallback", "score": 0.72,
+                 "score_ci_lower": 0.65, "score_ci_upper": 0.79, "band": "green",
+                 "contributing_benchmarks": ["mmlu"], "fallback_benchmarks": ["mmlu"]},
+                {"id": "R01", "name": "Rob", "triage": "ok", "score": 0.85,
+                 "score_ci_lower": 0.8, "score_ci_upper": 0.9, "band": "green",
+                 "contributing_benchmarks": ["mmlu_robust"], "fallback_benchmarks": []},
+            ],
+            "triage_counts": {"failed": 1, "fallback": 1, "ok": 1, "uncovered": 0, "na": 0},
+            "requested_requirements": ["R01", "R02", "R06"],
+            "trust_factor": {"score": 62.0, "band": "orange"},
+            "harness_provenance": [{"benchmark_id": "mmlu"}, {"benchmark_id": "advbench"}],
+        }
+    )
+    assert key["second_ids"] == ["R06"]  # next distinct score + second triage row
+    assert key["q2_targets"] == {"A": "R01", "B": "R06"}
+    assert key["q3b_target"] == "R02"  # two contributing benchmarks beat one
+    assert key["q3b_benchmarks"] == ["advbench", "decoding_trust"]
+    assert key["q4b_accepted"] == [2]
+    assert key["band_counts"] == {"red": 1, "orange": 0, "green": 2}
+    assert key["q6_targets"] == {"A": "advbench", "B": "mmlu"}
+
+
+def test_quiz_second_ids_single_distinct_score():
+    key = build_answer_key(
+        {
+            "requirements": [
+                {"id": "R01", "name": "Rob", "triage": "ok", "score": 0.5, "band": "orange",
+                 "contributing_benchmarks": [], "fallback_benchmarks": []},
+                {"id": "R02", "name": "Cyber", "triage": "ok", "score": 0.5, "band": "orange",
+                 "contributing_benchmarks": [], "fallback_benchmarks": []},
+            ],
+            "triage_counts": {"failed": 0, "fallback": 0, "ok": 2, "uncovered": 0, "na": 0},
+            "requested_requirements": ["R01", "R02"],
+            "trust_factor": {"score": 50.0, "band": "orange"},
+            "harness_provenance": [],
+        }
+    )
+    # One distinct score: any weakest reading is accepted for the second rank too.
+    assert set(key["second_ids"]) == set(key["weakest_ids"])
+
+
+def test_quiz_validators_end_to_end(client, study_run):
+    sid = _session(client, study_run)["session_id"]
+    store = RedisStudyStore()
+
+    def verdict(item):
+        return store.get_response(sid, item).verdict
+
+    _submit(client, sid, "Q1A", {"requirement_id": "R02"})
+    _submit(client, sid, "Q1B", {"requirement_id": "R06"})
+    _submit(client, sid, "Q2A", {"score": 0.85, "ci_lower": 0.8, "ci_upper": 0.9})
+    _submit(client, sid, "Q2B", {"score": 0.72, "ci_lower": 0.65, "ci_upper": 0.80})  # wrong upper
+    _submit(client, sid, "Q3A", {"benchmarks": ["mmlu"]})
+    _submit(client, sid, "Q3B", {"benchmarks": ["mmlu_robust"]})
+    _submit(client, sid, "Q4A", {"count": 3})
+    _submit(client, sid, "Q4B", {"count": 2})
+    _submit(client, sid, "Q5A", {"failed": 1, "fallback": 1, "ok": 1})
+    _submit(client, sid, "Q5B", {"red": 1, "orange": 0, "green": 2})
+    _submit(client, sid, "Q6A", {"excerpt": "a genuine model answer", "confirmed": True})
+    _submit(client, sid, "Q6B", {"excerpt": "short", "confirmed": True})
+
+    assert verdict("Q1A") == "correct"
+    assert verdict("Q1B") == "correct"
+    assert verdict("Q2A") == "correct"
+    assert verdict("Q2B") == "wrong"
+    assert verdict("Q3A") == "correct"
+    assert verdict("Q3B") == "correct"
+    assert verdict("Q4A") == "correct"
+    assert verdict("Q4B") == "correct"
+    assert verdict("Q5A") == "correct"
+    assert verdict("Q5B") == "correct"
+    assert verdict("Q6A") == "unverified"
+    assert verdict("Q6B") == "wrong"
+
+
+def test_quiz_export_schema_and_conditions(client, study_run):
+    s1 = _session(client, study_run)  # alpha_first
+    s2 = _session(client, study_run)  # beta_first
+    _submit(client, s1["session_id"], "Q1A", {"requirement_id": "R02"})
+    _submit(client, s1["session_id"], "Q1B", {"requirement_id": "R01"})
+    _submit(client, s2["session_id"], "Q1A", {"requirement_id": "R02"})
+
+    text = client.get("/api/v1/study/export_quiz.csv").text
+    rows = list(csv.DictReader(io.StringIO(text)))
+    assert list(rows[0].keys()) == [
+        "participant", "role", "ai_experience", "aiact_familiarity", "seniority",
+        "locale", "arm", "condition", "set", "pair", "item", "completed", "verdict",
+        "client_seconds", "server_seconds",
+    ]
+    by = {(r["participant"], r["item"]): r for r in rows}
+    assert by[("P1", "Q1A")]["condition"] == "baseline"  # alpha_first: set A first
+    assert by[("P1", "Q1B")]["condition"] == "vera"
+    assert by[("P2", "Q1A")]["condition"] == "vera"  # beta_first: set A second
+    assert by[("P1", "Q1A")]["set"] == "A"
+    assert by[("P1", "Q1A")]["pair"] == "1"
+    assert by[("P1", "Q1B")]["completed"] == "no"  # R01 is not the second-weakest
+
+
+def test_old_exports_untouched_by_quiz(client, study_run):
+    sid = _session(client, study_run)["session_id"]
+    _submit(client, sid, "T1", {"requirement_id": "R02"})
+    _submit(client, sid, "Q1A", {"requirement_id": "R02"})
+    text = client.get("/api/v1/study/export.csv").text
+    assert text.splitlines()[0] == "participant,role,task_id,completed,assisted,seconds,notes"
+    assert "Q1A" not in text  # quiz rows live in export_quiz.csv only

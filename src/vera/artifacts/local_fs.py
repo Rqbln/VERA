@@ -61,5 +61,8 @@ def presign_get(key: str, expires_in: int = 3600, settings: Settings | None = No
         return None
     if not target.is_file():
         return None
-    base = (s.vera_public_api_url or f"http://localhost:{s.api_port}").rstrip("/")
+    # No public URL configured: return a RELATIVE path. It resolves through
+    # the Next proxy in single-origin deployments (localhost and tunnel alike),
+    # where an absolute localhost URL would be unreachable for remote readers.
+    base = (s.vera_public_api_url or "").rstrip("/")
     return f"{base}/api/v1/artifacts/local/{key.lstrip('/')}"

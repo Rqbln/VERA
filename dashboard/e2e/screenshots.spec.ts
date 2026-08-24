@@ -75,6 +75,15 @@ const SUMMARY = {
   trust_factor: { score: 75, band: "green", components: { R01: 100, R06: 80, R07: 90, R12: 100 } },
 };
 
+// Print legibility: the paper shrinks these captures to column width, so the
+// app is zoomed before shooting and rendered at 2x pixel density. A narrower
+// viewport + zoom makes every font proportionally larger in the final figure.
+const ZOOM = 1.3;
+async function applyZoom(page: Page) {
+  await page.addStyleTag({ content: `body { zoom: ${ZOOM}; }` });
+  await page.waitForTimeout(300);
+}
+
 async function mock(page: Page) {
   await page.route("**/api/v1/health/stack", (r) =>
     r.fulfill({ json: { ok: true, degraded: true, checks: {
@@ -126,18 +135,21 @@ async function mock(page: Page) {
 }
 
 test.describe("control room (paper hero)", () => {
-  test.use({ viewport: { width: 1600, height: 900 } });
+  test.use({ viewport: { width: 1240, height: 1000 }, deviceScaleFactor: 2 });
 
   test("capture control room hero", async ({ page }) => {
     await mock(page);
     await page.goto(`/dashboards/compliance?run=${SUMMARY.run_id}`);
     await page.getByTestId("run-hero").waitFor({ timeout: 15000 });
+    await applyZoom(page);
     await page.waitForTimeout(500);
-    // Clip below the coverage bar: triage, N-strip, and detail sections appear in
-    // the appendix's full capture; the paper hero stays wide and short (~2.5:1).
+    // Clip just under the coverage bar (positions move with the zoom, so the
+    // bottom edge is measured from the hero card instead of hard-coded).
+    const hero = await page.getByTestId("run-hero").boundingBox();
+    const bottom = hero ? Math.min(hero.y + hero.height + 120, 1000) : 760;
     await page.screenshot({
       path: "../manuscript/figures/shot_control_room.png",
-      clip: { x: 0, y: 0, width: 1600, height: 650 },
+      clip: { x: 0, y: 0, width: 1240, height: Math.round(bottom) },
     });
   });
 
@@ -146,6 +158,7 @@ test.describe("control room (paper hero)", () => {
     await page.goto(`/dashboards/compliance?run=${SUMMARY.run_id}`);
     await page.getByTestId("run-summary-view").waitFor({ timeout: 15000 });
     await page.getByTestId("run-details-toggle").click();
+    await applyZoom(page);
     await page.waitForTimeout(500);
     await page.screenshot({
       path: "../manuscript/figures/shot_control_room_full.png",
@@ -170,10 +183,21 @@ test("capture governance runtime", async ({ page }) => {
   await page.screenshot({ path: "../manuscript/figures/shot_governance.png", fullPage: true });
 });
 
-test("capture guided home", async ({ page }) => {
-  await mock(page);
-  await page.goto("/home");
-  await page.getByTestId("home-overview").waitFor({ timeout: 15000 });
-  await page.waitForTimeout(500);
-  await page.screenshot({ path: "../manuscript/figures/shot_home.png", fullPage: true });
+test.describe("guided home (paper)", () => {
+  test.use({ viewport: { width: 1240, height: 800 }, deviceScaleFactor: 2 });
+
+  test("capture guided home", async ({ page }) => {
+    await mock(page);
+    await page.goto("/home");
+    await page.getByTestId("home-overview").waitFor({ timeout: 15000 });
+    await applyZoom(page);
+    await page.waitForTimeout(500);
+    // Clip to the content: fullPage would keep ~500px of empty grey below the fold.
+    const box = await page.getByTestId("home-overview").boundingBox();
+    const bottom = box ? Math.round((box.y + box.height + 24) * 1) : 800;
+    await page.screenshot({
+      path: "../manuscript/figures/shot_home.png",
+      clip: { x: 0, y: 0, width: 1240, height: bottom },
+    });
+  });
 });

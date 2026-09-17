@@ -1,6 +1,6 @@
 # Alternative requirement specification: security-focused subset (R01, R02, R12).
-# Load with VERA_REGISTRY_PATH=examples/spec_security_focus/registry.yaml
-# (together with VERA_CATALOG_PATH=examples/spec_security_focus/catalog.yaml).
+# Load with VERA_REGISTRY_PATH=examples/specs/security_focus/registry.yaml
+# (together with VERA_CATALOG_PATH=examples/specs/security_focus/catalog.yaml).
 # Same schema as the built-in registry: one entry per benchmark, `complai` lists
 # the requirement ids the benchmark serves, `implementation` names the runner.
 benchmarks:

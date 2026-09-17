@@ -2,8 +2,8 @@
 configuration alone (no code changes) — the paper's modularity demonstration.
 
 Usage:
-  VERA_REGISTRY_PATH=examples/spec_security_focus/registry.yaml \
-  VERA_CATALOG_PATH=examples/spec_security_focus/catalog.yaml \
+  VERA_REGISTRY_PATH=examples/specs/security_focus/registry.yaml \
+  VERA_CATALOG_PATH=examples/specs/security_focus/catalog.yaml \
   VERA_AUTH_MODE=guided VERA_MLFLOW_DISABLED=1 \
   python scripts/run_alt_spec_demo.py
 
@@ -43,7 +43,7 @@ def main() -> int:
     if version == "mvp2-v2":
         print(
             "The default catalog is loaded. Point VERA_CATALOG_PATH and "
-            "VERA_REGISTRY_PATH at examples/spec_security_focus/ first."
+            "VERA_REGISTRY_PATH at examples/specs/security_focus/ first."
         )
         return 2
     # The pipeline's own gate: the swapped registry and catalog must agree.

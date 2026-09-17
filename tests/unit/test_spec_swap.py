@@ -15,8 +15,8 @@ from vera.api import benchmark_registry
 from vera.benchmarks import catalog
 
 ROOT = Path(__file__).resolve().parents[2]
-ALT_CATALOG = ROOT / "examples" / "spec_security_focus" / "catalog.yaml"
-ALT_REGISTRY = ROOT / "examples" / "spec_security_focus" / "registry.yaml"
+ALT_CATALOG = ROOT / "examples" / "specs" / "security_focus" / "catalog.yaml"
+ALT_REGISTRY = ROOT / "examples" / "specs" / "security_focus" / "registry.yaml"
 
 
 @pytest.fixture(autouse=True)

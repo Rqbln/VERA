@@ -11,7 +11,7 @@ doc:
   navigation:
     index: docs/README.md
     architecture: docs/ARCHITECTURE.md
-    user_guide: USER_GUIDE.md
+    user_guide: docs/USER_GUIDE.md
     dev_setup: docs/README-dev.md
   related_paths: [README.md, docs/EVALUATION_GUIDE.md]
   tags: [agents, orientation, vera, eu-ai-act]
@@ -224,7 +224,7 @@ When you change a documented surface, update the owning doc and bump its `last_r
 
 - New route / env var? → `docs/README-dev.md` + this file's repo-map/quickstart.
 - New benchmark? → `benchmarks_catalog.yaml` + COMPL-AI mapping + `docs/ARCHITECTURE.md §6`.
-- New guided UI? → `USER_GUIDE.md` + the guided-dashboard section above.
+- New guided UI? → `docs/USER_GUIDE.md` + the guided-dashboard section above.
 - New architecture surface (pipeline, dashboard, governance runtime)? → `docs/ARCHITECTURE.md`.
 - New eval script / native-run flag / corpus? → `docs/EVALUATION_GUIDE.md` + this file's native-eval section.
 - New dependency/tooling? → verify the OSS/on-prem doctrine (`docs/ARCHITECTURE.md §8`) first.

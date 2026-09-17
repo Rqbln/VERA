@@ -116,7 +116,7 @@ The **Governance** page supervises a model **deployed live** (beyond a one-off e
 modes (*shadow* observes, *advisory* alerts, *enforcement* blocks), a live Trust Factor recomputed
 from four agents (cyber, ethics/toxicity, privacy, drift), signed incident logs, and a kill-switch.
 It is optional and for advanced teams (`make stack-gaas`; see
-[docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md)). The guided stack stays one command.
+[docs/ARCHITECTURE.md](./ARCHITECTURE.md)). The guided stack stays one command.
 
 ## 8. Common issues
 
@@ -129,9 +129,9 @@ It is optional and for advanced teams (`make stack-gaas`; see
 
 ## 9. For technical teams
 
-- Full documentation: [docs/README.md](./docs/README.md)
-- Architecture: [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md)
-- AI agent guide: [AGENTS.md](./AGENTS.md)
-- Enterprise mode (Keycloak/RBAC) and setup: [docs/README-dev.md](./docs/README-dev.md)
+- Full documentation: [docs/README.md](./README.md)
+- Architecture: [docs/ARCHITECTURE.md](./ARCHITECTURE.md)
+- AI agent guide: [AGENTS.md](../AGENTS.md)
+- Enterprise mode (Keycloak/RBAC) and setup: [docs/README-dev.md](./README-dev.md)
 - **Native evaluation** (all benchmarks R03–R12 actually executed, multi-model panel, banking
-  corpus, paper reproduction): [docs/EVALUATION_GUIDE.md](./docs/EVALUATION_GUIDE.md)
+  corpus, paper reproduction): [docs/EVALUATION_GUIDE.md](./EVALUATION_GUIDE.md)

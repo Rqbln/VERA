@@ -1,8 +1,8 @@
 # Alternative scoring policy: security-first weighting over the R01/R02/R12 subset.
 # Adversarial benchmarks are deliberately upweighted (an equally defensible policy
 # for a security-sensitive deployment). Load with:
-#   VERA_REGISTRY_PATH=examples/spec_security_focus/registry.yaml
-#   VERA_CATALOG_PATH=examples/spec_security_focus/catalog.yaml
+#   VERA_REGISTRY_PATH=examples/specs/security_focus/registry.yaml
+#   VERA_CATALOG_PATH=examples/specs/security_focus/catalog.yaml
 version: security-focus-v1
 requirement_weights:
   R01:

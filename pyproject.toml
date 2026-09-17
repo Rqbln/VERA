@@ -46,7 +46,7 @@ data = [
     "codecarbon>=2.3,<3",
 ]
 pdf = [
-    # Signed audit-PDF export. Needs system libs (cairo, pango) — see USER_GUIDE / README.
+    # Signed audit-PDF export. Needs system libs (cairo, pango) — see docs/USER_GUIDE.md / README.
     "weasyprint>=60,<63",
 ]
 gaas = [

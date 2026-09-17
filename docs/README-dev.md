@@ -42,7 +42,7 @@ The guided dashboard adds three routes on top of the RBAC lenses:
 - `/launch` — the Ollama **launch wizard** (model → requirements → options → submit `POST /api/v1/runs`).
 - `/runs-overview` — summary table of runs (status, triage counts, headline score).
 
-End-user walkthrough: [USER_GUIDE.md](../USER_GUIDE.md). Implementation status:
+End-user walkthrough: [USER_GUIDE.md](USER_GUIDE.md). Implementation status:
 [ARCHITECTURE.md](./ARCHITECTURE.md).
 
 ## Prerequisites
@@ -93,7 +93,7 @@ docker compose up --build
 
 ```bash
 export VERA_API_URL=http://127.0.0.1:8000
-vera-eval run examples/mvp2_ollama_e2e.yaml
+vera-eval run examples/runs/ollama_e2e.yaml
 ```
 
 Containers reach Ollama via `http://host.docker.internal:11434` (`OLLAMA_API_BASE`).
@@ -136,7 +136,7 @@ npm run build
 npx playwright test            # 34 functional cases: control-room RBAC (25) + guided-mode (7) + hitl-review (2); screenshots.spec.ts is capture-only
 ```
 
-Architecture: [ARCHITECTURE.md](./ARCHITECTURE.md). Guided UX: [USER_GUIDE.md](../USER_GUIDE.md).
+Architecture: [ARCHITECTURE.md](./ARCHITECTURE.md). Guided UX: [USER_GUIDE.md](USER_GUIDE.md).
 
 ## Environment
 
@@ -182,7 +182,7 @@ export VERA_E2E_TIMEOUT_SEC=900
 PYTHONPATH=src pytest tests/e2e/ -m "e2e and ollama" -q
 ```
 
-E2E uses [`examples/mvp2_ollama_e2e.yaml`](../examples/mvp2_ollama_e2e.yaml), real LangGraph + LiteLLM → Ollama, the signed catalog.
+E2E uses [`examples/runs/ollama_e2e.yaml`](../examples/runs/ollama_e2e.yaml), real LangGraph + LiteLLM → Ollama, the signed catalog.
 
 Optional Ollama HTTP smoke:
 

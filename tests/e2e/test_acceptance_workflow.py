@@ -27,10 +27,10 @@ REQ_SHORT = ("R01", "R02", "R06", "R08", "R10", "R11", "R12")
 
 @pytest.mark.e2e
 @pytest.mark.ollama
-def test_mvp2_acceptance_workflow(e2e_stack: None) -> None:  # noqa: ARG001
+def test_acceptance_workflow(e2e_stack: None) -> None:  # noqa: ARG001
     os.environ.setdefault("VERA_BOOTSTRAP_N", "200")
 
-    example = PROJECT_ROOT / "examples" / "mvp2_ollama_e2e.yaml"
+    example = PROJECT_ROOT / "examples" / "runs" / "ollama_e2e.yaml"
     body = yaml.safe_load(example.read_text(encoding="utf-8"))
 
     client = TestClient(api_main.app)

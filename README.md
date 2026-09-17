@@ -12,7 +12,7 @@ doc:
     documentation: ./docs/README.md
     architecture: ./docs/ARCHITECTURE.md
     agents: ./AGENTS.md
-    user_guide: ./USER_GUIDE.md
+    user_guide: ./docs/USER_GUIDE.md
     dev_setup: ./docs/README-dev.md
     paper: ./manuscript/main.tex
   tags: [vera, eu-ai-act, compl-ai, responsible-ai, llm-evaluation]
@@ -42,7 +42,7 @@ at one size, and three sizes of one family) on public datasets and a released sy
 ## Documentation
 
 - **Architecture:** [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — the framework end to end (pipeline, catalog, dashboard, governance runtime, benchmarks, artifacts).
-- **Non-technical users:** [USER_GUIDE.md](USER_GUIDE.md) — run an evaluation and read the results, no code.
+- **Non-technical users:** [docs/USER_GUIDE.md](docs/USER_GUIDE.md) — run an evaluation and read the results, no code.
 - **Documentation index:** [docs/README.md](docs/README.md).
 - **Developer setup & tests:** [docs/README-dev.md](docs/README-dev.md).
 - **AI coding agents:** [AGENTS.md](AGENTS.md) — orientation, repo map, quickstart, guardrails.
@@ -66,7 +66,7 @@ at one size, and three sizes of one family) on public datasets and a released sy
 ```bash
 ollama pull llama3.1:8b-instruct-q8_0
 make quickstart          # docker compose -f docker-compose.lite.yml up --build
-# open http://localhost:3000 (see USER_GUIDE.md)
+# open http://localhost:3000 (see docs/USER_GUIDE.md)
 ```
 
 **Full / enterprise (Keycloak RBAC + MLflow + MinIO):**
@@ -75,7 +75,7 @@ make quickstart          # docker compose -f docker-compose.lite.yml up --build
 cp .env.example .env      # adjust as needed
 make stack-full           # docker compose up --build; VERA_AUTH_MODE=enterprise enforces RBAC
 pip install -e ".[dev]"
-vera-eval run examples/mvp2_ollama_e2e.yaml
+vera-eval run examples/runs/ollama_e2e.yaml
 ```
 
 **Governance runtime** — live-inference governance (inline proxy, event bus, agents, OPA):

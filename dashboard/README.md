@@ -11,7 +11,7 @@ doc:
   navigation:
     agents: ../AGENTS.md
     dev: ../docs/README-dev.md
-    user_guide: ../USER_GUIDE.md
+    user_guide: ../docs/USER_GUIDE.md
   tags: [dashboard, nextjs, vera]
 last_reviewed: "2026-06-15"
 ---

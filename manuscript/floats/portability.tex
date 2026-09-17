@@ -1,0 +1,38 @@
+% floats/portability.tex -- Tab. 2 (VI-A, contribution I1), column table, 0.15 p.
+% Hand-built. Input from 06a-portability.tex whenever the ML arm reports results.
+% Established cells, checked on 16 Sep 2026 against the code:
+%   digest      catalog_digest() of src/vera/benchmarks/benchmarks_catalog.yaml,
+%               recomputed: b25f1485b6df... (also VF config/specs/default_catalog_snapshot.yaml);
+%               covers {version, requirement_weights} only (catalog.py:58-70, signing.py:13-20)
+%   registry    VF manifests record registry_sha256 (VF orchestrator/vera_adapter.py:245-271)
+%   reqs        12 in the catalog; E1 scores 9 per deployment, corpus-scan R03-R05 once
+%   instruments 24 distinct ids: 21 benchmarks + 3 dataset scans
+%   runners     9 distinct implementations in MVP2_BENCHMARK_REGISTRY, none new
+%   outside     VF FoundryLLMClient (VF llm/client.py:1-19); patches lm_eval_limit and
+%               ece_logprobs (VF orchestrator/patches.py:1-19), named in every manifest
+%   fields      VF calls evaluate_benchmarks in process (VF orchestrator/runner.py:229-270)
+% Pending cells: E1 (runs), N1 (ML column), N5 (core diff); registered below the tabular.
+\registerfloat{tab:portability}{table}
+\begin{table}[t]
+  \centering
+  \caption{What each specification required of the engine}
+  \label{tab:portability}
+  \tblsetup
+  \begin{tabularx}{\columnwidth}{@{}L{2.45cm}>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X@{}}
+    \toprule
+    & \textbf{Language models} & \textbf{Tabular classifiers} \\
+    \midrule
+    Catalog digest   & \texttt{b25f14\ldots} & \tbdcell \\
+    Requirements     & 12 (9 per model, 3 on a corpus) & \armswitch{4 (\req{03}, \req{05}, \req{07}, \req{11})}{\req{07}, \req{11} run; \req{03}, \req{05} specified}{} \\
+    Instruments      & 21 benchmarks, 3 corpus scans & \tbdcell{} criteria, one benchmark each; \tbdcell{} checks \\
+    Runners used/new & 9 / 0 & \tbdcell{} / \tbdcell \\
+    Code outside engine & client replaced; 2 runners patched at run time & \tbdcell \\
+    Core files changed & reference revision & \tbdcell \\
+    Fields added     & none & \tbdcell \\
+    Runs             & \tbdcell{} of 8 deployments & \armswitch{\tbdcell{} of 3 datasets}{\tbdcell{} on 1 dataset}{} \\
+    \bottomrule
+  \end{tabularx}
+  \par
+  {\raggedright
+  Requirement identifiers follow COMPL-AI~\cite{guldimann2024complai}. Digest: first six hexadecimal digits of the catalog's SHA-256 content digest (version and weights); run manifests also hash the registry. Core: modules fixed before the tabular arm was coded. Runs: \tbd{E1}{foundry}{27 Sep}{Tab. 2 LLM column: number of the 8 E1 runs completed; confirm from the manifests that the catalog digest is b25f14..., that the recorded VERA revision equals the VF pin and that both patches are listed} and \tbd{N1}{core}{04 Oct}{Tab. 2 ML column: tabular catalog digest, number of fairness criteria and of other checks, runners used and new, runs completed per dataset}. Core diff: \tbd{N5}{core}{05 Oct}{Tab. 2 ML column: core files changed, code outside the engine (predictions producer, launch script), run-context and request fields added; base = revision in the E1 manifests}.\par}
+\end{table}

@@ -1,0 +1,12 @@
+% Local shim: the Overleaf project resolves \usepackage{etc}; MacTeX does not
+% ship it. Keeps the synced main_apsec.tex byte-identical while compiling
+% locally, and provides the draft's helper macros if nothing else defines them.
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{etc}[2026/08/24 local shim for the Overleaf 'etc' dependency]
+\RequirePackage{xcolor}
+% tcolorbox fails to load on this TeX Live; a plain ruled box stands in
+% locally (Overleaf renders the real one).
+\newenvironment{tcolorbox}[1][]{\par\medskip\noindent\hrule\smallskip\itshape}{\par\smallskip\hrule\medskip}
+\providecommand{\todo}[1]{\textcolor{red}{[TODO: #1]}}
+\providecommand{\nax}{\textcolor{black!35}{--}}
+\endinput

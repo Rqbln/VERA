@@ -1,0 +1,43 @@
+\psubsection{decision}{\armswitch{0.6}{0.6}{0.7}}{I4}{core,aicc,legal,dal}{Review Decisions in Two Populations}
+% VI-D reports the decision study (N6). Every value comes from the
+% questionnaire export through scripts/decision_study.py. Highest APSEC-overlap
+% risk in the paper: no value, sentence or structure of the APSEC reading study
+% may appear here, and the guard must be re-run after every edit. Do not state
+% the expected outcome before the data exist (questionnaire rule).
+% If D13 cannot separate AICC from Legal/Risk: retitle "Review Decisions With and
+% Without the Scorecard", split every population statement and the Tab. 5 columns
+% by decision role (Q15), and drop "Both populations" from the first paragraph.
+% Reviewed 17 Sep (two cached reviews, 31 findings): Q6 is not a parallel
+% justification; Q8 wording; M3 not analysed (Section V aligned); tests on the
+% pooled sample only; duplicated method sentences removed.
+
+Respondents chose among three anonymised language models for a customer-facing assistant, first without and then with the requirement scorecard, which shows VERA's banded score for each requirement (\Cref{sec:protocol})\decision{D11}{core,foundry}{18 Sep}{Which scorecard was sent on 14 Sep (the older Mistral trio or the E6 Foundry trio); path and timestamp of the freeze record.}.
+The study thus observes a selection decision, not the retrieval of values from the dashboard examined in~\apsec.
+Both populations answer the language-model scenario, so their comparison does not depend on the tabular arm.
+\Cref{tab:decision} gives M1, M2, M4, M5 and M7 by population.
+
+\input{floats/decision}
+
+Of the \tbd{N6}{core}{5 Oct}{number of respondents who completed both phases} respondents who completed both phases, \tbd{N6}{core}{5 Oct}{complete responses from AICC} came from \aicc{} and \tbd{N6}{core}{5 Oct}{complete responses from Legal/Risk} from \legalrisk{}\decision{D13}{core,aicc,legal}{18 Sep}{How respondents are assigned to AICC or Legal/Risk (tracked channel or an added question).}.
+By domain, years on AI topics and decision authority (Q13--Q15), they were \tbd{N6}{core}{5 Oct}{profile per population from Q13, Q14 and Q15, one clause; and the responses collected before the D15 sign-off, with whether consent covers them or they are excluded from n}.
+\tbd{N6}{core}{5 Oct}{one sentence: pooled n against the floor fixed in Section V, and therefore whether test values are reported}
+
+Once the scorecard was added, \tbd{N6}{core}{7 Oct}{M1: pooled share of respondents whose second choice differs from the first, with 95\% Wilson interval} of respondents chose a different model (M1).
+The share of choices consistent with the position note\decision{D12}{core}{18 Sep}{Does a position note dated before diffusion exist? Otherwise reframe or drop M2.} went from \tbd{N6}{core}{7 Oct}{M2: pooled share of first-phase choices consistent with the note} to \tbd{N6}{core}{7 Oct}{M2: pooled share of second-phase choices consistent with the note} (M2; McNemar~\cite{mcnemar1947}, Holm-adjusted \tbd{N6}{core}{7 Oct}{M2: exact McNemar p after Holm adjustment, pooled}).
+Because the note names a defensible choice rather than a correct one, and the scorecard's fairness row came from a language-model probe that \Cref{sec:fairness} sets aside (\Cref{sec:threats}), M2 tests agreement with a documented policy and does not grade the choice itself.
+
+Median confidence changed by \tbd{N6}{core}{7 Oct}{M4: pooled median paired change from Q3 to Q7, in points} (M4; Wilcoxon signed-rank~\cite{wilcoxon1945}, Holm-adjusted \tbd{N6}{core}{7 Oct}{M4: Holm-adjusted Wilcoxon p, pooled}; rank-biserial $r_{\mathrm{rb}}$~\cite{kerby2014} of \tbd{N6}{core}{7 Oct}{M4: rank-biserial correlation, pooled}).
+Free-text answers to Q2, on what the first choice rests on, cited a median of \tbd{N6}{core}{7 Oct}{M5: median distinct criteria in Q2} distinct criteria, and answers to Q6, on whether and why the choice changed, a median of \tbd{N6}{core}{7 Oct}{M5: median distinct criteria in Q6, with the Holm-adjusted Wilcoxon p} (M5).
+Q6 asks for a reason only when the choice changed, so we also report M5 separately for respondents who changed their choice \tbd{N6}{core}{7 Oct}{M5 medians in Q2 and Q6 for switchers and for non-switchers}; agreement between the two coders was Krippendorff's $\alpha$~\cite{hayes2007answering} of \tbd{D35}{core,dal}{7 Oct}{Krippendorff alpha between the two M5 coders}.
+Median agreement with the three usefulness statements (M7) was \tbd{N6}{core}{7 Oct}{M7: pooled median per Q12 item, one clause; no scale mean}.
+
+Population contrasts are exploratory (\Cref{sec:protocol}).
+Across \Cref{tab:decision}, the populations differed most on \tbd{N6}{core}{7 Oct}{measure with the largest descriptive gap between AICC and Legal/Risk, both values; or the statement that no measure differed by more than a stated margin}.
+Among the criteria respondents ticked as having weighed in their second choice (Q8), the most frequent were \tbd{N6}{core}{7 Oct}{Q8: two or three most-ticked criteria per population, with counts}; the option naming sensitivity to the weighting was ticked by \tbd{N6}{core}{7 Oct}{Q8: respondents per population who ticked it, as k of n}.
+\parplan[\armswitch{40}{40}{80}]{We read these profiles against the remit of each team described in \Cref{sec:context}.}{Write only once the Q8 counts exist; no direction may be announced before. Candidate framing, to check against the data: a team working next to the builders of use cases and a second-line function ask different questions of one evidence set (schuett2025three for the three lines; placement of AICC and Legal/Risk is PENDING N7, so do not assert it here). Practitioner fairness needs: holstein2019improving; how practitioners pick among fairness metrics: deng2022exploring. Feeds lesson L5 in VIII. If D13 cannot separate the populations, split by decision role (Q15) and drop the two-population claim from I4. Avoid APSEC role-view wording.}
+
+Respondents also declared how long a model evaluation takes today and how many people it involves (M6; Q9, Q10): \tbd{N6}{core}{5 Oct}{Q9 by Q10 cross-tabulation, per population}.
+These declared estimates complement, but do not replace, the review-cost baseline of \Cref{sec:context}.
+
+\armnotwithdrawn{\decision{D14}{legal,core}{25 Sep}{Build or drop the decision instrument for the tabular arm.}
+\parplan[25]{On the tabular variant, a requirement scorecard for a credit-scoring classifier, we report M1, M4 and M5 for the \legalrisk{} respondents only.}{Only if D14 builds the instrument; otherwise delete this paragraph and the D14 marker. One population only, so no between-population comparison. Fairness row under the criterion declared in VI-B. Its rows join Tab. 5 under a separate rule, Legal/Risk column only. Ethics sign-off D15 must precede any collection.}}

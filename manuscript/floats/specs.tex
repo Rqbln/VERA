@@ -1,0 +1,56 @@
+% floats/specs.tex -- Tab. 1, the two specifications side by side (Section IV).
+% Hand-built, table*, budget 0.3 p. Sources, checked on 16 Sep 2026:
+%   LLM column: RAIP/src/vera/benchmarks/benchmarks_catalog.yaml l.5-43 (entries and weights),
+%     RAIP/src/vera/api/benchmark_registry.py l.18-138 (runners); identical weights in
+%     VF/config/specs/default_catalog_snapshot.yaml. Prompt pools: dynamic_prompts.py.
+%     Only the lm-eval tasks (R06, and MMLU inside the R01 ratio), the BBQ/BOLD/StereoSet
+%     samples, the garak DAN probes and the corpus scans are more than template pools; the
+%     prose of Section IV says so. Weights are printed only where a requirement has several
+%     entries (single entries weigh 1.0).
+%   ML column: engine report section 6 (G3, G6, G7, G8); nothing is implemented yet (N1).
+%   Anchor column: MS/main.tex L654-675 refined per requirement and checked against the
+%     ACPR 2020 publication page (data management incl. absence of discriminatory bias,
+%     performance, stability, explainability) and EBA/GL/2020/06 section 4.3.4 (bias,
+%     input-data quality, output quality). AI Act Art. 53 is a GPAI-provider duty. R12 has
+%     no verified anchor (N11). No anchor states that an obligation applies today.
+%     LOM = EBA Guidelines on loan origination and monitoring; ICT = EBA/GL/2019/04.
+%   Digest: SHA-256 of canonical JSON {version, requirement_weights}, recomputed; matches
+%     the catalog's signing block and the vera-foundry snapshot. Never print the catalog
+%     version string (APSEC guard).
+% Requirement names follow VERA's engine (dashboard/triage.py), shortened; the paper
+% uses the same names in every table and in prose (decided 17 Sep).
+% Rules separate COMPL-AI's principles (checked against arXiv 2410.07959): R01-R02
+% robustness and safety; R03-R05 privacy and data governance; R06-R09 transparency;
+% R10-R11 diversity, non-discrimination and fairness; R12 social and environmental
+% well-being. VERA's own triage metadata groups R12 under fairness; the paper follows COMPL-AI.
+\registerfloat{tab:specs}{table*}
+\begin{table*}[t]
+  \caption{The two specifications, grouped by COMPL-AI principle~\cite{guldimann2024complai}. LLM: catalog entries and weights (a weight after a list applies to each entry). ML: \armswitch{instruments as specified}{instruments as specified; $^\circ$\,specified, not run}{instruments as designed, not run}. $^\dagger$\,Not used as fairness evidence.}
+  \label{tab:specs}
+  \centering
+  \tblsetup
+  \begin{tabularx}{\textwidth}{@{}L{2.6cm}XL{4.3cm}L{3.95cm}@{}}
+    \toprule
+    Requirement & LLM specification: catalog entries & \armswitch{Tabular specification}{Tabular specification}{Tabular specification (designed)} & Anchor \\
+    \midrule
+    \req{01} Robustness & accuracy ratio .50; MMLU, BoolQ probes .25 & -- & DORA~\cite{dora2022}; ACPR stability~\cite{acpr2020ai} \\
+    \req{02} Cyber resilience & AdvBench, TensorTrust, LLM Rules, DAN~\cite{derczynski2024garak} (.25) & -- & DORA~\cite{dora2022}; EBA ICT~\cite{eba2021ictrisk} \\
+    \midrule
+    \req{03} Data adequacy & corpus scan: toxicity, group balance & group shares, base rates, missingness\armswitch{}{$^\circ$}{} & AI Act Art.~10~\cite{euaiact2024} \\
+    \req{04} Copyright & corpus scan: near-duplicates & -- & AI Act Art.~53, providers~\cite{euaiact2024} \\
+    \req{05} Privacy & corpus scan: share of documents with PII~\cite{microsoft2023presidio} & PII by column; $k$-anonymity\armswitch{}{$^\circ$}{} & GDPR; EBA ICT~\cite{eba2021ictrisk} \\
+    \midrule
+    \req{06} Capabilities & MMLU, GSM8K, HumanEval, TruthfulQA, BBH~\cite{gao2021lmevalharness} (.20) & -- & ACPR performance~\cite{acpr2020ai} \\
+    \req{07} Calibration & calibration error on MMLU-style probes & calibration error~\cite{guo2017calibration}, Brier score & ACPR~\cite{acpr2020ai}; EBA LOM~\cite{eba2020loan} \\
+    \req{08} AI disclosure & self-disclosure probes & -- & AI Act Art.~50~\cite{euaiact2024} \\
+    \req{09} Watermark & watermark detection proxy & -- & AI Act Art.~50~\cite{euaiact2024} \\
+    \midrule
+    \req{10} Representation bias & BBQ .34, BOLD .33, StereoSet .33~\cite{parrish2022bbq,dhamala2021bold,nadeem2021stereoset}$^\dagger$ & -- & ACPR non-discrimination~\cite{acpr2020ai} \\
+    \req{11} Fairness & loan-approval probe$^\dagger$ & disparate impact~\cite{feldman2015certifying}, equal opportunity, equalized odds~\cite{hardt2016equality}, group calibration~\cite{pleiss2017fairness}; thresholds \tbdcell & CCD2 Art.~6~\cite{euccd2023}; EBA LOM~\cite{eba2020loan} \\
+    \midrule
+    \req{12} Toxicity & RealToxicityPrompts, 2 AdvBench pools, TruthfulQA (.25) & -- & \tbdcell \\
+    \midrule
+    Digest (SHA-256) & \texttt{b25f1485} & \tbdcell & \\
+    \bottomrule
+  \end{tabularx}
+\end{table*}

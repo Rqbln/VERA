@@ -1,0 +1,45 @@
+% floats/case.tex -- Tab. 6 (Section VII): evidence and review action per
+% requirement in the case study. Hand-built, column width, budget 0.15 p,
+% optional (second float to cut, D20).
+% Sources, named by the \tbd markers in the paragraph that cites this table:
+%   Prior      N7 (AICC coverage before VERA; scope to confirm, D17)
+%   VERA       N8 run on the case model, classified with the E4 cause logic
+%   Action     N8 review record (publication permission, D16 and D27)
+% Rows follow the language-model specification: the nine requirements scored
+% per model, then the three scored once on a corpus. Every cell stays \tbdcell
+% until its source exists; never type a plausible value.
+\registerfloat{tab:case}{table}
+\begin{table}[t]
+  \centering
+  \caption{Case study: evidence and review action per requirement}
+  \label{tab:case}
+  \tblsetup
+  \begin{tabular}{@{}l l c c c@{}}
+    \toprule
+         & Requirement         & Prior     & VERA      & Review action \\
+    \midrule
+    \req{01} & Robustness          & \tbdcell & \tbdcell & \tbdcell \\
+    \req{02} & Cyber resilience    & \tbdcell & \tbdcell & \tbdcell \\
+    \req{06} & Capabilities        & \tbdcell & \tbdcell & \tbdcell \\
+    \req{07} & Calibration         & \tbdcell & \tbdcell & \tbdcell \\
+    \req{08} & AI disclosure       & \tbdcell & \tbdcell & \tbdcell \\
+    \req{09} & Watermark           & \tbdcell & \tbdcell & \tbdcell \\
+    \req{10} & Representation bias & \tbdcell & \tbdcell & \tbdcell \\
+    \req{11} & Fairness            & \tbdcell & \tbdcell & \tbdcell \\
+    \req{12} & Toxicity            & \tbdcell & \tbdcell & \tbdcell \\
+    \midrule
+    \req{03} & Data adequacy       & \tbdcell & \tbdcell & \tbdcell \\
+    \req{04} & Copyright           & \tbdcell & \tbdcell & \tbdcell \\
+    \req{05} & Privacy             & \tbdcell & \tbdcell & \tbdcell \\
+    \midrule
+    \multicolumn{4}{@{}l}{Decision on the use case} & \tbdcell \\
+    \bottomrule
+  \end{tabular}\\[2pt]
+  \parbox{\columnwidth}{\footnotesize\raggedright
+    Prior: \cmark{} covered by \aicc{} before VERA, \xmark{} not covered.
+    VERA: \stnat{} native, \stfb{} fallback, \stnm{} not measurable, \stna{} not
+    applicable; superscript s, h or d: serving, set-up (harness) or by-design cause
+    (Section~\ref{sec:measurability}). Action: E escalated, C accepted with
+    conditions, A accepted, W waived, \xmark{} no finding. \req{03}--\req{05}:
+    scanned on the synthetic corpus, not on the use case's data.}
+\end{table}

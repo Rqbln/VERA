@@ -1,0 +1,416 @@
+% support/preamble.tex -- preamble of main.tex (ICSE 2027 SEIP).
+% Every package and macro the section files use is defined here, so a section
+% file never loads a package or defines a macro of its own. The drafting
+% macros are documented in README.md.
+
+% ---------------------------------------------------------------------------
+% Build switches
+% ---------------------------------------------------------------------------
+% The Makefile sets these through latexmk -usepretex. Overleaf, which has no
+% Makefile, falls back to the defaults below. Starred \providecommand keeps the
+% defaults non-\long, like the \def the Makefile passes.
+%   \icsearm     full | reduced | withdrawn   ML-arm scenario (decision 30 Sep 2026)
+%   \icsemode    draft | clean | submit       draft: cockpit pages, plan markers
+%                                             and build banner; clean: the paper
+%                                             only; submit: clean, and the
+%                                             checker fails on any placeholder
+%   \icsetitle   A | B | C                    title option under discussion
+%   \icsetables  directory of the tables vera-foundry generates
+\providecommand*{\icsearm}{full}
+\providecommand*{\icsemode}{draft}
+\providecommand*{\icsetitle}{A}
+\providecommand*{\icsetables}{tables}
+\providecommand*{\icsegitrev}{no-git}
+\providecommand*{\icsebuilddate}{\today}
+
+% ---------------------------------------------------------------------------
+% Packages
+% ---------------------------------------------------------------------------
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{microtype}
+\usepackage{siunitx}
+\usepackage{xcolor}
+\usepackage{pifont}
+\usepackage{etoolbox}
+% tcolorbox does not load on the local TeX Live (kernel mismatch), so no box
+% in this paper depends on it.
+\usepackage{zref-savepos,zref-abspage,zref-lastpage}
+\usepackage{hyperref}
+\usepackage{cleveref}
+
+\makeatletter
+
+\newif\ificsedraft
+\newif\ificsesubmit
+\ifdefstring{\icsemode}{draft}{\icsedrafttrue}{%
+  \ifdefstring{\icsemode}{clean}{}{%
+    \ifdefstring{\icsemode}{submit}{\icsesubmittrue}{%
+      \PackageError{icse}{Unknown \string\icsemode\space '\icsemode'}{Use draft, clean or submit.}}}}
+
+\newif\ifarmfull
+\newif\ifarmreduced
+\newif\ifarmwithdrawn
+\ifdefstring{\icsearm}{full}{\armfulltrue}{%
+  \ifdefstring{\icsearm}{reduced}{\armreducedtrue}{%
+    \ifdefstring{\icsearm}{withdrawn}{\armwithdrawntrue}{%
+      \PackageError{icse}{Unknown \string\icsearm\space '\icsearm'}{Use full, reduced or withdrawn.}}}}
+% \armswitch{full}{reduced}{withdrawn}: text that depends on the scenario.
+\newcommand{\armswitch}[3]{\ifarmfull#1\fi\ifarmreduced#2\fi\ifarmwithdrawn#3\fi}
+% \armnotwithdrawn{text}: text present whenever the ML arm reports results.
+\newcommand{\armnotwithdrawn}[1]{\ifarmwithdrawn\else#1\fi}
+
+% ---------------------------------------------------------------------------
+% Colours and typographic helpers
+% ---------------------------------------------------------------------------
+\definecolor{brandgreen}{HTML}{00915A}
+\definecolor{pendingred}{HTML}{B3261E}
+\definecolor{decisionorange}{HTML}{B86E00}
+\definecolor{ownerfoundry}{HTML}{1F5FAD}
+\definecolor{owneraicc}{HTML}{7B3FA0}
+\definecolor{ownerlegal}{HTML}{A1531B}
+\definecolor{ownercore}{HTML}{3F6B4F}
+\definecolor{ownerdal}{HTML}{5B6770}
+\hypersetup{colorlinks=true,allcolors=brandgreen}
+
+\newcommand{\best}[1]{\textbf{#1}}
+\newcommand{\cmark}{\textcolor{brandgreen}{\ding{51}}}
+\newcommand{\xmark}{\textcolor{black!35}{--}}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcommand{\tblsetup}{\footnotesize\setlength{\tabcolsep}{3pt}\renewcommand{\arraystretch}{1.02}}
+
+% Measurability states of the matrix (VI-C), one glyph each.
+\newcommand{\stnat}{\textcolor{brandgreen}{\ding{108}}}% native
+\newcommand{\stfb}{\textcolor{decisionorange}{\ding{119}}}% fallback
+\newcommand{\stnm}{\textcolor{black!45}{\ding{109}}}% not measurable
+\newcommand{\stna}{\textcolor{black!35}{--}}% not part of this arm
+
+% Requirement identifiers as COMPL-AI and VERA number them.
+\newcommand{\req}[1]{R#1}
+
+% The APSEC paper (non-overlap discipline: cite it, never recopy it).
+\newcommand{\apsec}{\cite{queriaux2026vera}}
+
+% Names that depend on decision D27 (permission to name the bank and the teams).
+% Change them here only; sections always write \bankname{}, \aicc{}, \legalrisk{}.
+\newcommand{\bankname}{BNP Paribas}
+\newcommand{\aicc}{AICC}
+\newcommand{\legalrisk}{Legal/Risk}
+
+\newtheorem{proposition}{Proposition}
+\newtheorem{definition}{Definition}
+
+% No spacing adjustments: the SEIP call warns that "alterations of spacing, font
+% size, and other changes" may lead to desk rejection, so floats keep the
+% IEEEtran defaults (main_apsec.tex tightens them; this paper must not).
+% The checker refuses \vspace and skip changes in submit mode.
+
+% ---------------------------------------------------------------------------
+% Owners
+% ---------------------------------------------------------------------------
+\@namedef{icse@owner@foundry}{\textcolor{ownerfoundry}{Foundry}}
+\@namedef{icse@owner@aicc}{\textcolor{owneraicc}{AICC}}
+\@namedef{icse@owner@legal}{\textcolor{ownerlegal}{Legal/Risk}}
+\@namedef{icse@owner@core}{\textcolor{ownercore}{Core}}
+\@namedef{icse@owner@dal}{\textcolor{ownerdal}{Dalhousie}}
+\@namedef{icse@owner@all}{All}
+\newcommand{\icse@ownertag}[1]{{\sffamily\ifcsname icse@owner@#1\endcsname\@nameuse{icse@owner@#1}\else#1\fi}}
+\newcommand{\icse@ownerlist}[1]{\def\icse@sep{}\@for\icse@o:=#1\do{\icse@sep\icse@ownertag{\icse@o}\def\icse@sep{, }}}
+
+% ---------------------------------------------------------------------------
+% Planned sections and page measurement
+% ---------------------------------------------------------------------------
+% \psection{key}{budget}{contributions}{owners}{Title} and \psubsection{...}
+% replace \section and \subsection. They label the unit sec:key, record where
+% it starts on the page, and register it with the cockpit, which compares the
+% budget from the roadmap with the pages the unit actually occupies (from the
+% previous compilation, so rerun until latexmk settles).
+\zref@addprop{savepos}{abspage}
+
+\newcounter{icse@sectbd}\newcounter{icse@secpar}\newcounter{icse@secdec}
+\newcounter{icse@subtbd}\newcounter{icse@subpar}\newcounter{icse@subdec}
+\newcounter{icse@tbdall}\newcounter{icse@parall}\newcounter{icse@decall}
+\def\icse@cursec{front}
+\def\icse@cursub{}
+
+\newcommand{\icse@auxwrite}[1]{\if@filesw\immediate\write\@auxout{#1}\fi}
+% Page geometry for scripts/check.py (sp): paper width, paper height,
+% distance from the top of the paper to the top of the text block, text height.
+\def\icse@geom#1#2#3#4{}
+\AtBeginDocument{\icse@auxwrite{\string\icse@geom{\number\paperwidth}{\number\paperheight}{\number\dimexpr1in+\voffset+\topmargin+\headheight+\headsep\relax}{\number\textheight}}}
+
+\newcommand{\icse@closesub}{%
+  \ifx\icse@cursub\@empty\else
+    \icse@auxwrite{\string\icse@regstats{\icse@cursub}{\the\value{icse@subtbd}}{\the\value{icse@subpar}}{\the\value{icse@subdec}}}%
+  \fi
+  \gdef\icse@cursub{}%
+  \setcounter{icse@subtbd}{0}\setcounter{icse@subpar}{0}\setcounter{icse@subdec}{0}}
+\newcommand{\icse@closesec}{%
+  \icse@closesub
+  \ifx\icse@cursec\@empty\else
+    \icse@auxwrite{\string\icse@regstats{\icse@cursec}{\the\value{icse@sectbd}}{\the\value{icse@secpar}}{\the\value{icse@secdec}}}%
+  \fi
+  \setcounter{icse@sectbd}{0}\setcounter{icse@secpar}{0}\setcounter{icse@secdec}{0}}
+
+\newcommand{\psection}[6][]{% [roadmap budget]{key}{budget}{contributions}{owners}{Title}
+  \icse@closesec
+  \gdef\icse@cursec{#2}%
+  \section[#6]{\zsavepos{icse:#2}#6}\label{sec:#2}%
+  \icse@auxwrite{\string\icse@regunit{#2}{sec}{\detokenize{#6}}{#3}{#4}{#5}{\ifblank{#1}{#3}{#1}}}}
+\newcommand{\psubsection}[6][]{%
+  \icse@closesub
+  \gdef\icse@cursub{#2}%
+  \subsection[#6]{\zsavepos{icse:#2}#6}\label{sec:#2}%
+  \icse@auxwrite{\string\icse@regunit{#2}{sub}{\detokenize{#6}}{#3}{#4}{#5}{\ifblank{#1}{#3}{#1}}}}
+% \punsection: an unnumbered unit after the Conclusion (Data Availability,
+% Acknowledgment). It counts towards the body, so it sits before \icsebodyend.
+\newcommand{\punsection}[6][]{%
+  \icse@closesec
+  \gdef\icse@cursec{#2}%
+  \section*{\zsavepos{icse:#2}#6}%
+  \icse@auxwrite{\string\icse@regunit{#2}{sec}{\detokenize{#6}}{#3}{#4}{#5}{\ifblank{#1}{#3}{#1}}}}
+
+% \icsebodystart after \maketitle; \icsebodyend before the bibliography.
+\newcommand{\icsebodystart}{\zref@labelbyprops{icse:bodystart}{abspage}}
+\newcommand{\icsebodyend}{%
+  \icse@closesec
+  \par\zsavepos{icse:bodyend}%
+  \icse@auxwrite{\string\icse@regend}%
+  \icse@auxwrite{\string\icse@regtotals{\the\value{icse@tbdall}}{\the\value{icse@parall}}{\the\value{icse@decall}}}}
+
+% --- Reading the registrations back (from the .aux, at \begin{document}) ----
+\def\icse@units{}
+\def\icse@lastsec{}
+\def\icse@lastsub{}
+\def\icse@firstsec{}
+\def\icse@budgetsum{0}
+\def\icse@roadmapsum{0}
+\def\icse@totT{0}\def\icse@totP{0}\def\icse@totD{0}
+\def\icse@regunit#1#2#3#4#5#6#7{%
+  \g@addto@macro\icse@units{\icse@unitrow{#1}{#2}{#3}{#4}{#5}{#6}{#7}}%
+  \expandafter\gdef\csname icse@title@#1\endcsname{#3}%
+  \ifstrequal{#2}{sec}{%
+    \ifx\icse@firstsec\@empty\gdef\icse@firstsec{#1}\fi
+    \ifx\icse@lastsec\@empty\else\expandafter\xdef\csname icse@next@\icse@lastsec\endcsname{#1}\fi
+    \ifx\icse@lastsub\@empty\else\expandafter\xdef\csname icse@next@\icse@lastsub\endcsname{#1}\fi
+    \xdef\icse@lastsec{#1}\gdef\icse@lastsub{}%
+    \xdef\icse@budgetsum{\fpeval{\icse@budgetsum+#4}}%
+    \xdef\icse@roadmapsum{\fpeval{\icse@roadmapsum+#7}}%
+  }{%
+    \ifx\icse@lastsub\@empty\else\expandafter\xdef\csname icse@next@\icse@lastsub\endcsname{#1}\fi
+    \xdef\icse@lastsub{#1}%
+  }}
+\def\icse@regend{%
+  \ifx\icse@lastsec\@empty\else\expandafter\xdef\csname icse@next@\icse@lastsec\endcsname{bodyend}\fi
+  \ifx\icse@lastsub\@empty\else\expandafter\xdef\csname icse@next@\icse@lastsub\endcsname{bodyend}\fi}
+\def\icse@regstats#1#2#3#4{\expandafter\gdef\csname icse@statT@#1\endcsname{#2}\expandafter\gdef\csname icse@statP@#1\endcsname{#3}\expandafter\gdef\csname icse@statD@#1\endcsname{#4}}
+\def\icse@regtotals#1#2#3{\gdef\icse@totT{#1}\gdef\icse@totP{#2}\gdef\icse@totD{#3}}
+\def\icse@tbds{}
+\def\icse@decs{}
+\def\icse@pars{}
+\def\icse@floats{}
+\def\icse@regtbd#1#2#3#4#5{\g@addto@macro\icse@tbds{\icse@tbditem{#1}{#2}{#3}{#4}{#5}}}
+\def\icse@regdec#1#2#3#4#5{\g@addto@macro\icse@decs{\icse@decitem{#1}{#2}{#3}{#4}{#5}}}
+\def\icse@regpar#1#2#3#4#5{\g@addto@macro\icse@pars{\icse@paritem{#1}{#2}{#3}{#4}{#5}}}
+\def\icse@regfloat#1#2#3#4{\g@addto@macro\icse@floats{\icse@floatitem{#1}{#2}{#3}{#4}}}
+% The kernel reads the .aux a second time at \end{document}; do not register twice.
+\AtEndDocument{%
+  \def\icse@regunit#1#2#3#4#5#6#7{}\def\icse@regend{}\def\icse@regstats#1#2#3#4{}%
+  \def\icse@regtotals#1#2#3{}\def\icse@regtbd#1#2#3#4#5{}\def\icse@regdec#1#2#3#4#5{}%
+  \def\icse@regpar#1#2#3#4#5{}\def\icse@regfloat#1#2#3#4{}}
+
+% --- Position arithmetic ---------------------------------------------------
+% Position of a saved point in column units: two columns per page, plus the
+% fraction of the column height above the point. Differences give pages.
+\newcommand{\icse@abspage}[1]{\zref@extractdefault{icse:#1}{abspage}{0}}
+\newcommand{\icse@pos}[1]{%
+  (2*(\icse@abspage{#1}-1)
+   + ((\zposx{icse:#1}/65536 > \paperwidth/2) ? 1 : 0)
+   + ((\paperheight - 1in - \voffset - \topmargin - \headheight - \headsep
+       - \zposy{icse:#1}/65536) / \textheight))}
+\newcommand{\icse@known}[1]{\ifnum\icse@abspage{#1}>0 1\else 0\fi}
+\newcommand{\icse@measure}[1]{% pages occupied by unit #1
+  \ifcsname icse@next@#1\endcsname
+    \edef\icse@nx{\csname icse@next@#1\endcsname}%
+    \ifnum\numexpr\icse@known{#1}*\icse@known{\icse@nx}\relax=1
+      \fpeval{round((\icse@pos{\icse@nx}-\icse@pos{#1})/2,2)}%
+    \else ?\fi
+  \else ?\fi}
+\newcommand{\icse@delta}[2]{% unit, budget
+  \ifcsname icse@next@#1\endcsname
+    \edef\icse@nx{\csname icse@next@#1\endcsname}%
+    \ifnum\numexpr\icse@known{#1}*\icse@known{\icse@nx}\relax=1
+      \edef\icse@d{\fpeval{round((\icse@pos{\icse@nx}-\icse@pos{#1})/2-#2,2)}}%
+      \ifnum\fpeval{\icse@d>0.05}=1 \textcolor{pendingred}{\bfseries +\icse@d}%
+      \else\ifnum\fpeval{\icse@d<-0.05}=1 \textcolor{brandgreen}{\icse@d}\else 0\fi\fi
+    \else\fi
+  \fi}
+
+% ---------------------------------------------------------------------------
+% Drafting placeholders
+% ---------------------------------------------------------------------------
+% \parplan[filler words]{topic sentence}{sources and notes}
+%   A paragraph not yet written: the topic sentence in grey, then grey filler
+%   standing in for the rest of the paragraph, so that the page count stays
+%   realistic. The notes never reach the page; the cockpit lists them.
+% \tbd{source}{owner}{due}{what}
+%   A number or fact that does not exist yet, typeset as [source].
+% \decision{id}{owner}{due}{question}
+%   An open decision, typeset as [id]; ids follow the writing brief (D1, D2...).
+\newcommand{\icse@here}{\ifx\icse@cursub\@empty\icse@cursec\else\icse@cursub\fi}
+\newcommand{\icse@bump}[1]{%
+  \stepcounter{icse@sec#1}\stepcounter{icse@sub#1}\stepcounter{icse@#1all}}
+
+\newcount\icse@filln
+\newcount\icse@fillk
+\newcommand{\icse@fillword}{%
+  \ifcase\icse@fillk lorem\or ipsum\or dolor\or sit\or amet\or consectetur\or
+  adipiscing\or elit\or sed\or do\or eiusmod\or tempor\or incididunt\or ut\or
+  labore\or et\or dolore\or magna\or aliqua\or veniam\fi}
+\newcommand{\icse@filler}[1]{{\color{black!38}%
+  \icse@filln=0 \icse@fillk=0
+  \loop\ifnum\icse@filln<#1
+    \icse@fillword\space
+    \advance\icse@filln 1
+    \advance\icse@fillk 1 \ifnum\icse@fillk>19 \icse@fillk=0 \fi
+  \repeat}}
+
+\newcommand{\parplan}[3][80]{%
+  \icse@bump{par}%
+  \icse@auxwrite{\string\icse@regpar{\icse@here}{\the\value{icse@parall}}{#1}{\unexpanded{#2}}{\unexpanded{#3}}}%
+  {\color{black!72}#2}\ \icse@filler{#1}\unskip
+  \ificsedraft\textsuperscript{\sffamily\tiny\color{pendingred}P\the\value{icse@parall}}\fi
+  \par}
+
+% \tbdcell: a table cell whose value will come from an artefact already named
+% by a \tbd in the caption or the text; typeset as a red question mark.
+\newcommand{\tbdcell}{\textcolor{pendingred}{\sffamily ?}}
+
+\newcommand{\tbd}[4]{%
+  \icse@bump{tbd}%
+  \icse@auxwrite{\string\icse@regtbd{\icse@here}{\unexpanded{#1}}{#2}{\unexpanded{#3}}{\unexpanded{#4}}}%
+  \textcolor{pendingred}{\sffamily\bfseries[#1]}}
+
+\newcommand{\decision}[4]{% id, owner, due, question
+  \icse@bump{dec}%
+  \icse@auxwrite{\string\icse@regdec{\icse@here}{#1}{#2}{\unexpanded{#3}}{\unexpanded{#4}}}%
+  \textcolor{decisionorange}{\sffamily\bfseries[#1]}}
+% \registerdecision{id}{owner}{due}{question}: a decision with no place in the
+% text (title, authors, venue); listed in the cockpit, never typeset.
+\newcommand{\registerdecision}[4]{%
+  \icse@bump{dec}%
+  \icse@auxwrite{\string\icse@regdec{\icse@here}{#1}{#2}{\unexpanded{#3}}{\unexpanded{#4}}}}
+
+% Compatibility with the etc shim used by main_apsec.tex.
+\providecommand{\todo}[1]{\textcolor{pendingred}{[TODO: #1]}}
+
+% ---------------------------------------------------------------------------
+% Floats: planned placeholders and generated tables
+% ---------------------------------------------------------------------------
+% \plannedfloat{env}{label}{width}{height}{caption}{what goes here}
+%   A float that is designed but not built. The box has the budgeted size.
+% \generatedtable{env}{file}{label}{width}{height}{caption}{what goes here}
+%   Inputs \icsetables/file.tex when vera-foundry has produced it. A table
+%   built from the smoke results tree is kept but stamped SMOKE DATA in its
+%   caption, and the checker refuses it in submit mode. Until the file exists
+%   the planned placeholder stands in, with the same label.
+\newcommand{\icse@placeholder}[3]{%
+  \fcolorbox{black!30}{black!4}{%
+    \parbox[c][#2][c]{\dimexpr#1-2\fboxsep-2\fboxrule\relax}{%
+      \centering\footnotesize\sffamily\color{black!62}#3}}}
+\newcommand{\icse@figurebody}[5]{\icse@placeholder{#2}{#3}{#5}\caption{#4}\label{#1}}
+\newcommand{\icse@tablebody}[5]{\caption{#4}\label{#1}\icse@placeholder{#2}{#3}{#5}}
+\newcommand{\icse@floatbody}[6]{%
+  \begin{#1}[t]
+    \centering
+    \ifstrequal{#1}{figure}{\icse@figurebody{#2}{#3}{#4}{#5}{#6}}{%
+      \ifstrequal{#1}{figure*}{\icse@figurebody{#2}{#3}{#4}{#5}{#6}}{%
+        \icse@tablebody{#2}{#3}{#4}{#5}{#6}}}%
+  \end{#1}}
+\newcommand{\plannedfloat}[6]{%
+  \icse@auxwrite{\string\icse@regfloat{#2}{#1}{planned}{--}}%
+  \icse@floatbody{#1}{#2}{#3}{#4}{#5}{#6}}
+
+% \registerfloat{label}{env}: first line of a hand-built float file in
+% floats/, so that the cockpit lists it and the checker counts it.
+\newcommand{\registerfloat}[2]{\icse@auxwrite{\string\icse@regfloat{#1}{#2}{hand-built}{--}}}
+
+\newread\icse@rd
+\newif\ificse@smoke
+\edef\icse@smokestr{\detokenize{results-smoke}}
+\newcommand{\icse@readhead}{%
+  \ifeof\icse@rd\else
+    \readline\icse@rd to \icse@line
+    \edef\icse@tmp{\noexpand\in@{\icse@smokestr}{\icse@line}}\icse@tmp
+    \ifin@\global\icse@smoketrue\fi
+  \fi}
+% \icse@ifsmoke{file}{smoke}{not smoke}: reads the generator's header comment.
+\newcommand{\icse@ifsmoke}[3]{%
+  \global\icse@smokefalse
+  \openin\icse@rd=#1\relax
+  \ifeof\icse@rd\else\icse@readhead\icse@readhead\icse@readhead\closein\icse@rd\fi
+  \ificse@smoke#2\else#3\fi}
+% Status of a generated artefact, for the cockpit.
+\newcommand{\icse@artefact}[1]{%
+  \IfFileExists{\icsetables/#1.tex}%
+    {\icse@ifsmoke{\icsetables/#1.tex}{\textcolor{pendingred}{smoke data}}{\textcolor{brandgreen}{generated}}}%
+    {\textcolor{black!50}{not generated}}}
+
+% Kept outside \generatedtable: a parameter inside \IfFileExists branches breaks.
+\newcommand{\icse@smokecaption}{%
+  \let\icse@origcaption\caption
+  \renewcommand{\caption}[1]{\icse@origcaption{\textcolor{pendingred}{[SMOKE DATA, NOT RESULTS]} ##1}}}
+\newcommand{\generatedtable}[7]{%
+  \IfFileExists{\icsetables/#2.tex}{%
+    \icse@ifsmoke{\icsetables/#2.tex}{%
+      \icse@auxwrite{\string\icse@regfloat{#3}{#1}{smoke}{#2}}%
+      \begingroup
+        \icse@smokecaption
+        \input{\icsetables/#2.tex}%
+      \endgroup
+    }{%
+      \icse@auxwrite{\string\icse@regfloat{#3}{#1}{generated}{#2}}%
+      \input{\icsetables/#2.tex}%
+    }%
+  }{%
+    \IfFileExists{floats/#2-skeleton.tex}{%
+      \icse@auxwrite{\string\icse@regfloat{#3}{#1}{skeleton}{#2}}%
+      \input{floats/#2-skeleton.tex}%
+    }{%
+      \icse@auxwrite{\string\icse@regfloat{#3}{#1}{awaiting generator}{#2}}%
+      \icse@floatbody{#1}{#3}{#4}{#5}{#6}{#7\\[2pt]\texttt{\icsetables/\detokenize{#2}.tex} not generated yet}%
+    }%
+  }}
+% Until the generator runs, floats/<file>-skeleton.tex (a complete float
+% with the same label, cells as \tbdcell) stands in for the grey box.
+
+% ---------------------------------------------------------------------------
+% Draft banner
+% ---------------------------------------------------------------------------
+% Bottom of every page in draft mode: build identity, and a red warning on any
+% body page beyond the tenth.
+\newcommand{\icse@bannertext}{%
+  ICSE 2027 SEIP draft \textbullet\ mode \icsemode\ \textbullet\ ML arm: \icsearm\
+  \textbullet\ title \icsetitle\ \textbullet\ tables: \texttt{\icsetables}\
+  \textbullet\ \icsegitrev\ \textbullet\ \icsebuilddate\ \textbullet\ page \thepage}
+\ificsedraft
+  \AddToHook{shipout/foreground}{%
+    \put(0.5\paperwidth,-\dimexpr\paperheight-14pt\relax){%
+      \makebox[0pt][c]{\tiny\sffamily
+        \ifnum\numexpr\value{abspage}-\zref@extractdefault{icse:bodystart}{abspage}{1}+1>10
+          \ifnum\value{abspage}>\zref@extractdefault{icse:bodyend}{abspage}{999}
+            \color{black!55}\icse@bannertext\ \textbullet\ references only
+          \else
+            \color{pendingred}\bfseries\icse@bannertext\ \textbullet\ BODY BEYOND PAGE 10
+          \fi
+        \else
+          \color{black!55}\icse@bannertext
+        \fi}}}
+\fi
+
+\makeatother

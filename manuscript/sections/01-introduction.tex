@@ -1,0 +1,77 @@
+\psection{intro}{1.0}{I1--I4}{core}{Introduction}
+% Brief, Section I. Opens on credit scoring (withdrawn: on the control function
+% receiving LLMs); announces I1--I4 in prose, no numbers. Honesty rules (brief
+% 0.2): Annex III obligations apply from 2 Dec 2027, CCD2 from 20 Nov 2026;
+% "introduced into the review process", never "deployed in production reviews";
+% "content digest", never "signed"; I1 is "no change to the engine core", never
+% "no code change". Nothing from the APSEC paper except the \apsec citation.
+
+% P1 -- credit scoring as the reference high-risk use (established).
+\armswitch{}{}{The control functions of a bank were set up to review statistical models such as credit scorecards, and they now receive large language models (LLMs) as well.
+}%
+Credit scoring \armswitch{is}{is}{remains} the reference case of high-risk artificial intelligence (AI) in banking.
+The EU AI Act lists the assessment of the creditworthiness of natural persons among its high-risk uses (Annex~III, point~5(b))~\cite{euaiact2024}, and the Digital Omnibus on AI has deferred the obligations for such uses to 2~December 2027~\cite{euomnibus2026ai}.
+Banking supervision already covers these models.
+Since June 2021, the European Banking Authority's guidelines on loan origination have asked banks that assess creditworthiness with automated models to understand those models, to detect and prevent bias, to keep inputs and outputs traceable and auditable, and to document the methodology and data behind them~\cite{eba2020loan}.
+Leaving out the protected attribute does not remove bias, because a model can reproduce a disparity through correlated inputs and historical outcomes~\cite{barocas2016big}.
+A control function that approves a scoring model therefore needs a record, requirement by requirement, of what was measured, how the results were scored and why they were accepted.
+
+% P2 -- LLMs arrive without a review procedure (established).
+\armswitch{The same control functions now receive large language models (LLMs), for which neither supervisory guidance nor evaluation tooling provides an established review procedure.}{The same control functions now receive large language models (LLMs), for which neither supervisory guidance nor evaluation tooling provides an established review procedure.}{LLMs do not fit that procedure, and neither supervisory guidance nor evaluation tooling yet provides another one.}
+The model-risk guidance that the US banking agencies revised in April 2026 applies to traditional statistical models and to non-generative, non-agentic AI models, but places generative and agentic AI models outside its scope~\cite{federalreserve2026sr262}.
+Evaluation tooling covers part of the gap.
+COMPL-AI interprets the AI Act as a set of technical requirements and links those it can measure to public LLM benchmarks~\cite{guldimann2024complai}.
+A benchmark suite, however, reports scores under its own choice of benchmarks and aggregation, whereas a review has to record which requirements apply to a given use, how their evidence is weighted and which result is acceptable.
+A score reported this way does not show whether another weighting would have changed the conclusion.
+Access sets a second limit.
+A bank that reaches a model only through a provider's interface has close to black-box access, and black-box access is insufficient for rigorous audits~\cite{casper2024blackbox}.
+What a reviewer can measure then depends on how the model is served.
+
+% P3 -- non-discrimination is shared, and its criteria conflict (established).
+Non-discrimination is the obligation both families share.
+For credit it is a legal duty: the revised Consumer Credit Directive, which applies from 20~November 2026, prohibits discrimination against consumers in the conditions for granting credit (Art.~6)~\cite{euccd2023}.
+For LLMs, fairness is one of the principles that COMPL-AI turns into technical requirements~\cite{guldimann2024complai}.
+No single statistic discharges this obligation, because the standard fairness criteria conflict.
+When base rates differ between groups and prediction is imperfect, a risk score cannot both be calibrated within each group and balance its error rates across groups~\cite{kleinberg2017inherent,chouldechova2017fair}.
+EU non-discrimination law does not settle the choice with a statistical test, since it judges discrimination in context~\cite{wachter2021fairness}.
+Choosing a criterion is therefore a policy decision.
+A review that reports one fairness score without naming its criterion leaves that decision unrecorded.
+
+% P4 -- what we did (design established; populations D13, case D16, ML arm D4).
+\armswitch{We introduced one evaluation engine, VERA~\apsec, into the model review process of \bankname{} and applied it to both families.}{We introduced one evaluation engine, VERA~\apsec, into the model review process of \bankname{} and applied it to both families.}{We introduced one evaluation engine, VERA~\apsec, into the model review process of \bankname{} for LLMs deployed on Microsoft Foundry.}
+VERA reads a specification, which names the requirements to evaluate, the benchmarks or checks that measure each one and the weights that score them, and returns scored evidence per requirement; every run carries a content digest of those weights.
+\armswitch{%
+In the LLM arm, run with the team that assesses generative-AI use cases (\aicc{}), VERA evaluated models deployed on Microsoft Foundry.
+In the tabular arm, run with the legal and risk function (\legalrisk{}), it evaluated credit-scoring classifiers from their prediction files.
+Each arm has its own specification, and fairness is the requirement both teams own.
+}{%
+In the LLM arm, run with the team that assesses generative-AI use cases (\aicc{}), VERA evaluated models deployed on Microsoft Foundry.
+In the tabular arm, run with the legal and risk function (\legalrisk{}), it evaluated a credit-scoring classifier on one dataset from its prediction file; this arm demonstrates portability and does not cover the family.
+Each arm has its own specification, and fairness is the requirement both teams own.
+}{%
+Two teams work with its evidence, the team that assesses generative-AI use cases (\aicc{}) and the legal and risk function (\legalrisk{}), and fairness is the requirement both own.
+We also specified how the same engine accepts tabular credit-scoring classifiers from their prediction files, but did not run that arm (\cref{sec:vera}).
+}%
+Reviewers from both teams took part in a decision study\decision{D13}{core,aicc,legal}{18 Sep}{Can AICC and Legal/Risk respondents be told apart (tracked channel or added question)? If not, split by decision role (Q15) and drop "reviewers from both teams" here and in I4.}, and VERA was run on one \aicc{} use case in preparation for its review\decision{D16}{aicc}{2 Oct}{Case choice, permission and real-review go/no-go. Keep "in preparation for its review" until N8 documents a review decision (due 9 Oct); if no real review happens, say "retrospective case" here, in I4 and in the abstract.}.
+
+% P5 -- contributions I1--I4 in prose, plus the APSEC disclosure clause (D24).
+\armswitch{The paper makes four contributions.}{The paper makes four contributions.}{The paper makes four contributions, and the last two carry most of its evidence.}
+\armswitch{%
+\emph{(I1) The specification is data; the engine core is not.}
+Both specifications ran through the same scoring and governance core: the tabular arm added runners behind the existing sample contract without changing that core\tbd{N5}{core}{5 Oct}{diff audit against the core module list (D9): no core file changed}, and we list every change made outside it, including those the LLM arm needed (\cref{sec:vera,sec:portability}).
+}{%
+\emph{(I1) The specification is data; the engine core is not.}
+Both specifications ran through the same scoring and governance core, on a panel of LLMs and, as a demonstration, on a tabular classifier: the tabular arm added runners behind the existing sample contract without changing that core\tbd{N5}{core}{5 Oct}{diff audit against the core module list (D9): no core file changed}, and we list every change made outside it, including those the LLM arm needed (\cref{sec:vera,sec:portability}).
+}{%
+\emph{(I1) The specification is data, within one family.}
+A second LLM specification, which reweights and remaps the same benchmarks, runs without any change to the engine core\tbd{E8}{foundry}{11 Oct}{security-focus replay from cache confirms the reweighted specification ran}, and we design, without running it, the tabular specification the same core would accept (\cref{sec:vera}).
+}%
+\emph{(I2) The fairness criterion is a policy choice.}
+Each admissible criterion enters the scoring policy as a weighted component, so the choice is covered by the run's content digest, and a test shows which verdicts hold under every admissible criterion and which depend on the choice; \armswitch{we apply it to both families}{we apply it to the LLM arm and to one tabular dataset}{we apply it to LLMs that classify credit records\tbd{N2}{core,foundry}{4 Oct}{LLM record-classification fairness runs; if they do not run, I2 is stated as a design contribution and this clause is removed}} (\cref{sec:fairness}).
+\emph{(I3) What a bank can measure depends on serving mode and model family.}
+We classify each requirement as measured natively, measured through a fallback or not measurable, and attribute every limit to a cause, which separates limits of the serving route from limits of our set-up\armswitch{}{}{; across families the classification is analytical} (\cref{sec:measurability}).
+\emph{(I4) Experience from a regulated institution.}
+We report the decision study with reviewers from both teams, the \aicc{} case, and lessons for teams that build evaluation into model review (\cref{sec:decision,sec:casestudy,sec:lessons}).
+An earlier paper presents the VERA dashboard and a reading study of it~\apsec.
+The present paper reuses no data or result from that work; it reports the engine's introduction into model review, \armnotwithdrawn{the tabular arm, }the fairness-criterion analysis, the measurability study and the studies with reviewers.
+The Data Availability section lists what we release and what confidentiality prevents us from sharing.

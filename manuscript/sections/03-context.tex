@@ -1,0 +1,64 @@
+\psection[1.2]{context}{1.05}{I4}{aicc,legal}{Industrial Context}
+% Section III. Contribution I4 (industrial relevance); grounds the role split
+% used in VI-D and VIII. Regulatory framing is written; the AICC process, the
+% placement of both teams, the inventory share and the review cost are pending
+% (N7, N9, N11, D17, D18, D19). The context does not depend on the ML-arm
+% decision; under ARM=withdrawn P3 drops the IRB sentence and adds a
+% future-work sentence, the figure marks the ML path as designed, and the
+% P2/P4 plans shrink so the section comes in about 0.05 p shorter.
+
+% P1 -- approval roles and the three lines (established: APSEC approval setting,
+% rewritten; IIA three lines model; SR 26-2 "effective challenge").
+At \bankname{}, those who decide on a model do not produce its evidence: approval sits with the model owner and business management, engineers run the evaluations and assemble the results, and a second line in compliance or risk management challenges both.
+This split follows the three lines model~\cite{iia2020three}.
+In that model, the first line runs an activity and manages its risks, the second line provides risk expertise, monitoring and challenge, and internal audit gives independent assurance as the third line.
+It has also been adapted to the management of risks from AI~\cite{schuett2025three}.
+US model-risk guidance calls this kind of scrutiny effective challenge: critical analysis by experts with enough independence and standing to have a model changed~\cite{federalreserve2011sr117,federalreserve2026sr262}.
+A challenge can only examine what the evidence records.
+One end-to-end framework for internal algorithmic auditing produces documents at every stage of an audit, model cards among them~\cite{raji2020closing,mitchell2019modelcard}.
+Fig.~\ref{fig:process} places the two teams and both arms of VERA in this process.
+
+\plannedfloat{figure}{fig:process}{\columnwidth}{6.2cm}%
+  {Model review at \bankname{}: approval roles across the three lines, the two review teams, and where VERA evidence enters \armswitch{for each model family}{for each model family}{for language models, with the designed path for scoring classifiers}.}%
+  {Hand-built TikZ, floats/process.tex, drawn from N7 (\aicc{} and \legalrisk{}, 25 Sep).\\
+   Lanes: first line (model owner, business sponsor, engineers), second line (\legalrisk{}), third line (internal audit); \aicc{} placed where N7 says.\\
+   Flow: use case $\rightarrow$ evidence $\rightarrow$ challenge $\rightarrow$ approval.\\
+   LLM-arm runs enter at the \aicc{} review; ML-arm runs enter at the \legalrisk{} challenge\armswitch{.}{ (one classifier).}{ (dashed: specified, not evaluated).}\\
+   First float to cut (D38).}
+
+% P2 -- placement of the two teams (PENDING N7).
+\parplan[\armswitch{55}{55}{45}]{The two teams in this study sit at different points of these lines: \aicc{} assesses use cases built on language models, close to the teams that build them, and \legalrisk{} acts as a second line.}{PENDING N7 (aicc + legal, 25 Sep): mandate of each team, its place in the three lines, which decisions it can block and which it only advises on, and permission to describe both teams (D27, legal, 9 Oct). The only source today is the 16 Sep roadmap; no internal document names either team. Cite schuett2025three (three lines applied to AI risk) and rakova2021where (organisational enablers and blockers of responsible-AI practice). This paragraph grounds the role split used in VI-D and VIII; D13 fixes how questionnaire respondents are assigned to each team. Never write a person's name.}
+
+% P3 -- regulatory weight of the two families (established; inventory share pending D19).
+The two model families that reach these teams carry different regulatory weight.
+Credit scoring is a banking use that the EU AI Act classifies as high-risk: Annex~III, point~5(b), covers systems that evaluate the creditworthiness of natural persons or establish their credit score~\cite{euaiact2024}.
+The obligations for that class will apply from 2~December~2027, after the Digital Omnibus on AI deferred them~\cite{euomnibus2026ai}.
+Scoring models are nonetheless supervised already.
+The loan-origination guidelines of the European Banking Authority (EBA) expect a bank that uses automated models to assess creditworthiness to understand those models, to detect and prevent bias, to keep inputs and outputs traceable and auditable, and to assess the quality of the output regularly~\cite{eba2020loan}.
+\armnotwithdrawn{The EBA has also examined explainability for machine learning in internal-ratings-based credit models~\cite{eba2023machine}.}
+A language-model assistant that answers customers is not high-risk by that use, and the Act attaches transparency duties to it (Art.~50)~\cite{euaiact2024}.
+The US guidance cited above draws the same line: its April 2026 revision covers non-generative AI models and leaves generative and agentic AI outside its scope~\cite{federalreserve2026sr262}.
+The review of the two families therefore starts from unequal ground: established expectations for one, little external guidance for the other.
+Language models account for \tbd{D19}{legal}{2 Oct}{share of language models vs tabular ML models in the bank's model inventory, or an agreed qualitative wording} of the model inventory of \bankname{} \decision{D19}{legal}{2 Oct}{Disclose the LLM vs ML inventory share, or describe it qualitatively?}.
+\ifarmwithdrawn
+This paper evaluates the language-model family; Section~\ref{sec:vera} gives the specification designed for scoring classifiers, whose evaluation is future work.
+\fi
+
+% P4 -- AICC's evidence before VERA (PENDING N7, D17).
+\parplan[\armswitch{40}{40}{30}]{Before VERA, \aicc{}'s review of a language-model use case gathered systematic evidence on cyber-resilience and toxicity only, and the other measurable requirements had none.}{PENDING N7 and D17 (aicc, 25 Sep): confirm this scope, the instruments in use (probe frameworks for prompt attacks such as derczynski2024garak; prompt sets for toxic degeneration such as gehman2020realtoxicity) and where the results are filed. The only source today is the 16 Sep roadmap. Do not print the size of the complement ("the other ten") until D2 fixes the requirement count. VI-C and VII measure VERA's net contribution against this baseline.}
+
+% P5 -- review-cost baseline (PENDING N9, D18).
+The current cost of a review is the reference for the effort reported in Section~\ref{sec:casestudy}.
+We obtained it from \tbd{N9}{aicc,legal}{25 Sep}{method of the review-cost baseline: effort logged on past reviews or structured interviews; questionnaire answers Q9/Q10 are declared data and may appear only labelled as such}.
+A review today takes \tbd{N9}{aicc,legal}{5 Oct}{person-days per review, median and range, per model family if both are available} and involves \tbd{N9}{aicc,legal}{5 Oct}{number of people per review, by line} \decision{D18}{aicc,legal,core}{5 Oct}{Review-cost baseline: method (logged effort or interviews) and number}.
+
+% P6 -- VERA as advisory evidence; supervisory anchors (established: main.tex
+% shadow/advisory trials and regulatory mapping, rewritten; governance/modes.py;
+% ACPR 2020 page on data management; CCD2 Art. 6).
+We introduced VERA into this process as a source of evidence for reviewers, not as a gate that approves or blocks a model.
+Its optional runtime monitor has shadow, advisory and enforcement modes, and internal trials used only the two that never block.
+VERA's requirements also map onto expectations that the second line already tracks.
+Robustness and cyber-resilience correspond to information and communication technology (ICT) risk management and resilience testing under the Digital Operational Resilience Act~\cite{dora2022} and the EBA guidelines on ICT and security risk~\cite{eba2021ictrisk}.
+Privacy corresponds to data-protection obligations and to the information-security controls of the same guidelines~\cite{eba2021ictrisk}.
+Fairness corresponds to the non-discrimination article of the revised Consumer Credit Directive, which applies from 20~November~2026~\cite{euccd2023}, and to the position of the French banking supervisor (ACPR) that AI in finance must account for fairness of processing and the absence of discriminatory bias~\cite{acpr2020ai}.
+Section~\ref{sec:vera} anchors each requirement of both specifications \tbd{N11}{core,legal}{2 Oct}{supervisory anchor per requirement for the LLM and tabular specifications, reviewed with Legal/Risk (Tab. 1 column)}.

@@ -1,0 +1,47 @@
+\psubsection{measurability}{\armswitch{0.6}{0.6}{0.8}}{I3}{foundry,aicc}{What Can Be Measured}
+
+\generatedtable{table*}{E4_measurability}{tab:e4_measurability}{\textwidth}{4.4cm}{Measurability of the twelve requirements by serving route and model family}{Rows R01--R12 and a log-probability row (E0); columns: the Foundry deployments grouped by serving route, then the ML-arm column; cells native / fallback / not measurable / not applicable, with the cause class of every non-native cell (E4 with the D21 generator extension)}
+
+% P1 -- the serving route caps measurability within the LLM family.
+Within the language-model family, the serving route, that is, the serving mode behind a deployment's endpoint, caps what can be measured natively (\Cref{tab:e4_measurability}).
+Calibration (\req{07}) needs the probability a model assigns to its answer, which a runtime patch of VERA's runner (\armswitch{\Cref{sec:portability}}{\Cref{sec:portability}}{\Cref{sec:vera}}) reads where the route returns token log-probabilities.
+Elsewhere a heuristic confidence stands in, and the cell is flagged as a fallback.
+A probe of each deployment records whether log-probabilities come back \tbd{E0}{foundry}{18 Sep}{log-probability row of Tab. 4, per deployment (expected, to confirm: none on the three Claude deployments, returned on gpt-frontier, unknown on the serverless open models)}.
+
+% P2 -- only serving-class causes support the claim; set-up limits are reported apart.
+Only endpoint-imposed limits support this claim, so each non-native cell carries a cause class (serving, set-up, by design or unknown), and an unrecognised cause stays unknown.
+Three set-up limits hold on every route and are not counted \decision{D21}{foundry}{05 Oct}{E4 generator: render the cause class; causes.py currently puts any 'loglikelihood' or 'completions api' reason in the serving class, which would count the chat-only adapter fallbacks as serving limits (KNOWN LIMITS section 1 calls them a call-path limit)}:
+the garak harness~\cite{derczynski2024garak} behind one \req{02} benchmark does not run from the campaign workstation,
+HumanEval~\cite{chen2021humaneval} is not allowed to execute generated code there,
+and our chat-only lm-eval adapter~\cite{gao2021lmevalharness} cannot score log-likelihood tasks, even on routes that return log-probabilities.
+\req{09} is reported as not measurable, not as an unmeasured zero \decision{D8}{foundry}{17 Sep}{set the VERA watermark mode to na; rerun R09 before 4 Oct if E1 ran it in statistical mode}.
+Of \tbd{E4}{foundry}{04 Oct}{number of non-native LLM cells on the final E1 runs} non-native cells, \tbd{E4}{foundry}{04 Oct}{number of cells whose cause class is serving, with the requirements and routes they fall on} have a serving cause.
+
+\ifarmwithdrawn
+% P2b (withdrawn only) -- what each cause class lets a reviewer conclude.
+The cause class decides what a reviewer may conclude from a degraded cell.
+A set-up limit belongs to the evaluation environment and goes away when that environment changes.
+A serving limit stays with the route the bank chose.
+A by-design cell comes from a probe that never had a native harness, or from a requirement that does not apply.
+A measured cell can also fail to separate deployments, for three distinct reasons.
+The first is construction: \req{03} to \req{05} read the shared corpus once, so they carry no information about individual deployments.
+The second is resolution: most probe benchmarks cycle through one to three prompt templates, so a larger sample budget repeats prompts instead of adding new ones.
+The third is a genuine result \tbd{E4}{foundry}{04 Oct}{requirements where identical states or scores across deployments are a real finding, if any}.
+Only the third is evidence about the models under review.
+
+\fi
+% P3 -- across model families the boundary differs in kind.
+Across model families the boundary differs in kind.
+The tabular specification\armswitch{}{}{, designed but not run (\Cref{sec:vera}),} keeps four of the twelve measurable requirements of COMPL-AI~\cite{guldimann2024complai}: data adequacy, privacy, calibration and fairness \decision{D2}{core,legal}{18 Sep}{freeze the ML scope at four requirements and fix how the other eight split (proposed: six language-only, R02 R04 R08 R09 R10 R12; two transferable but out of scope, R01 R06)}.
+Of the other eight, \tbd{N4}{core,legal}{30 Sep}{number of language-only requirements, with a one-line reason each} concern generated text only, such as toxic continuations~\cite{gehman2020realtoxicity}, and \tbd{N4}{core,legal}{30 Sep}{number of requirements that would transfer to a classifier but lie outside the arm's scope, with a reason each} would transfer but lie outside this arm's scope.
+
+% P4 -- for the tabular family, access inverts the picture.
+For these four, access inverts the picture.
+The engine \armswitch{reads}{reads}{would read} the dataset and a predictions file with labels, predictions, scores and the protected attribute, so the serving route plays no part.
+Only a counterfactual test, which predicts again with the protected attribute flipped, \armswitch{needs}{needs}{would need} the model \decision{D3}{core}{22 Sep}{keep or cut counterfactual fairness and proxy detection; if cut, drop this sentence}.
+\armswitch{On the reference classifiers, \tbd{N1}{core}{04 Oct}{ML-arm column of Tab. 4 from the runs: how many in-scope cells are native, on which datasets} of the in-scope cells are native.}{The arm ran on one dataset \tbd{N1}{core}{04 Oct}{which dataset, and which in-scope requirements and criteria ran}, and \Cref{tab:e4_measurability} marks the in-scope requirements it did not run.}{No tabular run exists, so the ML-arm column of \Cref{tab:e4_measurability} is an analytical classification, and the serving-route axis alone carries the empirical evidence.}
+
+% P5 -- implication for model selection and for AICC's prior coverage.
+Choosing a serving route therefore also decides what the bank can evaluate later, a concrete case of the limits of query-only audits~\cite{casper2024blackbox}.
+The revised US model-risk guidance does not address this, as it places generative AI outside its scope~\cite{federalreserve2026sr262}.
+Of the requirements \aicc{} did not previously cover \decision{D17}{aicc}{25 Sep}{confirm that AICC's prior review covered cyber resilience and toxicity only}, \tbd{N7}{aicc,core}{05 Oct}{which, and how many, are limited by the serving route on at least one deployment (N7 process description crossed with E4)} are limited by the serving route.

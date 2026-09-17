@@ -1,0 +1,44 @@
+% floats/fairness_criteria-skeleton.tex -- stands in for
+% tables/fairness_criteria.tex (generator N3, owner core, due 9 Oct) until
+% vera-foundry writes it; the generated file must keep the label
+% tab:fairness-criteria. Section VI-B, Tab. 3.
+% - Cells are criterion scores m_c in [0,1], higher is fairer, as continuous
+%   values (never a thresholded 0 or 1). Range = max_c m_c - min_c m_c over the
+%   criteria columns only; Rob. = band(min) equals band(max) (Proposition 1), or
+%   all pass decisions agree if Legal/Risk sets per-criterion thresholds (D5).
+% - CF and Proxy depend on D3 (22 Sep): delete both columns if the attribute-flip
+%   and proxy checks are cut. Proxy is a check, not a criterion: it stays outside
+%   the range.
+% - A language model's gECE needs a confidence per decision (token
+%   log-probabilities, E0); print \stnm where the deployment returns none.
+% - Rows follow the ML-arm scenario (D4): full 8, reduced 5, withdrawn 4.
+\begin{table}[t]
+  \centering
+  \caption{Fairness score per admissible criterion, and criterion robustness}
+  \label{tab:fairness-criteria}
+  {\tblsetup
+  \begin{tabularx}{\columnwidth}{@{}X*{8}{c}@{}}
+    \toprule
+    Data or model & DI & EO & EOd & gECE & CF & $\Delta$ & Rob. & Proxy \\
+    \midrule
+\ifarmwithdrawn\else
+    Synthetic, planted & \tbdcell & \xmark & \xmark & \xmark & \xmark & \xmark & \xmark & \tbdcell \\
+    Synthetic          & \tbdcell & \tbdcell & \tbdcell & \tbdcell & \tbdcell & \tbdcell & \tbdcell & \tbdcell \\
+\fi
+\ifarmfull
+    Adult              & \tbdcell & \tbdcell & \tbdcell & \tbdcell & \tbdcell & \tbdcell & \tbdcell & \tbdcell \\
+    South German       & \tbdcell & \tbdcell & \tbdcell & \tbdcell & \tbdcell & \tbdcell & \tbdcell & \tbdcell \\
+\fi
+\ifarmwithdrawn\else
+    \midrule
+\fi
+    LLM \tbdcell       & \tbdcell & \tbdcell & \tbdcell & \tbdcell & \tbdcell & \tbdcell & \tbdcell & \xmark \\
+    LLM \tbdcell       & \tbdcell & \tbdcell & \tbdcell & \tbdcell & \tbdcell & \tbdcell & \tbdcell & \xmark \\
+    LLM \tbdcell       & \tbdcell & \tbdcell & \tbdcell & \tbdcell & \tbdcell & \tbdcell & \tbdcell & \xmark \\
+\ifarmreduced\else
+    LLM \tbdcell       & \tbdcell & \tbdcell & \tbdcell & \tbdcell & \tbdcell & \tbdcell & \tbdcell & \xmark \\
+\fi
+    \bottomrule
+    \multicolumn{9}{@{}L{\columnwidth}@{}}{Scores in $[0,1]$, higher is fairer. DI: disparate-impact ratio; EO: equal opportunity; EOd: equalized odds; gECE: group calibration; CF: attribute-flip consistency. $\Delta$: range over these criteria; Rob.: criterion-robust (\Cref{prop:criterion}); Proxy: strongest feature predicting the protected attribute. \armnotwithdrawn{Tabular rows score each dataset's reference model; }LLM rows classify credit records rendered as text. Values: runs \armnotwithdrawn{N1 and }N2, analysis N3.}
+  \end{tabularx}}
+\end{table}

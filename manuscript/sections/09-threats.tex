@@ -1,0 +1,35 @@
+\psection{threats}{0.4}{I1--I4}{core,dal}{Threats to Validity}
+\textbf{Construct validity.}
+Language-model benchmark scores are internal checks for comparing models within VERA, not leaderboard accuracies.
+Fairness probes for language models are weak instruments~\cite{blodgett2021stereotyping,raji2021everything,reuel2024betterbench} that Section~\ref{sec:fairness} sets aside, yet the decision-study scorecard showed a fairness row from such a probe\decision{D11}{core,foundry}{18 Sep}{Which scorecard was sent on 14 Sep (pre-campaign values or the E6 freeze), and where are freeze.json and its timestamp?}; that study observes how reviewers use evidence, not whether the evidence is right.
+Attack and toxicity verdicts inherit the biases of one open-weight judge served on Azure, which is also the model behind one target deployment and so grades its own outputs there.
+A native cell means that no fallback was flagged, not that the instrument is valid.
+Fairness criteria are technical proxies for non-discrimination law, not legal conclusions~\cite{wachter2021fairness}.
+
+\textbf{Internal validity.}
+The unaided phase of the decision study always came first, so a changed choice may partly reflect reconsideration.
+The form never named the tool, to limit demand effects.
+Respondents volunteered and some are colleagues of the authors, so the sample may favour structured evidence.
+The form timestamps sections only, so decision time is not tested.
+
+\textbf{External validity.}
+\ifarmwithdrawn
+I1 and I2 are not tested on a second model family; the tabular specification of Section~\ref{sec:vera} remains a design.
+\fi
+Evidence comes from one bank, two teams and one review case, which supports analytical generalisation only~\cite{runeson2009guidelines}.
+\armswitch{Public datasets carry artefacts: the choice of Adult's income threshold changes fairness conclusions~\cite{ding2021retiring}, and German Credit's documented coding is wrong, notably for sex and marital status~\cite{gromping2019south}\decision{D6}{legal,core}{22 Sep}{Protected attribute(s); South German Credit instead of the UCI coding; sex or age?}.
+}{The tabular arm ran on one dataset\tbd{N1}{core}{4 Oct}{which dataset the reduced tabular arm ran on}.
+}{}%
+Synthetic data describe their generator, not bank data\armnotwithdrawn{, and a planted disparity is true by construction}.
+Family transfer is classified analytically\tbd{N4}{core,legal}{30 Sep}{family transfer classification of the twelve measurable requirements, with a one-line reason each}: requirements on generated text, such as toxicity, have no counterpart in a scoring model, and robustness and capability have tabular counterparts left out of scope\decision{D2}{core,legal}{18 Sep}{Freeze the ML scope at four requirements; confirm six language-only (R02, R04, R08, R09, R10, R12) and two transferable but out of scope (R01, R06)}; no claim covers them for tabular models.
+Hosted model versions drift and run keys omit them, so results hold only for the versions in Section~\ref{sec:protocol}\tbd{E0}{foundry}{18 Sep}{model version per deployment from the E0 probe}.
+In July 2026 the Digital Omnibus deferred the Annex~III obligations to 2~December 2027~\cite{euomnibus2026ai}, so they do not yet apply.
+
+\textbf{Conclusion validity and reliability.}
+With \tbd{N6}{core}{5 Oct}{respondents from \aicc{} and from \legalrisk{}} respondents per population, tests have low power~\cite{wohlin2012experimentation} and are Holm-corrected~\cite{holm1979}.
+\ifarmreduced
+Tabular fairness gaps are point estimates without intervals\tbd{N1}{core}{30 Sep}{keep only if row-level bootstrap intervals on fairness gaps (G4) are not done}.
+\fi
+Dynamic probes cycle through at most three prompt templates, so a budget of 150 repeats prompts, and on one-template benchmarks zero seed spread and flat budget curves reflect the instrument, not model stability\tbd{E2}{foundry}{27 Sep}{confirm zero across-seed spread on every one-template benchmark}\tbd{E3}{foundry}{27 Sep}{confirm flat budget curves on the same benchmarks}.
+Cost is estimated from list prices, not billed, and energy is estimated on managed compute only.
+The replication package keeps only hashes of commercial models' outputs and no response cache, so reruns query endpoints that may have changed.

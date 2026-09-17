@@ -1,4 +1,5 @@
-# LaTeX build artifacts
+# LaTeX build products
+build/
 *.aux
 *.bbl
 *.blg
@@ -8,7 +9,11 @@
 *.out
 *.pdf
 *.synctex.gz
+tables-smoke/
 
-# ...but keep generated figure assets (source for compilation / replication)
-!figures/
+# Figures produced by `make tables` are kept (source for compilation / replication)
 !figures/*.pdf
+
+# Author blocks stay out of version control
+authors.tex
+apsec/authors_apsec.tex

@@ -1,0 +1,50 @@
+\psubsection{portability}{\armswitch{0.5}{0.5}{0.2}}{I1}{core,foundry}{One Engine, Two Specifications}
+% VI-A. Contribution I1. Evidence: engine report section 1 (sample contract, couplings),
+% VF orchestrator (client, patches, in-process path), N5 diff audit, E1/E2 runs, N1 ML runs.
+% Wording rules (brief 0.2): never "no code change"; "content digest (SHA-256)", never
+% "signed"; the digest covers version and weights only; R09 statistical, R10, R11 and the
+% heuristic R07 are not valid measurements; no E8 as the portability result unless withdrawn.
+\ifarmwithdrawn
+% Withdrawn: P1, P2 and P5 removed; E8 is the only runtime evidence and I1 is downgraded.
+Without the tabular arm, I1 holds in a weaker form: the specification is data within one model family, and the tabular specification of \Cref{sec:vera} remains a design.
+The runtime evidence is a replay of the language-model campaign under a security-first catalog and registry, covering three requirements on seven deployments with the same runners.
+A job served entirely from the call cache reuses the samples of the main campaign, so only the weighting, the recorded digest and the requirement scores differ; \tbd{E8}{foundry}{11 Oct}{number of the 21 E8 jobs served entirely from the cache (cached calls equal to calls, cost 0 EUR)} of the 21 jobs were served that way.
+A reweighting of this kind already ran in the earlier study~\apsec.
+The replay checks that the property holds on API-served models, which needed a substitute model client and two runner functions patched at run time.
+Each run manifest records the content digest (SHA-256) of the catalog, a hash of the registry, the engine revision and the patches in force, so a reviewer can tell which weighting produced a score.
+On the language-model panel, \tbd{E1}{foundry}{27 Sep}{LLM headline from valid instruments only (not R09 statistical, R10, R11, heuristic R07), e.g. the requirement with the widest spread across tiers and its range}, and the largest across-seed standard deviation of a requirement score was \tbd{E2}{foundry}{27 Sep}{largest across-seed SD of a requirement score, valid requirements only}; on single-template benchmarks that spread is zero by construction.
+\else
+\input{floats/portability}%
+% P1: what the ML arm changed in the core (N5).
+A reweighting needs only new catalog and registry files~\apsec; a second model family is the stronger test.
+Before the tabular arm was coded, we fixed the engine core as the modules that never call a model: catalog loading and its alignment gate, the content digest, the weighted bootstrap over the sample contract of \Cref{sec:vera}, the bands and the triage \decision{D9}{core}{18 Sep}{Which modules form the engine core for the N5 audit: catalog loading and alignment gate, digest, weighted bootstrap, bands, triage; are policy comparison and the sensitivity scripts in or out?}.
+Between the revision the language-model runs recorded and the one that ran the tabular arm, \tbd{N5}{core}{05 Oct}{number of core files changed (git diff --stat over the D9 list); I1 may say "no change to the engine core" only if this is zero} core files changed.
+The tabular arm added \tbd{N5}{core}{05 Oct}{number of new runners} runners, \tbd{N5}{core}{05 Oct}{number of new registry entries} registry entries and one catalog (\Cref{tab:portability}).
+
+% P2: code outside the core, for both arms (engine report section 1; VF client and patches).
+At the language-model revision, the dispatcher was a closed chain of branches that silently sent unknown runner names to a chat-prompt runner.
+Neither the run context nor the run request had a slot for labels, predictions or a protected attribute.
+The tabular arm \tbd{N5}{core}{05 Oct}{how each coupling was passed: dispatcher entries added and whether unknown names now raise (G2); run-context and request fields added (G1)}.
+The language-model arm needed code too: the engine's client sends every call to a configured Ollama endpoint, so the Foundry campaign substitutes a client with the same signature and patches two runner functions at run time.
+One patch lifts a ten-item cap on evaluation-harness tasks; the other reads calibration confidence from token log-probabilities where a deployment returns them, and otherwise flags the heuristic confidence as a fallback.
+
+% P3: same scoring path, digests and provenance (VF runner.py, vera_adapter.py).
+The Foundry campaign scores in process with the engine's dispatcher, weighted bootstrap and band settings.
+Each run manifest records the content digest (SHA-256) of the catalog, a hash of the registry, the engine revision and the patches in force.
+The catalog digest covers weights but not band thresholds \decision{D29}{core}{25 Sep}{G5: add per-criterion thresholds and the registry to the catalog and its digest, or describe the environment-set thresholds as they are?}.
+The tabular runs \tbd{N1}{core}{04 Oct}{entry point of the ML runs (script or campaign CLI), whether they call the same bootstrap and bands, and which digests and provenance fields their manifests record}.
+
+% P4: arm L results (E1, E2).
+On the language-model panel, \tbd{E1}{foundry}{27 Sep}{LLM headline from valid instruments only (not R09 statistical, R10, R11, heuristic R07), e.g. the requirement with the widest spread across the three tiers and its range}.
+Across three seeds on four deployments, the largest standard deviation of a requirement score was \tbd{E2}{foundry}{27 Sep}{largest across-seed SD of a requirement score, valid requirements only}.
+On single-template benchmarks this spread is zero by construction.
+
+% P5: arm M results (N1), by scenario.
+\ifarmreduced
+The reduced arm ran fairness and calibration on one dataset, \tbd{N1}{core}{04 Oct}{name of the single dataset the reduced arm ran on}; data adequacy and privacy are specified but were not run.
+On that dataset, \tbd{N1}{core}{04 Oct}{reduced-arm result: which fairness criteria ran, whether the engine flagged the disparity (recall against the manifest if synthetic), continuous values}.
+I1 therefore rests on a language-model panel and one tabular demonstration.
+\else
+\parplan[20]{On the synthetic credit corpus, the engine's findings are checked against the manifest of the planted disparity and proxy; the public datasets are scored with the same catalog.}{N1 runs due 4 Oct (G3, G9). Report recall of the planted disparate impact, and of the planted proxy only if D3 keeps G3b (22 Sep), against the generator manifest. Then per-criterion values on Adult (becker1996adult) and South German Credit (gromping2019south with hofmann1994statlog; D6), as continuous values, never thresholded 0/1. Detection and scoring only: which verdicts are criterion-robust belongs to VI-B.}
+\fi
+\fi

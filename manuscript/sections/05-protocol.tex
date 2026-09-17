@@ -1,0 +1,64 @@
+\psection{protocol}{0.9}{I1--I4}{core}{Protocol}
+% Section V. Sources checked on 16 Sep: VF config/deployments.yaml,
+% config/foundry.yaml, config/experiments/E1_panel.yaml, E2_seeds.yaml,
+% E6_scorecard.yaml; VF docs/KNOWN_LIMITS.md sections 2, 3 and 11; VF
+% analysis/measurability.py and causes.py; RAIP VERA_questionnaire_avant_apres.md.
+% The APSEC reading study, its counts and its ethics sentence are not reused.
+
+% --- P1: Arm L (design established; versions and dates pending E0/E1) -------
+\textbf{LLM arm: language models on Microsoft Foundry.}
+The arm evaluates eight deployments in three tiers: five frontier models from Anthropic, OpenAI and Mistral, an open-weight 70B model, and two small models (8B and 3B).
+All but the OpenAI model, served by Azure OpenAI, use serverless endpoints; the 70B model may move to managed compute \tbd{E1}{foundry}{27 Sep}{serving mode the 70B deployment actually used (serverless or managed compute)}.
+Each deployment is scored on the nine output-dependent requirements (\req{01}, \req{02}, \req{06}--\req{12}); the data requirements \req{03}--\req{05} are scored once, on a synthetic banking corpus.
+Runs use temperature 0, at most 256 output tokens, 150 items per benchmark, seed 42 and 500 bootstrap resamples~\cite{efron1993}, and four deployments receive two further seeds.
+A fixed judge, Llama~3.3 70B served on Azure, scores refusals and attack success.
+The client substitution and runtime patches this required are reported with the portability results\armnotwithdrawn{ (\Cref{sec:portability})}.
+Model versions are \tbd{E0}{foundry}{18 Sep}{model version of each deployment, from the E0 probe with write enabled} and run dates \tbd{E1}{foundry}{27 Sep}{run dates of the eight panel runs}.
+
+% --- P2: Arm M (pending N1; depends on the 30 Sep decision) -----------------
+\textbf{Tabular arm: credit-scoring classifiers.}
+\armswitch{%
+\parplan[40]{The tabular arm trains reference classifiers on a synthetic credit corpus with a planted disparity and proxy, on UCI Adult and on South German Credit, and gives VERA only their predictions.}{N1 (G1, G9). A predictions file with true label, predicted label, score and protected attribute keeps the engine independent of the model; only counterfactual checks would need the model artefact (D3). Cite becker1996adult, hofmann1994statlog with gromping2019south (corrected South German coding), ding2021retiring. Protected attribute: D6 (22 Sep). Reference models and split PENDING. Scope: fairness, calibration, data adequacy, privacy (D2). The synthetic manifest gives ground truth for the planted effects. Mirror Arm L: model versions, seed, data sizes. Runs due 4 Oct.}%
+}{%
+\parplan[25]{The tabular arm trains one reference classifier on the synthetic credit corpus, with a planted disparity, and gives VERA only its predictions.}{State that the public datasets are specified but not run. N1 reduced scope: one dataset, fairness criteria and calibration only; list what ran and mark the rest specified, not run. Protected attribute D6. Point estimates unless G4 lands. Runs due 4 Oct.}%
+}{%
+The tabular arm was designed (\Cref{sec:vera}) but not run, so it contributes no measured result.%
+}
+
+% --- P3: criterion sensitivity (procedure established; C and thresholds D5) -
+\textbf{Criterion sensitivity.}
+Each admissible fairness criterion $c \in \mathcal{C}$ is a separate benchmark under \req{11} with a score $m_c \in [0,1]$, higher meaning fairer, so adopting one criterion is a one-hot weighting and mixing criteria is any other weighting.
+A verdict is criterion-robust if all criteria in $\mathcal{C}$ and all their mixtures agree on it; \Cref{sec:fairness} gives the test, including per-criterion thresholds $\tau_c$.
+\legalrisk{} fixes $\mathcal{C}$ and the threshold rule \decision{D5}{legal}{30 Sep}{Admissible criteria; common band scale or per-criterion thresholds; default criterion for credit decisions; a rationale that can be quoted.}.
+The test covers the LLM arm, whose language models classify credit records rendered as text and feed the same metrics module \decision{D7}{core}{22 Sep}{LLM fairness instrument: record classification by the language models (N2), or the existing R10 and R11 probes with caveats.}\armswitch{, and every model--dataset pair of the tabular arm \tbd{N3}{core}{9 Oct}{criterion-sensitivity analysis on both arms, with the per-criterion threshold variant; row-level bootstrap intervals (G4) or point estimates declared as a threat}}{, and point estimates for the synthetic dataset of the tabular arm \tbd{N3}{core}{9 Oct}{criterion-sensitivity analysis on the LLM arm and on tabular point estimates}}{ \tbd{N3}{core}{9 Oct}{criterion-sensitivity analysis on the LLM record-classification runs (N2) only}}.
+
+% --- P4: measurability (procedure established; E0/N4 values pending) --------
+\textbf{Measurability.}
+Each deployment--requirement cell is native (the catalogued harness ran without a fallback flag), fallback (a degraded path, with its logged reason) or not measurable; native thus means unflagged, not valid.
+Each non-native cell gets a cause class from its logged reason: serving (the endpoint lacks a needed feature, such as log-probabilities), set-up (a tool is missing or unusable in the campaign set-up), by design (no native harness, or not applicable) or unknown.
+Unrecognised reasons never count as serving, and only serving-class cells support serving-mode claims.
+A probe records log-probability and seed support per deployment \tbd{E0}{foundry}{18 Sep}{log-probability and seed support per deployment}.
+With \legalrisk{}, we classify each of the twelve measurable requirements as transferable to tabular classifiers or not \tbd{N4}{core,legal}{30 Sep}{family-transfer classification of the twelve measurable requirements, one reason each (D2)}; \armswitch{Tabular-arm runs then fill the tabular column of the matrix}{Tabular-arm runs fill the tabular column of the matrix where they exist, and other cells are marked not run}{without Tabular-arm runs, this analytical classification is the tabular column of the matrix}.
+
+% --- P5: decision study (design established from the questionnaire) --------
+\textbf{Decision study.}
+In a within-subject design~\cite{wohlin2012experimentation}, participants choose one of three anonymised models for a customer-facing retail-banking assistant, in two phases.
+Phase one shows what a reviewer usually has (size, licence, a capability score, cost, latency, vendor claim); participants choose, justify, rate confidence from 1 to 5 and name missing information (Q1--Q4).
+Phase two, presented as a second source of information without naming the tool, adds requirement scores in three colour bands and marks verdicts that another defensible weighting would change \decision{D11}{core,foundry}{18 Sep}{Which scorecard was sent on 14 Sep (the older Mistral trio or the E6 Foundry trio); path and timestamp of the freeze record.}.
+They choose again, explain any change, rate confidence and tick the criteria that weighed (Q5--Q8), and cannot return to phase one.
+Closing items cover declared review effort, evidence sources, usefulness and role (Q9--Q16).
+\armnotwithdrawn{\legalrisk{} participants also answer a tabular credit-scoring variant \decision{D14}{legal,core}{25 Sep}{Build or drop the decision instrument for the tabular arm.}.}
+
+The measures are M1, the switch rate, with a Wilson interval; M2, agreement with the choice fixed before collection in a dated position note \decision{D12}{core}{18 Sep}{Does a position note dated before diffusion exist? Otherwise reframe or drop M2.}, by McNemar's test~\cite{mcnemar1947}; M3, decision time, which is not analysed because the form timestamps whole phases, not the choice; M4, confidence, by the Wilcoxon signed-rank test~\cite{wilcoxon1945} with the rank-biserial correlation~\cite{kerby2014}; M5, the count of distinct criteria cited in Q2 and Q6, coded twice \decision{D35}{core,dal}{5 Oct}{Name the two M5 coders (both must read French, or declare the translation of Q2 and Q6 before coding) and fix the M5 rule for respondents who kept their choice.} with Krippendorff's~$\alpha$ for agreement~\cite{hayes2007answering} and compared by the same test; M6, declared review effort; and M7, perceived usefulness.
+Tests run on the pooled sample, and Holm's procedure~\cite{holm1979} adjusts M2, M4 and M5 as one family; population contrasts are descriptive and exploratory.
+The study targets \aicc{} and \legalrisk{} \decision{D13}{core,aicc,legal}{18 Sep}{How respondents are assigned to \aicc{} or \legalrisk{} (tracked channel or an added question).}, with at least 30 participants and a floor, fixed between 15 and 20 at collection close before the export is opened, below which we report descriptive statistics only \tbd{N6}{core}{28 Sep}{collection window, invitations sent and responses per population}.
+
+% --- P6: case study (pending N8 and D16) ------------------------------------
+\textbf{Case study.}
+\parplan[10]{We follow one \aicc{} use case from submission to a documented review decision, as a single case whose embedded units of analysis are the requirements (\Cref{sec:casestudy})~\cite{runeson2009guidelines}.}{N8 and D16 (case choice and permission 25 Sep; go or no-go on a real review 2 Oct). Section VII owns the design and the data sources; keep one sentence here. Never claim that a run fed a release review before it has. Degraded outcome: a labelled retrospective of a past decision.}
+
+% --- P7: ethics (approval clauses pending D15) ------------------------------
+\textbf{Ethics.}
+The form collects no names, responses are analysed in aggregate, and no run in either arm uses customer or employee data.
+Collection requires approval by the bank's Responsible AI and Risk and Compliance functions, managers' agreement and informed consent \decision{D15}{legal}{25 Sep}{Compliance and legal sign-off, manager agreement, consent text, form tool and English version; must precede further collection.}.
+We declare compliance with the ACM policy on human participants at submission; the study is not pre-registered.

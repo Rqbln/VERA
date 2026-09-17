@@ -1,0 +1,70 @@
+\psection[1.0]{background}{0.85}{I1,I2,I4}{core,dal}{Background and Motivation}
+% Section II. Literature only. Every claim was checked on 16 Sep 2026 against
+% the verified bib notes and the cited papers' abstracts or text (COMPL-AI's
+% simple-average rule: arXiv 2410.07959, aggregation paragraph; Biswas and
+% Rajan: Finding 5; Kozodoi et al.: abstract; Wachter et al.: abstract).
+% Scenarios follow the writing brief: reduced merges the toolkit and
+% SE-fairness paragraphs; withdrawn cuts them to two sentences and makes the
+% validity of the language-model fairness instruments central.
+
+\textbf{Regulation and its technical interpretation.}
+The AI Act attaches obligations to high-risk systems, among them data governance (Art.~10) and accuracy, robustness and cybersecurity (Art.~15), without saying how any of them is to be measured~\cite{euaiact2024}.
+Its principles draw on the non-binding guidelines of the High-Level Expert Group on AI~\cite{hleg2019trustworthyai}.
+The NIST AI Risk Management Framework and ISO/IEC~42001 organise risk management across an organisation and prescribe no test for an individual model~\cite{nist2023airmf,iso42001_2023}.
+Requirements-engineering research extracts and tracks legal requirements, the AI Act included, and automates compliance checking~\cite{abualhaija2025llmregextraction,abualhaija2024regchange,amaral2022nlpcompliance}.
+COMPL-AI is the closest technical interpretation of the Act for language models~\cite{guldimann2024complai}.
+Its eighteen technical requirements fall under six principle groups, and twelve of them are measurable with public benchmarks.
+It combines scores by a simple average at every level, on the stated ground that the regulation sets no hierarchy among requirements.
+VERA takes over the twelve measurable requirements, \req{01} to \req{12}, as its unit of review.
+
+\textbf{Measurement and its validity.}
+Evaluation suites for language models reach beyond accuracy.
+HELM reports calibration, fairness and toxicity over shared scenarios~\cite{liang2023helm}, and DecodingTrust covers perspectives such as stereotype bias and privacy~\cite{wang2023decodingtrust}.
+The language model evaluation harness runs a large task library behind one interface~\cite{gao2021lmevalharness}, garak scans models for security vulnerabilities~\cite{derczynski2024garak}, and PromptOps applies metamorphic testing to robustness and fairness~\cite{sunetnanta2025promptops}.
+These tools settle what is measured.
+How the measurements combine into a judgement is fixed inside the suite or left to the reader.
+In neither case is the combination rule an input that the reviewing institution declares, versions and answers for.
+
+A score is also only as good as its construct.
+Raji et al.\ argue that influential benchmarks are presented as measures of general progress that their construction cannot support~\cite{raji2021everything}, and BetterBench finds that most of the benchmarks it assessed report no statistical significance and are hard to replicate~\cite{reuel2024betterbench}.
+Bias benchmarks for language models are a documented weak point: an inventory of stereotyping benchmarks, StereoSet~\cite{nadeem2021stereoset} among them, found that they often do not articulate what they measure~\cite{blodgett2021stereotyping}.
+VERA's language-model specification scores bias on StereoSet, BBQ~\cite{parrish2022bbq} and BOLD~\cite{dhamala2021bold}, and the last two were outside that inventory.
+We therefore do not use language-model bias scores as fairness evidence: \Cref{sec:fairness} applies fairness criteria to decisions with outcome labels instead.
+
+\ifarmfull
+\textbf{Fairness criteria and their choice.}
+For tabular classifiers, AIF360, Fairlearn and Aequitas make fairness criteria easy to compute~\cite{bellamy2019aif360,weerts2023fairlearn,saleiro2018aequitas}.
+The criteria formalise different notions of fairness, grouped as independence, separation and sufficiency, and the same classifier can be fair under one and unfair under another~\cite{verma2018fairness,barocas2023fairness}.
+The toolkits leave the choice among criteria, and its justification, to the user.
+Practitioners report needs that the toolkits do not meet, such as help in placing fairness in context and communicating it to stakeholders~\cite{lee2021landscape,deng2022exploring}.
+
+Software engineering treats fairness as a testable quality attribute~\cite{brun2018software}, and Themis generates discrimination tests without an oracle~\cite{galhotra2017fairness}.
+Adult~\cite{becker1996adult} and German Credit~\cite{hofmann1994statlog} are among the public datasets of fairness-testing research~\cite{chen2024fairness,chakraborty2021bias}, and the tabular specification of \Cref{sec:vera} draws on both\decision{D6}{legal,core}{22 Sep}{German Credit version (UCI Statlog coding or South German Credit, gromping2019south) and protected attribute; the dataset citation in Section II follows the answer}.
+On Kaggle models that include credit-risk tasks, Biswas and Rajan find that a model can look fair on disparate impact and worse on error rates~\cite{biswas2020machine}.
+Bias mitigation is a separate field~\cite{hort2024bias}; VERA measures and does not mitigate.
+\fi
+
+\ifarmreduced
+\textbf{Fairness criteria and their choice.}
+Toolkits such as AIF360, Fairlearn and Aequitas compute fairness criteria for tabular classifiers~\cite{bellamy2019aif360,weerts2023fairlearn,saleiro2018aequitas}.
+The criteria formalise different notions of fairness, so the same classifier can be fair under one and unfair under another~\cite{verma2018fairness,barocas2023fairness}.
+The toolkits leave the choice, and its justification, to the user, while practitioners ask for help placing fairness in context~\cite{lee2021landscape,deng2022exploring}.
+Software engineering tests fairness as a quality attribute~\cite{brun2018software,galhotra2017fairness,chakraborty2021bias}, and different metrics rank the same models differently~\cite{biswas2020machine}.
+A survey of the field lists Adult~\cite{becker1996adult} and German Credit~\cite{hofmann1994statlog} among its datasets~\cite{chen2024fairness}, and the tabular specification of \Cref{sec:vera} uses both\decision{D6}{legal,core}{22 Sep}{German Credit version (UCI Statlog coding or South German Credit, gromping2019south) and protected attribute; the dataset citation in Section II follows the answer}.
+VERA measures bias and does not mitigate it~\cite{hort2024bias}.
+\fi
+
+\ifarmwithdrawn
+\textbf{Fairness criteria and their choice.}
+Fairness toolkits compute many criteria~\cite{bellamy2019aif360,weerts2023fairlearn}, a classifier can be fair under one and unfair under another~\cite{verma2018fairness,barocas2023fairness}, and practitioners ask for help placing fairness in context~\cite{lee2021landscape,deng2022exploring}.
+Software engineering tests fairness as a quality attribute~\cite{brun2018software,galhotra2017fairness,chen2024fairness}, and different metrics rank the same models differently~\cite{biswas2020machine}.
+\fi
+
+In credit scoring, the choice of criterion has been studied directly.
+Kozodoi et al.\ recommend separation for scorecards and find on real data that several criteria can be approximately satisfied at once~\cite{kozodoi2022fairness}.
+Hurlin et al.\ show how lenders and their regulators can test the fairness of a scoring model formally and identify the variables behind a lack of fairness~\cite{hurlin2026fairness}.
+Wachter et al.\ argue that EU non-discrimination law is too contextual to be automated, and they propose conditional demographic disparity as a baseline statistic whose interpretation stays with the courts~\cite{wachter2021fairness}.
+Practitioner studies document gaps between fairness research and the challenges of product teams~\cite{holstein2019improving}, and fairness work that rests on ad hoc processes and individual advocates~\cite{madaio2020codesigning}.
+In a bank, the choice of criterion is also open to challenge by a control function that did not build the model (\Cref{sec:context}).
+No tool discussed above records the scoring policy, fairness criterion included, as a versioned review artefact that one reviewer can cite, another can challenge, and a later run can be checked against.
+This paper treats that policy as data (I1), makes the fairness criterion an explicit entry in it (I2), and reports what introducing it into a bank's review process involved (I4).

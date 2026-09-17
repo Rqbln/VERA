@@ -1,0 +1,182 @@
+% support/cockpit.tex -- the drafting cockpit, typeset before the title page in
+% draft mode only. Nothing here counts towards the page limit: every page
+% figure below is measured from the title page. Measured values come from the
+% previous compilation (latexmk reruns until they settle).
+\makeatletter
+
+% --- Row renderers ----------------------------------------------------------
+\newcommand{\icse@unitref}[1]{\ifcsname r@sec:#1\endcsname\ref{sec:#1}\else\ifstrequal{#1}{front}{Abs.}{#1}\fi}
+\newcommand{\icse@unitname}[1]{\ifcsname icse@title@#1\endcsname\ifcsname r@sec:#1\endcsname\ref{sec:#1}\enspace\fi\@nameuse{icse@title@#1}\else\ifstrequal{#1}{front}{Title and abstract}{#1}\fi}
+\newcommand{\icse@stat}[2]{%
+  \ifcsname icse@stat#2@#1\endcsname
+    \ifnum\@nameuse{icse@stat#2@#1}=0 \textcolor{black!35}{0}\else\textbf{\@nameuse{icse@stat#2@#1}}\fi
+  \else ?\fi}
+\newcommand{\icse@unitrow}[7]{%
+  \ifcsname r@sec:#1\endcsname\ifstrequal{#2}{sec}{\textbf{\ref{sec:#1}}}{\hspace{0.8em}\ref{sec:#1}}\else\textbf{--}\fi
+  & \ifstrequal{#2}{sec}{\textbf{#3}}{\hspace{0.8em}#3}
+  & #5 & \icse@ownerlist{#6}
+  & \ifdimequal{#7pt}{#4pt}{\textcolor{black!40}{#7}}{#7}
+  & \ifstrequal{#2}{sec}{\textbf{#4}}{#4}
+  & \icse@measure{#1} & \icse@delta{#1}{#4}
+  & \icse@stat{#1}{T} & \icse@stat{#1}{P} & \icse@stat{#1}{D}\tabularnewline}
+
+\newcommand{\icse@pagesof}[1]{\numexpr\zref@extractdefault{#1}{abspage}{0}-\zref@extractdefault{icse:bodystart}{abspage}{0}+1\relax}
+\newcommand{\icse@limit}[2]{% value, limit
+  \ifnum#1>#2 \textcolor{pendingred}{\bfseries\the#1 / #2 \ding{55}}\else\textcolor{brandgreen}{\the#1 / #2 \ding{51}}\fi}
+
+\def\icse@lastparunit{}
+\newcommand{\icse@paritem}[5]{%
+  \ifdefstring{\icse@lastparunit}{#1}{}{%
+    \par\medskip\noindent{\sffamily\bfseries\icse@unitname{#1}}\par\nopagebreak\smallskip
+    \gdef\icse@lastparunit{#1}}%
+  \par\noindent\hangindent=2.6em\hangafter=1
+  \makebox[2.6em][l]{\sffamily\footnotesize\textcolor{pendingred}{P#2}}%
+  #4\enspace{\footnotesize\color{black!60}(${\sim}$#3 filler words)\ifblank{#5}{}{\ --- #5}}\par}
+\newcommand{\icse@tbditem}[5]{%
+  \par\noindent\hangindent=2.6em\hangafter=1
+  \makebox[2.6em][l]{\sffamily\footnotesize\icse@unitref{#1}}%
+  \textcolor{pendingred}{\sffamily\bfseries[#2]}\enspace #5\enspace
+  {\footnotesize\color{black!60}--- \icse@ownertag{#3}, due #4}\par}
+% Decisions are raised wherever the text depends on them, so one id can appear
+% in several units: a first pass collects the units per id, a second prints
+% each id once.
+\newcommand{\icse@deccollect}[5]{%
+  \ifcsname icse@decunits@#2\endcsname
+    \expandafter\g@addto@macro\csname icse@decunits@#2\endcsname{, \icse@unitref{#1}}%
+  \else
+    \expandafter\gdef\csname icse@decunits@#2\endcsname{\icse@unitref{#1}}%
+    \global\advance\icse@decunique by 1
+  \fi}
+\newcommand{\icse@decprint}[5]{%
+  \ifcsname icse@decdone@#2\endcsname\else
+    \expandafter\gdef\csname icse@decdone@#2\endcsname{}%
+    \par\noindent\hangindent=2.6em\hangafter=1
+    \makebox[2.6em][l]{\sffamily\footnotesize\textcolor{decisionorange}{#2}}%
+    #5\enspace{\footnotesize\color{black!60}--- \icse@ownerlist{#3}, by #4; raised in \csname icse@decunits@#2\endcsname}\par
+  \fi}
+\newcount\icse@decunique
+\newcommand{\icse@floatitem}[4]{%
+  \ref{#1} & \texttt{\detokenize{#1}} & \texttt{#2} &
+  \ifstrequal{#3}{generated}{\textcolor{brandgreen}{generated}}{%
+    \ifstrequal{#3}{smoke}{\textcolor{pendingred}{smoke data}}{%
+      \ifstrequal{#3}{skeleton}{\textcolor{decisionorange}{skeleton}}{\textcolor{black!55}{#3}}}}
+  & \ifstrequal{#4}{--}{hand-built}{\texttt{\icsetables/\detokenize{#4}.tex}}\tabularnewline}
+
+% Citations in cockpit notes print their keys and never reach the reference
+% list, whose length counts towards the page limit.
+\begingroup
+\renewcommand{\cite}[1]{\texttt{[\detokenize{#1}]}}
+
+% --- Page 1: identity, page budget ------------------------------------------
+\onecolumn
+\pagenumbering{roman}
+\thispagestyle{empty}
+\noindent{\sffamily\bfseries\LARGE Drafting cockpit\hfill\normalsize ICSE 2027 SEIP}\par
+\noindent\rule{\textwidth}{0.6pt}\par\smallskip
+\noindent{\small
+\textbf{Working title (\icsetitle).} \icsetitletext\par
+\textbf{Build.} mode \texttt{\icsemode} \textbullet\ ML arm \texttt{\icsearm} \textbullet\
+tables from \texttt{\icsetables/} \textbullet\ revision \texttt{\icsegitrev} \textbullet\ \icsebuilddate\par
+\textbf{Venue constraints.} \input{support/venue}\par}
+
+\medskip
+\noindent{\sffamily\bfseries Page budget (sommaire)}\hfill
+{\small body \icse@limit{\icse@pagesof{icse:bodyend}}{10}\quad
+with references \icse@limit{\icse@pagesof{LastPage}}{12}}\par\smallskip
+{\small\setlength{\tabcolsep}{4pt}%
+\noindent\begin{tabularx}{\textwidth}{@{}l X L{1.25cm} L{3.3cm} r r r r r r r@{}}
+  \toprule
+  & Unit & Contrib. & Owners & Roadmap & Budget & Measured & $\Delta$ & TBD & Plans & Dec. \\
+  \midrule
+  & Title, authors, abstract, keywords & & & -- & -- &
+    \ifnum\numexpr\icse@known{bodystart}*\icse@known{\icse@firstsec}\relax=1
+      \fpeval{round((\icse@pos{\icse@firstsec}-2*(\icse@abspage{bodystart}-1))/2,2)}\else ?\fi
+    & & & & \\
+  \icse@units
+  \midrule
+  & \textbf{Body (limit: 10 pages)} & & & \icse@roadmapsum & \textbf{\icse@budgetsum} &
+    \ifnum\numexpr\icse@known{bodystart}*\icse@known{bodyend}\relax=1
+      \textbf{\fpeval{round((\icse@pos{bodyend}-2*(\icse@abspage{bodystart}-1))/2,2)}}\else ?\fi
+    & & \icse@totT & \icse@totP & \icse@totD \\
+  \bottomrule
+\end{tabularx}}
+\par\smallskip
+{\footnotesize\color{black!70}\noindent
+\emph{Roadmap}: pages per the 16 September roadmap. \emph{Budget}: the working budget, which
+trims the roadmap to leave room for the title block, Data Availability and the Acknowledgment
+that the roadmap does not count (decision D38 in the writing brief); grey when equal to the
+roadmap. The split of Section VI into its four subsections is proposed, not agreed. \emph{Measured}: pages between the start of this unit
+and the start of the next, floats included wherever they land, so a unit that hosts a
+full-width float appears longer than its prose. \emph{TBD}: missing numbers or facts;
+\emph{Plans}: paragraphs still written as plans; \emph{Dec.}: open decisions.\par}
+
+\clearpage
+\noindent{\sffamily\bfseries Contributions}\par\smallskip
+{\small\noindent\begin{tabularx}{\textwidth}{@{}l X X l@{}}
+  \toprule
+  & Claim & Established by & Fed by \\
+  \midrule
+  I1 & The specification is data and the engine is not, shown on two model families without a code change &
+       Two disjoint specifications, one engine, two result sets (\Cref{sec:portability}) & \icse@ownerlist{foundry,legal} \\
+  I2 & Fairness is a trade-off and the trade-off is auditable: which verdicts survive another criterion &
+       Impossibility results plus Proposition~1 applied to the criterion, on both arms (\Cref{sec:fairness}) & \icse@ownerlist{legal} \\
+  I3 & What can be measured depends on the serving mode and the model family &
+       Model $\times$ requirement matrix: native, fallback, not measurable (\Cref{sec:measurability}) & \icse@ownerlist{foundry,aicc} \\
+  I4 & Deployment experience in a regulated institution &
+       Two reviewer populations, the review process, its baseline cost, the case study (\Cref{sec:context,sec:decision,sec:casestudy}) & \icse@ownerlist{aicc,legal} \\
+  \bottomrule
+\end{tabularx}}
+
+\medskip
+\noindent{\sffamily\bfseries ML-arm decision point, 30 September 2026}\par\smallskip
+{\small\noindent\begin{tabularx}{\textwidth}{@{}l X X@{}}
+  \toprule
+  Scenario & State on 30 September & What the paper does \\
+  \midrule
+  \ifarmfull\textbf{full} \ding{212}\else full\fi & The fairness module produces numbers on at least two datasets &
+    Nominal architecture: both arms in every results subsection \\
+  \ifarmreduced\textbf{reduced} \ding{212}\else reduced\fi & The module runs on one dataset, without the sensitivity analysis &
+    ML arm is a portability demonstration; I1 and I2 hold in shorter form; VI-B centres on the LLM side of fairness \\
+  \ifarmwithdrawn\textbf{withdrawn} \ding{212}\else withdrawn\fi & Nothing runs &
+    ML arm removed from the results, kept as design in Section IV and as future work; the paper stands on I3 and I4 \\
+  \bottomrule
+\end{tabularx}\par\smallskip
+\noindent Build another scenario with \texttt{make draft ARM=reduced} or all three with \texttt{make arms}.}
+
+% --- Evidence pipeline --------------------------------------------------------
+\medskip
+\noindent{\sffamily\bfseries Evidence pipeline}\par\smallskip
+\input{support/pipeline}
+
+\clearpage
+\noindent{\sffamily\bfseries Floats}\par\smallskip
+{\small\noindent\begin{tabularx}{\textwidth}{@{}l l l l X@{}}
+  \toprule
+  No. & Label & Env. & Status & Source \\
+  \midrule
+  \icse@floats
+  \bottomrule
+\end{tabularx}}
+
+% --- Missing facts and open decisions ----------------------------------------
+\medskip
+\noindent{\sffamily\bfseries Missing numbers and facts (TBD)}\par\smallskip
+{\small\ifx\icse@tbds\@empty\noindent None.\par\else\icse@tbds\fi}
+
+\medskip
+{\let\icse@decitem\icse@deccollect\icse@decs}%
+\noindent{\sffamily\bfseries Open decisions}\hfill{\small\the\icse@decunique\ decisions, \icse@totD\ mentions in the text}\par\smallskip
+{\small\ifx\icse@decs\@empty\noindent None.\par\else\let\icse@decitem\icse@decprint\icse@decs\fi}
+
+% --- Detailed outline ---------------------------------------------------------
+\clearpage
+\noindent{\sffamily\bfseries\Large Detailed outline}\hfill{\small paragraphs still written as plans}\par
+\noindent\rule{\textwidth}{0.4pt}\par
+{\small\ifx\icse@pars\@empty\noindent Every paragraph is written.\par\else\icse@pars\fi}
+
+\clearpage
+\endgroup
+\pagenumbering{arabic}
+% Back to the paper's two columns; the page is empty, so no blank page results.
+\twocolumn
+\makeatother

@@ -1,3 +1,4 @@
+# Python
 .venv/
 __pycache__/
 *.py[cod]
@@ -6,22 +7,24 @@ dist/
 build/
 .pytest_cache/
 .ruff_cache/
-.env
-mlruns/
-.DS_Store
 .coverage
 htmlcov/
-# Lite-mode local artifact store
-.vera-artifacts/
-# SciOrchestrator skill is a locally-vendored tool with its own git history
-/skills/
-.raip-artifacts/
 
-# Identity: kept out of the repo (anonymized mirror proxies it)
-VERA_DOSSIER_RAPPORT_S2.md
-manuscript/authors.tex
-manuscript/authors_apsec.tex
-docs/ANONYMIZATION_ROADMAP.md
-
-# Claude Code session/config
+# Environment and OS
+.env
+.DS_Store
 .claude/
+
+# Local runtime stores (lite mode artifacts, MLflow)
+.vera-artifacts/
+mlruns/
+
+# Study exports written by `make study-export` (the APSEC exports live in manuscript/apsec/study/)
+data/user_study/*.csv
+!data/user_study/template.csv
+
+# Personal working documents (roadmaps, meeting notes, writing brief): never versioned
+private/
+
+# Locally vendored tools with their own git history
+/skills/

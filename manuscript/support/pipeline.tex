@@ -1,0 +1,34 @@
+% support/pipeline.tex -- evidence pipeline shown in the cockpit: every experiment
+% of vera-foundry (E0-E8) and every piece of new work (N1-N12) with the
+% sections it feeds, the artefact that carries it into the body, its owner and
+% due date. Generated artefacts show their live status. Source: writing brief,
+% part (a), 16 Sep 2026.
+{\footnotesize\setlength{\tabcolsep}{3pt}%
+\noindent\begin{tabularx}{\textwidth}{@{}l X L{1.3cm} L{3.3cm} l L{1.1cm} L{1.5cm}@{}}
+  \toprule
+  Id & Produces & Sections & Carried into the body by & Owner & Due & Status \\
+  \midrule
+  E0 & logprobs, seed and latency per deployment; model versions; cost of 1k items & V, VI-C & logprobs row of Tab.~4; \texttt{E0\_capabilities} to replication & \icse@ownerlist{foundry} & 18 Sep & \icse@artefact{E0_capabilities} \\
+  E1 & 8 deployments $\times$ 9 inference requirements, budget 150, seed 42 & VI-A, VI-C, VII & prose; \texttt{E1\_panel} to replication & \icse@ownerlist{foundry} & 27 Sep & \icse@artefact{E1_panel} \\
+  E2 & spread across three seeds & VI-A, IX & one sentence & \icse@ownerlist{foundry} & 27 Sep & -- \\
+  E3 & sampling-budget curves & IX & one sentence; \texttt{E3\_budget} to replication & \icse@ownerlist{foundry} & 27 Sep & \icse@artefact{E3_budget} \\
+  E4 & native / fallback / not measurable with cause class & VI-C, VII & Tab.~4 (extended generator, D21) & \icse@ownerlist{foundry} & 4 Oct & \icse@artefact{E4_measurability} \\
+  E5 & tokens, EUR, latency; energy estimate on managed compute & IV, IX, Ack. & one sentence each; \texttt{E5\_cost} to replication & \icse@ownerlist{foundry,dal} & 4 Oct & \icse@artefact{E5_cost} \\
+  E6 & frozen three-candidate scorecard (decision-study stimulus) & V, VI-D & stimulus only & \icse@ownerlist{foundry,core} & 13 Sep & verify (D11) \\
+  E7 & Proposition~1 on benchmark weights & VI-B (optional) & \texttt{E7\_sensitivity} to replication & \icse@ownerlist{foundry} & 9 Oct & \icse@artefact{E7_sensitivity} \\
+  E8 & security-focus replay from cache & IV (one clause) & none & \icse@ownerlist{foundry} & 11 Oct & -- \\
+  \midrule
+  N1 & ML fairness module and ML arm (predictions payload, criteria, synthetic credit corpus, tabular runners, ML specification) & IV, VI-A--C & Tab.~1 ML column, Tab.~2, Tab.~3, Fig.~2 & \icse@ownerlist{core,legal} & runs 4 Oct & not started \\
+  N2 & LLM classifying credit records, scored by the same module & VI-B, VI-C & Tab.~3, Fig.~2 & \icse@ownerlist{core,foundry} & runs 4 Oct & not started \\
+  N3 & criterion sensitivity (Proposition~1, criterion form) & V, VI-B & Fig.~2, Tab.~3 & \icse@ownerlist{core,legal} & 9 Oct & \icse@artefact{fairness_criteria} \\
+  N4 & transfer classification of the twelve requirements across families & IV, VI-C, IX & ML column of Tab.~4 & \icse@ownerlist{core,legal} & 30 Sep & not started \\
+  N5 & portability diff audit of the engine core & VI-A, VIII & Tab.~2 & \icse@ownerlist{core} & 5 Oct & needs D9 \\
+  N6 & decision study on two populations & V, VI-D, IX & Tab.~5 & \icse@ownerlist{core,aicc,legal} & 7 Oct & collecting \\
+  N7 & AICC process description & III, VI-C & Fig.~1 (optional) & \icse@ownerlist{aicc} & 25 Sep & no producer \\
+  N8 & AICC case study: run, review, cost log & VII & Tab.~6 (optional) & \icse@ownerlist{aicc,foundry} & 9 Oct & no producer \\
+  N9 & review-cost baseline & III, VII & prose & \icse@ownerlist{aicc,legal} & 5 Oct & no producer \\
+  N10 & Legal/Risk arbitration of the fairness criterion & VI-B, VIII & prose & \icse@ownerlist{legal} & 30 Sep & not asked \\
+  N11 & regulatory anchor per requirement & III, Tab.~1 & Tab.~1 column & \icse@ownerlist{core,legal} & 2 Oct & old draft exists \\
+  N12 & replication export and redistribution clearance & Data Avail. & prose & \icse@ownerlist{foundry,legal} & 11 Oct & smoke only \\
+  \bottomrule
+\end{tabularx}}

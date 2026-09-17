@@ -1,0 +1,65 @@
+\psection{vera}{1.0}{I1}{core,legal}{VERA and Its Two Specifications}
+% Sources for every established sentence (checked 16 Sep 2026):
+%   specification = registry + catalog: RAIP/src/vera/api/benchmark_registry.py:18-163,
+%     RAIP/src/vera/benchmarks/catalog.py:22-24,58-100; alignment gate inside the run:
+%     tasks/eval.py:339-341; digest pinned per run: eval.py:335,396-418, governance/signing.py:13-20
+%     (a hash, never "signed"); bands are environment settings: dashboard/score_bands.py:10-28.
+%   sample contract: benchmarks/runners/base.py:9-30; aggregation graph/supervisor.py:40-82,
+%     stats/bootstrap.py:99-150; triage dashboard/triage.py:103-159.
+%   LLM couplings: base.py:9-17, runners/evaluate.py:84-103, schemas/run_payload.py:32-41;
+%     vera-foundry client VF/src/vera_foundry/llm/client.py:1-7, patches VF/.../patches.py:1-19.
+%   LLM specification: benchmarks_catalog.yaml:5-43; prompt pools benchmarks/dynamic_prompts.py;
+%     corpus RAIP/scripts/gen_banking_corpus.py (seeded; planted PII, near-duplicates, segments).
+%   ML specification, predictions file, datasets: design only (engine report sections 4 and 6).
+%   Security-focus digest (withdrawn paragraph): RAIP/examples/spec_security_focus/catalog.yaml,
+%     recomputed 16 Sep.
+
+VERA's dashboard, role views and a reading study are reported in~\apsec; here we describe only what contribution I1 relies on.
+A \emph{specification} is the pair of artefacts that fixes what a review measures and how it scores the result: a \emph{registry} maps each benchmark to requirements and to the runner that executes it, and a \emph{catalog} weights each benchmark within each requirement score.
+The default registry is a Python constant, the default catalog is a YAML file, and two environment variables replace either with another file.
+A gate fails any run whose registry and catalog disagree on the requirement--benchmark pairs.
+Each run record pins a content digest (SHA-256) of the catalog's version and weights.
+The digest covers neither the registry nor the band thresholds, which are deployment settings~\decision{D29}{core}{25 Sep}{G5: put per-criterion thresholds and the registry into the catalog and its digest, or keep describing the band thresholds as deployment settings outside the digest.}.
+
+\input{floats/specs}
+
+The boundary that matters for a second model family lies between the runners and the scoring core.
+Runners return, per requirement and benchmark, item scores in $[0,1]$ and raw rows that flag fallbacks, their causes and non-applicable requirements; we call this interface the \emph{sample contract}.
+Nothing downstream, from the weighted requirement score and its bootstrap interval~\cite{efron1993} to the bands, the triage and the run record, calls the model.
+Three upstream couplings assume a language model: the run context holds a model identifier, a judge, decoding settings and a chat client, but no labels or predictions; the dispatcher routes an unknown runner name to a chat-prompt runner; and the run request accepts a text corpus but no tabular records, labels or predictions.
+Even the LLM arm needed a substitute chat client with the same call signature, and two runner patches applied at run time, to reach models served on Microsoft Foundry\armnotwithdrawn{ (\Cref{sec:portability})}.
+The I1 claim is therefore bounded: no change to the engine core, \armswitch{while the tabular arm adds runners behind the existing sample contract}{while the tabular arm adds runners behind the existing sample contract}{and a tabular arm would add runners behind the existing sample contract}.
+
+The LLM specification scores nine requirements per deployed model, and the data requirements \req{03} to \req{05} once, on a seeded synthetic banking corpus with planted personal data, near-duplicates and imbalanced client segments.
+Each requirement combines one to five catalog entries (\Cref{tab:specs}).
+Many entries are short prompt pools named after a public benchmark, and we do not use the \req{10} and \req{11} probes as fairness evidence~\decision{D7}{core}{22 Sep}{LLM fairness instrument: N2 record classification through the same metrics module, or keep R10/R11 with caveats.}.
+The last column of \Cref{tab:specs} names the regulatory or supervisory text a reviewer checks each requirement against~\tbd{N11}{core,legal}{02 Oct}{Legal/Risk confirmation of the per-requirement anchors in Tab. 1, and an anchor for R12 (none verified).}.
+
+\armswitch{The tabular specification covers}{The tabular specification covers}{We designed, but did not run, an tabular specification that covers} the four requirements with a direct tabular counterpart: data adequacy, privacy, calibration and fairness~\decision{D2}{core,legal}{18 Sep}{Freeze the ML scope at four requirements (R03, R05, R07, R11) and fix the count of the other eight.}.
+Fairness is the requirement both reviewer populations own, and the one where the criterion is a forced choice: when base rates differ and prediction is imperfect, the standard group criteria cannot all hold~\cite{kleinberg2017inherent,chouldechova2017fair}.
+The specification therefore registers each admissible criterion~\cite{verma2018fairness} as its own catalog entry under \req{11}, rescaled so that 1 is fairest~\decision{D5}{legal}{30 Sep}{Admissible criteria, common scale or per-criterion thresholds, default criterion for credit, quotable rationale.}.
+Adopting one criterion is then a one-hot weighting, and any blend of criteria is another weighting.
+The choice thus lives in the scoring policy, and the reachable-range test of \Cref{sec:fairness} applies to it.
+Individual fairness~\cite{dwork2012fairness} is out of scope.
+The tabular catalog digest closes \Cref{tab:specs}~\tbd{N1}{core}{25 Sep}{ML registry and catalog YAML with one benchmark id per criterion (G3, G11) and their content digest, for the Tab. 1 footer; thresholds per criterion (G5).}.
+
+\armswitch{The tabular arm hands VERA predictions, not models.}{The tabular arm hands VERA predictions, not models.}{In this design VERA receives predictions, not models.}
+A run declares the dataset and a predictions file holding, for each applicant, the true label, the predicted label, the score and the protected attribute~\tbd{N1}{core}{23 Sep}{Predictions-file payload in the run request and run context (G1), and the dispatcher entries for the tabular runners (G2).}.
+Fairness and calibration runners read only this file and the data runners read the dataset, so the engine never loads the model, however it was trained or served.
+Only a counterfactual test, which flips the protected attribute and predicts again, would need the model artefact~\decision{D3}{core}{22 Sep}{Keep or cut counterfactual fairness and proxy detection (cite kusner2017counterfactual and yeom2018hunting only if kept).}.
+\ifarmfull
+The tabular arm uses three datasets.
+Adult~\cite{becker1996adult} and German Credit~\cite{hofmann1994statlog} are the usual subjects of fairness testing in software engineering~\cite{chen2024fairness}; we use the corrected South German Credit coding~\cite{gromping2019south}~\decision{D6}{legal,core}{22 Sep}{Protected attribute(s); South German Credit instead of the UCI coding; sex or age.}.
+Because Adult has known validity limits~\cite{ding2021retiring}, the third is a seeded synthetic credit dataset whose manifest records a planted disparate impact and a planted proxy, which gives ground truth~\tbd{N1}{core}{25 Sep}{Synthetic credit generator with manifest (seed, planted disparity, proxy strength, base rates) and the Adult and South German Credit loaders (G9).}.
+\fi
+\ifarmreduced
+The tabular arm uses one dataset, a seeded synthetic credit dataset whose manifest records a planted disparate impact and a planted proxy, which gives ground truth~\tbd{N1}{core}{25 Sep}{Synthetic credit generator with manifest (seed, planted disparity, proxy strength, base rates) (G9); protected attribute per D6.}.
+Adult~\cite{becker1996adult} and South German Credit~\cite{hofmann1994statlog,gromping2019south} are specified but not run.
+\fi
+\ifarmwithdrawn
+The design targets Adult~\cite{becker1996adult}, South German Credit~\cite{hofmann1994statlog,gromping2019south} and a seeded synthetic credit dataset with a planted disparate impact and proxy.
+
+Within the LLM family, the specification-as-data claim has one runtime test: a security-focused registry and catalog, shipped with the engine, re-map and re-weight \req{01}, \req{02} and \req{12} over the same runners under their own digest, \texttt{b49281c5}.
+Replayed from the cached calls of the main campaign, this specification \tbd{E8}{foundry}{11 Oct}{Security-focus replay of R01, R02 and R12 from cache: check that every call is cached and the cost is zero; report which verdicts change.}.
+I1 is therefore a specification-as-data claim within one family, with the tabular specification designed but not run.
+\fi

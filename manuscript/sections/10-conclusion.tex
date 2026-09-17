@@ -1,0 +1,30 @@
+\psection[0.3]{conclusion}{0.25}{--}{core}{Conclusion}
+% Brief, Section X. P1 answers the paper per contribution, with pending
+% clauses and no new number; P2 gives future work with a scenario clause.
+% Honesty rules (brief 0.2): "introduced into the review process", never
+% "deployed"; "content digest", never "signed"; I1 is "no change to the engine
+% core", never "no code change"; the LLM arm's client swap and runtime patches
+% are named. Nothing from the APSEC conclusion: that paper reported a reading
+% study of the dashboard; this one reports the deployment.
+% Withdrawn: I3 and I4 lead, the two-family claim is dropped, and I1 is stated
+% within one family.
+
+% P1 -- one answer per contribution (every result pending; see the tbd notes).
+\ifarmwithdrawn
+We introduced VERA into the model review process of \bankname{} for language models, with reviewers from \aicc{} and \legalrisk{}.
+What a bank can measure follows the serving route of each model once limits of the evaluation set-up are set apart from those of the route, and across model families we classify it analytically (I3)\tbd{E4}{foundry}{4 Oct}{one clause, no new number: which requirements and routes serving-class causes degraded; the family axis rests on N4 alone}.
+In the decision study, \tbd{N6}{core}{7 Oct}{one-clause outcome by population, no new number; if D13 cannot separate the teams, by decision role}; in the \aicc{} case, \tbd{N8}{aicc}{9 Oct}{one clause on what the review did with the evidence; retrospective wording if D16 degrades} (I4).
+Within one family the specification is data: a reweighted and remapped specification ran with no change to the engine core, while the tabular specification remains a design (I1)\tbd{E8}{foundry}{11 Oct}{security-focus replay from cache confirms the reweighted specification ran}.
+Each admissible fairness criterion is a weighted component of the scoring policy, so the choice is a catalog weighting covered by the content digest (I2); \tbd{N2}{core,foundry}{9 Oct}{one clause, no new number: whether the language-model record-classification runs gave criterion-dependent verdicts; if N2 did not run, state the test as a design contribution}.
+\else
+We introduced VERA into the model review process of \bankname{} \armswitch{for two model families: language models, reviewed with \aicc{}, and credit-scoring classifiers, reviewed with \legalrisk{}.}{for language models, reviewed with \aicc{}, and demonstrated it with \legalrisk{} on one credit-scoring dataset.}{}
+One engine core carried both specifications (I1).
+The tabular arm added runners behind the existing sample contract with no change to that core\tbd{N5}{core}{5 Oct}{diff audit against the core module list (D9): no core file changed}, and the language-model arm needed a replacement model client and two runtime runner patches, also outside it.
+Each admissible fairness criterion is a weighted component of the scoring policy, so the choice is a catalog weighting covered by the content digest, and a test shows whether a verdict holds under every admissible criterion (I2); \tbd{N3}{core}{9 Oct}{one clause, no new number: on which arm and dataset verdicts were criterion-dependent, or that none were}.
+What a bank can measure depends on the serving route within the language-model family and, across families, on whether a requirement concerns generated text at all (I3)\tbd{N4}{core,legal}{30 Sep}{family transfer classification with a one-line reason per requirement (D2)}.
+In the decision study, \tbd{N6}{core}{7 Oct}{one-clause outcome by population, no new number; if D13 cannot separate the teams, by decision role}; in the \aicc{} case, \tbd{N8}{aicc}{9 Oct}{one clause on what the review did with the evidence; retrospective wording if D16 degrades} (I4).
+\fi
+
+% P2 -- future work (roadmap), with the scenario clause, and the digest gap.
+The first direction for future work is a dedicated fairness study of credit-scoring models, anchored in the grounds of discrimination that French law prohibits, which treats the arbitration among criteria as a governance object with a recorded owner and rationale\armswitch{.}{, starting with the remaining datasets and intervals on fairness gaps.}{, starting with the tabular arm specified in \Cref{sec:vera}, which would test I1 and I2 on a second model family.}
+The second is to extend the content digest to the registry and the band thresholds, so that no verdict can change under an unchanged digest\decision{D29}{core}{25 Sep}{Drop this sentence if G5 lands and the registry and per-criterion thresholds enter the digest; otherwise keep it as stated.}.

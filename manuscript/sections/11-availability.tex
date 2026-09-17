@@ -1,0 +1,22 @@
+\punsection[0]{availability}{0.07}{--}{foundry,legal}{Data Availability}
+% Brief, Section X, item 3. Both unnumbered units count as body under the CFP
+% wording, so main.tex keeps them before \icsebodyend. Redaction follows
+% the vera-foundry replication policy: raw outputs of models whose provider is
+% anthropic, openai or mistral are withheld and their SHA-256 hashes kept
+% (Ministral is provider mistral, so it is redacted too); the response cache is
+% never exported. The last sentence uses the wording the ICSE 2027 open-science
+% Q&A suggests for data that cannot be shared.
+VERA is open source at \url{https://github.com/Rqbln/VERA}; all runs used commit \tbd{N12}{foundry}{11 Oct}{VERA commit recorded in the manifests of every run reported in the paper}.
+The replication package\tbd{N12}{foundry,legal}{11 Oct}{location and persistent identifier of the replication export} holds the specifications, run manifests, scores with fallback flags, seeded synthetic-data generators with their ground truth, and the decision-study instrument.
+It withholds raw outputs of Anthropic, OpenAI and Mistral~AI models, keeping their SHA-256 hashes, because provider terms may restrict redistribution\decision{D27}{legal}{9 Oct}{Legal clearance to redistribute the replication export, with the outputs of all three commercial providers (Ministral included) kept redacted.}.
+Questionnaire responses and \aicc{} review records cannot be shared because of confidentiality agreements.
+
+\punsection[0]{acknowledgment}{0.05}{--}{core}{Acknowledgment}
+% Brief, Section X, item 4: the generative-AI disclosure required by the IEEE
+% Submission and Peer Review Policy (in the acknowledgments section), and the
+% carbon-footprint sentence the SEIP call invites. Energy is not measurable on
+% serverless or Azure OpenAI routes; on managed compute it is an estimate from
+% GPU hours, rated power and an assumed utilisation, never a measurement.
+We thank the \aicc{} and \legalrisk{} reviewers who took part in this work.
+\tbd{AI-use}{core}{21 Oct}{Generative-AI use disclosure under the IEEE policy: tools used and what they produced (text, code, figures); the drafting of this paper used AI assistance, so the disclosure is needed. Check the IEEE wording on editing-only use.}
+Energy cannot be measured on the serverless and Azure OpenAI routes, where a third party runs the computation; the language-model runs used \tbd{E5}{dal,foundry}{11 Oct}{total tokens on the serverless and Azure OpenAI routes} tokens there and an estimated \tbd{E5}{dal,foundry}{11 Oct}{estimated kWh on managed compute (GPU hours times rated power times assumed utilisation); drop the clause if no run used managed compute}~kWh on managed compute\decision{D26}{dal}{2 Oct}{Energy as a figure or as prose; whether a grid-intensity factor turns the kWh estimate into a carbon figure.}.

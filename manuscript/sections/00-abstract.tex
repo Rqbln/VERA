@@ -1,0 +1,25 @@
+% 00-abstract.tex -- placed inside \begin{abstract}...\end{abstract} by main.tex.
+% Plain prose only (it is also pasted into HotCRP). Scenario text uses \armswitch.
+% Wording rules (brief, part d): keep "introducing ... into the model review
+% process" until Section VII documents a real review (D16, N8); drop "an
+% industrial case study" if Section VII degrades to a retrospective case; in the
+% withdrawn scenario, drop the fairness-test clause if N2 did not run and the
+% test is not stated as a design contribution in Section VI-B.
+European banks put credit-scoring models through formal review, and the EU AI Act classifies creditworthiness assessment as a high-risk use.
+The same control functions now receive large language models, for which model-risk practice has no established review procedure.
+We report on introducing VERA into a European bank's model review process.
+VERA is an evaluation engine that turns a declared specification of responsible-AI requirements into scored, traceable evidence.
+Its central design decision keeps that specification, scoring policy included, as data outside the engine core.
+\armswitch{%
+We test this decision on two model families, each with its own specification and reviewer population: cloud-served language models, examined with the team that assesses generative-AI use cases, and tabular credit-scoring classifiers, examined with the legal and risk function.
+Fairness is the requirement both populations own.
+Because common fairness criteria cannot in general hold together, we treat the criterion as an explicit, auditable policy choice and identify which review verdicts survive a change of criterion.
+}{%
+We test this decision on two model families, each with its own specification and reviewer population: cloud-served language models, examined with the team that assesses generative-AI use cases, and, as a portability demonstration, a tabular credit-scoring classifier examined with the legal and risk function.
+Fairness is the requirement both populations own.
+Because common fairness criteria cannot in general hold together, we treat the criterion as an explicit, auditable policy choice and identify which review verdicts survive a change of criterion.
+}{%
+We apply VERA to cloud-served language models examined by two populations, the team that assesses generative-AI use cases and the legal and risk function, and specify how the same engine accepts tabular credit-scoring classifiers.
+Because common fairness criteria cannot in general hold together, we treat the criterion as an explicit, auditable policy choice and give a test of which verdicts survive a change of criterion.
+}%
+We also map, by serving mode and model family, which requirements are measurable natively, through a fallback or not at all, and report a decision study with both populations, an industrial case study and lessons for practice.

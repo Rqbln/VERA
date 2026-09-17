@@ -1,227 +1,19 @@
-% Merged 2026-08-20: Overleaf bibliography (authoritative for shared keys)
-% + local-only entries appended below the marker.
+% references.bib -- bibliography of the ICSE 2027 SEIP paper (main.tex).
+% The APSEC paper keeps its own copy in apsec/references.bib; the two files
+% evolve independently.
+%
+% Entries from "Status to update" on were checked against their publisher, DOI
+% or official page on 16 Sep 2026 by two independent passes (propose, then
+% adversarial verification); the ICSE Research Track desk-rejects fabricated
+% references, so keep that standard for every entry added here.
 
-@article{guldimann2024complai,
-  title   = {COMPL-AI Framework: A Technical Interpretation and LLM Benchmarking Suite for the EU Artificial Intelligence Act},
-  author  = {Guldimann, Philipp and Spiridonov, Alexander and Staab, Robin and Jovanovi{\'c}, Nikola and Vero, Mark and others},
-  journal = {arXiv preprint arXiv:2410.07959},
-  year    = {2024},
-  url     = {https://arxiv.org/abs/2410.07959}
-}
-
-@misc{euaiact2024,
-  title        = {Regulation (EU) 2024/1689 of the European Parliament and of the Council of 13 June 2024 laying down harmonised rules on artificial intelligence (AI Act)},
-  year         = {2024},
-  howpublished = {Official Journal of the European Union},
-  note         = {Laying down harmonised rules on artificial intelligence},
-  url          = {https://eur-lex.europa.eu/}
-}
-
-@misc{hleg2019trustworthyai,
-  title        = {Ethics Guidelines for Trustworthy AI},
-  author       = {{High-Level Expert Group on Artificial Intelligence}},
-  year         = {2019},
-  howpublished = {European Commission},
-  url          = {https://digital-strategy.ec.europa.eu/en/library/ethics-guidelines-trustworthy-ai}
-}
-
-@inproceedings{mitchell2019modelcard,
-  title     = {Model Cards for Model Reporting},
-  author    = {Mitchell, Margaret and Wu, Simone and Zaldivar, Andrew and Barnes, Parker and others},
-  booktitle = {Proceedings of the Conference on Fairness, Accountability, and Transparency (FAT* 2019)},
-  year      = {2019},
-  pages     = {220--229},
-  publisher = {ACM},
-  url       = {https://dl.acm.org/doi/10.1145/3287560.3287596}
-}
-
-@article{gebru2021datasheets,
-  title   = {Datasheets for Datasets},
-  author  = {Gebru, Timnit and Morgenstern, Jamie and Vecchione, Briana and Vaughan, Jennifer Wortman and others},
-  journal = {Communications of the ACM},
-  volume  = {64},
-  number  = {12},
-  pages   = {86--92},
-  year    = {2021},
-  url     = {https://dl.acm.org/doi/10.1145/3458723}
-}
-
-@article{hendrycks2021mmlu,
-  title   = {Measuring Massive Multitask Language Understanding},
-  author  = {Hendrycks, Dan and Burns, Collin and Basart, Steven and others},
-  journal = {International Conference on Learning Representations (ICLR)},
-  year    = {2021},
-  url     = {https://arxiv.org/abs/2009.03300}
-}
-
-@article{cobbe2021gsm8k,
-  title   = {Training Verifiers to Solve Math Word Problems},
-  author  = {Cobbe, Karl and Kosaraju, Vineet and Bavarian, Mohammad and Chen, Mark and others},
-  journal = {arXiv preprint arXiv:2110.14168},
-  year    = {2021},
-  note    = {Introduces the GSM8K benchmark},
-  url     = {https://arxiv.org/abs/2110.14168}
-}
-
-@article{chen2021humaneval,
-  title   = {Evaluating Large Language Models Trained on Code},
-  author  = {Chen, Mark and Tworek, Jerry and Jun, Heewoo and others},
-  journal = {arXiv preprint arXiv:2107.03374},
-  year    = {2021},
-  note    = {Introduces the HumanEval benchmark},
-  url     = {https://arxiv.org/abs/2107.03374}
-}
-
-@inproceedings{lin2022truthfulqa,
-  title     = {TruthfulQA: Measuring How Models Mimic Human Falsehoods},
-  author    = {Lin, Stephanie and Hilton, Jacob and Evans, Owain},
-  booktitle = {ACL 2022},
-  year      = {2022},
-  url       = {https://arxiv.org/abs/2109.07958}
-}
-
-@inproceedings{suzgun2023bbh,
-  title     = {Challenging BIG-Bench Tasks and Whether Chain-of-Thought Can Solve Them},
-  author    = {Suzgun, Mirac and Scales, Nathan and Schaeffer, Rylan and others},
-  booktitle = {Findings of the Association for Computational Linguistics: ACL 2023},
-  year      = {2023},
-  note      = {BIG-Bench Hard; arXiv:2210.09261},
-  url       = {https://arxiv.org/abs/2210.09261}
-}
-
-@inproceedings{gehman2020realtoxicity,
-  title     = {RealToxicityPrompts: Evaluating Neural Toxic Degeneration in Language Models},
-  author    = {Gehman, Samuel and Gururangan, Suchin and Sap, Maarten and others},
-  booktitle = {Findings of EMNLP 2020},
-  pages     = {3356--3369},
-  year      = {2020},
-  url       = {https://arxiv.org/abs/2009.11462}
-}
-
-@inproceedings{parrish2022bbq,
-  title     = {BBQ: A Hand-Built Bias Benchmark for Question Answering},
-  author    = {Parrish, Alicia and Chen, Angelica and Nangia, Nikita and others},
-  booktitle = {ACL 2022},
-  year      = {2022},
-  url       = {https://arxiv.org/abs/2110.08193}
-}
-
-@inproceedings{dhamala2021bold,
-  title     = {BOLD: Dataset and Metrics for Measuring Biases in Open-Ended Language Generation},
-  author    = {Dhamala, Jwala and Sun, Tony and Kumar, Varun and others},
-  booktitle = {FAccT 2021},
-  year      = {2021},
-  url       = {https://arxiv.org/abs/2101.11718}
-}
-
-@inproceedings{nadeem2021stereoset,
-  title     = {StereoSet: Measuring Stereotypical Bias in Pretrained Language Models},
-  author    = {Nadeem, Moin and Bethke, Anna and Reddy, Siva},
-  booktitle = {ACL 2021},
-  year      = {2021},
-  url       = {https://arxiv.org/abs/2004.09456}
-}
-
-@inproceedings{guo2017calibration,
-  title     = {On Calibration of Modern Neural Networks},
-  author    = {Guo, Chuan and Pleiss, Geoff and Sun, Yu and Weinberger, Kilian Q},
-  booktitle = {ICML 2017},
-  pages     = {1321--1330},
-  year      = {2017},
-  url       = {https://arxiv.org/abs/1706.04599}
-}
-
-@inproceedings{carlini2023extracting,
-  title     = {Extracting Training Data from Large Language Models},
-  author    = {Carlini, Nicholas and Tramer, Florian and Wallace, Eric and Jagielski, Matthew and others},
-  booktitle = {USENIX Security Symposium},
-  year      = {2021},
-  url       = {https://arxiv.org/abs/2012.07805}
-}
-
-@inproceedings{kirchenbauer2023watermark,
-  title     = {A Watermark for Large Language Models},
-  author    = {Kirchenbauer, John and Geiping, Jonas and Wen, Yuxin and others},
-  booktitle = {ICML 2023},
-  year      = {2023},
-  url       = {https://arxiv.org/abs/2301.10226}
-}
-
-@inproceedings{hardt2016equality,
-  title     = {Equality of Opportunity in Supervised Learning},
-  author    = {Hardt, Moritz and Price, Eric and Srebro, Nati},
-  booktitle = {NeurIPS 2016},
-  year      = {2016},
-  url       = {https://arxiv.org/abs/1610.02413}
-}
-
-@misc{gao2021lmevalharness,
-  title        = {The Language Model Evaluation Harness},
-  author       = {Gao, Leo and Tow, Jonathan and Abbasi, Baber and Biderman, Stella and others},
-  year         = {2021},
-  howpublished = {EleutherAI, \url{https://github.com/EleutherAI/lm-evaluation-harness}},
-  note         = {Zenodo DOI 10.5281/zenodo.5371628}
-}
-
-@article{wang2023decodingtrust,
-  title   = {DecodingTrust: A Comprehensive Assessment of Trustworthiness in GPT Models},
-  author  = {Wang, Boxin and Chen, Weixin and Pei, Hengzhi and others},
-  journal = {arXiv preprint arXiv:2306.11698},
-  year    = {2023},
-  url     = {https://arxiv.org/abs/2306.11698}
-}
-
-@inproceedings{studtmann2023histree,
-  title     = {Histree: A Tree-Based Experiment History Tracking Tool for Jupyter Notebooks},
-  author    = {Studtmann, Laurens and Aydin, Selin and Lichter, Horst},
-  booktitle = {30th Asia-Pacific Software Engineering Conference (APSEC 2023)},
-  year      = {2023},
-  pages     = {299--308},
-  publisher = {IEEE},
-  note      = {RWTH Software Engineering group publication; APSEC 2023.}
-}
-
-@inproceedings{liu2022mscpdp,
-  title     = {An Empirical Study on Multi-Source Cross-Project Defect Prediction Models},
-  author    = {Liu, Xuanying and Li, Zonghao and Zou, Jiaqi and Tong, Hanghang},
-  booktitle = {29th Asia-Pacific Software Engineering Conference (APSEC 2022)},
-  year      = {2022},
-  pages     = {318--327},
-  publisher = {IEEE}
-}
-
-@inproceedings{sunetnanta2025promptops,
-  title     = {PromptOps: Automated Tool for Testing Trustworthiness of LLMs},
-  author    = {Sontesadisai, Chommakorn and Sae-Ngow, Chalisa and Rudeerudchanawong, Jirateep and Dangsungnoen, Lapatrada and Ragkhitwetsagul, Chaiyong and Racharak, Teeradaj and Sunetnanta, Thanwadee},
-  booktitle = {2025 32nd Asia-Pacific Software Engineering Conference (APSEC)},
-  year      = {2025},
-  pages     = {1005--1008},
-  publisher = {IEEE},
-  doi       = {10.1109/APSEC66846.2025.00117}
-}
-
-@article{liang2023helm,
-  title   = {Holistic Evaluation of Language Models},
-  author  = {Liang, Percy and Bommasani, Rishi and Lee, Tony and others},
-  journal = {Transactions on Machine Learning Research (TMLR)},
-  year    = {2023},
-  note    = {arXiv:2211.09110},
-  url     = {https://arxiv.org/abs/2211.09110}
-}
-
-@article{derczynski2024garak,
-  title   = {garak: A Framework for Security Probing Large Language Models},
-  author  = {Derczynski, Leon and Galinkin, Erick and Martin, Jeffrey and Majumdar, Subho and Inie, Nanna},
-  journal = {arXiv preprint arXiv:2406.11036},
-  year    = {2024},
-  url     = {https://arxiv.org/abs/2406.11036}
-}
-
-@misc{microsoft2023presidio,
-  title        = {Presidio: Context-Aware, Pluggable and Customizable PII De-identification},
-  author       = {{Microsoft}},
-  year         = {2023},
-  howpublished = {GitHub repository, \url{https://github.com/microsoft/presidio}}
+% --- Entries shared with the APSEC paper, cited by this one ------------------
+@inproceedings{abualhaija2024regchange,
+  author    = {Abualhaija, Sallam and Ceci, Marcello and Sannier, Nicolas and Bianculli, Domenico and Briand, Lionel C. and Zetzsche, Dirk A. and Bodellini, Marco},
+  title     = {{AI-Enabled Regulatory Change Analysis of Legal Requirements}},
+  booktitle = {IEEE International Requirements Engineering Conference (RE)},
+  year      = {2024},
+  doi       = {10.1109/RE59067.2024.00012}
 }
 
 @inproceedings{abualhaija2025llmregextraction,
@@ -240,72 +32,95 @@
   doi     = {10.1109/TSE.2023.3288901}
 }
 
-@inproceedings{abualhaija2024regchange,
-  author    = {Abualhaija, Sallam and Ceci, Marcello and Sannier, Nicolas and Bianculli, Domenico and Briand, Lionel C. and Zetzsche, Dirk A. and Bodellini, Marco},
-  title     = {{AI-Enabled Regulatory Change Analysis of Legal Requirements}},
-  booktitle = {IEEE International Requirements Engineering Conference (RE)},
-  year      = {2024},
-  doi       = {10.1109/RE59067.2024.00012}
+@article{chen2021humaneval,
+  title   = {Evaluating Large Language Models Trained on Code},
+  author  = {Chen, Mark and Tworek, Jerry and Jun, Heewoo and others},
+  journal = {arXiv preprint arXiv:2107.03374},
+  year    = {2021},
+  note    = {Introduces the HumanEval benchmark},
+  url     = {https://arxiv.org/abs/2107.03374}
 }
 
-@article{davis1989tam,
-  author  = {Davis, Fred D.},
-  title   = {Perceived Usefulness, Perceived Ease of Use, and User Acceptance of Information Technology},
-  journal = {MIS Quarterly},
-  volume  = {13},
-  number  = {3},
-  pages   = {319--340},
-  year    = {1989},
-  doi     = {10.2307/249008}
+@article{derczynski2024garak,
+  title   = {garak: A Framework for Security Probing Large Language Models},
+  author  = {Derczynski, Leon and Galinkin, Erick and Martin, Jeffrey and Majumdar, Subho and Inie, Nanna},
+  journal = {arXiv preprint arXiv:2406.11036},
+  year    = {2024},
+  url     = {https://arxiv.org/abs/2406.11036}
 }
 
-@article{rajput2024fecom,
-  author  = {Rajput, Saurabhsingh and Widmayer, Tim and Shang, Ziyuan and
-             Kechagia, Maria and Sarro, Federica and Sharma, Tushar},
-  title   = {Enhancing Energy-Awareness in Deep Learning through Fine-Grained
-             Energy Measurement},
-  journal = {ACM Transactions on Software Engineering and Methodology},
-  volume  = {33},
-  number  = {8},
-  pages   = {1--34},
-  year    = {2024}
+@inproceedings{dhamala2021bold,
+  title     = {BOLD: Dataset and Metrics for Measuring Biases in Open-Ended Language Generation},
+  author    = {Dhamala, Jwala and Sun, Tony and Kumar, Varun and others},
+  booktitle = {FAccT 2021},
+  year      = {2021},
+  url       = {https://arxiv.org/abs/2101.11718}
 }
 
-@book{wohlin2012experimentation,
-  author    = {Wohlin, Claes and Runeson, Per and H{\"o}st, Martin and Ohlsson, Magnus C. and Regnell, Bj{\"o}rn and Wessl{\'e}n, Anders},
-  title     = {Experimentation in Software Engineering},
-  publisher = {Springer},
-  year      = {2012},
-  doi       = {10.1007/978-3-642-29044-2}
+@book{efron1993,
+  title     = {An Introduction to the Bootstrap},
+  author    = {Efron, Bradley and Tibshirani, Robert J.},
+  year      = {1993},
+  publisher = {Chapman \& Hall/CRC},
+  doi       = {10.1007/978-1-4899-4541-9}
 }
 
-@misc{codecarbon,
-  author = {{CodeCarbon contributors}},
-  title  = {CodeCarbon: Estimate and Track Carbon Emissions from Compute},
-  howpublished = {\url{https://codecarbon.io}},
-  year   = {2024}
+@misc{euaiact2024,
+  title        = {Regulation (EU) 2024/1689 of the European Parliament and of the Council of 13 June 2024 laying down harmonised rules on artificial intelligence (AI Act)},
+  year         = {2024},
+  howpublished = {Official Journal of the European Union},
+  note         = {Laying down harmonised rules on artificial intelligence},
+  url          = {https://eur-lex.europa.eu/}
 }
 
-@article{wilcoxon1945,
-  title   = {Individual Comparisons by Ranking Methods},
-  author  = {Wilcoxon, Frank},
-  journal = {Biometrics Bulletin},
-  volume  = {1},
-  number  = {6},
-  pages   = {80--83},
-  year    = {1945},
-  doi     = {10.2307/3001968}
+@misc{gao2021lmevalharness,
+  title        = {The Language Model Evaluation Harness},
+  author       = {Gao, Leo and Tow, Jonathan and Abbasi, Baber and Biderman, Stella and others},
+  year         = {2021},
+  howpublished = {EleutherAI, \url{https://github.com/EleutherAI/lm-evaluation-harness}},
+  note         = {Zenodo DOI 10.5281/zenodo.5371628}
 }
 
-@article{mcnemar1947,
-  title   = {Note on the Sampling Error of the Difference Between Correlated Proportions or Percentages},
-  author  = {McNemar, Quinn},
-  journal = {Psychometrika},
-  volume  = {12},
-  number  = {2},
-  pages   = {153--157},
-  year    = {1947},
-  doi     = {10.1007/BF02295996}
+@inproceedings{gehman2020realtoxicity,
+  title     = {RealToxicityPrompts: Evaluating Neural Toxic Degeneration in Language Models},
+  author    = {Gehman, Samuel and Gururangan, Suchin and Sap, Maarten and others},
+  booktitle = {Findings of EMNLP 2020},
+  pages     = {3356--3369},
+  year      = {2020},
+  url       = {https://arxiv.org/abs/2009.11462}
+}
+
+@article{guldimann2024complai,
+  title   = {COMPL-AI Framework: A Technical Interpretation and LLM Benchmarking Suite for the EU Artificial Intelligence Act},
+  author  = {Guldimann, Philipp and Spiridonov, Alexander and Staab, Robin and Jovanovi{\'c}, Nikola and Vero, Mark and others},
+  journal = {arXiv preprint arXiv:2410.07959},
+  year    = {2024},
+  url     = {https://arxiv.org/abs/2410.07959}
+}
+
+@inproceedings{guo2017calibration,
+  title     = {On Calibration of Modern Neural Networks},
+  author    = {Guo, Chuan and Pleiss, Geoff and Sun, Yu and Weinberger, Kilian Q},
+  booktitle = {ICML 2017},
+  pages     = {1321--1330},
+  year      = {2017},
+  url       = {https://arxiv.org/abs/1706.04599}
+}
+
+@inproceedings{hardt2016equality,
+  title     = {Equality of Opportunity in Supervised Learning},
+  author    = {Hardt, Moritz and Price, Eric and Srebro, Nati},
+  booktitle = {NeurIPS 2016},
+  year      = {2016},
+  url       = {https://arxiv.org/abs/1610.02413}
+}
+
+@misc{hleg2019trustworthyai,
+  title        = {Ethics Guidelines for Trustworthy AI},
+  author       = {{High-Level Expert Group on Artificial Intelligence}},
+  year         = {2019},
+  howpublished = {European Commission},
+  url          = {https://digital-strategy.ec.europa.eu/en/library/ethics-guidelines-trustworthy-ai}
 }
 
 @article{holm1979,
@@ -327,32 +142,725 @@
   doi     = {10.2466/11.IT.3.1}
 }
 
-@book{efron1993,
-  title     = {An Introduction to the Bootstrap},
-  author    = {Efron, Bradley and Tibshirani, Robert J.},
-  year      = {1993},
-  publisher = {Chapman \& Hall/CRC},
-  doi       = {10.1007/978-1-4899-4541-9}
-}
-
-@article{ji2023hallucination,
-  title   = {Survey of Hallucination in Natural Language Generation},
-  author  = {Ji, Ziwei and Lee, Nayeon and Frieske, Rita and Yu, Tiezheng and Su, Dan and Xu, Yan and Ishii, Etsuko and Bang, Ye Jin and Madotto, Andrea and Fung, Pascale},
-  journal = {ACM Computing Surveys},
-  volume  = {55},
-  number  = {12},
-  pages   = {1--38},
+@article{liang2023helm,
+  title   = {Holistic Evaluation of Language Models},
+  author  = {Liang, Percy and Bommasani, Rishi and Lee, Tony and others},
+  journal = {Transactions on Machine Learning Research (TMLR)},
   year    = {2023},
-  doi     = {10.1145/3571730}
+  note    = {arXiv:2211.09110},
+  url     = {https://arxiv.org/abs/2211.09110}
 }
 
-@article{cronbach1951,
-  title   = {Coefficient Alpha and the Internal Structure of Tests},
-  author  = {Cronbach, Lee J.},
+@article{mcnemar1947,
+  title   = {Note on the Sampling Error of the Difference Between Correlated Proportions or Percentages},
+  author  = {McNemar, Quinn},
   journal = {Psychometrika},
-  volume  = {16},
+  volume  = {12},
+  number  = {2},
+  pages   = {153--157},
+  year    = {1947},
+  doi     = {10.1007/BF02295996}
+}
+
+@misc{microsoft2023presidio,
+  title        = {Presidio: Context-Aware, Pluggable and Customizable PII De-identification},
+  author       = {{Microsoft}},
+  year         = {2023},
+  howpublished = {GitHub repository, \url{https://github.com/microsoft/presidio}}
+}
+
+@inproceedings{mitchell2019modelcard,
+  title     = {Model Cards for Model Reporting},
+  author    = {Mitchell, Margaret and Wu, Simone and Zaldivar, Andrew and Barnes, Parker and others},
+  booktitle = {Proceedings of the Conference on Fairness, Accountability, and Transparency (FAT* 2019)},
+  year      = {2019},
+  pages     = {220--229},
+  publisher = {ACM},
+  url       = {https://dl.acm.org/doi/10.1145/3287560.3287596}
+}
+
+@inproceedings{nadeem2021stereoset,
+  title     = {StereoSet: Measuring Stereotypical Bias in Pretrained Language Models},
+  author    = {Nadeem, Moin and Bethke, Anna and Reddy, Siva},
+  booktitle = {ACL 2021},
+  year      = {2021},
+  url       = {https://arxiv.org/abs/2004.09456}
+}
+
+@inproceedings{parrish2022bbq,
+  title     = {BBQ: A Hand-Built Bias Benchmark for Question Answering},
+  author    = {Parrish, Alicia and Chen, Angelica and Nangia, Nikita and others},
+  booktitle = {ACL 2022},
+  year      = {2022},
+  url       = {https://arxiv.org/abs/2110.08193}
+}
+
+@inproceedings{sunetnanta2025promptops,
+  title     = {PromptOps: Automated Tool for Testing Trustworthiness of LLMs},
+  author    = {Sontesadisai, Chommakorn and Sae-Ngow, Chalisa and Rudeerudchanawong, Jirateep and Dangsungnoen, Lapatrada and Ragkhitwetsagul, Chaiyong and Racharak, Teeradaj and Sunetnanta, Thanwadee},
+  booktitle = {2025 32nd Asia-Pacific Software Engineering Conference (APSEC)},
+  year      = {2025},
+  pages     = {1005--1008},
+  publisher = {IEEE},
+  doi       = {10.1109/APSEC66846.2025.00117}
+}
+
+@article{wang2023decodingtrust,
+  title   = {DecodingTrust: A Comprehensive Assessment of Trustworthiness in GPT Models},
+  author  = {Wang, Boxin and Chen, Weixin and Pei, Hengzhi and others},
+  journal = {arXiv preprint arXiv:2306.11698},
+  year    = {2023},
+  url     = {https://arxiv.org/abs/2306.11698}
+}
+
+@article{wilcoxon1945,
+  title   = {Individual Comparisons by Ranking Methods},
+  author  = {Wilcoxon, Frank},
+  journal = {Biometrics Bulletin},
+  volume  = {1},
+  number  = {6},
+  pages   = {80--83},
+  year    = {1945},
+  doi     = {10.2307/3001968}
+}
+
+@book{wohlin2012experimentation,
+  author    = {Wohlin, Claes and Runeson, Per and H{\"o}st, Martin and Ohlsson, Magnus C. and Regnell, Bj{\"o}rn and Wessl{\'e}n, Anders},
+  title     = {Experimentation in Software Engineering},
+  publisher = {Springer},
+  year      = {2012},
+  doi       = {10.1007/978-3-642-29044-2}
+}
+
+% --- ICSE entries --------------------------------------------------------------
+
+% Status to update once the APSEC decision is known (decision D24 in the cockpit).
+@misc{queriaux2026vera,
+  title        = {{VERA}: A Responsible {AI} Dashboard for Assessing {LLM} Deployments in Light of the {EU AI Act}},
+  author       = {Qu{\'e}riaux, Robin and Bachellery, Solveig and D{\'e}l{\'e}ris, L{\'e}a and Barry, Mariam and Rajput, Saurabh and Sharma, Tushar and Lebecq, J{\'e}r{\^o}me},
+  year         = {2026},
+  howpublished = {Submitted to the Software Engineering in Practice track of the 33rd Asia-Pacific Software Engineering Conference (APSEC 2026)}
+}
+
+% --- Banking and AI governance entries present in references.bib at HEAD but
+% absent from the working copy; move them back there if that file regains them.
+
+@misc{dora2022,
+  title        = {Regulation (EU) 2022/2554 on digital operational resilience for the financial sector (DORA)},
+  year         = {2022},
+  howpublished = {Official Journal of the European Union},
+  note         = {Digital Operational Resilience Act},
+  url          = {https://eur-lex.europa.eu/eli/reg/2022/2554/oj}
+}
+
+@misc{eba2021ictrisk,
+  title        = {Guidelines on ICT and security risk management (EBA/GL/2019/04)},
+  author       = {{European Banking Authority}},
+  year         = {2019},
+  howpublished = {EBA Guidelines},
+  url          = {https://www.eba.europa.eu/}
+}
+
+@misc{acpr2020ai,
+  title        = {Governance of Artificial Intelligence in Finance},
+  author       = {{Autorit\'e de Contr\^ole Prudentiel et de R\'esolution}},
+  year         = {2020},
+  howpublished = {ACPR Discussion Document, Banque de France},
+  url          = {https://acpr.banque-france.fr/}
+}
+
+@misc{nist2023airmf,
+  title        = {Artificial Intelligence Risk Management Framework (AI RMF 1.0)},
+  author       = {{NIST}},
+  year         = {2023},
+  howpublished = {National Institute of Standards and Technology},
+  url          = {https://www.nist.gov/itl/ai-risk-management-framework}
+}
+
+@misc{iso42001_2023,
+  title        = {{ISO/IEC 42001:2023} Information Technology -- Artificial Intelligence -- Management System},
+  author       = {{International Organization for Standardization}},
+  year         = {2023},
+  howpublished = {International Standard},
+  url          = {https://www.iso.org/standard/81230.html}
+}
+
+% --- Inter-coder reliability for the decision study (M5). Added by hand; verify
+% with the rest before submission.
+@article{hayes2007answering,
+  title   = {Answering the Call for a Standard Reliability Measure for Coding Data},
+  author  = {Hayes, Andrew F. and Krippendorff, Klaus},
+  journal = {Communication Methods and Measures},
+  volume  = {1},
+  number  = {1},
+  pages   = {77--89},
+  year    = {2007},
+  doi     = {10.1080/19312450709336664}
+}
+
+% --- Verified entries (topic noted above each)
+
+% VI-B / II: impossibility theorem. Calibration within groups and balance for the positive and negative classes cannot all hold unless base rates are eq
+% verified: verified; Checked the DOI record at https://doi.org/10.4230/LIPIcs.ITCS.2017.43: title matches exactly. Authors are Jon Kleinberg, Sendhil Mullainathan, Manish Raghavan, 
+@inproceedings{kleinberg2017inherent,
+  author    = {Kleinberg, Jon and Mullainathan, Sendhil and Raghavan, Manish},
+  title     = {Inherent Trade-Offs in the Fair Determination of Risk Scores},
+  booktitle = {Proceedings of the 8th Innovations in Theoretical Computer Science Conference (ITCS 2017)},
+  series    = {Leibniz International Proceedings in Informatics (LIPIcs)},
+  volume    = {67},
+  pages     = {43:1--43:23},
+  publisher = {Schloss Dagstuhl--Leibniz-Zentrum f{\"u}r Informatik},
+  year      = {2017},
+  doi       = {10.4230/LIPIcs.ITCS.2017.43}
+}
+
+% VI-B / II: second impossibility result. Predictive parity and equal error rates are incompatible when base rates differ. Cite together with kleinberg2
+% verified: verified; Checked the DOI record at https://doi.org/10.1089/big.2016.0047: title matches exactly and the sole author is Alexandra Chouldechova. Published in Big Data, vol
+@article{chouldechova2017fair,
+  author  = {Chouldechova, Alexandra},
+  title   = {Fair Prediction with Disparate Impact: A Study of Bias in Recidivism Prediction Instruments},
+  journal = {Big Data},
+  volume  = {5},
+  number  = {2},
+  pages   = {153--163},
+  year    = {2017},
+  doi     = {10.1089/big.2016.0047}
+}
+
+% VI-B: calibration by group vs. equalized odds. Links the calibration requirement to the fairness criterion choice, and shows why calibration is the hi
+% verified: verified; Checked the NeurIPS proceedings page at https://proceedings.neurips.cc/paper_files/paper/2017/hash/b8b9c74ac526fffbeb2d39ab038d1cd7-Abstract.html: title is 'On 
+@inproceedings{pleiss2017fairness,
+  author    = {Pleiss, Geoff and Raghavan, Manish and Wu, Felix and Kleinberg, Jon and Weinberger, Kilian Q.},
+  title     = {On Fairness and Calibration},
+  booktitle = {Advances in Neural Information Processing Systems 30 (NeurIPS 2017)},
+  pages     = {5680--5689},
+  publisher = {Curran Associates, Inc.},
+  year      = {2017},
+  url       = {https://proceedings.neurips.cc/paper_files/paper/2017/hash/b8b9c74ac526fffbeb2d39ab038d1cd7-Abstract.html}
+}
+
+% IV (ML specification): catalogue of group and individual fairness definitions (demographic parity, equal opportunity, equalized odds, calibration). Pu
+% verified: verified; Checked the DOI record at https://doi.org/10.1145/3194770.3194776: title is 'Fairness definitions explained' and the authors are Sahil Verma and Julia Rubin. It
+@inproceedings{verma2018fairness,
+  author    = {Verma, Sahil and Rubin, Julia},
+  title     = {Fairness Definitions Explained},
+  booktitle = {Proceedings of the International Workshop on Software Fairness (FairWare 2018)},
+  pages     = {1--7},
+  publisher = {ACM},
+  year      = {2018},
+  doi       = {10.1145/3194770.3194776}
+}
+
+% IV / VI-B: individual fairness (similar individuals treated similarly), the alternative to group criteria.
+% verified: verified; Checked the DOI record at https://doi.org/10.1145/2090236.2090255: title is 'Fairness through awareness'. Authors are Dwork, Hardt, Pitassi, Reingold, Zemel, in
+@inproceedings{dwork2012fairness,
+  author    = {Dwork, Cynthia and Hardt, Moritz and Pitassi, Toniann and Reingold, Omer and Zemel, Richard},
+  title     = {Fairness Through Awareness},
+  booktitle = {Proceedings of the 3rd Innovations in Theoretical Computer Science Conference (ITCS 2012)},
+  pages     = {214--226},
+  publisher = {ACM},
+  year      = {2012},
+  doi       = {10.1145/2090236.2090255}
+}
+
+% IV (ML specification): counterfactual fairness metric in the fairness module. Drop it together with the metric if counterfactual fairness is cut after
+% verified: verified; Checked the NeurIPS proceedings page at https://proceedings.neurips.cc/paper_files/paper/2017/hash/a486cd07e4ac3d270571622f4f316ec5-Abstract.html: title is 'Cou
+@inproceedings{kusner2017counterfactual,
+  author    = {Kusner, Matt J. and Loftus, Joshua and Russell, Chris and Silva, Ricardo},
+  title     = {Counterfactual Fairness},
+  booktitle = {Advances in Neural Information Processing Systems 30 (NeurIPS 2017)},
+  pages     = {4066--4076},
+  publisher = {Curran Associates, Inc.},
+  year      = {2017},
+  url       = {https://proceedings.neurips.cc/paper_files/paper/2017/hash/a486cd07e4ac3d270571622f4f316ec5-Abstract.html}
+}
+
+% II / VI-B: textbook reference for independence, separation and sufficiency, and for why the choice between them is normative. Supports the claim that 
+% verified: verified; Checked OpenLibrary at https://openlibrary.org/isbn/9780262048613.json: the ISBN is 9780262048613, the title is 'Fairness and Machine Learning' with subtitle 'L
+@book{barocas2023fairness,
+  author    = {Barocas, Solon and Hardt, Moritz and Narayanan, Arvind},
+  title     = {Fairness and Machine Learning: Limitations and Opportunities},
+  publisher = {MIT Press},
+  address   = {Cambridge, MA},
+  year      = {2023},
+  note      = {{ISBN} 978-0-262-04861-3},
+  url       = {https://fairmlbook.org}
+}
+
+% IV / VI-B: disparate impact ratio (four-fifths rule) and certifying/removing disparate impact. Used for the demographic-parity metric and for the prox
+% verified: verified; Crossref api.crossref.org/works/10.1145/2783258.2783311: title 'Certifying and Removing Disparate Impact'; authors Feldman, Friedler, Moeller, Scheidegger, Venk
+@inproceedings{feldman2015certifying,
+  author    = {Feldman, Michael and Friedler, Sorelle A. and Moeller, John and Scheidegger, Carlos and Venkatasubramanian, Suresh},
+  title     = {Certifying and Removing Disparate Impact},
+  booktitle = {Proceedings of the 21st ACM SIGKDD International Conference on Knowledge Discovery and Data Mining (KDD 2015)},
+  pages     = {259--268},
+  publisher = {ACM},
+  year      = {2015},
+  doi       = {10.1145/2783258.2783311}
+}
+
+% I / III: how data mining produces disparate impact through proxies and historical bias, and why removing the protected attribute is not enough. Motiva
+% verified: verified; DOI 10.15779/Z38BG31 is registered with DataCite, not Crossref. It resolves to lawcat.berkeley.edu/record/1127463, and DataCite lists Barocas & Selbst, 2016, pu
+@article{barocas2016big,
+  author  = {Barocas, Solon and Selbst, Andrew D.},
+  title   = {Big Data's Disparate Impact},
+  journal = {California Law Review},
+  volume  = {104},
   number  = {3},
-  pages   = {297--334},
-  year    = {1951},
-  doi     = {10.1007/BF02310555}
+  pages   = {671--732},
+  year    = {2016},
+  doi     = {10.15779/Z38BG31}
+}
+
+% I / VI-B / VIII: EU non-discrimination law is contextual and cannot be reduced to one statistical test. Grounds the Legal/Risk arbitration of the fair
+% verified: verified; Crossref api.crossref.org/works/10.1016/j.clsr.2021.105567: title 'Why fairness cannot be automated: Bridging the gap between EU non-discrimination law and AI';
+@article{wachter2021fairness,
+  author  = {Wachter, Sandra and Mittelstadt, Brent and Russell, Chris},
+  title   = {Why Fairness Cannot Be Automated: Bridging the Gap Between {EU} Non-Discrimination Law and {AI}},
+  journal = {Computer Law \& Security Review},
+  volume  = {41},
+  pages   = {105567},
+  year    = {2021},
+  doi     = {10.1016/j.clsr.2021.105567}
+}
+
+% IV (ML specification): formal proxy-use detection (association with the protected attribute plus causal influence). Cite for the proxy-detection check
+% verified: verified; Official NeurIPS BibTeX (papers.nips.cc/paper_files/paper/2018/file/6cd9313ed34ef58bad3fdd504355e72c-Bibtex.bib): authors Yeom, Datta, Fredrikson; same title; A
+@inproceedings{yeom2018hunting,
+  author    = {Yeom, Samuel and Datta, Anupam and Fredrikson, Matt},
+  title     = {Hunting for Discriminatory Proxies in Linear Regression Models},
+  booktitle = {Advances in Neural Information Processing Systems 31 (NeurIPS 2018)},
+  pages     = {4568--4578},
+  publisher = {Curran Associates, Inc.},
+  year      = {2018},
+  url       = {https://arxiv.org/abs/1810.07155}
+}
+
+% I / II / VI-B: fairness criteria compared on credit-scoring data, with their profit implications. The closest domain precedent for the ML arm.
+% verified: verified; Crossref api.crossref.org/works/10.1016/j.ejor.2021.06.023: title 'Fairness in credit scoring: Assessment, implementation and profit implications'; authors Kozo
+@article{kozodoi2022fairness,
+  author  = {Kozodoi, Nikita and Jacob, Johannes and Lessmann, Stefan},
+  title   = {Fairness in Credit Scoring: Assessment, Implementation and Profit Implications},
+  journal = {European Journal of Operational Research},
+  volume  = {297},
+  number  = {3},
+  pages   = {1083--1094},
+  year    = {2022},
+  doi     = {10.1016/j.ejor.2021.06.023}
+}
+
+% I / II / VI-B: formal fairness tests for scoring models and identification of the variables driving unfairness, framed for lenders and regulators (Fre
+% verified: verified; Crossref api.crossref.org/works/10.1287/mnsc.2022.03888: title 'The Fairness of Credit Scoring Models'; authors Christophe Hurlin, Christophe Pérignon, Sébastie
+@article{hurlin2026fairness,
+  author  = {Hurlin, Christophe and P{\'e}rignon, Christophe and Saurin, S{\'e}bastien},
+  title   = {The Fairness of Credit Scoring Models},
+  journal = {Management Science},
+  volume  = {72},
+  number  = {1},
+  pages   = {406--425},
+  year    = {2026},
+  doi     = {10.1287/mnsc.2022.03888}
+}
+
+% II / IX: validity critique of the fairness benchmarks used in the LLM arm (StereoSet and related). Supports treating LLM-arm fairness scores as weaker
+% verified: verified; Crossref api.crossref.org/works/10.18653/v1/2021.acl-long.81: title 'Stereotyping Norwegian Salmon: An Inventory of Pitfalls in Fairness Benchmark Datasets'; au
+@inproceedings{blodgett2021stereotyping,
+  author    = {Blodgett, Su Lin and Lopez, Gilsinia and Olteanu, Alexandra and Sim, Robert and Wallach, Hanna},
+  title     = {Stereotyping {N}orwegian Salmon: An Inventory of Pitfalls in Fairness Benchmark Datasets},
+  booktitle = {Proceedings of the 59th Annual Meeting of the Association for Computational Linguistics and the 11th International Joint Conference on Natural Language Processing (ACL-IJCNLP 2021)},
+  pages     = {1004--1015},
+  publisher = {Association for Computational Linguistics},
+  year      = {2021},
+  doi       = {10.18653/v1/2021.acl-long.81}
+}
+
+% II / IX: construct-validity critique of benchmarks as general measures. Author order follows the paper (the proceedings metadata lists them in a diffe
+% verified: verified; https://datasets-benchmarks-proceedings.neurips.cc/paper/2021/hash/084b6fbb10729ed4da8c3d3f5a3ae7c9-Abstract-round2.html: title, venue (NeurIPS Datasets and Ben
+@inproceedings{raji2021everything,
+  author    = {Raji, Inioluwa Deborah and Bender, Emily M. and Paullada, Amandalynne and Denton, Emily and Hanna, Alex},
+  title     = {{AI} and the Everything in the Whole Wide World Benchmark},
+  booktitle = {Proceedings of the Neural Information Processing Systems Track on Datasets and Benchmarks},
+  volume    = {1},
+  year      = {2021},
+  url       = {https://datasets-benchmarks-proceedings.neurips.cc/paper/2021/hash/084b6fbb10729ed4da8c3d3f5a3ae7c9-Abstract-round2.html}
+}
+
+% II / IX: 46-criterion benchmark quality assessment. Most benchmarks report no statistical significance and are hard to replicate. Supports the benchma
+% verified: verified; Official NeurIPS BibTeX (proceedings.neurips.cc .../26889e8359e7ef8a7f5d77457364ca55-Bibtex-Datasets_and_Benchmarks_Track.bib): the authors (order and spelling)
+@inproceedings{reuel2024betterbench,
+  author    = {Reuel, Anka and Hardy, Amelia and Smith, Chandler and Lamparth, Max and Hardy, Malcolm and Kochenderfer, Mykel J.},
+  title     = {{BetterBench}: Assessing {AI} Benchmarks, Uncovering Issues, and Establishing Best Practices},
+  booktitle = {Advances in Neural Information Processing Systems 37 (NeurIPS 2024), Datasets and Benchmarks Track},
+  pages     = {21763--21813},
+  publisher = {Curran Associates, Inc.},
+  year      = {2024},
+  doi       = {10.52202/079017-0685}
+}
+
+% V / IX: known external-validity limits of UCI Adult (threshold artefacts, 1994 US census). Justifies adding the synthetic corpus with ground truth.
+% verified: verified; Official NeurIPS BibTeX (proceedings.neurips.cc/paper_files/paper/2021/file/32e54441e6382a7fbacbbbaf3c450059-Bibtex.bib): authors Ding, Hardt, Miller, Schmidt; 
+@inproceedings{ding2021retiring,
+  author    = {Ding, Frances and Hardt, Moritz and Miller, John and Schmidt, Ludwig},
+  title     = {Retiring {Adult}: New Datasets for Fair Machine Learning},
+  booktitle = {Advances in Neural Information Processing Systems 34 (NeurIPS 2021)},
+  pages     = {6478--6490},
+  publisher = {Curran Associates, Inc.},
+  year      = {2021},
+  url       = {https://proceedings.neurips.cc/paper/2021/hash/32e54441e6382a7fbacbbbaf3c450059-Abstract.html}
+}
+
+% V / IX: the UCI German Credit code table is wrong (e.g. the personal-status/sex coding), and a corrected 'South German Credit' dataset exists. Directl
+% verified: corrected; Downloaded https://www1.beuth-hochschule.de/FB_II/reports/Report-2019-004.pdf (HTTP 200, 10 pages). The cover reads 'Fachbereich II', '04/2019', 'Ulrike Groempi
+@techreport{gromping2019south,
+  author      = {Gr{\"o}mping, Ulrike},
+  title       = {South {German} Credit Data: Correcting a Widely Used Data Set},
+  institution = {Beuth Hochschule f{\"u}r Technik Berlin, Fachbereich II},
+  type        = {Reports in Mathematics, Physics and Chemistry, Report},
+  number      = {04/2019},
+  month       = nov,
+  year        = {2019},
+  url         = {https://www1.beuth-hochschule.de/FB_II/reports/Report-2019-004.pdf}
+}
+
+% II / IV: fairness toolkit (AIF360). Positions VERA as a specification-driven review engine, not another metrics library.
+% verified: verified; Crossref api.crossref.org/works/10.1147/JRD.2019.2942287: title 'AI Fairness 360: An extensible toolkit for detecting and mitigating algorithmic bias'; IBM Jour
+@article{bellamy2019aif360,
+  author  = {Bellamy, Rachel K. E. and Dey, Kuntal and Hind, Michael and Hoffman, Samuel C. and Houde, Stephanie and Kannan, Kalapriya and Lohia, Pranay and Martino, Jacquelyn and Mehta, Sameep and Mojsilovi{\'c}, Aleksandra and others},
+  title   = {{AI Fairness 360}: An Extensible Toolkit for Detecting and Mitigating Algorithmic Bias},
+  journal = {IBM Journal of Research and Development},
+  volume  = {63},
+  number  = {4/5},
+  pages   = {4:1--4:15},
+  year    = {2019},
+  doi     = {10.1147/JRD.2019.2942287}
+}
+
+% II / IV: Fairlearn toolkit. Also a candidate backend for the ML-arm fairness metrics (cite if used).
+% verified: verified; Official JMLR BibTeX (https://www.jmlr.org/papers/v24/23-0389.bib): authors Weerts, Dudik, Edgar, Jalali, Lutz, Madaio; title; JMLR vol. 24, no. 257, pages 1--8
+@article{weerts2023fairlearn,
+  author  = {Weerts, Hilde and Dud{\'\i}k, Miroslav and Edgar, Richard and Jalali, Adrin and Lutz, Roman and Madaio, Michael},
+  title   = {{Fairlearn}: Assessing and Improving Fairness of {AI} Systems},
+  journal = {Journal of Machine Learning Research},
+  volume  = {24},
+  number  = {257},
+  pages   = {1--8},
+  year    = {2023},
+  url     = {https://www.jmlr.org/papers/v24/23-0389.html}
+}
+
+% II: Aequitas bias-audit toolkit aimed at policymakers as well as data scientists. The closest precedent for audit-oriented, non-specialist output. arX
+% verified: verified; arXiv API (export.arxiv.org, id 1811.05577): title 'Aequitas: A Bias and Fairness Audit Toolkit', submitted 2018-11-14. Authors in order: Pedro Saleiro, Benedic
+@article{saleiro2018aequitas,
+  author  = {Saleiro, Pedro and Kuester, Benedict and Hinkson, Loren and London, Jesse and Stevens, Abby and Anisfeld, Ari and Rodolfa, Kit T. and Ghani, Rayid},
+  title   = {{Aequitas}: A Bias and Fairness Audit Toolkit},
+  journal = {arXiv preprint arXiv:1811.05577},
+  year    = {2018},
+  url     = {https://arxiv.org/abs/1811.05577}
+}
+
+% II / VIII: industry practitioners' fairness needs (domain-specific guidance, process support). Motivates I4.
+% verified: verified; Crossref api.crossref.org/works/10.1145/3290605.3300830: title 'Improving Fairness in Machine Learning Systems' + subtitle 'What Do Industry Practitioners Need?
+@inproceedings{holstein2019improving,
+  author    = {Holstein, Kenneth and Wortman Vaughan, Jennifer and Daum{\'e}, III, Hal and Dud{\'\i}k, Miroslav and Wallach, Hanna},
+  title     = {Improving Fairness in Machine Learning Systems: What Do Industry Practitioners Need?},
+  booktitle = {Proceedings of the 2019 CHI Conference on Human Factors in Computing Systems (CHI 2019)},
+  pages     = {1--16},
+  publisher = {ACM},
+  year      = {2019},
+  doi       = {10.1145/3290605.3300830}
+}
+
+% II / VIII: how practitioners actually use (and misuse) fairness toolkits. Supports the lesson that metric choice needs explicit guidance and review.
+% verified: verified; Crossref api.crossref.org/works/10.1145/3531146.3533113: exact title, 7 authors in the given order and spelling (Deng, Nagireddy, Lee, Singh (Jatinder), Wu, Hol
+@inproceedings{deng2022exploring,
+  author    = {Deng, Wesley Hanwen and Nagireddy, Manish and Lee, Michelle Seng Ah and Singh, Jatinder and Wu, Zhiwei Steven and Holstein, Kenneth and Zhu, Haiyi},
+  title     = {Exploring How Machine Learning Practitioners (Try To) Use Fairness Toolkits},
+  booktitle = {Proceedings of the 2022 ACM Conference on Fairness, Accountability, and Transparency (FAccT 2022)},
+  pages     = {473--484},
+  publisher = {ACM},
+  year      = {2022},
+  doi       = {10.1145/3531146.3533113}
+}
+
+% II: survey of gaps in open-source fairness toolkits (context, organisational fit), which VERA's role-based review addresses.
+% verified: verified; Crossref api.crossref.org/works/10.1145/3411764.3445261: exact title, authors Michelle Seng Ah Lee and Jat Singh (spelled 'Jat' in the published record), CHI 20
+@inproceedings{lee2021landscape,
+  author    = {Lee, Michelle Seng Ah and Singh, Jat},
+  title     = {The Landscape and Gaps in Open Source Fairness Toolkits},
+  booktitle = {Proceedings of the 2021 CHI Conference on Human Factors in Computing Systems (CHI 2021)},
+  pages     = {1--13},
+  publisher = {ACM},
+  year      = {2021},
+  doi       = {10.1145/3411764.3445261}
+}
+
+% III / VIII: organisational enablers and blockers of responsible-AI practice. Frames the AICC vs Legal/Risk deployment findings (I4).
+% verified: verified; Crossref api.crossref.org/works/10.1145/3449081: title 'Where Responsible AI meets Reality' + subtitle 'Practitioner Perspectives on Enablers for Shifting Organ
+@article{rakova2021where,
+  author  = {Rakova, Bogdana and Yang, Jingying and Cramer, Henriette and Chowdhury, Rumman},
+  title   = {Where Responsible {AI} Meets Reality: Practitioner Perspectives on Enablers for Shifting Organizational Practices},
+  journal = {Proceedings of the ACM on Human-Computer Interaction},
+  volume  = {5},
+  number  = {CSCW1},
+  pages   = {1--23},
+  year    = {2021},
+  doi     = {10.1145/3449081}
+}
+
+% III / VIII: fairness checklists co-designed with practitioners, and organisational challenges in the review process.
+% verified: verified; Crossref api.crossref.org/works/10.1145/3313831.3376445: exact title, authors Michael A. Madaio, Luke Stark, Jennifer Wortman Vaughan, Hanna Wallach in that ord
+@inproceedings{madaio2020codesigning,
+  author    = {Madaio, Michael A. and Stark, Luke and Wortman Vaughan, Jennifer and Wallach, Hanna},
+  title     = {Co-Designing Checklists to Understand Organizational Challenges and Opportunities around Fairness in {AI}},
+  booktitle = {Proceedings of the 2020 CHI Conference on Human Factors in Computing Systems (CHI 2020)},
+  pages     = {1--14},
+  publisher = {ACM},
+  year      = {2020},
+  doi       = {10.1145/3313831.3376445}
+}
+
+% II (SE fairness): Themis, the foundational fairness-testing paper at FSE. Anchors the paper in the SE fairness literature for ICSE reviewers.
+% verified: verified; Crossref api.crossref.org/works/10.1145/3106237.3106277: title 'Fairness testing: testing software for discrimination', authors Galhotra, Brun, Meliou, containe
+@inproceedings{galhotra2017fairness,
+  author    = {Galhotra, Sainyam and Brun, Yuriy and Meliou, Alexandra},
+  title     = {Fairness Testing: Testing Software for Discrimination},
+  booktitle = {Proceedings of the 11th Joint Meeting on Foundations of Software Engineering (ESEC/FSE 2017)},
+  pages     = {498--510},
+  publisher = {ACM},
+  year      = {2017},
+  doi       = {10.1145/3106237.3106277}
+}
+
+% II (SE fairness): fairness as a first-class software quality requirement, which is VERA's framing.
+% verified: verified; Crossref api.crossref.org/works/10.1145/3236024.3264838: title 'Software fairness', authors Brun, Meliou, container 'Proceedings of the 2018 26th ACM Joint Meet
+@inproceedings{brun2018software,
+  author    = {Brun, Yuriy and Meliou, Alexandra},
+  title     = {Software Fairness},
+  booktitle = {Proceedings of the 26th ACM Joint Meeting on European Software Engineering Conference and Symposium on the Foundations of Software Engineering (ESEC/FSE 2018), New Ideas and Emerging Results},
+  pages     = {754--759},
+  publisher = {ACM},
+  year      = {2018},
+  doi       = {10.1145/3236024.3264838}
+}
+
+% II (SE fairness): root causes of bias in ML software (label and sampling bias) evaluated on Adult and German Credit. Shared datasets with the ML arm.
+% verified: verified; Crossref https://api.crossref.org/works/10.1145/3468264.3468537: title 'Bias in machine learning software: why? how? what to do?', authors Chakraborty, Majumder
+@inproceedings{chakraborty2021bias,
+  author    = {Chakraborty, Joymallya and Majumder, Suvodeep and Menzies, Tim},
+  title     = {Bias in Machine Learning Software: Why? {How}? {What} to Do?},
+  booktitle = {Proceedings of the 29th ACM Joint Meeting on European Software Engineering Conference and Symposium on the Foundations of Software Engineering (ESEC/FSE 2021)},
+  pages     = {429--440},
+  publisher = {ACM},
+  year      = {2021},
+  doi       = {10.1145/3468264.3468537}
+}
+
+% II (SE fairness): TOSEM survey of fairness testing, listing the common datasets (Adult, German Credit) and tools. The single best SE umbrella citation
+% verified: verified; Crossref https://api.crossref.org/works/10.1145/3652155: exact title, authors Chen, Zhang, Hort, Harman, Sarro (same order), TOSEM vol 33 issue 5, pp. 1-59, 202
+@article{chen2024fairness,
+  author  = {Chen, Zhenpeng and Zhang, Jie M. and Hort, Max and Harman, Mark and Sarro, Federica},
+  title   = {Fairness Testing: A Comprehensive Survey and Analysis of Trends},
+  journal = {ACM Transactions on Software Engineering and Methodology},
+  volume  = {33},
+  number  = {5},
+  pages   = {137:1--137:59},
+  year    = {2024},
+  doi     = {10.1145/3652155}
+}
+
+% II / VIII: survey of bias mitigation for ML classifiers. VERIFIED venue: ACM Journal on Responsible Computing 1(2), 2024 (not TOSEM). VERA measures an
+% verified: verified; Crossref https://api.crossref.org/works/10.1145/3631326: exact title, authors Hort, Chen, Zhang, Harman, Sarro, ACM Journal on Responsible Computing vol 1 issue
+@article{hort2024bias,
+  author  = {Hort, Max and Chen, Zhenpeng and Zhang, Jie M. and Harman, Mark and Sarro, Federica},
+  title   = {Bias Mitigation for Machine Learning Classifiers: A Comprehensive Survey},
+  journal = {ACM Journal on Responsible Computing},
+  volume  = {1},
+  number  = {2},
+  pages   = {1--52},
+  year    = {2024},
+  doi     = {10.1145/3631326}
+}
+
+% II (SE fairness): empirical study of fairness in real-world ML models, including credit datasets, with metric-disagreement findings relevant to VI-B.
+% verified: verified; Crossref https://api.crossref.org/works/10.1145/3368089.3409704: exact title, authors Biswas, Rajan, Proc. 28th ACM ESEC/FSE (ESEC/FSE '20, virtual), pages 642-
+@inproceedings{biswas2020machine,
+  author    = {Biswas, Sumon and Rajan, Hridesh},
+  title     = {Do the Machine Learning Models on a Crowd Sourced Platform Exhibit Bias? {An} Empirical Study on Model Fairness},
+  booktitle = {Proceedings of the 28th ACM Joint Meeting on European Software Engineering Conference and Symposium on the Foundations of Software Engineering (ESEC/FSE 2020)},
+  pages     = {642--653},
+  publisher = {ACM},
+  year      = {2020},
+  doi       = {10.1145/3368089.3409704}
+}
+
+% I / III / VIII: exemplar SEIP industrial ML case study, used as a model for how to report the deployment (I4).
+% verified: verified; Crossref https://api.crossref.org/works/10.1109/ICSE-SEIP.2019.00042: exact title, all 9 authors in the same order and spelling (Amershi, Begel, Bird, DeLine, G
+@inproceedings{amershi2019software,
+  author    = {Amershi, Saleema and Begel, Andrew and Bird, Christian and DeLine, Robert and Gall, Harald and Kamar, Ece and Nagappan, Nachiappan and Nushi, Besmira and Zimmermann, Thomas},
+  title     = {Software Engineering for Machine Learning: A Case Study},
+  booktitle = {Proceedings of the 41st IEEE/ACM International Conference on Software Engineering: Software Engineering in Practice (ICSE-SEIP 2019)},
+  pages     = {291--300},
+  publisher = {IEEE},
+  year      = {2019},
+  doi       = {10.1109/ICSE-SEIP.2019.00042}
+}
+
+% V / VII / IX: case study methodology for the AICC case study and the two-population protocol. Year is the volume year 2009 (online Dec 2008).
+% verified: verified; Crossref https://api.crossref.org/works/10.1007/s10664-008-9102-8: exact title, authors Per Runeson and Martin Höst, Empirical Software Engineering vol 14 issue
+@article{runeson2009guidelines,
+  author  = {Runeson, Per and H{\"o}st, Martin},
+  title   = {Guidelines for Conducting and Reporting Case Study Research in Software Engineering},
+  journal = {Empirical Software Engineering},
+  volume  = {14},
+  number  = {2},
+  pages   = {131--164},
+  year    = {2009},
+  doi     = {10.1007/s10664-008-9102-8}
+}
+
+% III / VIII: end-to-end internal algorithmic auditing framework. The closest precedent for an internal review process with artefacts at each stage.
+% verified: verified; Crossref https://api.crossref.org/works/10.1145/3351095.3372873: title 'Closing the AI accountability gap', subtitle 'defining an end-to-end framework for inter
+@inproceedings{raji2020closing,
+  author    = {Raji, Inioluwa Deborah and Smart, Andrew and White, Rebecca N. and Mitchell, Margaret and Gebru, Timnit and Hutchinson, Ben and Smith-Loud, Jamila and Theron, Daniel and Barnes, Parker},
+  title     = {Closing the {AI} Accountability Gap: Defining an End-to-End Framework for Internal Algorithmic Auditing},
+  booktitle = {Proceedings of the 2020 Conference on Fairness, Accountability, and Transparency (FAT* 2020)},
+  pages     = {33--44},
+  publisher = {ACM},
+  year      = {2020},
+  doi       = {10.1145/3351095.3372873}
+}
+
+% III: applies the three-lines-of-defense model to AI risk management. Gives academic grounding for AICC (near first line) vs Legal/Risk (second line) a
+% verified: verified; Crossref api.crossref.org/works/10.1007/s00146-023-01811-0: title 'Three lines of defense against risks from AI', sole author Jonas Schuett, AI & SOCIETY vol 40
+@article{schuett2025three,
+  author  = {Schuett, Jonas},
+  title   = {Three Lines of Defense Against Risks from {AI}},
+  journal = {AI \& Society},
+  volume  = {40},
+  number  = {2},
+  pages   = {493--507},
+  year    = {2025},
+  doi     = {10.1007/s00146-023-01811-0}
+}
+
+% VI-C (I3, measurability matrix): black-box API access limits what an auditor can evaluate. Directly supports the claim that a bank using a model throu
+% verified: verified; Crossref for 10.1145/3630106.3659037: exact title, ACM FAccT 2024, pp. 2254-2272. The 21-author list starts Casper, Ezell, Siegmann, Kolt, Curtis (Taylor Lynn),
+@inproceedings{casper2024blackbox,
+  author    = {Casper, Stephen and Ezell, Carson and Siegmann, Charlotte and Kolt, Noam and Curtis, Taylor Lynn and Bucknall, Benjamin and Haupt, Andreas and Wei, Kevin and Scheurer, J{\'e}r{\'e}my and Hobbhahn, Marius and others},
+  title     = {Black-Box Access is Insufficient for Rigorous {AI} Audits},
+  booktitle = {Proceedings of the 2024 ACM Conference on Fairness, Accountability, and Transparency (FAccT 2024)},
+  pages     = {2254--2272},
+  publisher = {ACM},
+  year      = {2024},
+  doi       = {10.1145/3630106.3659037}
+}
+
+% VI-C (I3): vLLM, the self-hosted serving engine that exposes token log-probabilities (the 'native' measurement mode), as opposed to API-only serving. 
+% verified: verified; Crossref for 10.1145/3600006.3613165: exact title, Proceedings of the 29th Symposium on Operating Systems Principles, pp. 611-626, ACM, Oct 2023. The 9 authors 
+@inproceedings{kwon2023efficient,
+  author    = {Kwon, Woosuk and Li, Zhuohan and Zhuang, Siyuan and Sheng, Ying and Zheng, Lianmin and Yu, Cody Hao and Gonzalez, Joseph and Zhang, Hao and Stoica, Ion},
+  title     = {Efficient Memory Management for Large Language Model Serving with {PagedAttention}},
+  booktitle = {Proceedings of the 29th Symposium on Operating Systems Principles (SOSP 2023)},
+  pages     = {611--626},
+  publisher = {ACM},
+  year      = {2023},
+  doi       = {10.1145/3600006.3613165}
+}
+
+% III: canonical model-risk-management guidance (effective challenge, validation) familiar to reviewers. WARNING: superseded on 17 Apr 2026 by SR 26-2, 
+% verified: verified; Downloaded federalreserve.gov/supervisionreg/srletters/SR2602.pdf. Its 'Supersedes' list reads: SR letter 11-7, 'Guidance on Model Risk Management' (April 4, 20
+@misc{federalreserve2011sr117,
+  author       = {{Board of Governors of the Federal Reserve System and Office of the Comptroller of the Currency}},
+  title        = {Guidance on Model Risk Management},
+  howpublished = {SR Letter 11-7 (Federal Reserve) and OCC Bulletin 2011-12},
+  month        = apr,
+  year         = {2011},
+  note         = {{Superseded} by {SR} Letter 26-2 ({April} 17, 2026)}
+}
+
+% I / III / VI-C: current US model-risk guidance (17 Apr 2026, Fed/FDIC/OCC), superseding SR 11-7. It states that generative and agentic AI models are O
+% verified: verified; Fetched https://www.federalreserve.gov/supervisionreg/srletters/SR2602.pdf (HTTP 200): SR 26-2, April 17, 2026, subject 'Revised Guidance on Model Risk Manageme
+@misc{federalreserve2026sr262,
+  author       = {{Board of Governors of the Federal Reserve System and Federal Deposit Insurance Corporation and Office of the Comptroller of the Currency}},
+  title        = {Revised Guidance on Model Risk Management},
+  howpublished = {SR Letter 26-2 / OCC Bulletin 2026-13},
+  month        = apr,
+  year         = {2026},
+  note         = {{Supersedes} {SR} 11-7; generative and agentic {AI} models are out of scope},
+  url          = {https://www.federalreserve.gov/supervisionreg/srletters/SR2602.pdf}
+}
+
+% I / III: EU supervisory expectations for creditworthiness assessment and automated models in loan origination, including fair treatment of consumers. 
+% verified: verified; Downloaded the given EBA URL (HTTP 200, PDF). Cover page: 'FINAL REPORT - Guidelines on loan origination and monitoring, EBA/GL/2020/06, 29 May 2020'. The text 
+@misc{eba2020loan,
+  author       = {{European Banking Authority}},
+  title        = {Guidelines on Loan Origination and Monitoring},
+  howpublished = {EBA/GL/2020/06},
+  month        = may,
+  year         = {2020},
+  note         = {{Final} report dated 29 {May} 2020},
+}
+
+% III / VI-A: EBA report on ML in internal-ratings-based (IRB) credit models, covering explainability and how prudential rules interact with the GDPR an
+% verified: verified; Downloaded the given EBA URL (HTTP 200, 24-page PDF). Cover: 'Machine Learning for IRB Models - Follow-up Report from the Consultation on the Discussion Paper o
+@misc{eba2023machine,
+  author       = {{European Banking Authority}},
+  title        = {Machine Learning for {IRB} Models: Follow-up Report from the Consultation on the Discussion Paper on Machine Learning for {IRB} Models},
+  howpublished = {EBA/REP/2023/28},
+  month        = aug,
+  year         = {2023},
+  url          = {https://www.eba.europa.eu/sites/default/files/document_library/Publications/Reports/2023/1061483/Follow-up%20report%20on%20machine%20learning%20for%20IRB%20models.pdf}
+}
+
+% III: the three lines model (first line / second line / internal audit) used to place AICC and Legal/Risk.
+% verified: verified; Checked https://www.theiia.org/en/content/position-papers/2020/the-iias-three-lines-model-an-update-of-the-three-lines-of-defense/ : the title is exactly 'The I
+@misc{iia2020three,
+  author       = {{The Institute of Internal Auditors}},
+  title        = {The {IIA}'s Three Lines Model: An Update of the Three Lines of Defense},
+  howpublished = {Position paper},
+  year         = {2020},
+  note         = {{Updated} 2024},
+  url          = {https://www.theiia.org/en/content/position-papers/2020/the-iias-three-lines-model-an-update-of-the-three-lines-of-defense/}
+}
+
+% I / VI-B: revised EU Consumer Credit Directive (CCD2). Art. 6 non-discrimination in access to credit; creditworthiness assessment may not use GDPR Art
+% verified: verified; The EUR-Lex HTML is behind a bot wall, so I pulled the official English text and metadata notice from EU Cellar (publications.europa.eu/resource/celex/32023L222
+@misc{euccd2023,
+  title        = {Directive ({EU}) 2023/2225 of the {European} {Parliament} and of the {Council} of 18 {October} 2023 on Credit Agreements for Consumers and Repealing {Directive} 2008/48/{EC}},
+  howpublished = {Official Journal of the European Union, L 2023/2225, 30 October 2023},
+  year         = {2023},
+  note         = {{Consumer} Credit Directive ({CCD2}); applies from 20 November 2026},
+  url          = {http://data.europa.eu/eli/dir/2023/2225/oj}
+}
+
+% I / III: Digital Omnibus on AI (Reg. 2026/1744, OJ 24 Jul 2026, in force 27 Jul 2026). It defers Annex III high-risk obligations, including credit sco
+% verified: corrected; The EUR-Lex HTML is behind a bot wall, so I pulled the official English text from EU Cellar (publications.europa.eu/resource/celex/32026R1744). Header: 'Officia
+@misc{euomnibus2026ai,
+  title        = {Regulation ({EU}) 2026/1744 of the {European} {Parliament} and of the {Council} of 8 {July} 2026 amending {Regulations} ({EU}) 2024/1689, ({EU}) 2018/1139 and ({EU}) 2023/1230 as regards the simplification of the implementation of harmonised rules on artificial intelligence ({Digital} {Omnibus} on {AI})},
+  howpublished = {Official Journal of the European Union, L 2026/1744, 24 July 2026},
+  year         = {2026},
+  note         = {{Digital} Omnibus on {AI}; defers {Annex} {III} high-risk obligations to 2 December 2027},
+  url          = {http://data.europa.eu/eli/reg/2026/1744/oj}
+}
+
+% V / VI-A,B: UCI Adult dataset (ML arm), with DataCite DOI.
+% verified: verified; The DOI 10.24432/C5XW20 redirects to https://archive.ics.uci.edu/dataset/2. DataCite (api.datacite.org/dois/10.24432/C5XW20) gives title 'Adult', creators 'Barr
+@misc{becker1996adult,
+  author       = {Becker, Barry and Kohavi, Ronny},
+  title        = {Adult},
+  howpublished = {UCI Machine Learning Repository},
+  year         = {1996},
+  doi          = {10.24432/C5XW20},
+  url          = {https://doi.org/10.24432/C5XW20}
+}
+
+% V / VI-A,B: Statlog German Credit dataset (ML arm), with DataCite DOI. Pair with gromping2019south in IX.
+% verified: verified; The DOI 10.24432/C5NC77 redirects to https://archive.ics.uci.edu/dataset/144. DataCite gives title 'Statlog (German Credit Data)', creator 'Hofmann, Hans', publ
+@misc{hofmann1994statlog,
+  author       = {Hofmann, Hans},
+  title        = {Statlog ({German} Credit Data)},
+  howpublished = {UCI Machine Learning Repository},
+  year         = {1994},
+  doi          = {10.24432/C5NC77},
+  url          = {https://doi.org/10.24432/C5NC77}
 }

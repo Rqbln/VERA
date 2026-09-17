@@ -1,0 +1,63 @@
+% floats/E4_measurability-skeleton.tex -- Tab. 4 (Section VI-C) until the
+% extended vera-foundry generator (decision D21) writes tables/E4_measurability.tex.
+% \generatedtable inputs this file while that table is absent; the label and the
+% structure are the ones the generator must reproduce:
+%   rows     R01-R12, then the log-probability row from the E0 probe;
+%   columns  the Foundry deployments of vera-foundry/config/deployments.yaml
+%            (prefix "vera-" dropped, as the generator does), grouped by serving
+%            route, then one ML-arm column;
+%   cells    \stnat \stfb \stnm \stna, a cause-class superscript on every
+%            non-native LLM cell (s, h, d, u); R03-R05 are one corpus scan, so
+%            one merged cell spans the LLM columns.
+% Every state is pending (E0, E4, N1/N4), so every cell is \tbdcell except the
+% log-probability cell of the ML arm, which does not apply to a classifier by design.
+% The ML cells of language-only requirements become \stna once D2 and N4 settle.
+\begin{table*}[t]
+\centering
+\caption{Measurability of the twelve requirements by serving route and model family}
+\label{tab:e4_measurability}
+\tblsetup
+\begin{tabular}{@{}l*{9}{c}c@{}}
+\toprule
+ & \multicolumn{7}{c}{Serverless} & AOAI & MC & Tabular arm \\
+\cmidrule(lr){2-8}\cmidrule(lr){9-9}\cmidrule(lr){10-10}\cmidrule(l){11-11}
+Requirement
+ & \shortstack{\texttt{t1-}\\\texttt{claude-}\\\texttt{opus5}}
+ & \shortstack{\texttt{t1-}\\\texttt{claude-}\\\texttt{sonnet5}}
+ & \shortstack{\texttt{t1-}\\\texttt{claude-}\\\texttt{haiku45}}
+ & \shortstack{\texttt{t1-}\\\texttt{mistral-}\\\texttt{medium}}
+ & \shortstack{\texttt{t2-}\\\texttt{llama-}\\\texttt{70b}}
+ & \shortstack{\texttt{t3-}\\\texttt{llama-}\\\texttt{8b}}
+ & \shortstack{\texttt{t3-}\\\texttt{ministral-}\\\texttt{3b}}
+ & \shortstack{\texttt{t1-}\\\texttt{gpt-}\\\texttt{frontier}}
+ & \shortstack{\texttt{t2-}\\\texttt{qwen-}\\\texttt{72b-mc}}
+ & \armswitch{\shortstack{tabular\\classifiers}}{\shortstack{one\\dataset}}{\shortstack{analytical,\\not run}} \\
+\midrule
+\req{01} Robustness          & \tbdcell & \tbdcell & \tbdcell & \tbdcell & \tbdcell & \tbdcell & \tbdcell & \tbdcell & \tbdcell & \tbdcell \\
+\req{02} Cyber resilience    & \tbdcell & \tbdcell & \tbdcell & \tbdcell & \tbdcell & \tbdcell & \tbdcell & \tbdcell & \tbdcell & \tbdcell \\
+\req{03} Data adequacy       & \multicolumn{9}{c}{\tbdcell\ (one scan of the shared corpus)} & \tbdcell \\
+\req{04} Copyright           & \multicolumn{9}{c}{\tbdcell\ (one scan of the shared corpus)} & \tbdcell \\
+\req{05} Privacy             & \multicolumn{9}{c}{\tbdcell\ (one scan of the shared corpus)} & \tbdcell \\
+\req{06} Capabilities        & \tbdcell & \tbdcell & \tbdcell & \tbdcell & \tbdcell & \tbdcell & \tbdcell & \tbdcell & \tbdcell & \tbdcell \\
+\req{07} Calibration         & \tbdcell & \tbdcell & \tbdcell & \tbdcell & \tbdcell & \tbdcell & \tbdcell & \tbdcell & \tbdcell & \tbdcell \\
+\req{08} AI disclosure       & \tbdcell & \tbdcell & \tbdcell & \tbdcell & \tbdcell & \tbdcell & \tbdcell & \tbdcell & \tbdcell & \tbdcell \\
+\req{09} Watermark           & \tbdcell & \tbdcell & \tbdcell & \tbdcell & \tbdcell & \tbdcell & \tbdcell & \tbdcell & \tbdcell & \tbdcell \\
+\req{10} Representation bias & \tbdcell & \tbdcell & \tbdcell & \tbdcell & \tbdcell & \tbdcell & \tbdcell & \tbdcell & \tbdcell & \tbdcell \\
+\req{11} Fairness            & \tbdcell & \tbdcell & \tbdcell & \tbdcell & \tbdcell & \tbdcell & \tbdcell & \tbdcell & \tbdcell & \tbdcell \\
+\req{12} Toxicity            & \tbdcell & \tbdcell & \tbdcell & \tbdcell & \tbdcell & \tbdcell & \tbdcell & \tbdcell & \tbdcell & \tbdcell \\
+\midrule
+Log-probabilities returned   & \tbdcell & \tbdcell & \tbdcell & \tbdcell & \tbdcell & \tbdcell & \tbdcell & \tbdcell & \tbdcell & \stna \\
+\bottomrule
+\addlinespace[3pt]
+\end{tabular}
+\par
+\begin{minipage}[t]{\textwidth}
+\stnat~native, no benchmark flagged a fallback;
+\stfb~fallback, at least one benchmark took a degraded path and recorded why;
+\stnm~not measurable;
+\stna~not applicable.
+Superscripts give the cause class of a non-native language-model cell: s~serving route, h~harness or other set-up limit, d~by design, u~unknown; only s counts as a serving limit.
+Columns are the campaign's deployments without the \texttt{vera-} prefix; AOAI: Azure OpenAI; MC: managed compute behind vLLM \tbd{E0}{foundry}{18 Sep}{whether a managed-compute deployment runs in the GPU window (qwen-72b-mc is disabled in the config; a llama-70b-mc copy is planned); drop the MC column otherwise}.
+The ML-arm column comes from \armswitch{runs on the reference classifiers.}{runs on one dataset ($^{\ast}$~in scope but not run, classified by design).}{an analytical classification of the designed specification, not from runs.}
+\end{minipage}
+\end{table*}

@@ -1,0 +1,38 @@
+\psection[0.6]{lessons}{0.55}{I4}{all}{Lessons Learned}
+% Reviewed 17 Sep (two cached reviews, 22 findings): garak and calibration causes
+% aligned with VI-C and the vera-foundry patch; no APSEC "by construction" wording;
+% L5 head neutral until the Q8 counts exist; one \tbd per value shared with VI-B.
+
+These lessons address teams that build evaluation into model review in a regulated institution; each names the section whose result it rests on.
+
+\textbf{L1: Put the fairness criterion under change control.}
+Fairness criteria conflict, and EU non-discrimination law does not reduce to one statistical test~\cite{wachter2021fairness}, so a named control function, here \legalrisk{}, must own the choice (\Cref{sec:fairness}).
+VERA's content digest (SHA-256) covers the catalog's version and weights but not the band thresholds, which are environment settings, so a verdict can change under an unchanged digest~\decision{D29}{core}{25 Sep}{If G5 lands, rewrite in the past tense: thresholds and registry now enter the digest; if not, keep the sentence as the observed gap.}.
+The criteria, their thresholds and the rationale belong in one file under that digest.
+
+\ifarmwithdrawn
+\textbf{L2: Cost a new model family by its couplings, not by its metrics.}
+A second family first meets the engine's language-model couplings: the run context and run request carry no labels or predictions, and the dispatcher sends an unknown runner name to a chat-prompt runner without an error (\Cref{sec:vera}).
+The gaps still open at the go/no-go, \tbd{N1}{core}{30 Sep}{which of the engineering gaps G1--G12 were still open at the go/no-go, with the effort each would have taken}, kept our tabular arm from running in time; audit these couplings before committing to a second family.
+\else
+\textbf{L2: Define engine independence as a data contract, and audit it with a diff.}
+Machine-learning components resist clean module boundaries~\cite{amershi2019software}, so we drew ours at the sample contract: runners return per-benchmark scores with fallback flags, and nothing downstream calls a model (\Cref{sec:vera}).
+The language-model arm already needed a substitute client and two runtime runner patches outside the core; with the core module list fixed before coding, the diff for the tabular arm\armswitch{}{, run on one dataset,}{} is \tbd{N5}{core}{5 Oct}{result of the diff audit restricted to the core module list fixed by D9: core files changed, and runners, registry entries and payload fields added outside it} (\Cref{sec:portability}).
+Publish that restricted diff with the claim.
+\fi
+
+\textbf{L3: Record the serving route at model selection, since it fixes what can be evaluated later.}
+Calibration (\req{07}) needs the probability a model gives its own answer; our campaign reads it from token log-probabilities, and where a route withholds them a fixed heuristic confidence stands in and the cell is marked as a fallback.
+Serving causes degraded \tbd{E4}{foundry}{4 Oct}{number of language-model requirement cells degraded by serving-class causes, after reclassifying the chat-only adapter's log-likelihood fallbacks as set-up limits (D21), and the routes concerned} cells (\Cref{sec:measurability,sec:casestudy}).
+A bank that buys query access limits its own review~\cite{casper2024blackbox}, so the route belongs in the selection record beside cost and latency.
+
+\textbf{L4: Give every fallback a cause, or a limit of the set-up will pass for a property of the model.}
+Each non-native cell carries a cause class, serving, set-up, by design or unknown, and only serving causes support a claim about a deployment (\Cref{sec:measurability}).
+The garak harness~\cite{derczynski2024garak} behind one \req{02} benchmark does not run from the workstation that drives the campaign, so that benchmark falls back whatever deployment it probes; a reason the classifier does not recognise stays unknown until someone reads it.
+
+\parplan[35]{\textbf{L5: What the two reviewer populations asked of the same evidence, and what that implies for the views built for them.}}{Evidence: VI-D, criteria cited by population in Q8 (N6); population split (D13); placement of AICC and Legal/Risk in the lines of defence (N7, Section III). Cite schuett2025three and rakova2021where. No direction may be announced before the Q8 counts exist. If the populations cannot be separated, split by decision role (Q15) and reword the head; if Q8 shows no difference, replace the lesson. Do not reuse the APSEC wording on role views or its fifth lesson on aggregation.}
+
+\textbf{L6: Report which verdicts survive a change of criterion, and which instruments cannot show a gap.}
+A fairness verdict is criterion-robust when every admissible criterion yields the same verdict (\Cref{prop:criterion}); in our runs, \armswitch{\tbd{N3}{core}{9 Oct}{criterion-dependent fairness verdicts out of all model--dataset pairs on both arms, as k of n}}{\tbd{N3}{core}{9 Oct}{criterion-dependent fairness verdicts on the language-model record classification and the one tabular dataset, as k of n}}{\tbd{N2}{foundry}{04 Oct}{criterion-dependent verdicts among the deployments run under N2, as k of n; if N2 did not run, state the test as a design and drop this clause}} were criterion-dependent.
+Two of VERA's language-model bias and fairness instruments set no fallback flag although neither can measure a difference between groups: the \req{11} probe assigns every prompt to the same group, and the \req{10} path over public bias datasets scores zero whatever the model answers~\decision{D7}{core}{22 Sep}{Record classification (N2) or R10/R11 kept with caveats; if N2 does not replace the probes, the language-model fairness row is a caveat only.}.
+A review report should state both, and say that the engine does not mitigate: mitigation is a separate family of methods~\cite{hort2024bias}.

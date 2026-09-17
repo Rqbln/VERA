@@ -1,0 +1,40 @@
+% floats/decision.tex -- Tab. 5, decision measures by population (VI-D, I4).
+% Hand-built skeleton. scripts/decision_study.py (N6, core, 7 Oct) replaces the
+% \tbdcell cells from the questionnaire export; the pending values are named by
+% the \tbd markers in sections/06d-decision.tex.
+% - Row M2 stays only if D12 finds a position note dated before diffusion.
+% - If D13 cannot separate the populations, the two population columns become
+%   the decision-role split of Q15 and the caption says so.
+% - Tests run on the pooled sample only; below the floor fixed in Section V the
+%   test values go and the descriptive entries stay.
+% - Cells must fit a column table: point estimates in the population columns,
+%   the interval or test value under the pooled estimate if space is short.
+% - If D14 builds the tabular instrument (full or reduced arm), its rows are
+%   added under a separate rule, with the Legal/Risk column only.
+\registerfloat{tab:decision}{table}
+\begin{table}[t]
+  \centering
+  \caption{Decision measures by population. Values run from the first phase,
+    without the scorecard, to the second, with it. Tests use the pooled sample
+    and share one Holm correction; population columns are descriptive. M7 items
+    are median agreement ratings from 1 to 5, translated from the French form.}
+  \label{tab:decision}
+  \tblsetup
+  \begin{tabularx}{\columnwidth}{@{}Xccc@{}}
+    \toprule
+    Measure (test or statistic) & \aicc{} & \legalrisk{} & Pooled \\
+    \midrule
+    Complete responses ($n$) & \tbdcell & \tbdcell & \tbdcell \\
+    \addlinespace
+    M1 Choice changed, share (95\% Wilson CI) & \tbdcell & \tbdcell & \tbdcell \\
+    M2 Consistent with the note, share before $\rightarrow$ after (McNemar) & \tbdcell & \tbdcell & \tbdcell \\
+    M4 Confidence, median change (Wilcoxon; $r_{\mathrm{rb}}$) & \tbdcell & \tbdcell & \tbdcell \\
+    M5 Criteria cited, median Q2 $\rightarrow$ Q6 (Wilcoxon) & \tbdcell & \tbdcell & \tbdcell \\
+    M5 Coder agreement (Krippendorff $\alpha$) & -- & -- & \tbdcell \\
+    \addlinespace
+    M7 Phase two helped me decide & \tbdcell & \tbdcell & \tbdcell \\
+    M7 Would have saved time on a real case & \tbdcell & \tbdcell & \tbdcell \\
+    M7 Want it for my next model choices & \tbdcell & \tbdcell & \tbdcell \\
+    \bottomrule
+  \end{tabularx}
+\end{table}

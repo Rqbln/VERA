@@ -13,7 +13,7 @@ synthetic banking corpus, and the governance-runtime benchmark.
 
 ## 1. Set up the native stack
 ```bash
-bash scripts/setup_native.sh        # installs [benchmarks,lab,pdf], checks Ollama + panel models
+bash scripts/setup_native.sh        # installs [benchmarks,data,pdf], checks Ollama + panel models
 ```
 This installs the real harnesses: **lm-eval** (R06), **datasets** (R10: BBQ/BOLD/StereoSet),
 **Detoxify** (R12 + R03), **Presidio** (R05), **Levenshtein/sacrebleu** (R04), **CodeCarbon** (N03),

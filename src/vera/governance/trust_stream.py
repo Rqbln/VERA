@@ -36,22 +36,6 @@ def _series_key(model: str) -> str:
     return f"vera:gov:trust:series:{model}"
 
 
-def _write_timescale(model: str, score: float, settings: Settings) -> None:
-    if not settings.vera_timescale_url:
-        return
-    try:
-        import psycopg  # optional
-
-        with psycopg.connect(settings.vera_timescale_url, connect_timeout=2) as conn:
-            conn.execute(
-                "INSERT INTO metric_timeseries (ts, model, metric, value)"
-                " VALUES (now(), %s, %s, %s)",
-                (model, "trust_factor", score),
-            )
-    except Exception:
-        pass  # best-effort; Redis series is the source of truth for the dashboard
-
-
 def record_signal(
     model: str, cr: str, score: float, settings: Settings | None = None
 ) -> dict[str, Any] | None:
@@ -65,7 +49,6 @@ def record_signal(
         r.set(_trust_key(model), json.dumps(tf))
         point = {"ts": datetime.now(UTC).isoformat(), "score": tf["score"], "band": tf["band"]}
         r.xadd(_series_key(model), {"data": json.dumps(point)}, maxlen=500, approximate=True)
-        _write_timescale(model, float(tf["score"]), s)
     return tf
 
 

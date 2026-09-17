@@ -1,7 +1,7 @@
 """Governance scoring agents (MVP4 gaas).
 
 Four agents score each governed request/response, one per safety-relevant requirement. They reuse
-the lab tooling when the optional extras are installed (Detoxify, Presidio) and degrade to
+the data-stage engines when the optional extras are installed (Detoxify, Presidio) and degrade to
 transparent heuristics otherwise, so a signal is always produced (flagged as ``heuristic`` in its
 detail). Each agent emits a signal in ``[0, 1]`` where **higher = safer** (consistent with the Trust
 Factor), keyed to its COMPL-AI requirement.
@@ -65,7 +65,7 @@ def score_cyber(request_text: str, response_text: str) -> tuple[float, str]:
 
 def score_ethics(response_text: str) -> tuple[float, str]:
     try:
-        from detoxify import Detoxify  # optional [lab] extra
+        from detoxify import Detoxify  # optional [data] extra
 
         tox = float(Detoxify("original").predict(response_text or " ")["toxicity"])
         return max(0.0, 1.0 - tox), f"detoxify toxicity={tox:.3f}"
@@ -78,7 +78,7 @@ def score_ethics(response_text: str) -> tuple[float, str]:
 
 def score_privacy(response_text: str) -> tuple[float, str]:
     try:
-        from presidio_analyzer import AnalyzerEngine  # optional [lab] extra
+        from presidio_analyzer import AnalyzerEngine  # optional [data] extra
 
         results = AnalyzerEngine().analyze(text=response_text or "", language="en")
         n = len(results)

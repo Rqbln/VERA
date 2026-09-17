@@ -10,7 +10,6 @@ from vera.api.admin_routes import router as admin_router
 from vera.api.benchmark_registry import list_benchmark_entries
 from vera.api.dashboard_routes import router as dashboard_router
 from vera.api.forms_routes import router as forms_router
-from vera.api.lab_routes import router as lab_router
 from vera.api.models_routes import router as models_router
 from vera.api.study_routes import router as study_router
 from vera.config import get_settings
@@ -27,7 +26,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-app.include_router(lab_router)
 app.include_router(dashboard_router)
 app.include_router(models_router)
 app.include_router(forms_router)

@@ -41,44 +41,8 @@ services:
       mc alias set local http://minio:9000 minioadmin minioadmin &&
       mc mb -p local/vera || true &&
       mc mb -p local/mlflow || true &&
-      mc mb -p local/vera-datasets-clean || true &&
-      mc mb -p local/vera-datasets-poisoned || true &&
-      mc mb -p local/vera-checkpoints || true
+      mc mb -p local/vera-datasets-clean || true
       "
-
-  postgres-vera:
-    image: postgres:16-alpine
-    environment:
-      POSTGRES_USER: vera
-      POSTGRES_PASSWORD: vera
-      POSTGRES_DB: vera
-    ports:
-      - "5433:5432"
-    volumes:
-      - pg_vera:/var/lib/postgresql/data
-      - ./infra/sql/vera:/docker-entrypoint-initdb.d:ro
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U vera"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
-
-  timescaledb:
-    image: timescale/timescaledb:latest-pg16
-    environment:
-      POSTGRES_USER: vera
-      POSTGRES_PASSWORD: vera
-      POSTGRES_DB: vera_ts
-    ports:
-      - "5434:5432"
-    volumes:
-      - tsdata:/var/lib/postgresql/data
-      - ./infra/sql/timescale:/docker-entrypoint-initdb.d:ro
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U vera"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
 
   mlflow:
     image: ghcr.io/mlflow/mlflow:v2.16.0
@@ -137,8 +101,6 @@ services:
       AWS_DEFAULT_REGION: us-east-1
       OLLAMA_API_BASE: http://host.docker.internal:11434
       VERA_TARGET_MODEL: ollama/llama3.1:8b-instruct-q8_0
-      VERA_POSTGRES_URL: postgresql://vera:vera@postgres-vera:5432/vera
-      VERA_TIMESCALE_URL: postgresql://vera:vera@timescaledb:5432/vera_ts
     extra_hosts:
       - "host.docker.internal:host-gateway"
     ports:
@@ -194,8 +156,6 @@ services:
       AWS_DEFAULT_REGION: us-east-1
       OLLAMA_API_BASE: http://host.docker.internal:11434
       VERA_TARGET_MODEL: ollama/llama3.1:8b-instruct-q8_0
-      VERA_POSTGRES_URL: postgresql://vera:vera@postgres-vera:5432/vera
-      VERA_TIMESCALE_URL: postgresql://vera:vera@timescaledb:5432/vera_ts
     extra_hosts:
       - "host.docker.internal:host-gateway"
     depends_on:
@@ -208,7 +168,5 @@ services:
 
 volumes:
   pgdata:
-  pg_vera:
-  tsdata:
   minio_data:
   mlflow_data:

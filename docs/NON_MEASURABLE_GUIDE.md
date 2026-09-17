@@ -37,7 +37,7 @@ For credibility, have ≥2 reviewers and report inter-rater agreement.
 ## N03 — environmental impact (automatic)
 Measured during the eval run by **CodeCarbon** (`src/vera/governance/energy.py`) and written to the
 N03 form automatically (`kwh`, `co2eq_kg`, `source`). No manual entry; it shows as `measured` on the
-strip. Install the `[lab]` extra for real measurement (else it degrades to `unavailable`).
+strip. Install the `[data]` extra for real measurement (else it degrades to `unavailable`).
 
 ## N04 / N05 / N06 — declarative forms
 Attested via the **Declarative forms (N03–N06)** panel or `PUT /api/v1/runs/<id>/forms/<Nxx>`:

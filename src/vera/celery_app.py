@@ -11,9 +11,6 @@ celery_app = Celery(
     backend=settings.celery_backend,
     include=[
         "vera.tasks.eval",
-        "vera.tasks.dataset_scan",
-        "vera.tasks.lab_train",
-        "vera.tasks.checkpoint_eval_task",
         "vera.tasks.canary",
     ],
 )

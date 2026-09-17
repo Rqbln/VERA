@@ -274,7 +274,7 @@ def _model_card_context(
             "mode": "inference-only",
             "kwh": "n/a",
             "co2eq": "n/a",
-            "ref": "lab train / CodeCarbon when VERA_LAB_TRAIN",
+            "ref": "run-level CodeCarbon measurement (install the [data] extra)",
         },
         "n04": {
             "status": "available" if req.dataset_corpus else "not_provided",
@@ -288,7 +288,7 @@ def _model_card_context(
             "R09 SynthID production deferred to MVP2.2."
         ),
         "recommendations": (
-            "Install optional [benchmarks] and [lab] extras; set VERA_WATERMARK_MODE=statistical; "
+            "Install optional [benchmarks] and [data] extras; set VERA_WATERMARK_MODE=statistical; "
             "provide dataset_corpus for R03–R05 in POST /runs."
         ),
         "signature": sign_artifact(

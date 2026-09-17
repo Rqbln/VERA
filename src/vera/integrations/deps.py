@@ -1,4 +1,4 @@
-"""Detect optional lab/benchmark dependencies."""
+"""Detect optional data-stage and benchmark dependencies."""
 
 from __future__ import annotations
 
@@ -15,7 +15,7 @@ def _try_import(name: str) -> tuple[bool, str | None]:
 
 
 def require_lab_extra(name: str) -> tuple[bool, dict[str, Any]]:
-    """Return (available, status dict) for a lab optional dependency."""
+    """Return (available, status dict) for an optional dependency."""
     status = lab_engine_status(name)
     return bool(status.get("available")), status
 

@@ -2,9 +2,9 @@ name: VERA CI
 
 on:
   push:
-    branches: [main, MVP2, mvp3-mvp4, mvp4-gaas]
+    branches: [main]
   pull_request:
-    branches: [main, MVP2, mvp3-mvp4]
+    branches: [main]
 
 jobs:
   unit:
@@ -25,7 +25,7 @@ jobs:
         with:
           python-version: "3.11"
       - run: pip install -e ".[dev]"
-      - run: pytest tests/unit/ tests/lab/ -m "not gpu and not slow" -q
+      - run: pytest tests/unit/ -m "not gpu and not slow" -q
 
   integration:
     runs-on: ubuntu-latest
@@ -78,16 +78,3 @@ jobs:
         env:
           CI: "1"
           NEXT_PUBLIC_AUTH_DISABLED: "1"
-
-  e2e-ollama:
-    runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/MVP2'
-    continue-on-error: true
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-      - run: pip install -e ".[dev,benchmarks]"
-      - run: echo "VERA_E2E_OLLAMA=1 — run on self-hosted with Ollama"
-      - run: pytest tests/e2e/ -m "e2e" --collect-only -q

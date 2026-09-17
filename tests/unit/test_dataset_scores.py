@@ -1,9 +1,6 @@
-import pytest
-
 from vera.data.pipeline import scan_dataset
 
 
-@pytest.mark.lab
 def test_scan_dataset_produces_r03_r04_r05():
     texts = ["Hello world", "Normal sentence.", "No toxic content here."]
     result = scan_dataset(

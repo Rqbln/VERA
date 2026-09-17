@@ -80,14 +80,6 @@ class Settings(BaseSettings):
     api_host: str = Field(default="0.0.0.0", validation_alias="API_HOST")
     api_port: int = Field(default=8000, validation_alias="API_PORT")
 
-    vera_postgres_url: str = Field(
-        default="postgresql://vera:vera@localhost:5433/vera",
-        validation_alias="VERA_POSTGRES_URL",
-    )
-    vera_timescale_url: str = Field(
-        default="postgresql://vera:vera@localhost:5434/vera_ts",
-        validation_alias="VERA_TIMESCALE_URL",
-    )
     vera_signing_key_id: str = Field(
         default="openbao-transit-dev",
         validation_alias="VERA_SIGNING_KEY_ID",

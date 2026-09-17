@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "vera"
 version = "0.2.0"
-description = "VERA MVP2 — evaluation core + injection lab (FastAPI, Celery, LangGraph, LiteLLM/Ollama)"
+description = "VERA — evaluation engine and review dashboard for responsible-AI requirements (FastAPI, Celery, LangGraph, LiteLLM)"
 readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "Apache-2.0" }
@@ -37,16 +37,13 @@ benchmarks = [
     "garak>=0.10,<0.11",
     "datasets>=2.18,<4",
 ]
-lab = [
+data = [
+    # Data-stage engines (R03-R05), toxicity scoring and run-level energy measurement.
     "detoxify>=0.5,<0.6",
     "presidio-analyzer>=2.2,<3",
     "python-Levenshtein>=0.25,<0.27",
     "sacrebleu>=2.4,<3",
     "codecarbon>=2.3,<3",
-    "hydra-core>=1.3,<1.4",
-    "omegaconf>=2.3,<2.4",
-    "psycopg[binary]>=3.1,<4",
-    "scipy>=1.11,<2",
 ]
 pdf = [
     # Signed audit-PDF export. Needs system libs (cairo, pango) — see USER_GUIDE / README.
@@ -71,11 +68,10 @@ markers = [
     "e2e: end-to-end tests (needs Redis, MinIO, MLflow, Ollama)",
     "ollama: requires a live Ollama/vLLM endpoint",
     "airgap: optional air-gapped or sovereignty checks",
-    "lab: MVP2 lab unit tests (no GPU)",
     "gpu: requires GPU runner",
-    "slow: long-running lab experiments",
+    "slow: long-running experiments",
 ]
-testpaths = ["tests/unit", "tests/integration", "tests/e2e", "tests/lab", "tests"]
+testpaths = ["tests"]
 
 [tool.coverage.run]
 source = ["vera"]
@@ -93,7 +89,6 @@ exclude_lines = [
 
 [project.scripts]
 vera-eval = "vera.cli.main:main"
-vera-lab = "vera.cli.lab_main:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/vera"]

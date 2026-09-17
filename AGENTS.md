@@ -133,7 +133,7 @@ Full dev setup: `docs/README-dev.md`. Dashboard design system + i18n: `dashboard
 To run the **real** benchmark engines (not dynamic-probe fallbacks) and reproduce the paper numbers:
 
 ```bash
-bash scripts/setup_native.sh              # installs .[benchmarks,lab,pdf] + checks Ollama/panel models
+bash scripts/setup_native.sh              # installs .[benchmarks,data,pdf] + checks Ollama/panel models
 VERA_REQUIRE_NATIVE=1 python scripts/run_paper_eval.py   # multi-model panel, sequential
 python scripts/bench_gaas.py              # proxy overhead + agent detection + degradation
 python manuscript/scripts/gen_paper_multi.py             # tables + figures from the results JSON

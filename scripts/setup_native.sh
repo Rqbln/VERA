@@ -2,7 +2,7 @@
 # VERA — set up the NATIVE benchmark stack so the evaluation uses real harnesses (no heuristic
 # fallbacks). Run from the repo root:  bash scripts/setup_native.sh
 #
-# Installs the [benchmarks,lab,pdf] extras, checks system libs + Ollama models, and prints the
+# Installs the [benchmarks,data,pdf] extras, checks system libs + Ollama models, and prints the
 # environment the paper run expects. Idempotent; safe to re-run.
 set -u
 
@@ -22,8 +22,8 @@ echo "== 1. Python native extras =="
 if python -c "import lm_eval, garak, datasets, detoxify, presidio_analyzer, Levenshtein, sacrebleu" 2>/dev/null; then
   green "  all native harness deps importable"
 else
-  amber "  installing .[benchmarks,lab,pdf] (this is large; first run can take a while)…"
-  pip install -e '.[benchmarks,lab,pdf]' || red "  pip install reported errors — see output above"
+  amber "  installing .[benchmarks,data,pdf] (this is large; first run can take a while)…"
+  pip install -e '.[benchmarks,data,pdf]' || red "  pip install reported errors — see output above"
 fi
 
 echo "== 2. System libs for PDF export (weasyprint) =="

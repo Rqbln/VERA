@@ -10,7 +10,6 @@ mocks, so the tests exercise the same stores the app uses.
 | Unit | `tests/unit/` | `make test-unit` (or `pytest tests/unit -q`) | Needs Redis on `:6379`. Covers the catalog, weighted aggregation and bootstrap, signing and the catalog digest, score bands, triage, the graph aggregate node, and API/dashboard handlers. |
 | Integration | `tests/integration/` | `VERA_INTEGRATION=1 pytest tests/integration -m integration` | Needs Redis (and MinIO for artifact round-trips). |
 | End-to-end | `tests/e2e/` | `VERA_E2E_OLLAMA=1 pytest tests/e2e -m "e2e and ollama"` | Optional; drives a full run against a local Ollama model. |
-| Lab | `tests/lab/` | `pytest tests/lab` | Dataset-stage and lifecycle-lab checks. |
 | Dashboard | `dashboard/` | `cd dashboard && npx playwright test` | RBAC matrix + guided-mode surfaces. |
 
 Lint: `ruff check src tests`. Coverage gate: 80% on `vera`.
@@ -24,6 +23,7 @@ Lint: `ruff check src tests`. Coverage gate: 80% on `vera`.
 
 ## Reproducibility checks
 
-- `manuscript/scripts/gen_sensitivity_panel.py` doubles as a reconciliation check: it verifies that
-  every stored aggregate reproduces exactly from its per-benchmark decomposition and the catalog
-  weights (exit non-zero on any mismatch).
+- `tests/unit/test_spec_swap.py` loads the alternative specification in
+  `examples/specs/security_focus/` through configuration alone and checks that it stays aligned,
+  carries its own digest and leaves the default specification untouched.
+- `tests/unit/test_signing.py` checks that content digests are stable.

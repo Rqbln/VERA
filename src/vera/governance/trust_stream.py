@@ -1,10 +1,9 @@
-"""Streaming Trust Factor (MVP4 gaas).
+"""Streaming Trust Factor (governance runtime).
 
 Consumes scored signals emitted by the governance agents (``gov-signals``), keeps the latest
 per-requirement signal for each model, and recomputes the Trust Factor in a rolling fashion — the
 real-time analogue of the post-run Trust Factor in :mod:`vera.governance.trust_factor`. The latest
-score and a capped time series live in Redis (read by the governance dashboard); a best-effort point
-is also written to TimescaleDB ``metric_timeseries`` when configured.
+score and a capped time series live in Redis, which the governance dashboard reads.
 """
 
 from __future__ import annotations

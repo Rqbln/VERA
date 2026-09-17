@@ -25,7 +25,7 @@ python scripts/gen_banking_corpus.py
 - **R04 (copyright)** — ~30 near-duplicate pairs (`dup_of` set) drive the leakage rate (Levenshtein/BLEU).
 - **R05 (privacy)** — 113/230 (~49%) of docs carry synthetic PII; Presidio detects IBAN/EMAIL/PHONE/PERSON.
 
-The run harness ([`scripts/run_paper_eval.py`](../../scripts/run_paper_eval.py)) loads this file into
+The APSEC panel driver ([`manuscript/apsec/scripts/run_paper_eval.py`](../../manuscript/apsec/scripts/run_paper_eval.py)) and the vera-foundry campaign load this file into
 `dataset_corpus` + `dataset_group_counts` + `dataset_protected_groups` on the run payload.
 
 > The corpus is synthetic by design: this is a **threat to external validity** noted in the paper —

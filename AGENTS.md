@@ -60,7 +60,7 @@ POST /api/v1/runs ──▶ Redis run record ──▶ Celery task (run_benchmar
                        dashboard read API (/runs, /summary, /series, /health/stack)
 ```
 
-Stack: FastAPI + Celery + Redis + LangGraph + LiteLLM→Ollama, MLflow, MinIO, Postgres/TimescaleDB,
+Stack: FastAPI + Celery + Redis + LangGraph + LiteLLM→Ollama, MLflow, MinIO, Postgres (Keycloak),
 Keycloak, Next.js 14 dashboard, Docker. See `docs/ARCHITECTURE.md §2` for the full table — do not
 restate it elsewhere.
 
@@ -73,19 +73,20 @@ restate it elsewhere.
 | `src/vera/api/dashboard_routes.py` | Read API: `/runs`, `/summary`, `/inspector`, `/series`, `/health/stack`, HITL, drift, kill-switch |
 | `src/vera/api/models_routes.py` | Connected Ollama models + persistent model registry |
 | `src/vera/api/forms_routes.py` | Declarative forms N03–N06 + signed audit PDF |
-| `src/vera/api/lab_routes.py` | MVP2 lab (dataset scan, poisoning, checkpoint eval) |
 | `src/vera/tasks/eval.py` | The evaluation Celery job (graph → MLflow → artifacts → Redis) |
 | `src/vera/tasks/monitor.py` | On-demand drift/canary check |
 | `src/vera/graph/` | LangGraph supervisor (evaluate + aggregate nodes) |
 | `src/vera/benchmarks/` | `benchmarks_catalog.yaml`, `catalog.py`, runners (lm_eval, garak, hf_dynamic, …) |
 | `src/vera/governance/` | signing, **trust_factor**, **kill_switch**, **pdf_export**, datasheet, **energy** (CodeCarbon → N03) |
 | `src/vera/store/` | Redis stores: `redis_run` (carries `energy`), `redis_models`, `redis_hitl` (multi-criteria rubric), `redis_forms` |
-| `scripts/` | `setup_native.sh`, `gen_banking_corpus.py`, `run_paper_eval.py` (multi-model), `bench_gaas.py`; `manuscript/scripts/gen_paper_multi.py` |
+| `scripts/` | `setup_native.sh`, `gen_banking_corpus.py`, `analyze_user_study.py` |
+| `examples/` | `runs/` (run definitions), `specs/` (alternative registry + catalog pairs) |
+| `manuscript/` | ICSE 2027 SEIP paper (`make draft`, see `manuscript/README.md`); submitted APSEC paper frozen in `manuscript/apsec/` |
 | `src/vera/artifacts/` | `s3io` (MinIO) + `local_fs` (lite fallback), backend selector |
 | `src/vera/dashboard/` | **Python** triage + score bands (NOT the UI) |
 | `dashboard/` | **Next.js** UI (App Router, TanStack Query, Tailwind, Recharts, Playwright) |
 | `docs/` | French specs; `ROADMAP.md` is the hub |
-| `tests/` | `unit/` (+ Redis), `integration/`, `e2e/`, `lab/` |
+| `tests/` | `unit/` (+ Redis), `integration/`, `e2e/` |
 
 > **Name-collision gotcha:** `src/vera/dashboard/` (Python: triage/score logic) is different from
 > the top-level `dashboard/` (the Next.js front-end).
@@ -109,11 +110,11 @@ MLflow/MinIO/Keycloak are off (the stack-health strip shows them amber, not red)
 **Full / enterprise mode:**
 
 ```bash
-make stack-full                            # docker compose up --build (Keycloak, MLflow, MinIO, Timescale)
+make stack-full                            # docker compose up --build (Keycloak, MLflow, MinIO)
 # VERA_AUTH_MODE=enterprise enforces Keycloak RBAC (8 personas, password vera-dev)
 ```
 
-**Governance-as-a-Service (MVP4 gaas profile):**
+**Governance runtime (gaas profile):**
 
 ```bash
 make stack-gaas                            # full stack + inline proxy (:8100), Redpanda, OPA, OpenSearch,
@@ -128,21 +129,18 @@ API `/admin/v1/*`; UI at `/governance`. Full guide: `docs/ARCHITECTURE.md §5`.
 Native (no Docker): `make quickstart-native` prints the three commands (API, worker, `npm run dev`).
 Full dev setup: `docs/README-dev.md`. Dashboard design system + i18n: `dashboard/DESIGN_SYSTEM.md`.
 
-## Native evaluation & paper reproduction
+## Native evaluation
 
-To run the **real** benchmark engines (not dynamic-probe fallbacks) and reproduce the paper numbers:
+To run the **real** benchmark engines (not dynamic-probe fallbacks):
 
 ```bash
 bash scripts/setup_native.sh              # installs .[benchmarks,data,pdf] + checks Ollama/panel models
-VERA_REQUIRE_NATIVE=1 python scripts/run_paper_eval.py   # multi-model panel, sequential
-python scripts/bench_gaas.py              # proxy overhead + agent detection + degradation
-python manuscript/scripts/gen_paper_multi.py             # tables + figures from the results JSON
+vera-eval run examples/runs/ollama_e2e.yaml   # one run through the CLI
 ```
 
 Key flags (also in `.env.example`): **`VERA_REQUIRE_NATIVE=1`** makes a run *fail* if a
 native-harness benchmark silently falls back (allow exceptions via `VERA_NATIVE_ALLOW=garak`);
-`VERA_HF_TRUST_REMOTE_CODE=true` for BBQ/BOLD/StereoSet; `VERA_EVAL_MODELS` / `VERA_EVAL_N` for the
-panel. **Serving caveat:** Ollama has no token log-probs, so R06/R10 use dynamic probes and native
+`VERA_HF_TRUST_REMOTE_CODE=true` for BBQ/BOLD/StereoSet. **Serving caveat:** Ollama has no token log-probs, so R06/R10 use dynamic probes and native
 lm-eval is reserved for a vLLM backend (recorded in provenance) — see `lm_eval_runner.py`.
 
 - **R03–R05** run natively over the synthetic banking corpus `data/corpus/banking_synth.jsonl`

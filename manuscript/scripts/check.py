@@ -254,7 +254,12 @@ def main() -> int:
     last = b.abspages.get("LastPage")
     body_pages = body_end - start + 1 if start and body_end else None
     total_pages = last - start + 1 if start and last else None
-    ok = lambda v, lim: "?" if v is None else (f"{v}/{lim} ok" if v <= lim else f"{v}/{lim} OVER")
+
+    def ok(value: int | None, limit: int) -> str:
+        if value is None:
+            return "?"
+        return f"{value}/{limit} ok" if value <= limit else f"{value}/{limit} OVER"
+
     print(f"ICSE 2027 SEIP check  [{job.name}, mode {args.mode}]")
     print(f"  body pages {ok(body_pages, BODY_LIMIT)}   with references {ok(total_pages, TOTAL_LIMIT)}")
     if body_pages and body_pages > BODY_LIMIT:

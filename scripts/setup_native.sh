@@ -59,4 +59,4 @@ cat <<EOF
   export VERA_REQUIRE_NATIVE=1          # fail instead of silently falling back (garak/Mac excepted)
   export VERA_MLFLOW_DISABLED=1 VERA_ARTIFACT_BACKEND=local
 EOF
-green "Setup check complete. Next: python scripts/gen_banking_corpus.py && python scripts/run_paper_eval.py"
+green "Setup check complete. Next: python scripts/gen_banking_corpus.py && vera-eval run examples/runs/ollama_e2e.yaml"

@@ -1,15 +1,14 @@
 ---
 doc:
-  title: Native multi-model evaluation — reproduction guide
+  title: Native evaluation guide
   status: active
-  last_reviewed: 2026-06-26
+  last_reviewed: 2026-09-17
 ---
 
-# Native evaluation & reproduction guide
+# Native evaluation guide
 
-How to reproduce the paper's numbers: run the **native** COMPL-AI suite (real harnesses, not the
-heuristic fallbacks) over a **panel of models**, plus the dataset-stage requirements (R03–R05) on the
-synthetic banking corpus, and the governance-runtime benchmark.
+How to run the **native** COMPL-AI suite (real harnesses, not the heuristic fallbacks) against a
+served model, plus the dataset-stage requirements (R03–R05) on the synthetic banking corpus.
 
 ## 1. Set up the native stack
 ```bash
@@ -45,29 +44,17 @@ python scripts/gen_banking_corpus.py   # -> data/corpus/banking_synth.jsonl (100
 ```
 See [data/corpus/README.md](../data/corpus/README.md).
 
-## 4. Run the panel
+## 4. Run an evaluation
 ```bash
-VERA_EVAL_MODELS="ollama/qwen2.5:32b-instruct-q4_K_M,ollama/mistral-small:24b,ollama/llama3.1:8b-instruct-q8_0" \
-VERA_EVAL_N=50 python scripts/run_paper_eval.py
-# -> manuscript/results/paper_results_multi.json (per-model scores, CIs, fallback count, energy, Trust Factor)
+vera-eval run examples/runs/ollama_e2e.yaml     # or POST /api/v1/runs, or the dashboard wizard
 ```
-Models run **sequentially** (one fits in 36 GB at a time). With the 32B principal expect a few hours;
-start with `VERA_EVAL_N=10` for a smoke run.
+Lower the sampling budget in the run definition for a quick smoke run before a full one.
 
-## 5. Governance-runtime benchmark
-```bash
-python scripts/bench_gaas.py    # -> manuscript/results/gaas_bench.json
-```
-Measures the inline-proxy latency overhead, agent detection of known jailbreak/PII/toxic responses,
-policy enforcement, and the bus round-trip (Redis-Streams fallback).
-
-## 6. Regenerate the paper data/figures
-```bash
-python manuscript/scripts/gen_paper_multi.py   # consumes paper_results_multi.json + gaas_bench.json
-# prints the multi-model table, the non-degenerate sensitivity rows, and the GaaS numbers to
-# transcribe into main.tex; also writes optional figures (the paper itself uses the tables).
-cd manuscript && latexmk -pdf main.tex
-```
+**Model panels.** The ICSE 2027 campaign (panels of Foundry deployments, seeds, budgets,
+measurability and cost analyses) runs from the separate `vera-foundry` repository, which pins a VERA
+commit and generates the paper's tables. The driver behind the APSEC panel is kept for provenance in
+`manuscript/apsec/scripts/run_paper_eval.py` (run from the repository root; it writes
+`manuscript/apsec/results/`).
 
 ## Native-vs-fallback matrix
 | Req | Benchmarks | Native harness | Mac |

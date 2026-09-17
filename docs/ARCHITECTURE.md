@@ -21,11 +21,11 @@ last_reviewed: "2026-07-03"
 
 VERA turns a model and a set of responsible-AI requirements into an **explainable, signed
 scorecard** that different roles can read. This document is the single architecture reference; the
-research paper in `manuscript/` is the companion write-up.
+papers in `manuscript/` are the companion write-ups.
 
 ## 1. Conceptual model
 
-- **Input:** an evaluation target (a model endpoint, a checkpoint, or a dataset corpus) plus the set
+- **Input:** an evaluation target (a model endpoint or a dataset corpus) plus the set
   of requirements to check.
 - **Output:** a scorecard, one score per measurable COMPL-AI requirement (CR01–CR12) with a bootstrap
   confidence interval, plus run-tied governance documents (model card, and a datasheet for dataset
@@ -84,8 +84,8 @@ Each measurable requirement `R` is a weighted mean of its per-benchmark means,
   reachable score over the entire simplex of weightings is exactly `Δ_R = max_b m_b − min_b m_b`.
   If `Δ_R = 0` (or the reachable interval stays inside one band) the verdict is **certified
   invariant** to any reweighting; if the interval straddles a band threshold the verdict is
-  **weight-dependent**. `manuscript/scripts/gen_sensitivity_panel.py` computes `Δ` and the flip flag
-  per requirement and verifies that every stored aggregate reproduces from its decomposition.
+  **weight-dependent**. `src/vera/stats/policy_compare.py` compares verdicts across weightings; the
+  vera-foundry campaign computes `Δ` and the flip flag per requirement (experiment E7).
 - **Bands, not thresholds.** Scores render as green / amber / red bands (`score_bands.py`: green
   ≥ 0.70, amber ≥ 0.40), never a binary pass/fail; release decisions are human trade-offs.
 
@@ -163,7 +163,7 @@ content signature. The dataset-stage requirements run over a 100%-synthetic bank
 ## 8. Deployment profiles and constraints
 
 One codebase, three profiles: **lite** (Redis + API + worker + dashboard, local artifacts, no login),
-**enterprise** (adds Keycloak RBAC, MLflow, MinIO, TimescaleDB), and **gaas** (adds the governance
+**enterprise** (adds Keycloak RBAC, MLflow, MinIO), and **gaas** (adds the governance
 runtime of §5). Every layer degrades gracefully. The project is **fully open-source and
 self-hostable**: no managed cloud services and no SaaS observability by default; proprietary LLMs are
 allowed only as *evaluation targets* through LiteLLM, and every default and fallback path works with

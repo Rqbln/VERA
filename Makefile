@@ -1,6 +1,6 @@
 # VERA — convenience targets. `make help` lists them.
 .DEFAULT_GOAL := help
-.PHONY: help quickstart quickstart-down stack-full stack-down quickstart-native stack-gaas stack-gaas-down test test-unit lint
+.PHONY: help quickstart quickstart-down stack-full stack-down quickstart-native stack-gaas stack-gaas-down test test-unit lint paper
 
 OLLAMA_MODEL ?= llama3.1:8b-instruct-q8_0
 
@@ -24,7 +24,7 @@ quickstart-native: ## Run API + worker + dashboard locally (no Docker), guided m
 	@echo "       celery -A vera.celery_app worker --loglevel=INFO"
 	@echo "  3) cd dashboard && NEXT_PUBLIC_AUTH_MODE=guided npm run dev"
 
-stack-full: ## Full enterprise stack (Keycloak RBAC, MinIO, MLflow, TimescaleDB)
+stack-full: ## Full enterprise stack (Keycloak RBAC, MinIO, MLflow)
 	docker compose up --build
 
 stack-down: ## Stop and remove the full stack
@@ -54,3 +54,6 @@ study-export: ## Export study responses (quiz + legacy tasks + TAM) and print th
 	curl -fsS http://localhost:8000/api/v1/study/export_quiz.csv -o data/user_study/quiz.csv
 	python scripts/analyze_user_study.py data/user_study/sessions.csv \
 		--survey data/user_study/survey.csv --quiz data/user_study/quiz.csv
+
+paper: ## Build the ICSE 2027 SEIP draft (see manuscript/README.md for every paper target)
+	$(MAKE) -C manuscript draft

@@ -9,7 +9,7 @@ test.beforeEach(() => {
 });
 
 // Captures dashboard screenshots for the APSEC paper using the REAL S1 scores
-// (from manuscript/results/paper_results.json), in guided no-login mode (double-blind safe).
+// of the superseded first manuscript, in guided no-login mode (double-blind safe).
 const META: Record<string, { name: string; principle: string; aiact: string }> = {
   R01: { name: "Robustness predictability", principle: "robustness_safety", aiact: "Art. 15" },
   R06: { name: "Capabilities", principle: "transparency", aiact: "Art. 15" },

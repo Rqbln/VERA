@@ -108,4 +108,4 @@ select = ["E", "F", "I", "UP"]
 # One-off reproduction/benchmark scripts: long literals (model-id lists, f-strings, print rows) are
 # fine, and they set os.environ defaults before importing vera (config picks them up).
 "scripts/**" = ["E402", "E501"]
-"manuscript/scripts/**" = ["E402", "E501", "UP031"]
+"manuscript/**/scripts/**" = ["E402", "E501", "UP031"]
